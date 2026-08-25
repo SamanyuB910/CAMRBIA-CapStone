@@ -510,6 +510,28 @@ def category_mix(df: pd.DataFrame, *, band: str = "first half") -> pd.DataFrame:
     return (table.T / table.sum(axis=1)).T.reindex(columns=[c for c in CATEGORIES if c in table.columns])
 
 
+def attested_only(df: pd.DataFrame) -> pd.DataFrame:
+    """The readout table restricted to corpus-attested vocab rows.
+
+    ``zero_freq`` is dropped (it is all-False by construction here, and would
+    otherwise render as a meaningless all-zero contrast row).
+    """
+    out = df[~df["zero_freq"]].drop(columns=["zero_freq"]).copy()
+    out.attrs.update(df.attrs)
+    return out
+
+
+def rare_row_contrasts(
+    df: pd.DataFrame, *, reference: str | None = None, seed: int = 20260825, n_boot: int = 10000
+) -> pd.DataFrame:
+    """``contrasts`` recomputed over corpus-attested rows only — the CI-bearing
+    version of ``trash_excluding_rare``. A gap that survives here is not an
+    untrained-vocab-row artefact."""
+    if "zero_freq" not in df.columns:
+        return pd.DataFrame()
+    return contrasts(attested_only(df), reference=reference, seed=seed, n_boot=n_boot)
+
+
 def trash_excluding_rare(df: pd.DataFrame, *, band: str = "first half") -> pd.DataFrame:
     """The trash rate recomputed over corpus-attested rows only — the direct
     answer to Halsall's confound. If the R-vs-J gap survives here, it is not an
@@ -792,7 +814,26 @@ def report(
         "0 means near-untrained rows. **If the R-vs-J gap survives in**",
         "**`trash_attested_rows_only`, it is not a rare-row artefact.**\n",
     ]
-    rare = trash_excluding_rare(df)
-    lines.append(rare.to_markdown(floatfmt=".4f") if not rare.empty else "_No frequency data._")
+    for band in ("first half", "all layers"):
+        table = trash_excluding_rare(df, band=band)
+        heading = "First half of layers" if band == "first half" else "All layers"
+        lines.append(f"### {heading}\n")
+        lines.append(table.to_markdown(floatfmt=".4f") if not table.empty else "_No frequency data._")
+        lines.append("")
+
+    lines.append("### Paired contrasts over attested rows only (10k resamples)\n")
+    lines.append(
+        "The CI-bearing version of the tables above: if a `trash` gap has a CI clear of"
+        "\nzero here, it is not a rare-row artefact.\n"
+    )
+    try:
+        rare_deltas = rare_row_contrasts(df, seed=seed)
+        lines.append(
+            rare_deltas.to_markdown(floatfmt=".4f")
+            if not rare_deltas.empty
+            else "_No frequency data, or only one lens arm._"
+        )
+    except ValueError as exc:
+        lines.append(f"_Skipped: {exc}_")
     lines.append("")
     return "\n".join(lines)

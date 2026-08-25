@@ -270,8 +270,10 @@ from rlens.coherence import (
     build_panel,
     classify_token,
     contrasts,
+    attested_only,
     corpus_token_counts,
     load_lexicon,
+    rare_row_contrasts,
     paired_bootstrap,
     per_item,
     per_layer,
@@ -697,6 +699,37 @@ def test_poetry_reads_at_the_newline_ending_line_one(monkeypatch):
     seq = tok.encode("one line\nsecond")
     assert readout_position(tok, seq, "poetry") == seq.index(ord("\n"))
     assert readout_position(tok, seq, "multihop") == len(seq) - 1
+
+
+def test_rare_row_contrasts_drop_zero_freq_and_carry_cis():
+    """The CI-bearing companion to trash_excluding_rare. `zero_freq` is all-False
+    on the attested subset, so it must not render as a contrast row."""
+    df = annotate(_synthetic_readouts(), lexicon=LEXICON,
+                  counts={hash(" against") % 1000: 5})   # "......" is unattested
+    attested = attested_only(df)
+    assert "zero_freq" not in attested.columns
+    assert attested.attrs["n_layers"] == df.attrs["n_layers"], "band mask needs n_layers"
+
+    table = rare_row_contrasts(df, reference="ours-R", n_boot=500)
+    assert "zero_freq" not in table.index.get_level_values("metric")
+    assert {"delta", "ci_lo", "ci_hi"} <= set(table.columns)
+
+
+def test_report_section_4_labels_its_layer_band():
+    """§4 was computed on the first half but rendered unlabelled, so it read as
+    an all-layers table."""
+    from rlens.coherence import report
+
+    df = annotate(_synthetic_readouts(), lexicon=LEXICON, counts={hash(" against") % 1000: 5})
+    import tempfile
+
+    with tempfile.TemporaryDirectory() as tmp:
+        tmp = Path(tmp)
+        sheet, key = build_panel(df, tmp, n_items=4, seed=9)
+        text = report(df, model_name="stub", sheet_path=sheet, key_path=key, repo_root=tmp)
+    assert "### First half of layers" in text
+    assert "### All layers" in text
+    assert "attested rows only" in text
 
 
 def test_report_renders_and_states_its_evidence_status(monkeypatch, tmp_path):
