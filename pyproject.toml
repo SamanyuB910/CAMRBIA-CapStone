@@ -37,6 +37,15 @@ package = true
 
 [tool.uv.sources]
 jlens = { git = "https://github.com/anthropics/jacobian-lens", rev = "581d398613e5602a5af361e1c34d3a92ea82ba8e" }
+# PyPI's Linux torch bundles a CUDA newer than many GPU-box drivers (e.g. the
+# A100 pod's 12.8). cu126 wheels run on any >=12.6 driver. Windows stays on
+# the PyPI CPU wheel.
+torch = [{ index = "pytorch-cu126", marker = "sys_platform == 'linux'" }]
+
+[[tool.uv.index]]
+name = "pytorch-cu126"
+url = "https://download.pytorch.org/whl/cu126"
+explicit = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
