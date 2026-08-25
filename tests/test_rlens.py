@@ -1033,3 +1033,70 @@ def test_per_set_breakdown_isolates_a_single_set_artefact():
     ws = whitespace_by_set(df)
     assert ws.loc[("poetry", "ours-R"), "whitespace"] == 1.0
     assert ws.loc[("multihop", "ours-R"), "whitespace"] == 0.0
+
+
+def test_panel_is_sized_for_a_human_rater(tmp_path):
+    """Every early layer is unratable by hand (24 items x 31 layers ~ 744 entries);
+    the panel must sample the early band instead."""
+    df = annotate(_synthetic_readouts(n_items=8, n_layers=32), lexicon=LEXICON)
+    sheet_path, _ = build_panel(df, tmp_path, n_items=8, max_layers=6, seed=13)
+    sheet = [json.loads(l) for l in sheet_path.read_text(encoding="utf-8").splitlines()]
+
+    layers = sorted({e["layer"] for e in sheet})
+    assert len(layers) <= 6
+    assert len(sheet) == 8 * len(layers)
+    assert max(layers) < 16, "panel must stay inside the early band"
+    assert len(layers) > 1 and layers[1] - layers[0] > 1, "layers spread, not the first 6"
+
+
+def test_panel_csv_is_blind_and_has_blank_score_columns(tmp_path):
+    df = annotate(_synthetic_readouts(n_items=6), lexicon=LEXICON)
+    build_panel(df, tmp_path, n_items=6, max_layers=3, seed=14)
+
+    csv_path = tmp_path / "coherence_panel.csv"
+    assert csv_path.exists()
+    table = pd.read_csv(csv_path)
+    for lens in df["lens"].unique():          # no lens name may leak to the rater
+        assert lens not in csv_path.read_text(encoding="utf-8")
+    for arm in ("arm_A", "arm_B", "arm_C"):
+        assert arm in table.columns
+        assert f"{arm}_score" in table.columns
+        assert table[f"{arm}_score"].isna().all(), "scores start blank"
+
+
+def test_hand_entered_scores_unblind_to_the_right_lenses(tmp_path):
+    """The full hand-rating loop: emitted CSV -> scores filled in -> unblind."""
+    df = annotate(_synthetic_readouts(n_items=6), lexicon=LEXICON)
+    _, key_path = build_panel(df, tmp_path, n_items=6, max_layers=3, seed=15)
+
+    table = pd.read_csv(tmp_path / "coherence_panel.csv")
+    # An ideal rater: 0 when the arm is the trash column, 3 otherwise.
+    for arm in ("arm_A", "arm_B", "arm_C"):
+        table[arm] = table[arm].fillna("")
+        table[f"{arm}_score"] = [0 if str(v).startswith("......") else 3 for v in table[arm]]
+
+    # Mirror what cmd_unblind does: drop the token columns, THEN rename.
+    scored = table.drop(columns=[f"arm_{a}" for a in "ABC"]).rename(
+        columns={f"arm_{a}_score": f"arm_{a}" for a in "ABC"}
+    )
+    assert not scored.columns.duplicated().any()
+    long = unblind(scored, key_path)
+
+    early = long[long["layer"] < 4].groupby("lens")["score"].mean()
+    assert early["ours-R"] == 3.0
+    assert early["ours-J"] == 0.0
+
+
+def test_unblind_rejects_duplicate_score_columns():
+    """Renaming arm_*_score onto the existing arm_* token columns silently drops
+    half the data; refuse it loudly instead."""
+    key = pd.DataFrame([{"entry": "000L00", "arm_A": "ours-R", "arm_B": "ours-J"}])
+    import tempfile
+
+    with tempfile.TemporaryDirectory() as tmp:
+        key_path = Path(tmp) / "key.jsonl"
+        key_path.write_text("\n".join(key.to_json(orient="records", lines=True).splitlines()))
+        bad = pd.DataFrame([[".", "x", 3, 0]], columns=["arm_A", "arm_B", "arm_A", "arm_B"])
+        bad.insert(0, "entry", "000L00")
+        with pytest.raises(ValueError, match="duplicate column names"):
+            unblind(bad, key_path)

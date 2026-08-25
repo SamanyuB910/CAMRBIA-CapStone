@@ -692,6 +692,7 @@ def build_panel(
     n_items: int = 24,
     layers: list[int] | None = None,
     lenses: list[str] | None = None,
+    max_layers: int = 6,
     seed: int = 20260825,
 ) -> tuple[Path, Path]:
     """Write a blinded rating sheet and its key.
@@ -716,7 +717,12 @@ def build_panel(
         raise ValueError(f"{len(lenses)} lenses is more arms than the sheet can label")
     if layers is None:  # early layers are where the claim lives; sample across them
         all_layers = sorted(df["layer"].unique())
-        layers = all_layers[: max(1, len(all_layers) // 2)]
+        early = all_layers[: max(1, len(all_layers) // 2)]
+        # Every early layer is unratable by a human: 24 items x 31 layers is ~744
+        # entries. Spread `max_layers` evenly across the early band instead, so a
+        # sitting is finishable and still covers the range the claim is about.
+        step = max(1, len(early) // max_layers)
+        layers = early[::step][:max_layers]
 
     pairs = sorted({(s, i) for s, i in df[["set", "item"]].itertuples(index=False)})
     rng.shuffle(pairs)
@@ -744,6 +750,19 @@ def build_panel(
     key_path = out_dir / "coherence_panel_key.jsonl"
     sheet_path.write_text("\n".join(json.dumps(e, ensure_ascii=False) for e in sheet), encoding="utf-8")
     key_path.write_text("\n".join(json.dumps(e) for e in key), encoding="utf-8")
+
+    # A spreadsheet-shaped copy for human raters: readable token lists plus blank
+    # score columns. Same blinding, same entry ids, so `unblind` accepts either.
+    csv_path = out_dir / "coherence_panel.csv"
+    rows = []
+    for entry in sheet:
+        row = {"entry": entry["entry"], "set": entry["set"], "layer": entry["layer"]}
+        for arm in arm_labels:
+            row[arm] = " | ".join(entry[arm])
+        for arm in arm_labels:
+            row[f"{arm}_score"] = ""      # rater fills 0-3 here
+        rows.append(row)
+    pd.DataFrame(rows).to_csv(csv_path, index=False)
     return sheet_path, key_path
 
 
@@ -812,6 +831,12 @@ def unblind(scores: pd.DataFrame, key_path: Path) -> pd.DataFrame:
     """Join autorater/human arm scores back to lens names via the key."""
     key = pd.DataFrame([json.loads(l) for l in key_path.read_text(encoding="utf-8").splitlines() if l])
     arms = [c for c in key.columns if c.startswith("arm_")]
+    if scores.columns.duplicated().any():
+        raise ValueError(
+            "scores has duplicate column names "
+            f"({sorted(scores.columns[scores.columns.duplicated()])}) — drop the token "
+            "columns before renaming the *_score columns onto them"
+        )
     merged = scores.merge(key, on="entry", suffixes=("_score", "_lens"))
     rows = [
         {
