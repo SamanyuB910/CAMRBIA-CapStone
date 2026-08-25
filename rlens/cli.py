@@ -72,6 +72,15 @@ def _lens_path(kind: str, name: str, model: str = DEFAULT_MODEL) -> Path:
     return REPO_ROOT / "lenses" / kind / model / name / "lens.pt"
 
 
+def _ranks_dir(explicit: str | None) -> Path:
+    """Where per-item rank parquet goes. Defaults to the pod's network volume
+    (which survives the pod) when it exists, else the repo's results/."""
+    if explicit:
+        return Path(explicit)
+    workspace = Path("/workspace/results/quantitative-evals")
+    return workspace if workspace.parents[1].is_dir() else REPO_ROOT / "results"
+
+
 # ---------------------------------------------------------------------------
 # download
 # ---------------------------------------------------------------------------
@@ -381,16 +390,26 @@ def cmd_eval(args) -> None:
     }.items():
         if _lens_path(kind, file, args.model).exists():
             lenses[name] = JacobianLens.load(str(_lens_path(kind, file, args.model)))
-    print(f"model: {args.model}   lenses: {list(lenses)}   sets: {args.sets}")
     if len(lenses) == 1:
         raise SystemExit(
             f"no lens files under lenses/*/{args.model}/ - run `rlens download --experiment-models`"
         )
+    if not args.no_control:
+        from rlens.control import ControlLens
+
+        reference = lenses.get("released-R") or lenses.get("ours-R")
+        if reference is None:
+            print("WARNING: no R-lens loaded - skipping the control arm")
+        else:
+            lenses["control"] = ControlLens(reference, seed=_pins()["fitting"]["seed"])
+            print(f"control: {lenses['control']}")
+    print(f"model: {args.model}   lenses: {list(lenses)}   sets: {args.sets}")
 
     df = run_passk(
         model, lenses,
         sets=args.sets, k=args.k,
         filter_correct=not args.no_filter_correct, limit=args.limit,
+        ranks_dir=_ranks_dir(args.ranks_dir), model_name=args.model,
     )
     summary = summarize_passk(df)
 
@@ -404,6 +423,8 @@ def cmd_eval(args) -> None:
     lines = [
         "# pass@%d — %s\n" % (args.k, args.model),
         f"Sets: {args.sets}. Items kept after correctness filter: {df.attrs['n_kept']}.",
+        "Intermediates scored / present (the rest have no single-token surface form - "
+        f"protocol deviation, see C2): {df.attrs['n_intermediates']}.",
         expectation + "\n",
         "## Summary (mean pass@%d over layers)\n" % args.k,
         summary.to_markdown(floatfmt=".3f"),
@@ -466,6 +487,11 @@ def main() -> None:
     p.add_argument("--limit", type=int, default=None, help="max items per set (quick checks)")
     p.add_argument("--no-filter-correct", action="store_true",
                    help="keep items the model itself answers wrongly")
+    p.add_argument("--no-control", action="store_true",
+                   help="skip the random norm-matched control arm")
+    p.add_argument("--ranks-dir", default=None,
+                   help="per-item rank parquet dir (default: /workspace/results/quantitative-evals on the pod, "
+                        "else results/)")
     p.add_argument("--device", default=default_device)
     p.add_argument("--dtype", choices=["bf16", "fp32"], default="bf16")
     p.set_defaults(func=cmd_eval)
