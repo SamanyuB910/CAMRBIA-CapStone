@@ -683,7 +683,7 @@ def cmd_rate_local(args) -> None:
         )
     scores = judge_panel_local(
         sheet, model_id=args.model, revision=args.revision, device=args.device,
-        dtype=args.dtype, limit=args.limit,
+        dtype=args.dtype, limit=args.limit, max_new_tokens=args.max_new_tokens,
     )
     out = Path(args.out) if args.out else sheet.parent / f"{args.rater_name}.csv"
     # Emit in the same shape as the human sheet so `rlens unblind` treats every
@@ -817,6 +817,7 @@ def main() -> None:
     p.add_argument("--rater-name", default="local-rater", help="becomes the output filename stem")
     p.add_argument("--out", default=None)
     p.add_argument("--limit", type=int, default=None)
+    p.add_argument("--max-new-tokens", type=int, default=256)
     p.add_argument("--device", default=default_device)
     p.add_argument("--dtype", choices=["bf16", "fp32"], default="bf16")
     p.set_defaults(func=cmd_rate_local)

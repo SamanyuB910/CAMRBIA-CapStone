@@ -1241,7 +1241,8 @@ def judge_panel_local(
     device: str = "cuda",
     dtype: str = "bf16",
     limit: int | None = None,
-    max_new_tokens: int = 64,
+    max_new_tokens: int = 256,
+    prefill: str = '{"arm_A":',
 ) -> pd.DataFrame:
     """Rate a blinded sheet with a locally-hosted model — no API, no spend.
 
@@ -1274,18 +1275,27 @@ def judge_panel_local(
             {"role": "system", "content": RUBRIC},
             {"role": "user", "content": json.dumps(arms, ensure_ascii=False)},
         ]
-        prompt = tok.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+        try:  # Qwen3-family templates reason before answering unless told not to
+            prompt = tok.apply_chat_template(
+                messages, tokenize=False, add_generation_prompt=True, enable_thinking=False
+            )
+        except TypeError:
+            prompt = tok.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+        # Prefill the assistant turn so the model cannot open with prose. Small
+        # instruct models otherwise emit a "Thinking Process:" preamble and the
+        # JSON never arrives inside the token budget.
+        prompt += prefill
         inputs = tok(prompt, return_tensors="pt").to(model.device)
         with torch.no_grad():
             out = model.generate(
                 **inputs, max_new_tokens=max_new_tokens, do_sample=False,
                 pad_token_id=tok.pad_token_id or tok.eos_token_id,
             )
-        text = tok.decode(out[0, inputs["input_ids"].shape[1]:], skip_special_tokens=True)
+        text = prefill + tok.decode(out[0, inputs["input_ids"].shape[1]:], skip_special_tokens=True)
 
         scores = _parse_arm_scores(text, list(arms))
         if scores is None:
-            print(f"  {entry['entry']}: unparseable rater output {text[:60]!r} — skipped")
+            print(f"  {entry['entry']}: unparseable rater output {text[:160]!r} — skipped")
             continue
         rows.append({"entry": entry["entry"], "set": entry["set"], "layer": entry["layer"], **scores})
 

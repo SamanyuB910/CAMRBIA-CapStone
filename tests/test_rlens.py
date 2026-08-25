@@ -1278,3 +1278,22 @@ def test_local_rater_refuses_to_invent_a_missing_arm():
     assert _parse_arm_scores("I think 2", ["arm_A", "arm_B", "arm_C"]) is None
     assert _parse_arm_scores("", ["arm_A", "arm_B"]) is None
     assert _parse_arm_scores('{"arm_A": 3}', ["arm_A", "arm_B"]) is None
+
+
+def test_parser_handles_a_prefilled_assistant_turn():
+    """The local rater prefills '{"arm_A":' so the model cannot open with prose;
+    the parser must accept the reconstructed string."""
+    from rlens.coherence import _parse_arm_scores
+
+    reconstructed = '{"arm_A":' + ' 2, "arm_B": 0, "arm_C": 3}'
+    assert _parse_arm_scores(reconstructed, ["arm_A", "arm_B", "arm_C"]) == {
+        "arm_A": 2, "arm_B": 0, "arm_C": 3
+    }
+
+
+def test_parser_rejects_a_reasoning_preamble_with_no_scores():
+    """What Qwen3.5-4B actually emitted before the prefill fix."""
+    from rlens.coherence import _parse_arm_scores
+
+    preamble = "Thinking Process:\n\n1.  **Analyze the Request:**\n    *   Task"
+    assert _parse_arm_scores(preamble, ["arm_A", "arm_B", "arm_C"]) is None
