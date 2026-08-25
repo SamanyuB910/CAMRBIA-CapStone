@@ -445,10 +445,14 @@ def cmd_onset(args) -> None:
             hf, tok, lenses, items, layers=layers,
             ridge=args.ridge, center=args.center, batch_size=args.batch_size,
         )
-        # alpha=0 numerics check: identity condition must reproduce clean margins
+        # alpha=0 numerics checks: in-batch identity IS the effect reference
+        # (must be exactly 0); vs the batch-of-1 forward, bf16 kernel-shape
+        # noise is expected and reported for context.
         ident = df[df.condition == "identity"]
-        worst = (ident["margin"] - ident["clean_margin"]).abs().max()
-        print(f"identity-condition max |margin drift| = {worst:.2e} (must be ~0)")
+        exact = (ident["margin"] - ident["clean_margin"]).abs().max()
+        shape_noise = (ident["margin"] - ident["clean_margin_single"]).abs().max()
+        print(f"identity vs in-batch reference: {exact:.2e} (must be 0); vs batch-of-1 clean: {shape_noise:.2e} (bf16 shape noise)")
+        assert exact == 0.0, "in-batch identity reference broken"
         records_path.parent.mkdir(exist_ok=True)
         df.to_parquet(records_path)
         print(f"{len(df)} records -> {records_path}")

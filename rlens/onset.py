@@ -158,7 +158,13 @@ class EditRunner:
     def run(self, input_ids: torch.Tensor, layer: int, position: int, edits: list, batch_size: int = 24) -> torch.Tensor:
         out = []
         for start in range(0, len(edits), batch_size):
-            chunk = edits[start : start + batch_size]
+            chunk = list(edits[start : start + batch_size])
+            # pad to a constant batch shape: cuBLAS kernel choice (and hence
+            # bf16 rounding) depends on shape, so all chunks must match the
+            # chunk containing the identity/clean reference exactly
+            n_real = len(chunk)
+            if n_real < batch_size and len(edits) > batch_size:
+                chunk += [chunk[-1]] * (batch_size - n_real)
             batch = input_ids.expand(len(chunk), -1)
 
             def hook(module, args, output, chunk=chunk):
@@ -172,7 +178,7 @@ class EditRunner:
                 logits = self.hf_model(input_ids=batch, use_cache=False).logits
             finally:
                 handle.remove()
-            out.append(logits[:, -1].float().cpu())
+            out.append(logits[:n_real, -1].float().cpu())
         return torch.cat(out)
 
 
@@ -386,7 +392,13 @@ def run_measurements(
             acts = {l: rec.activations[l][0].detach() for l in layers}
         clean_logp = clean_logits.log_softmax(-1)
         clean_margin = float(clean_logp[item.y_prime_id] - clean_logp[item.y_id])
-        base = {"item": item.name, "category": item.category, "clean_logp_y": float(clean_logp[item.y_id]), "clean_margin": clean_margin}
+        base = {
+            "item": item.name, "category": item.category,
+            "clean_logp_y": float(clean_logp[item.y_id]), "clean_margin": clean_margin,
+            # batch-of-1 values kept for the numerics report; intervention rows
+            # override the non-_single keys with the in-batch identity reference
+            "clean_logp_y_single": float(clean_logp[item.y_id]), "clean_margin_single": clean_margin,
+        }
 
         # shuffled-label baseline concept for the readout (fixed derangement)
         shuf = items[(item_idx + 1) % len(items)]
@@ -415,9 +427,16 @@ def run_measurements(
 
             logits = runner.run(input_ids, layer, item.t_i, edits, batch_size=batch_size)
             logp = logits.log_softmax(-1)
+            # effects are referenced to the IN-BATCH identity condition
+            # (labels[0]): identical kernel shapes -> bf16 shape-noise cancels
+            # exactly. The batch-of-1 clean values stay as *_single for the
+            # numerics report.
+            clean_b_logp_y = float(logp[0][item.y_id])
+            clean_b_margin = float(logp[0][item.y_prime_id] - logp[0][item.y_id])
             for label, lp, lg in zip(labels, logp, logits):
                 records.append({
                     **base, "layer": layer, **label,
+                    "clean_logp_y": clean_b_logp_y, "clean_margin": clean_b_margin,
                     "logp_y": float(lp[item.y_id]), "logp_yp": float(lp[item.y_prime_id]),
                     "margin": float(lp[item.y_prime_id] - lp[item.y_id]),
                     "top1_is_yp": int(int(lg.argmax()) in token_ids_of(tok, item.y_prime)),
