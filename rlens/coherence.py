@@ -236,7 +236,9 @@ def unembedding_matrix(model):
         head = get() if callable(get) else None
         if head is not None and hasattr(head, "weight"):
             return head.weight
-        for attr in ("lm_head", "unembed_weight", "W_U"):
+        # ``_lm_head`` is where jlens's HFLensModel keeps it (see its ``unembed``);
+        # ``_embed_tokens`` is the tied-weights fallback.
+        for attr in ("_lm_head", "lm_head", "unembed_weight", "W_U", "_embed_tokens"):
             head = getattr(obj, attr, None)
             if head is None:
                 continue
@@ -247,6 +249,69 @@ def unembedding_matrix(model):
         f"cannot locate W_U on {type(model).__name__}; pass row_pct=None to skip the "
         "unembedding-norm diagnostic, or extend unembedding_matrix()"
     )
+
+
+def model_device(model):
+    """The device the model's unembedding sits on — where readouts happen."""
+    return unembedding_matrix(model).device
+
+
+def pin_lenses(lenses: dict, device, *, verbose: bool = True):
+    """Move every lens's Jacobians onto ``device`` once, returning a restore fn.
+
+    ``JacobianLens.load`` maps to CPU and ``transport`` does
+    ``self.jacobians[layer].to(residual.device)`` on *every* call. Our loop calls
+    it once per (item, layer, lens), so the same ``[d_model, d_model]`` matrix is
+    re-copied once per item. On qwen3.5-27b that is 365 items x 64 layers x 2
+    lenses = ~47k transfers of a 5120x5120 matrix — terabytes of PCIe traffic for
+    data that never changes.
+
+    Cost is one copy of every Jacobian resident in VRAM; the exact figure depends
+    on the stored dtype, so it is measured and reported rather than assumed. On
+    OOM the move is rolled back and the run proceeds off CPU, slowly but
+    correctly — a slow run beats a dead one halfway through a 27B sweep.
+    """
+    import torch
+
+    if device is None or str(device) == "cpu":
+        return lambda: None
+
+    originals: list[tuple] = []
+    moved_bytes = 0
+    try:
+        for name, lens in lenses.items():
+            if lens is None:  # the logit lens transports nothing
+                continue
+            for layer in lens.source_layers:
+                tensor = lens.jacobians[layer]
+                if tensor.device == device:
+                    continue
+                originals.append((lens, layer, tensor))
+                lens.jacobians[layer] = tensor.to(device)
+                moved_bytes += tensor.numel() * tensor.element_size()
+    except (torch.cuda.OutOfMemoryError, RuntimeError) as exc:
+        for lens, layer, tensor in originals:
+            lens.jacobians[layer] = tensor
+        if device.type == "cuda":
+            torch.cuda.empty_cache()
+        if verbose:
+            print(f"NOTE: could not pin lenses to {device} ({type(exc).__name__}); "
+                  "falling back to per-call transfers. This is correct but slow — "
+                  "rerun with --lens-device cpu to silence, or use a larger GPU.")
+        return lambda: None
+
+    if verbose and originals:
+        dtype = originals[0][2].dtype
+        print(f"pinned {len(originals)} Jacobians ({moved_bytes / 1e9:.1f} GB, {dtype}) "
+              f"to {device}: transport is now a device-local matmul")
+
+    def restore() -> None:
+        for lens, layer, tensor in originals:
+            lens.jacobians[layer] = tensor
+        if device.type == "cuda":
+            torch.cuda.empty_cache()
+
+    return restore
 
 
 def unembed_row_percentiles(model):
@@ -269,6 +334,7 @@ def unembed_row_percentiles(model):
 @dataclass
 class CoherenceConfig:
     sets: tuple[str, ...] = tuple(EVAL_SETS)
+    lens_device: str = "auto"  # "auto" -> the model's device; "cpu" -> leave them
     k: int = 10
     limit: int | None = None
     filter_correct: bool = True
@@ -287,8 +353,21 @@ def collect_readouts(model, lenses: dict, cfg: CoherenceConfig) -> pd.DataFrame:
 
     from jlens.hooks import ActivationRecorder
 
-    with torch.no_grad():
-        return _collect_readouts(model, lenses, cfg, ActivationRecorder)
+    device = None
+    if cfg.lens_device != "cpu":
+        try:
+            device = model_device(model)
+        except AttributeError as exc:
+            print(f"NOTE: lens pinning skipped ({exc})")
+    if cfg.lens_device not in ("auto", "cpu"):
+        device = torch.device(cfg.lens_device)
+
+    restore = pin_lenses(lenses, device)
+    try:
+        with torch.no_grad():
+            return _collect_readouts(model, lenses, cfg, ActivationRecorder)
+    finally:
+        restore()
 
 
 def _collect_readouts(model, lenses: dict, cfg: CoherenceConfig, ActivationRecorder) -> pd.DataFrame:

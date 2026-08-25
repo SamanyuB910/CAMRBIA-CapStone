@@ -779,3 +779,136 @@ def test_degenerate_bootstrap_p_value_is_capped_at_one():
     df = annotate(_synthetic_readouts(), lexicon=LEXICON)
     stats = paired_bootstrap(per_item(df, "all layers"), "in_prompt", "ours-R", "ours-J", n=500)
     assert 0.0 <= stats["p_two_sided"] <= 1.0
+
+
+def test_unembedding_matrix_finds_the_jlens_private_head():
+    """jlens's HFLensModel exposes no get_output_embeddings and stores the head
+    at the private `_lm_head`; probing only the public names silently disabled
+    the §4 unembedding-norm diagnostic on a real run."""
+    from rlens.coherence import unembed_row_percentiles, unembedding_matrix
+
+    class FakeLensModel:               # mirrors HFLensModel's surface
+        def __init__(self):
+            self._lm_head = torch.nn.Linear(8, 32, bias=False)
+
+    W = unembedding_matrix(FakeLensModel())
+    assert W.shape == (32, 8)
+
+    pct = unembed_row_percentiles(FakeLensModel())
+    assert pct.shape == (32,)
+    assert float(pct.min()) == 0.0 and float(pct.max()) == 1.0
+
+    class Tied:                        # tied-weights fallback
+        def __init__(self):
+            self._embed_tokens = torch.nn.Embedding(16, 4)
+
+    assert unembedding_matrix(Tied()).shape == (16, 4)
+
+    with pytest.raises(AttributeError, match="cannot locate W_U"):
+        unembedding_matrix(object())
+
+
+def test_download_only_filter_rejects_unknown_model_names():
+    """`--only` guards a ~54 GB gated download; a typo must fail loudly, not
+    silently fetch everything."""
+    import yaml
+
+    from rlens.cli import _model_pin
+
+    pins = yaml.safe_load((REPO_ROOT / "pins.yaml").read_text(encoding="utf-8"))
+    assert "qwen3.5-27b" in pins["experiment_models"]
+    assert _model_pin("qwen3.5-27b")["hf_id"] == "Qwen/Qwen3.5-27B"
+    assert _model_pin()["hf_id"] == "Qwen/Qwen3.5-4B"
+    with pytest.raises(SystemExit, match="unknown model"):
+        _model_pin("qwen3.5-27B")           # wrong case: not a silent fallback
+
+
+# --- lens pinning ------------------------------------------------------------
+
+
+class _FakeLens:
+    def __init__(self, n_layers=4, d=8):
+        self.source_layers = list(range(n_layers))
+        self.jacobians = {l: torch.zeros(d, d, dtype=torch.float16) for l in self.source_layers}
+
+
+def test_pin_lenses_is_a_noop_on_cpu_and_skips_the_logit_lens():
+    from rlens.coherence import pin_lenses
+
+    lenses = {"logit": None, "ours-R": _FakeLens()}
+    before = {l: t.data_ptr() for l, t in lenses["ours-R"].jacobians.items()}
+    restore = pin_lenses(lenses, torch.device("cpu"), verbose=False)
+    assert {l: t.data_ptr() for l, t in lenses["ours-R"].jacobians.items()} == before
+    restore()   # must be callable and harmless
+    restore = pin_lenses(lenses, None, verbose=False)
+    restore()
+
+
+def test_pin_lenses_moves_and_restores(monkeypatch):
+    """Exercises the move/restore bookkeeping without a GPU by pinning to a
+    second CPU tensor identity via a fake device that is not 'cpu'."""
+    from rlens import coherence as C
+
+    lens = _FakeLens()
+    originals = dict(lens.jacobians)
+    moved = {}
+
+    class FakeDevice:
+        type = "cuda"
+
+        def __str__(self):
+            return "cuda:0"
+
+        def __eq__(self, other):
+            return isinstance(other, FakeDevice)
+
+    dev = FakeDevice()
+
+    def fake_to(self, target):
+        out = self.clone()
+        moved[id(out)] = True
+        return out
+
+    monkeypatch.setattr(torch.Tensor, "to", fake_to, raising=False)
+    monkeypatch.setattr(torch.cuda, "empty_cache", lambda: None)
+
+    restore = C.pin_lenses({"ours-R": lens}, dev, verbose=False)
+    assert all(id(t) in moved for t in lens.jacobians.values()), "every Jacobian moved once"
+    restore()
+    assert lens.jacobians == originals, "restore must put the CPU tensors back"
+
+
+def test_pin_lenses_falls_back_on_oom_without_losing_the_lens(monkeypatch):
+    """A 27B sweep must survive a failed pin, not die halfway through."""
+    from rlens import coherence as C
+
+    lens = _FakeLens()
+    originals = dict(lens.jacobians)
+    calls = {"n": 0}
+
+    class FakeDevice:
+        type = "cuda"
+
+        def __str__(self):
+            return "cuda:0"
+
+    def flaky_to(self, target):
+        calls["n"] += 1
+        if calls["n"] > 2:
+            raise RuntimeError("CUDA out of memory")
+        return self.clone()
+
+    monkeypatch.setattr(torch.Tensor, "to", flaky_to, raising=False)
+    monkeypatch.setattr(torch.cuda, "empty_cache", lambda: None)
+
+    restore = C.pin_lenses({"ours-R": lens}, FakeDevice(), verbose=False)
+    assert lens.jacobians == originals, "partial moves must be rolled back"
+    restore()
+    assert lens.jacobians == originals
+
+
+def test_lens_device_config_default_is_auto():
+    from rlens.coherence import CoherenceConfig
+
+    assert CoherenceConfig().lens_device == "auto"
+    assert CoherenceConfig(lens_device="cpu").lens_device == "cpu"

@@ -136,7 +136,13 @@ def cmd_download(args) -> None:
     print(f"[eval] copied {src}/{{evaluations,experiments}} -> {dest}")
 
     if args.experiment_models:
-        for name, spec in pins["experiment_models"].items():
+        wanted = args.only or list(pins["experiment_models"])
+        unknown = set(wanted) - set(pins["experiment_models"])
+        if unknown:
+            raise SystemExit(f"unknown model(s) {sorted(unknown)}; "
+                             f"pins.yaml knows {list(pins['experiment_models'])}")
+        for name in wanted:
+            spec = pins["experiment_models"][name]
             revision = spec["revision"] or model_info(spec["hf_id"]).sha
             print(f"[{name}] snapshot_download {spec['hf_id']}@{revision[:8]} ...")
             if spec["revision"] is None:
@@ -456,6 +462,7 @@ def cmd_coherence(args) -> None:
     cfg = CoherenceConfig(
         sets=tuple(args.sets), k=args.k, limit=args.limit,
         filter_correct=not args.no_filter_correct, trash_set=args.trash_set, seed=args.seed,
+        lens_device=args.lens_device,
     )
     raw = collect_readouts(model, lenses, cfg)
 
@@ -530,6 +537,9 @@ def main() -> None:
     p = sub.add_parser("download", help="fetch model(s), released lenses, and data at pinned revisions")
     p.add_argument("--experiment-models", action="store_true",
                    help="also download qwen3.5-27b + gemma-3-27b-it and their released lens pairs (~110 GB)")
+    p.add_argument("--only", nargs="+", default=None, metavar="NAME",
+                   help="with --experiment-models: fetch only these (e.g. qwen3.5-27b), "
+                        "skipping the ~54 GB gated gemma download")
     p.set_defaults(func=cmd_download)
 
     p = sub.add_parser("smoke", help="released J-lens vs logit-lens readout + provenance dump")
@@ -583,6 +593,10 @@ def main() -> None:
     p.add_argument("--judge-limit", type=int, default=None)
     p.add_argument("--seed", type=int, default=20260825)
     p.add_argument("--device", default=default_device)
+    p.add_argument("--lens-device", default="auto",
+                   help="where the Jacobians live during the sweep: 'auto' (the model's "
+                        "device — one copy resident, transport is device-local), 'cpu' "
+                        "(re-copied per call; use if VRAM is tight), or an explicit device")
     p.add_argument("--dtype", choices=["bf16", "fp32"], default="bf16")
     p.set_defaults(func=cmd_coherence)
 
