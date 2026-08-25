@@ -10,8 +10,8 @@ are gradient-equivalent to the ones here:
 - LN-rule:      RelP divides by ``scale.detach()``; we detach the rsqrt factor.
 - Identity-rule: RelP uses ``zp * (silu(x)/zp).data`` with ``zp = stabilize(x)``
   (grad = silu(x)/x = sigmoid(x), except grad 0 at exactly x == 0); we use
-  ``g * sigmoid(g).detach()`` (grad = sigmoid(g) everywhere, forward exactly
-  ``g * sigmoid(g)``).
+  :class:`SiluWithSigmoidGrad` (grad = sigmoid(g) everywhere, forward is the
+  unmodified silu kernel, bit-identical).
 - Half-rule:    RelP uses ``(p/2) + (p/2).detach()`` on the product p = a*u;
   we use ``0.5*(a*u.detach() + a.detach()*u)``. Both give each branch exactly
   half its unpatched gradient and a bit-exact forward.
@@ -116,6 +116,27 @@ class RulesConfig:
 # ---------------------------------------------------------------------------
 
 
+class SiluWithSigmoidGrad(torch.autograd.Function):
+    """The identity rule with a bit-exact forward.
+
+    ``g * sigmoid(g).detach()`` has the same gradient but reconstructs silu
+    from two kernels, which differs from the fused ``F.silu`` by ~1 ulp per
+    element — measured 2.3e-5 on final fp32 logits of the 4B model, over the
+    1e-5 forward-equivalence gate. Calling the same silu kernel and supplying
+    the sigmoid gradient directly keeps the forward bit-identical.
+    """
+
+    @staticmethod
+    def forward(ctx, x: torch.Tensor) -> torch.Tensor:
+        ctx.save_for_backward(x)
+        return torch.nn.functional.silu(x)
+
+    @staticmethod
+    def backward(ctx, grad_output: torch.Tensor) -> torch.Tensor:
+        (x,) = ctx.saved_tensors
+        return grad_output * torch.sigmoid(x)
+
+
 def qwen3_5_rmsnorm_forward_ln_rule(self, x: torch.Tensor) -> torch.Tensor:
     """``Qwen3_5RMSNorm.forward`` with the normalization factor detached.
 
@@ -135,15 +156,15 @@ def swiglu_mlp_forward_rules(self, x: torch.Tensor, cfg: RulesConfig) -> torch.T
     identity-rule and/or half-rule installed.
 
     Unpatched forward is ``down_proj(act_fn(gate_proj(x)) * up_proj(x))`` with
-    ``act_fn = silu``. ``g * sigmoid(g)`` equals ``F.silu(g)`` up to kernel
-    rounding (silu has a fused kernel); the half-rule split is bit-exact at
-    ``beta = 0.5`` (each ``0.5 * p`` is an exact exponent decrement).
+    ``act_fn = silu``. Both rules are forward-bit-exact: the identity rule via
+    :class:`SiluWithSigmoidGrad` (same silu kernel), the half-rule because each
+    ``0.5 * p`` is an exact exponent decrement.
 
     The gate branch gets ``beta`` of the gradient, the up branch ``1 - beta``
     (released artifacts use 0.5, where the assignment is symmetric).
     """
     g = self.gate_proj(x)
-    a = g * torch.sigmoid(g).detach() if cfg.identity_rule else self.act_fn(g)
+    a = SiluWithSigmoidGrad.apply(g) if cfg.identity_rule else self.act_fn(g)
     u = self.up_proj(x)
     if cfg.half_rule:
         beta = cfg.half_rule_beta

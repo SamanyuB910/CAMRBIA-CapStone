@@ -37,7 +37,8 @@ def test_tiny_model_forward_equivalence(tiny_qwen, tiny_batch, cfg):
         patched = _logits(tiny_qwen, tiny_batch)
     restored = _logits(tiny_qwen, tiny_batch)
 
-    assert (patched - baseline).abs().max().item() < 1e-5
+    # all three rules are forward-bit-exact by construction (same kernels)
+    assert torch.equal(patched, baseline)
     assert torch.equal(restored, baseline), "remove() did not restore the original forward"
 
 

@@ -69,7 +69,9 @@ def build_provenance(
         "corpus_mode": "pretrain",
         "rlens_extra": {
             "prompt_indices": list(prompt_indices),
-            "torch": torch.__version__,
+            # str(): torch.__version__ is a TorchVersion, which breaks
+            # JacobianLens.load's weights_only=True deserialization
+            "torch": str(torch.__version__),
         },
     }
 

@@ -8,24 +8,26 @@ Mandatory M3 gate:
 
 import torch
 
-from rlens.rules import qwen3_5_rmsnorm_forward_ln_rule
+from rlens.rules import SiluWithSigmoidGrad, qwen3_5_rmsnorm_forward_ln_rule
 
 
 def test_identity_rule_grad_is_sigmoid_exactly():
     torch.manual_seed(0)
     g = torch.randn(64, dtype=torch.float32, requires_grad=True)
-    a = g * torch.sigmoid(g).detach()
+    a = SiluWithSigmoidGrad.apply(g)
     a.backward(torch.ones_like(a))
     assert torch.equal(g.grad, torch.sigmoid(g.detach()))
+    # x == 0 edge: sigmoid(0) = 0.5 (RelP's ratio trick gives 0 there instead)
+    z = torch.zeros(1, requires_grad=True)
+    SiluWithSigmoidGrad.apply(z).backward(torch.ones(1))
+    assert z.grad.item() == 0.5
 
 
-def test_identity_rule_forward_matches_silu():
+def test_identity_rule_forward_is_bit_exact():
     torch.manual_seed(0)
     g = torch.randn(4096, dtype=torch.float32)
-    patched = g * torch.sigmoid(g).detach()
-    reference = torch.nn.functional.silu(g)
-    # silu has a fused kernel; agreement is up to rounding, not bitwise.
-    assert (patched - reference).abs().max().item() < 1e-6
+    # same silu kernel -> bitwise equality (the detach form was only ~1e-6 close)
+    assert torch.equal(SiluWithSigmoidGrad.apply(g), torch.nn.functional.silu(g))
 
 
 def test_half_rule_grads_are_exactly_half():
