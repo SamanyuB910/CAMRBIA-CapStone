@@ -480,17 +480,19 @@ def test_panel_labels_every_lens_when_there_are_more_than_three(tmp_path):
     sheet_path, key_path = build_panel(df, tmp_path, n_items=4, seed=7)
     key = [json.loads(l) for l in key_path.read_text(encoding="utf-8").splitlines()]
     sheet = [json.loads(l) for l in sheet_path.read_text(encoding="utf-8").splitlines()]
-    assert set(key[0]) - {"entry"} == {f"arm_{c}" for c in "ABCDE"}
+    arm_keys = {k for k in key[0] if k.startswith("arm_")}
+    assert arm_keys == {f"arm_{c}" for c in "ABCDE"}
     for entry in sheet:                       # every arm carries a real readout
         assert all(entry[f"arm_{c}"] for c in "ABCDE")
-    assert {row[arm] for row in key for arm in row if arm != "entry"} == set(df["lens"].unique())
+    assigned = {row[arm] for row in key for arm in row if arm.startswith("arm_")}
+    assert assigned == set(df["lens"].unique())
 
 
 def test_panel_can_be_restricted_to_named_lenses(tmp_path):
     df = annotate(_synthetic_readouts(n_items=4), lexicon=LEXICON)
     _, key_path = build_panel(df, tmp_path, n_items=4, lenses=["ours-R", "ours-J"], seed=8)
     key = [json.loads(l) for l in key_path.read_text(encoding="utf-8").splitlines()]
-    assert set(key[0]) - {"entry"} == {"arm_A", "arm_B"}
+    assert {k for k in key[0] if k.startswith("arm_")} == {"arm_A", "arm_B"}
     with pytest.raises(ValueError, match="no readouts"):
         build_panel(df, tmp_path, lenses=["nope"])
 
@@ -1126,3 +1128,88 @@ def test_panel_is_stratified_across_eval_sets():
     counts = collections.Counter(e["set"] for e in sheet)
     assert len(counts) == 5, "every eval set represented"
     assert max(counts.values()) - min(counts.values()) <= 1, f"unbalanced: {counts}"
+
+
+# --- panel analysis ----------------------------------------------------------
+
+
+def _rated_panel(tmp_path, seed=31):
+    """Build a panel and score it as an ideal rater would: 0 for the trash arm,
+    3 otherwise. Returns (readouts, long-form scores)."""
+    from rlens.coherence import unblind as _unblind
+
+    df = annotate(_synthetic_readouts(n_items=10, n_layers=8),
+                  lexicon=LEXICON, counts={hash(" against") % 1000: 5})
+    _, key_path = build_panel(df, tmp_path, n_items=10, max_layers=4, seed=seed)
+    table = pd.read_csv(tmp_path / "coherence_panel.csv")
+    arms = [c for c in table.columns if c.startswith("arm_") and not c.endswith("_score")]
+    for arm in arms:
+        table[f"{arm}_score"] = [0 if str(v).startswith("......") else 3 for v in table[arm]]
+    scored = table.drop(columns=arms).rename(columns={f"{a}_score": a for a in arms})
+    return df, _unblind(scored, key_path)
+
+
+def test_panel_stats_give_the_primary_result_a_confidence_interval(tmp_path):
+    """The panel is the §6.2.2 primary result; a bare mean is not enough when
+    §2 gets 10k bootstraps."""
+    from rlens.coherence import panel_stats
+
+    _, long = _rated_panel(tmp_path)
+    summary, contrasts = panel_stats(long, n_layers=8, n_boot=500)
+
+    assert summary.loc[("all rated layers", "ours-R"), "mean_score"] == 3.0
+    assert {"mean_score", "std", "n"} <= set(summary.columns)
+
+    row = contrasts.loc[("first half", "ours-J - ours-R")]
+    assert row["delta"] == pytest.approx(-3.0)     # J is the planted-trash arm early
+    assert row["ci_hi"] <= 0 and row["n_entries"] > 0
+
+
+def test_rater_agreement_needs_two_raters_and_finds_disagreement(tmp_path):
+    from rlens.coherence import rater_agreement
+
+    _, long = _rated_panel(tmp_path)
+    long["rater"] = "ashay"
+    assert rater_agreement(long).empty, "single rater -> no agreement table"
+
+    disagreeing = long.copy()
+    disagreeing["rater"] = "nicole"
+    disagreeing["score"] = 3 - disagreeing["score"]        # perfectly inverted
+    table = rater_agreement(pd.concat([long, disagreeing], ignore_index=True))
+    assert len(table) == 1
+    assert table.iloc[0]["spearman"] == pytest.approx(-1.0)
+    assert table.iloc[0]["exact_agreement"] < 0.5
+
+
+def test_metric_vs_rating_detects_a_proxy_that_tracks_the_rater(tmp_path):
+    """The validation the whole exploratory section rests on: if `trash` does not
+    anticorrelate with rated coherence, §2 cannot be read as a coherence result."""
+    from rlens.coherence import metric_vs_rating
+
+    readouts, long = _rated_panel(tmp_path)
+    table = metric_vs_rating(readouts, long)
+
+    assert "trash" in table.index
+    # planted so that trash == 1 exactly where the rater said 0
+    assert table.loc["trash", "spearman_vs_score"] == pytest.approx(-1.0)
+    assert table.loc["trash", "n_cells"] > 0
+
+
+def test_metric_vs_rating_flags_a_proxy_that_does_not_track(tmp_path):
+    from rlens.coherence import metric_vs_rating
+
+    readouts, long = _rated_panel(tmp_path)
+    scrambled = long.copy()
+    scrambled["score"] = 1.5                       # rater sees no difference at all
+    table = metric_vs_rating(readouts, scrambled)
+    rho = table.loc["trash", "spearman_vs_score"]
+    assert pd.isna(rho) or abs(rho) < 0.1, "a constant rater cannot validate any proxy"
+
+
+def test_panel_key_carries_the_item_index_for_joining(tmp_path):
+    """Without the item index the ratings cannot be joined back to the readout
+    metrics, which silently disables the metric-vs-rating validation."""
+    df = annotate(_synthetic_readouts(n_items=4), lexicon=LEXICON)
+    _, key_path = build_panel(df, tmp_path, n_items=4, max_layers=2, seed=33)
+    key = [json.loads(l) for l in key_path.read_text(encoding="utf-8").splitlines()]
+    assert all({"entry", "set", "item", "layer"} <= set(row) for row in key)

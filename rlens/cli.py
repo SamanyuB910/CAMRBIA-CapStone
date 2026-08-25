@@ -585,47 +585,84 @@ def cmd_rescore(args) -> None:
 
 
 def cmd_unblind(args) -> None:
-    """Join hand-entered panel scores to lens names and report the comparison."""
+    """Join hand-entered panel scores to lens names and report the comparison.
+
+    Accepts one score file per rater; the filename stem becomes the rater label,
+    so inter-rater agreement is reported whenever more than one is supplied.
+    """
     import pandas as pd
 
-    from rlens.coherence import unblind
+    from rlens.coherence import metric_vs_rating, panel_stats, rater_agreement, unblind
 
-    scores = pd.read_csv(args.scores)
-    arm_cols = [c for c in scores.columns if c.startswith("arm_") and c.endswith("_score")]
-    if not arm_cols:
-        raise SystemExit(
-            f"{args.scores} has no arm_*_score columns. Fill the score columns in the "
-            "coherence_panel.csv emitted next to the panel, then pass that file here."
-        )
-    # The sheet carries both `arm_A` (the token list the rater read) and
-    # `arm_A_score`. Drop the token columns BEFORE renaming, or the rename
-    # collides and pandas silently drops one of each duplicated pair.
-    bare = [c[: -len("_score")] for c in arm_cols]
-    scores = scores.drop(columns=[c for c in bare if c in scores.columns])
-    scores = scores.rename(columns=dict(zip(arm_cols, bare)))
-    rated = scores.dropna(subset=bare, how="all")
-    if rated.empty:
-        raise SystemExit("no rows have any score filled in yet")
+    key_path = Path(args.key)
+    frames = []
+    for path in args.scores:
+        path = Path(path)
+        scores = pd.read_csv(path)
+        arm_cols = [c for c in scores.columns if c.startswith("arm_") and c.endswith("_score")]
+        if not arm_cols:
+            raise SystemExit(
+                f"{path} has no arm_*_score columns. Fill the score columns in the "
+                "coherence_panel.csv emitted next to the panel, then pass that file here."
+            )
+        # The sheet carries both `arm_A` (the token list the rater read) and
+        # `arm_A_score`. Drop the token columns BEFORE renaming, or the rename
+        # collides and pandas silently drops one of each duplicated pair.
+        bare = [c[: -len("_score")] for c in arm_cols]
+        scores = scores.drop(columns=[c for c in bare if c in scores.columns])
+        scores = scores.rename(columns=dict(zip(arm_cols, bare)))
+        rated = scores.dropna(subset=bare, how="all")
+        if rated.empty:
+            print(f"skipping {path}: no scores filled in yet")
+            continue
+        long = unblind(rated, key_path).dropna(subset=["score"])
+        long["rater"] = args.rater_names.pop(0) if args.rater_names else path.stem
+        frames.append(long)
 
-    long = unblind(rated, Path(args.key)).dropna(subset=["score"])
+    if not frames:
+        raise SystemExit("no rated entries in any of the supplied score files")
+    long = pd.concat(frames, ignore_index=True)
     long["score"] = long["score"].astype(float)
 
-    n_layers = args.n_layers
-    print(f"\nrated entries: {len(rated)}  ({len(long)} arm-scores)\n")
-    print("mean coherence (0-3), all rated layers:")
-    print(long.groupby("lens")["score"].agg(["mean", "std", "count"]).to_string(float_format="%.2f"))
-    if n_layers:
-        early = long[long["layer"] < (n_layers + 1) // 2]
-        if not early.empty:
-            print("\nfirst half of layers only:")
-            print(early.groupby("lens")["score"].agg(["mean", "count"]).to_string(float_format="%.2f"))
-    print("\nby layer:")
-    print(long.pivot_table(index="layer", columns="lens", values="score").to_string(float_format="%.2f"))
+    print(f"\nraters: {sorted(long['rater'].unique())}   rated arm-scores: {len(long)}\n")
+
+    agreement = rater_agreement(long)
+    if not agreement.empty:
+        print("Inter-rater agreement (shared cells):")
+        print(agreement.to_string(float_format="%.3f"), "\n")
+    elif long["rater"].nunique() < 2:
+        print("NOTE: single rater — no agreement statistics. A second rater materially\n"
+              "      strengthens this result; pass another score file to this command.\n")
+
+    summary, contrasts = panel_stats(long, n_layers=args.n_layers, seed=args.seed)
+    print("Mean rated coherence (0-3):")
+    print(summary.to_string(float_format="%.3f"))
+    if not contrasts.empty:
+        print("\nPaired contrasts (entry-level bootstrap):")
+        print(contrasts.to_string(float_format="%.3f"))
+
+    if args.readouts:
+        readouts = pd.read_parquet(args.readouts)
+        validation = metric_vs_rating(readouts, long)
+        if validation.empty:
+            print("\nNOTE: could not join ratings to readout metrics (regenerate the panel "
+                  "so the key carries item indices).")
+        else:
+            print("\nDoes the automated metric track the human rating? "
+                  "(Spearman, ordinal scores)")
+            print(validation.to_string(float_format="%.3f"))
+            rho = validation.loc["trash", "spearman_vs_score"] if "trash" in validation.index else None
+            if rho is not None:
+                verdict = (
+                    "tracks rated coherence" if rho < -0.3
+                    else "does NOT track rated coherence — do not read §2 as a coherence result"
+                    if rho > -0.1 else "tracks it weakly"
+                )
+                print(f"\n  trash vs score rho = {rho:.3f} -> the form-based proxy {verdict}.")
 
     if args.out:
         long.to_csv(args.out, index=False)
         print(f"\nunblinded scores -> {args.out}")
-
 
 
 # ---------------------------------------------------------------------------
@@ -731,9 +768,13 @@ def main() -> None:
     p.set_defaults(func=cmd_rescore)
 
     p = sub.add_parser("unblind", help="join hand-entered panel scores to lens names")
-    p.add_argument("scores", help="the filled-in coherence_panel.csv")
+    p.add_argument("scores", nargs="+", help="filled-in coherence_panel.csv, one per rater")
     p.add_argument("--key", required=True, help="coherence_panel_key.jsonl")
+    p.add_argument("--rater-names", nargs="*", default=[], help="labels (default: filename stems)")
+    p.add_argument("--readouts", default=None, metavar="PARQUET",
+                   help="coherence_readouts_<model>.parquet — enables the metric-vs-rating check")
     p.add_argument("--n-layers", type=int, default=None, help="to split first-half vs all")
+    p.add_argument("--seed", type=int, default=20260825)
     p.add_argument("--out", default=None, help="write the unblinded long-form scores here")
     p.set_defaults(func=cmd_unblind)
 

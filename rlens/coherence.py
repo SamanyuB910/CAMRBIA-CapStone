@@ -757,7 +757,8 @@ def build_panel(
             }
             entry = {"entry": f"{entry_id:03d}L{layer:02d}", "set": set_name, "layer": int(layer), **arms}
             sheet.append(entry)
-            key.append({"entry": entry["entry"], **dict(zip(arm_labels, order))})
+            key.append({"entry": entry["entry"], "set": set_name, "item": int(item),
+                        "layer": int(layer), **dict(zip(arm_labels, order))})
 
     out_dir.mkdir(parents=True, exist_ok=True)
     sheet_path = out_dir / "coherence_panel.jsonl"
@@ -855,8 +856,9 @@ def unblind(scores: pd.DataFrame, key_path: Path) -> pd.DataFrame:
     rows = [
         {
             "entry": row["entry"],
-            "set": row.get("set"),
-            "layer": row.get("layer"),
+            "set": row.get("set_lens", row.get("set")),
+            "item": row.get("item"),
+            "layer": row.get("layer_lens", row.get("layer")),
             "lens": row[f"{arm}_lens"],
             "score": row[f"{arm}_score"],
         }
@@ -1044,3 +1046,156 @@ def rescore(readouts: pd.DataFrame, *, trash_set: str = DEFAULT_TRASH_SET,
         counts=None,  # corpus_count / zero_freq already ride along in the frame
         trash_set=trash_set,
     )
+
+
+# ---------------------------------------------------------------------------
+# Panel analysis
+# ---------------------------------------------------------------------------
+
+
+def _pearson(a: pd.Series, b: pd.Series) -> float:
+    """Pearson, guarded: numpy warns and returns nan when either side is
+    constant (a rater who gave every arm the same score)."""
+    a, b = a.astype(float), b.astype(float)
+    if a.nunique() < 2 or b.nunique() < 2:
+        return float("nan")
+    return float(a.corr(b))
+
+
+def _spearman(a: pd.Series, b: pd.Series) -> float:
+    """Spearman rho as Pearson on ranks — pandas' own `method="spearman"` pulls
+    in scipy, which this project does not depend on."""
+    a, b = a.astype(float), b.astype(float)
+    if a.nunique() < 2 or b.nunique() < 2:
+        return float("nan")
+    return float(a.rank().corr(b.rank()))
+
+
+def panel_stats(
+    scores: pd.DataFrame, *, n_layers: int | None = None, seed: int = 20260825, n_boot: int = 10000
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Mean rated coherence per lens, and paired contrasts with bootstrap CIs.
+
+    The panel is the §6.2.2 primary result, so it gets the same statistical
+    treatment as the exploratory metrics rather than a bare mean: entries are the
+    resampling unit, and every arm of an entry rates the *same* hidden state, so
+    the pairing is exact.
+    """
+    scores = scores.dropna(subset=["score"]).copy()
+    scores["score"] = scores["score"].astype(float)
+    if scores.empty:
+        return pd.DataFrame(), pd.DataFrame()
+
+    bands = {"all rated layers": scores}
+    if n_layers:
+        early = scores[scores["layer"] < (n_layers + 1) // 2]
+        if not early.empty:
+            bands["first half"] = early
+
+    means, contrast_rows = {}, []
+    lenses = sorted(scores["lens"].unique())
+    for band, sub in bands.items():
+        for lens, group in sub.groupby("lens"):
+            means[(band, lens)] = {
+                "mean_score": group["score"].mean(),
+                "std": group["score"].std(),
+                "n": len(group),
+            }
+        wide = sub.pivot_table(index="entry", columns="lens", values="score")
+        for a, b in [(x, y) for i, x in enumerate(lenses) for y in lenses[i + 1 :]]:
+            if a not in wide or b not in wide:
+                continue
+            diff = (wide[a] - wide[b]).dropna().to_numpy()
+            if diff.size == 0:
+                continue
+            rng = np.random.default_rng(seed)
+            boot = diff[rng.integers(0, diff.size, size=(n_boot, diff.size))].mean(axis=1)
+            boot.sort()
+            contrast_rows.append(
+                {
+                    "band": band, "contrast": f"{a} - {b}",
+                    "delta": float(diff.mean()),
+                    "ci_lo": float(boot[int(0.025 * n_boot)]),
+                    "ci_hi": float(boot[int(0.975 * n_boot)]),
+                    "p_two_sided": min(1.0, float(2 * min((boot <= 0).mean(), (boot >= 0).mean()))),
+                    "n_entries": int(diff.size),
+                }
+            )
+    summary = pd.DataFrame(means).T
+    summary.index.names = ["band", "lens"]
+    contrasts_df = (
+        pd.DataFrame(contrast_rows).set_index(["band", "contrast"]) if contrast_rows else pd.DataFrame()
+    )
+    return summary, contrasts_df
+
+
+def rater_agreement(scores: pd.DataFrame) -> pd.DataFrame:
+    """Pairwise inter-rater agreement on the shared (entry, lens) cells.
+
+    A single-rater panel is one person's opinion. With two or more, report how
+    much they actually agree before reporting what they concluded: Spearman on
+    the ordinal scores, exact-match rate, and mean absolute difference.
+    """
+    if "rater" not in scores.columns or scores["rater"].nunique() < 2:
+        return pd.DataFrame()
+    wide = scores.pivot_table(index=["entry", "lens"], columns="rater", values="score")
+    raters = sorted(wide.columns)
+    rows = []
+    for i, a in enumerate(raters):
+        for b in raters[i + 1 :]:
+            both = wide[[a, b]].dropna()
+            if both.empty:
+                continue
+            rows.append(
+                {
+                    "pair": f"{a} vs {b}",
+                    "n_cells": len(both),
+                    "spearman": _spearman(both[a], both[b]),
+                    "exact_agreement": float((both[a] == both[b]).mean()),
+                    "mean_abs_diff": float((both[a] - both[b]).abs().mean()),
+                }
+            )
+    return pd.DataFrame(rows).set_index("pair") if rows else pd.DataFrame()
+
+
+def metric_vs_rating(readouts: pd.DataFrame, scores: pd.DataFrame) -> pd.DataFrame:
+    """Does the automated trash rate actually track rated coherence?
+
+    This is the validation the whole exploratory section rests on. Each rated
+    (set, item, layer, lens) cell is joined to the diagnostics computed for that
+    exact readout, and each diagnostic is correlated (Spearman, on ordinal
+    scores) against the human score.
+
+    A strongly negative `trash` correlation means the proxy works. A near-zero
+    or positive one means the form-based rate is not measuring what a rater
+    calls coherence — which would invalidate reading §2 as a coherence result,
+    and is a finding in its own right.
+    """
+    scores = scores.dropna(subset=["score"]).copy()
+    if scores.empty or "item" not in scores.columns or scores["item"].isna().all():
+        return pd.DataFrame()
+    scores["score"] = scores["score"].astype(float)
+
+    metrics = [m for m in ("trash", "zero_freq", "in_prompt") if m in readouts.columns]
+    cells = readouts.groupby(["set", "item", "layer", "lens"])[metrics].mean().reset_index()
+    cells["item"] = cells["item"].astype(int)
+    scores["item"] = scores["item"].astype(int)
+    scores["layer"] = scores["layer"].astype(int)
+
+    joined = scores.merge(cells, on=["set", "item", "layer", "lens"], how="inner")
+    if joined.empty:
+        return pd.DataFrame()
+
+    rows = []
+    for metric in metrics:
+        rows.append(
+            {
+                "metric": metric,
+                "spearman_vs_score": _spearman(joined["score"], joined[metric]),
+                "pearson_vs_score": _pearson(joined["score"], joined[metric]),
+                "n_cells": len(joined),
+            }
+        )
+    out = pd.DataFrame(rows).set_index("metric")
+    out.attrs["joined"] = joined
+    return out
