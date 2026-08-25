@@ -6,6 +6,7 @@
     uv run rlens compare [--functional]           our fits vs released -> results/verification_report.md
     uv run rlens eval [--sets ...] [--limit N]    pass@10 battery: R vs J vs logit -> results/
     uv run rlens coherence [--judge] [...]        early-layer coherence -> results/
+    uv run rlens rescore <readouts.parquet>       re-score saved readouts, no GPU
 """
 
 from __future__ import annotations
@@ -458,6 +459,12 @@ def cmd_coherence(args) -> None:
         if path.exists():
             lenses[name] = JacobianLens.load(str(path))
     print(f"lenses: {list(lenses)}   sets: {args.sets}   trash set: {args.trash_set}")
+    if set(lenses) == {"logit"}:
+        searched = _lens_path("released", "j-lens", model_name).parent.parent
+        raise SystemExit(
+            f"no J/R lens artifacts for {model_name!r} under {searched}\n"
+            f"Fetch them with:  rlens download --experiment-models --only {model_name}"
+        )
 
     cfg = CoherenceConfig(
         sets=tuple(args.sets), k=args.k, limit=args.limit,
@@ -520,6 +527,38 @@ def cmd_coherence(args) -> None:
         encoding="utf-8",
     )
     print(f"\n{overall.to_string(float_format='%.4f')}\n\nreport -> {report_path}")
+
+
+# ---------------------------------------------------------------------------
+# rescore
+# ---------------------------------------------------------------------------
+
+
+def cmd_rescore(args) -> None:
+    import pandas as pd
+
+    from rlens.coherence import build_panel, load_lexicon, per_layer, report, rescore, summarize
+
+    src = Path(args.readouts).expanduser()
+    df = pd.read_parquet(src)
+    tag = args.tag or src.stem.replace("coherence_readouts_", "")
+    n_layers = args.n_layers or int(df["layer"].max()) + 2  # +1 index, +1 skipped target layer
+    df.attrs.update({"n_layers": n_layers, "k": int(df["rank"].max()), "n_kept": {}})
+
+    df = rescore(df, trash_set=args.trash_set, lexicon=load_lexicon())
+    out_dir = Path(args.out_dir).expanduser() if args.out_dir else src.parent
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    sheet_path, key_path = build_panel(df, out_dir / "panel", n_items=args.panel_items, seed=args.seed)
+    per_layer(df).to_csv(out_dir / f"coherence_per_layer_{tag}.{args.trash_set}.csv")
+    report_path = out_dir / f"coherence_{tag}.{args.trash_set}.md"
+    report_path.write_text(
+        report(df, model_name=f"{tag} (rescored: --trash-set {args.trash_set})",
+               sheet_path=sheet_path, key_path=key_path, seed=args.seed),
+        encoding="utf-8",
+    )
+    print(f"{summarize(df, seed=args.seed).to_string(float_format='%.4f')}\n\nreport -> {report_path}")
+
 
 
 # ---------------------------------------------------------------------------
@@ -605,6 +644,16 @@ def main() -> None:
                         "(re-copied per call; use if VRAM is tight), or an explicit device")
     p.add_argument("--dtype", choices=["bf16", "fp32"], default="bf16")
     p.set_defaults(func=cmd_coherence)
+
+    p = sub.add_parser("rescore", help="re-run the coherence metrics from a saved readouts parquet (no GPU)")
+    p.add_argument("readouts", help="path to coherence_readouts_<model>.parquet")
+    p.add_argument("--trash-set", default=DEFAULT_TRASH_SET, choices=sorted(TRASH_SETS))
+    p.add_argument("--out-dir", default=None, help="default: alongside the parquet")
+    p.add_argument("--tag", default=None, help="model label for filenames (default: from the parquet name)")
+    p.add_argument("--n-layers", type=int, default=None, help="override the first-half boundary")
+    p.add_argument("--panel-items", type=int, default=24)
+    p.add_argument("--seed", type=int, default=20260825)
+    p.set_defaults(func=cmd_rescore)
 
     args = parser.parse_args()
     args.func(args)

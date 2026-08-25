@@ -71,7 +71,9 @@ CATEGORIES = (
     "special",      # the tokenizer's own special/added ids, or a <|...|> form
     "undecodable",  # U+FFFD or an unpaired surrogate: a broken byte-fallback piece
     "whitespace",   # whitespace only
-    "punct",        # no alphanumerics (post ex.: "＊＊＊＊＊＊＊＊", "......", " ...\n\n")
+    "punct_run",    # >=2 non-alphanumeric marks -- the post's ACTUAL trash examples:
+                    #                 "＊＊＊＊＊＊＊＊", "......", " ...\n\n"
+    "punct_single", # exactly one mark (".", ",", " -"): sentence structure, not garbage
     "numeric",      # digits / digit-punctuation
     "cjk_single",   # exactly one CJK/kana/hangul char (post ex.: "尷", half of a word)
     "cjk_multi",    # >=2 such chars (post ex.: "锁定"; but ALSO the post's *praised*
@@ -84,45 +86,55 @@ CATEGORIES = (
 
 # Which categories count as trash.
 #
-# CALIBRATION (Qwen3.5-4B, V=248077, full vocabulary). These are the shares a
-# *uniform random* top-k draw would score, i.e. the floor every measured rate
-# must be read against:
+# CALIBRATION (Qwen3.5-4B, V=248077, full vocabulary) -- the shares a *uniform
+# random* top-k draw scores, i.e. the floor every measured rate is read against.
+#   word 27.84% | latin_oov 26.49% | cjk_multi 23.50% | subword_oov 16.80%
+#   cjk_single 2.97% | punct_run 1.57% | undecodable 0.38% | punct_single 0.25%
+#   whitespace 0.18% | special 0.01% | numeric 0.01%
 #
-#   word 27.8% | latin_oov 26.5% | cjk_multi 23.5% | subword_oov 16.8%
-#   cjk_single 3.0% | punct 1.8% | undecodable 0.4% | whitespace 0.2% | special 0.01%
+# Per trash set: form 2.14% | form+punct_single 2.39% | form+oov 28.63%
+#                form+oov+cjk 31.60%
 #
-# NEGATIVE RESULT, recorded so nobody re-derives it: the lexicon-OOV categories
-# do NOT work as trash proxies, and we do not use them.
-#   * `latin_oov` is 26.5% of the vocabulary because word-initial BPE *prefixes*
-#     of ordinary words (" ent", " prot", " http", " som") are not in any word
-#     list. A prefix piece in a top-k is unremarkable, not incoherent.
-#   * `subword_oov` (16.8%) is the same story for mid-word pieces ("ation", "ou").
-#   * Worse, the classifier cannot reproduce the post's own latin examples:
-#     "euw"/"zinho" land in `subword_oov` and "tav" is a real dictionary word
-#     (`word`). Separating "nonsense fragment" from "prefix of a real word"
-#     needs the context the form classifier deliberately never sees.
-# The blinded panel in section A is what covers this ground; the OOV sets stay
-# available only so the claim above can be re-checked, never as the default.
+# PUNCTUATION SPLIT (added 2026-08-25, after the first qwen3.5-27b run).
+# `punct` originally lumped every non-alphanumeric token together. The post's
+# trash examples are all *runs* -- "＊＊＊＊＊＊＊＊", "......", " ...\n\n" -- and it
+# never calls a lone "." or "," incoherent, so the lump over-counted. This did
+# not matter at 4B (punct was ~0.12 for every arm) but dominated at 27B, where
+# R-lens carries 0.238 punct to J-lens's 0.138 while ALSO carrying more whole
+# words. Disclosure: the split was made after seeing that result. The old
+# behaviour is preserved as `form+punct_single` precisely so the change can be
+# audited rather than trusted.
 TRASH_SETS = {
-    # The default, and the only set defensible without external data or a
-    # semantic judgement: 2.4% of the vocabulary, so a rate above that means a
-    # lens really is concentrating mass on non-semantic rows.
-    "form": ("empty", "special", "undecodable", "whitespace", "punct"),
-    # NOT RECOMMENDED (28.9% uniform baseline) - see the negative result above.
-    "form+oov": ("empty", "special", "undecodable", "whitespace", "punct", "latin_oov"),
-    # NOT RECOMMENDED (45.7% uniform baseline).
-    "form+oov+subword": (
-        "empty", "special", "undecodable", "whitespace", "punct", "latin_oov", "subword_oov",
+    # The default: forms that carry no semantic content under any reading.
+    "form": ("empty", "special", "undecodable", "whitespace", "punct_run"),
+    # The pre-split definition, kept for auditability and back-comparison.
+    "form+punct_single": (
+        "empty", "special", "undecodable", "whitespace", "punct_run", "punct_single",
     ),
-    # NOT RECOMMENDED (31.9%): the post's "尷" is a cjk_single, but so is any
-    # legitimate single-character CJK token, so this penalises multilingual
-    # readouts for being multilingual - and the post *praises* R-lens for
-    # surfacing "颜色的" and "是什么呢".
+    # NOT RECOMMENDED -- lexicon-OOV cannot separate a nonsense fragment from a
+    # prefix of a real word (26.5% of the vocabulary is word-initial BPE
+    # prefixes; the post's own "tav" is a dictionary word). See the tests.
+    "form+oov": (
+        "empty", "special", "undecodable", "whitespace", "punct_run", "latin_oov",
+    ),
+    # NOT RECOMMENDED -- penalises multilingual readouts for being multilingual:
+    # the post's "尷" is a cjk_single, but so is any legitimate CJK token, and the
+    # post *praises* R-lens for surfacing "颜色的" and "是什么呢".
     "form+oov+cjk": (
-        "empty", "special", "undecodable", "whitespace", "punct", "latin_oov", "cjk_single",
+        "empty", "special", "undecodable", "whitespace", "punct_run",
+        "latin_oov", "cjk_single",
     ),
 }
 DEFAULT_TRASH_SET = "form"
+
+# Measured share of the Qwen3.5-4B vocabulary each set covers (the uniform-draw
+# floor). Printed in every report so no rate is read without its baseline.
+_UNIFORM_BASELINE = {
+    "form": 0.0214,
+    "form+punct_single": 0.0239,
+    "form+oov": 0.2863,
+    "form+oov+cjk": 0.3160,
+}
 
 # Only the ``<|...|>`` convention. A looser ``<...>`` pattern misclassified real
 # ASCII tokens ("<?>", "<->", "<()>") as special; the authoritative list is the
@@ -175,7 +187,8 @@ def classify_token(
     if core == "":
         return "whitespace"
     if not any(ch.isalnum() for ch in core):
-        return "punct"
+        # A lone mark is sentence structure; a run of them is the post's "......".
+        return "punct_single" if len(core) == 1 else "punct_run"
     if any(_is_cjk(ch) for ch in core):
         return "cjk_single" if len(core) == 1 else "cjk_multi"
     if any(ch.isdigit() for ch in core) and not any(ch.isalpha() for ch in core):
@@ -371,7 +384,16 @@ def collect_readouts(model, lenses: dict, cfg: CoherenceConfig) -> pd.DataFrame:
 
 
 def _collect_readouts(model, lenses: dict, cfg: CoherenceConfig, ActivationRecorder) -> pd.DataFrame:
-    layers = next(l for l in lenses.values() if l is not None).source_layers
+    jacobian_lenses = [name for name, lens in lenses.items() if lens is not None]
+    if not jacobian_lenses:
+        raise SystemExit(
+            "no Jacobian lens artifacts loaded — only the logit lens is present, so there "
+            "is nothing to compare it against.\n"
+            "The released J/R pair for this model has not been downloaded. Fetch it with:\n"
+            "    rlens download --experiment-models --only <model>\n"
+            "then check the files landed under lenses/released/<model>/{j-lens,r-lens}/lens.pt"
+        )
+    layers = lenses[jacobian_lenses[0]].source_layers
     final_layer = model.n_layers - 1
     record_at = sorted(set(layers) | {final_layer})
     tok = model.tokenizer
@@ -849,8 +871,9 @@ def report(
         "A deterministic classifier over token *forms* only. It never judges semantics, so",
         'it **under-counts** the post\'s definition ("non-semantic, incoherent, **or**',
         '**unrelated to the prompt**"). Read it as a lower bound.\n',
-        "Uniform-draw baseline for this set on the Qwen3.5-4B vocabulary: **2.4%** — a rate",
-        "at or below that is indistinguishable from random vocabulary rows.\n",
+        f"Uniform-draw baseline for `{trash_set}` on the Qwen3.5-4B vocabulary: "
+        f"**{_UNIFORM_BASELINE.get(trash_set, float('nan')):.2%}** — a rate at or below that is",
+        "indistinguishable from random vocabulary rows.\n",
         "`in_prompt` is the share of top-k tokens echoing the prompt: the cheap stand-in for",
         'the post\'s observation that R-lens early readouts "show clear structure, e.g.',
         'representing the current token or similar tokens".\n',
@@ -916,3 +939,29 @@ def report(
         lines.append(f"_Skipped: {exc}_")
     lines.append("")
     return "\n".join(lines)
+
+
+def rescore(readouts: pd.DataFrame, *, trash_set: str = DEFAULT_TRASH_SET,
+            lexicon: frozenset[str] | None = None) -> pd.DataFrame:
+    """Re-annotate a saved readout table under a different trash definition.
+
+    The parquet written by ``rlens coherence`` holds every top-k token with its
+    frequency and unembedding-norm diagnostics already attached, so changing the
+    classifier is a pure-pandas operation: no model, no GPU, no 52 GB reload.
+    That is the whole reason the readouts are persisted.
+
+    The tokenizer's special-token judgement is not recoverable from strings
+    alone, so it is carried over from the stored ``category`` column rather than
+    re-derived by regex.
+    """
+    special_ids = set()
+    if "category" in readouts.columns:
+        special_ids = set(readouts.loc[readouts["category"] == "special", "token_id"].unique())
+    keep = [c for c in ("category", "trash") if c in readouts.columns]
+    return annotate(
+        readouts.drop(columns=keep),
+        lexicon=lexicon,
+        special_ids=special_ids,
+        counts=None,  # corpus_count / zero_freq already ride along in the frame
+        trash_set=trash_set,
+    )

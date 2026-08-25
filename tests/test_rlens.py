@@ -297,9 +297,11 @@ LEXICON = frozenset({"against", "basketball", "japan", "color", "the", "capital"
 @pytest.mark.parametrize(
     "text,expected",
     [
-        ("＊＊＊＊＊＊＊＊", "punct"),
-        ("......", "punct"),
-        (" ...\n\n", "punct"),
+        ("＊＊＊＊＊＊＊＊", "punct_run"),
+        ("......", "punct_run"),
+        (" ...\n\n", "punct_run"),
+        (".", "punct_single"),
+        (" -", "punct_single"),
         ("   ", "whitespace"),
         ("", "empty"),
         ("<|im_start|>", "special"),
@@ -320,8 +322,8 @@ def test_classify_token_categories(text, expected):
 
 def test_special_flag_comes_from_the_tokenizer_not_a_regex():
     """A loose <...> pattern misread real ASCII tokens as special tokens."""
-    assert classify_token("<?>") == "punct"
-    assert classify_token("<->") == "punct"
+    assert classify_token("<?>") == "punct_run"
+    assert classify_token("<->") == "punct_run"
     assert classify_token("<pad>", LEXICON) != "special"
     assert classify_token("<pad>", LEXICON, is_special=True) == "special"
 
@@ -615,8 +617,10 @@ def _run_pipeline(monkeypatch, items, sets=("multihop",)):
     layers = list(range(model.n_layers))
     lenses = {
         "ours-R": _StubLens(layers, "a", "a", model.n_layers),   # clean everywhere
-        "ours-J": _StubLens(layers, "*", "a", model.n_layers),   # punct early only
-        "logit": _StubLens(layers, "*", "*", model.n_layers),    # punct everywhere
+        # "\t" is a single-char token that is still trash under `form`
+        # (whitespace); a lone "*" is punct_single, which deliberately is not.
+        "ours-J": _StubLens(layers, "\t", "a", model.n_layers),  # trash early only
+        "logit": _StubLens(layers, "\t", "\t", model.n_layers),  # trash everywhere
     }
     monkeypatch.setattr(C, "load_items", lambda name: items)
 
@@ -930,3 +934,73 @@ def test_report_renders_absolute_paths_when_out_dir_is_off_repo(tmp_path, monkey
     text = report(df, model_name="stub", sheet_path=sheet, key_path=key,
                   repo_root=tmp_path / "repo")     # unrelated root
     assert str(sheet) in text, "off-repo path must render absolute, not blow up"
+
+
+def test_logit_only_run_fails_with_an_actionable_message(monkeypatch):
+    """A missing released lens pair used to surface as a bare StopIteration from
+    `next(...)` deep in the collector."""
+    from rlens import coherence as C
+
+    monkeypatch.setattr(C, "load_items", lambda name: [{"prompt": "abc", "intermediates": ["a"]}])
+    cfg = C.CoherenceConfig(sets=("multihop",), k=2, filter_correct=False)
+    with pytest.raises(SystemExit, match="rlens download --experiment-models"):
+        C._collect_readouts(_StubModel(), {"logit": None}, cfg, _StubRecorder)
+
+
+def test_punct_split_matches_the_posts_examples_not_lone_marks():
+    """The post's trash examples are all runs; it never calls a lone mark
+    incoherent. The split was added after the 27B run — this pins the rule so
+    the change is auditable rather than a moving target."""
+    for run in ("......", "＊＊＊＊＊＊＊＊", " ...\n\n", "--", "!!"):
+        assert classify_token(run, LEXICON) == "punct_run", run
+    for single in (".", ",", " -", "!", ":"):
+        assert classify_token(single, LEXICON) == "punct_single", single
+
+    assert "punct_run" in TRASH_SETS["form"]
+    assert "punct_single" not in TRASH_SETS["form"]
+    # the pre-split definition stays available for back-comparison
+    assert "punct_single" in TRASH_SETS["form+punct_single"]
+
+
+def test_rescore_reproduces_annotate_without_a_tokenizer():
+    """`rlens rescore` must reach the same answer from a saved frame as the
+    original GPU run did — that is what makes re-scoring trustworthy."""
+    from rlens.coherence import rescore
+
+    df = _synthetic_readouts()
+    counts = {hash(" against") % 1000: 5}
+    original = annotate(df, lexicon=LEXICON, counts=counts, trash_set="form")
+
+    round_tripped = rescore(original, trash_set="form", lexicon=LEXICON)
+    pd.testing.assert_series_equal(
+        original["trash"].reset_index(drop=True), round_tripped["trash"].reset_index(drop=True)
+    )
+    assert (round_tripped["zero_freq"] == original["zero_freq"]).all(), "diagnostics ride along"
+
+    # and a different definition really does change the verdict
+    loose = rescore(original, trash_set="form+punct_single", lexicon=LEXICON)
+    assert loose["trash"].mean() >= round_tripped["trash"].mean()
+
+
+def test_rescore_preserves_the_tokenizers_special_judgement():
+    """Special-token identity can't be re-derived from strings, so it must be
+    carried over from the stored category rather than guessed by regex."""
+    from rlens.coherence import rescore
+
+    df = _synthetic_readouts(n_items=2)
+    df.loc[df.index[:5], "token"] = "<pad>"          # a special token no regex catches
+    special_id = int(df.loc[df.index[0], "token_id"])
+    annotated = annotate(df, lexicon=LEXICON, special_ids={special_id})
+    assert (annotated.loc[annotated["token_id"] == special_id, "category"] == "special").all()
+
+    again = rescore(annotated, lexicon=LEXICON)
+    assert (again.loc[again["token_id"] == special_id, "category"] == "special").all()
+
+
+def test_every_trash_set_has_a_measured_baseline():
+    """A rate without its uniform-draw floor is unreadable; the report prints
+    one per set, so a new set must not silently render as NaN."""
+    from rlens.coherence import _UNIFORM_BASELINE
+
+    assert set(_UNIFORM_BASELINE) == set(TRASH_SETS)
+    assert _UNIFORM_BASELINE["form"] < _UNIFORM_BASELINE["form+punct_single"]
