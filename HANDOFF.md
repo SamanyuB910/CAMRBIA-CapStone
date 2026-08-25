@@ -48,7 +48,7 @@ Because the released draw is (very likely) recoverable — provenance shows
 `docs_consumed == n_prompts == 25` ⇒ rows [0:25) — expect ours-vs-released to land
 **well below** the disjoint-draw noise floor. Interpretation:
 - J passes, R passes → replication verified; commit the report + lenses metadata.
-- J passes, R fails → the rules are wrong somewhere: revisit `src/rlens/rules.py`
+- J passes, R fails → the rules are wrong somewhere: revisit `rlens/rules.py`
   against `results/provenance_qwen3.5-4b.json` (M3), not the estimator.
 - J fails → pipeline problem (prompt selection, tokenizer BOS, revision) — fix before
   blaming the rules. Sanity-check: our J vs released J correlation should dwarf the
@@ -71,7 +71,7 @@ columns to every rank table. On 4b expect ours ≈ released and J ≈ R (the exp
    `qwen3.5-9b/{j-lens,r-lens}/lens.pt`, extend `DRAWS`/recipe (target_layer=30 per
    the released table, d_model 4096), fit J+R, compare released-vs-ours, then look for
    the early-layer R advantage in readouts/pass@10.
-2. **pass@10 battery** (`src/rlens/evals/`): eval prompt sets are already in
+2. **pass@10 battery** (new module, e.g. `rlens/evals.py`): eval prompt sets are already in
    `data/eval_prompts/evaluations/` (multihop, multilingual, association, typo, poetry,
    order-ops). Filter to questions the model answers correctly, report per-layer
    pass@10, averaged over first-half layers vs all layers.

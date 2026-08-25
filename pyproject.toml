@@ -26,7 +26,7 @@ dependencies = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/rlens"]
+packages = ["rlens"]
 
 [tool.uv]
 package = true

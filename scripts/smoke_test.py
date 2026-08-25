@@ -31,12 +31,11 @@ PROMPT = "Fact: The currency used in the country shaped like a boot is"
 
 def load_model(dtype: str, device: str):
     torch_dtype = {"bf16": torch.bfloat16, "fp32": torch.float32}[dtype]
-    revision = None
-    lock_path = REPO_ROOT / "configs" / "revisions.lock.yaml"
-    if lock_path.exists():
-        import yaml
+    import yaml
 
-        revision = yaml.safe_load(lock_path.read_text())["model"]["revision"]
+    revision = yaml.safe_load((REPO_ROOT / "pins.yaml").read_text(encoding="utf-8"))[
+        "model"
+    ]["revision"]
     print(f"loading {MODEL_ID}@{revision} dtype={dtype} device={device} ...")
     t0 = time.perf_counter()
     hf = transformers.AutoModelForCausalLM.from_pretrained(

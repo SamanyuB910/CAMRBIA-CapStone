@@ -38,7 +38,7 @@ def _git_commit() -> str:
         return subprocess.run(
             ["git", "rev-parse", "--short", "HEAD"],
             capture_output=True, text=True, check=True,
-            cwd=Path(__file__).resolve().parents[2],
+            cwd=Path(__file__).resolve().parents[1],
         ).stdout.strip()
     except Exception:
         return "unknown"

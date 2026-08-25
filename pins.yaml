@@ -1,0 +1,52 @@
+# Single source of truth for every pinned version in this project.
+# Package versions are enforced by uv.lock; the key ones are mirrored here for
+# quick reference. scripts/download_assets.py downloads exactly these revisions.
+
+python: "3.11.9"
+
+packages:
+  torch: "2.13.0"            # CPU wheel on Windows dev box; CUDA-bundled wheel on Linux via the same uv.lock
+  transformers: "5.15.1"
+  datasets: "5.0.1"
+  huggingface_hub: "1.28.0"
+  accelerate: "1.14.0"
+
+reference_repos:             # cloned into reference/ (gitignored, read-only)
+  jacobian-lens:
+    url: https://github.com/anthropics/jacobian-lens
+    commit: 581d398613e5602a5af361e1c34d3a92ea82ba8e   # also the installed jlens dep (pyproject/uv.lock)
+  RelP:
+    url: https://github.com/FarnoushRJ/RelP
+    commit: 8219d6dc417c3fd7f318342cf61cd2a0c20b7250
+  idhantgulati-j-lens:
+    url: https://github.com/idhantgulati/j-lens
+    commit: 38e4f95ceb9bd6ff0c90798400197a589430f4ae
+
+model:
+  hf_id: Qwen/Qwen3.5-4B
+  revision: 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a   # released provenance records no revision; main @ 2026-08-24
+  n_layers: 32
+  d_model: 2560
+  target_layer: 30           # penultimate; released convention
+  skip_first: 4              # released recipe (jlens default is 16)
+
+lenses_released:
+  repo: camilablank/workspace-lenses
+  revision: d740106d1e0f95456dc8718fba2895e9c8ffd6ef
+  files:
+    - qwen3.5-4b/j-lens/lens.pt
+    - qwen3.5-4b/r-lens/lens.pt
+
+dataset:
+  hf_id: NeelNanda/pile-10k
+  revision: 127bfedcd5047750df5ccf3a12979a47bfa0bafa
+  n_rows_downloaded: 200     # fitting draws use rows 0:25 / 25:50 / 50:75; Jaccard eval uses 100:150
+
+fitting:
+  n_prompts: 25              # released recipe (much lighter than the paper's n=1000)
+  max_seq_len: 128
+  seed: 20260824
+
+gpu:
+  local: false               # HP OmniBook dev box, Intel iGPU only — CPU work only here
+  gpu_gate_deferred_to: remote SSH Linux machine (available 2026-08-25); see HANDOFF.md

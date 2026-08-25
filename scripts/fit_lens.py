@@ -25,6 +25,7 @@ os.environ.setdefault("HF_HUB_DISABLE_SYMLINKS_WARNING", "1")
 import pandas as pd
 import torch
 import transformers
+import yaml
 
 import jlens
 from rlens.fit import FitRecipe, fit_and_save
@@ -32,6 +33,7 @@ from rlens.rules import RulesConfig
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DRAWS = {"primary": (0, 25), "nf1": (25, 50), "nf2": (50, 75)}
+PINS = yaml.safe_load((REPO_ROOT / "pins.yaml").read_text(encoding="utf-8"))
 
 
 def load_prompts(start: int, stop: int) -> tuple[list[str], list[int]]:
@@ -88,7 +90,8 @@ def main() -> None:
     start, stop = DRAWS[args.draw]
     prompts, indices = load_prompts(start, start + args.n if args.n != 25 else stop)
 
-    tok = transformers.AutoTokenizer.from_pretrained("Qwen/Qwen3.5-4B")
+    model_id, revision = PINS["model"]["hf_id"], PINS["model"]["revision"]
+    tok = transformers.AutoTokenizer.from_pretrained(model_id, revision=revision)
     if args.tiny:
         hf = tiny_model(tok)
         recipe = FitRecipe(
@@ -99,7 +102,7 @@ def main() -> None:
     else:
         dtype = {"bf16": torch.bfloat16, "fp32": torch.float32}[args.dtype]
         hf = transformers.AutoModelForCausalLM.from_pretrained(
-            "Qwen/Qwen3.5-4B", dtype=dtype, device_map=args.device
+            model_id, revision=revision, dtype=dtype, device_map=args.device
         )
         recipe = FitRecipe()
         out_dir = REPO_ROOT / "lenses" / "ours" / args.model
