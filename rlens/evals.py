@@ -1,14 +1,20 @@
 """pass@10 eval battery: R-lens vs J-lens vs logit lens on the official eval sets.
 
 Protocol (post / paper §A.6, mirrored from reference/idhantgulati-j-lens):
-- read out at the final prompt token (poetry: at the newline ending line 1);
+- read out at the final prompt token (poetry: at the newline ending line 1) —
+  §A.6 (p.86-87) confirms this per set: "immediately preceding the answer"
+  (multihop), "at the closing period" (association), "at the final fragment of
+  the misspelled token" (typo), "at the newline between the two lines" (poetry);
 - prompts are .rstrip()'ed (a trailing space would become the readout token);
 - an intermediate counts as recovered at layer l if any single-token surface
   form (case / leading-space variants, digit<->word for numbers) is in the
   lens top-k at that layer;
 - items where the model itself gets the target wrong are dropped (the post's
   correctness filter; disable with filter_correct=False). Only multihop and
-  multilingual carry a ``target`` — the other sets have nothing to filter on.
+  multilingual carry a ``target`` — the other sets have nothing to filter on;
+- pass@k here is the POST's per-layer definition (top-k at layer l). The paper's
+  §A.6 "recovered at any layer" variant is derivable from the parquet as
+  min-rank-over-layers <= k; keep the two clearly labelled (plan, deviation 10).
 
 One forward pass per item is shared across all lenses; the logit lens is the
 identity transport (``use_jacobian=False`` equivalent). All lens/layer readouts
