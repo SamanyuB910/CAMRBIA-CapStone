@@ -1004,3 +1004,32 @@ def test_every_trash_set_has_a_measured_baseline():
 
     assert set(_UNIFORM_BASELINE) == set(TRASH_SETS)
     assert _UNIFORM_BASELINE["form"] < _UNIFORM_BASELINE["form+punct_single"]
+
+
+def test_per_set_breakdown_isolates_a_single_set_artefact():
+    """A trash gap confined to one eval set must be visible as such, not smeared
+    across the aggregate — this is what distinguishes a protocol artefact (e.g.
+    poetry reading out at a newline) from a real lens property."""
+    from rlens.coherence import per_set, whitespace_by_set
+
+    rows = []
+    for set_name in ("multihop", "poetry"):
+        for item in range(6):
+            for layer in range(4):
+                for lens, text in {"ours-R": "\t", "ours-J": " against"}.items():
+                    token = text if set_name == "poetry" else " against"
+                    rows.append({"set": set_name, "item": item, "layer": layer, "lens": lens,
+                                 "rank": 1, "token_id": hash(token) % 1000, "token": token,
+                                 "in_prompt": False})
+    df = pd.DataFrame(rows)
+    df.attrs["n_layers"] = 4
+    df = annotate(df, lexicon=LEXICON)
+
+    table = per_set(df)
+    assert table.loc[("poetry", "ours-R"), "trash"] == 1.0
+    assert table.loc[("multihop", "ours-R"), "trash"] == 0.0, "artefact must not leak across sets"
+    assert table.loc[("poetry", "ours-J"), "trash"] == 0.0
+
+    ws = whitespace_by_set(df)
+    assert ws.loc[("poetry", "ours-R"), "whitespace"] == 1.0
+    assert ws.loc[("multihop", "ours-R"), "whitespace"] == 0.0

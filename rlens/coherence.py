@@ -602,6 +602,35 @@ def contrasts(
     return pd.DataFrame(rows).set_index(keys)
 
 
+def per_set(df: pd.DataFrame, *, band: str = "first half") -> pd.DataFrame:
+    """Each diagnostic broken out by eval set — rows (set, lens), columns metrics.
+
+    Aggregating the five sets hides set-specific scoring artefacts. The clearest
+    is poetry: its readout position is *the newline ending line 1*, so a lens
+    surfacing a newline there is right, not incoherent, yet ``whitespace`` counts
+    it as trash. Any trash gap that lives in one set is a property of that set's
+    protocol, not of the lens.
+    """
+    sub = df[_band_mask(df)] if band == "first half" else df
+    table = sub.groupby(["set", "lens"])[_available(df)].mean()
+    return table.sort_index()
+
+
+def whitespace_by_set(df: pd.DataFrame, *, band: str = "first half") -> pd.DataFrame:
+    """Share of top-k that is whitespace or a punctuation run, per (set, lens) —
+    the two categories that drive the trash rate once lone marks are excluded."""
+    sub = df[_band_mask(df)] if band == "first half" else df
+    flags = pd.DataFrame(
+        {
+            "whitespace": sub["category"].eq("whitespace"),
+            "punct_run": sub["category"].eq("punct_run"),
+            "set": sub["set"],
+            "lens": sub["lens"],
+        }
+    )
+    return flags.groupby(["set", "lens"])[["whitespace", "punct_run"]].mean().sort_index()
+
+
 def category_mix(df: pd.DataFrame, *, band: str = "first half") -> pd.DataFrame:
     """Share of each form category in the top-k, per lens. The trash rate is a
     sum over a chosen subset of these; showing the whole mix is what lets a
@@ -906,6 +935,17 @@ def report(
         "uniform-draw baseline of every category, and for why the lexicon-OOV sets are not",
         "used.\n",
         category_mix(df).to_markdown(floatfmt=".3f"),
+        "",
+        "### Per eval set, first half of layers\n",
+        "Aggregating the five sets hides set-specific scoring artefacts. The clearest:",
+        "**poetry's readout position is the newline ending line 1**, so a lens surfacing a",
+        "newline there is *correct*, yet `whitespace` scores it as trash. A trash gap that",
+        "lives in one set is a property of that set's protocol, not of the lens.\n",
+        per_set(df).to_markdown(floatfmt=".3f"),
+        "",
+        "Whitespace and punctuation-run share — the two categories that drive `trash` once",
+        "lone marks are excluded:\n",
+        whitespace_by_set(df).to_markdown(floatfmt=".3f"),
         "",
         "## 4. Untrained-vocab-row confound (§6.2.3)\n",
         "Anne K. Halsall, in the comments on the post: *\"Question on the trash tokens: did",
