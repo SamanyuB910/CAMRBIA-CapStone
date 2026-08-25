@@ -136,6 +136,8 @@ def test_items_parquet_records_the_filter_and_the_dropped_intermediates(harness,
     assert items.loc["i3", "kept"]
 
     # "delta" has no single-token surface form: present but never scored
+    assert items.loc["i2", "filter_applicable"]      # target "alpha" is single-token
+    assert not items.loc["i0", "filter_applicable"]  # association carries no target
     assert items.loc["i1", "n_intermediates_total"] == 2
     assert items.loc["i1", "n_intermediates_single_token"] == 1
     assert df.attrs["n_kept"] == {"association": 2, "multihop": 1}
@@ -193,3 +195,25 @@ def test_control_lens_runs_as_an_eval_arm(harness, tmp_path):
     ranks = pd.read_parquet(tmp_path / "passk_fake.parquet")
     assert "control" in set(ranks["lens"])
     assert ("association", "control") in df.columns
+
+
+def test_unfilterable_target_is_kept_and_flagged(harness, tmp_path, monkeypatch):
+    """A target with no single-token surface form cannot be correctness-checked.
+    The item must still be scored, and the row must say the filter never ran."""
+    model, lenses = harness
+    monkeypatch.setattr(evals, "load_items", lambda name: [
+        {"name": "i9", "prompt": "p9", "intermediates": ["alpha"], "target": "delta"},
+    ])
+    df = evals.run_passk(model, lenses, sets=["multihop"], k=3,
+                         ranks_dir=tmp_path, model_name="fake")
+    items = pd.read_parquet(tmp_path / "passk_fake_items.parquet").set_index("item_id")
+    assert items.loc["i9", "kept"]
+    assert not items.loc["i9", "filter_applicable"]
+    assert df.attrs["n_kept"] == {"multihop": 1}
+
+
+def test_lenses_must_share_source_layers(harness):
+    model, lenses = harness
+    lenses["R"].source_layers = [0, 1]  # a lens fitted at different layers
+    with pytest.raises(ValueError, match="source_layers"):
+        evals.run_passk(model, lenses, sets=["association"], k=3)

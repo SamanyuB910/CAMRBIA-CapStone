@@ -12,8 +12,8 @@ Protocol (post / paper §A.6, mirrored from reference/idhantgulati-j-lens):
 
 One forward pass per item is shared across all lenses; the logit lens is the
 identity transport (``use_jacobian=False`` equivalent). All lens/layer readouts
-for an item are unembedded in a single batched matmul (the unembedding matrix is
-read once per item, not once per (layer, lens) pair).
+for an item are unembedded in batches, so the unembedding matrix is read a
+handful of times per item rather than once per (layer, lens) pair.
 
 ``run_passk`` returns the pooled per-layer table the report is built from, but
 the durable artefact is the per-item one: with ``ranks_dir=`` it streams two
@@ -140,6 +140,8 @@ def _rank_schemas():
         ("n_intermediates_single_token", pa.int32()),
         ("n_tokens", pa.int32()),
         ("readout_pos", pa.int32()),
+        ("readout_token", pa.string()),
+        ("filter_applicable", pa.bool_()),
     ])
     return ranks, items
 
@@ -175,7 +177,13 @@ def run_passk(
     ``unembed_chunk=1`` reproduces the pre-C3 one-readout-at-a-time unembed, so
     running it against the default is a direct parity check on the batching with
     no device or dtype confound."""
-    layers = next(l for l in lenses.values() if l is not None).source_layers
+    fitted = {name: list(l.source_layers) for name, l in lenses.items() if l is not None}
+    layers = next(iter(fitted.values()))
+    mismatched = {name: ls for name, ls in fitted.items() if ls != layers}
+    if mismatched:  # the (layer, lens) grid assumes one shared layer set
+        raise ValueError(
+            f"lenses disagree on source_layers: {[(n, len(ls)) for n, ls in fitted.items()]}"
+        )
     final_layer = model.n_layers - 1
     record_at = sorted(set(layers) | {final_layer})
     tok = model.tokenizer
@@ -212,29 +220,35 @@ def run_passk(
 
                 words = list(item["intermediates"])
                 id_sets = [(w, ids) for w in words if (ids := token_ids_of(tok, w))]
+                record = {
+                    "set": set_name, "item_id": item_id, "item_index": item_index,
+                    "kept": True, "n_intermediates_total": len(words),
+                    "n_intermediates_single_token": len(id_sets),
+                    "n_tokens": len(seq), "readout_pos": pos,
+                    "readout_token": tok.decode([seq[pos]]),
+                    "filter_applicable": False,
+                }
 
                 if filter_correct and "target" in item:
+                    # the post filters multihop and multilingual only - the sets that
+                    # carry a target. A target with no single-token surface form (e.g.
+                    # "pequeno") cannot be checked this way, so the item is kept
+                    # unfiltered and flagged: filter_applicable=False marks the rows
+                    # the post's correctness filter never actually reached.
                     target_ids = token_ids_of(tok, item["target"])
-                    final_logits = model.unembed(acts[final_layer][-1]).float()
-                    if target_ids and int(final_logits.argmax()) not in target_ids:
-                        if item_w is not None:
-                            item_w.add({
-                                "set": set_name, "item_id": item_id, "item_index": item_index,
-                                "kept": False, "n_intermediates_total": len(words),
-                                "n_intermediates_single_token": len(id_sets),
-                                "n_tokens": len(seq), "readout_pos": pos,
-                            })
-                        continue
+                    record["filter_applicable"] = bool(target_ids)
+                    if target_ids:
+                        final_logits = model.unembed(acts[final_layer][-1]).float()
+                        if int(final_logits.argmax()) not in target_ids:
+                            record["kept"] = False
+                            if item_w is not None:
+                                item_w.add(record)
+                            continue
                 n_kept[set_name] += 1
                 n_inter[set_name][0] += len(words)
                 n_inter[set_name][1] += len(id_sets)
                 if item_w is not None:
-                    item_w.add({
-                        "set": set_name, "item_id": item_id, "item_index": item_index,
-                        "kept": True, "n_intermediates_total": len(words),
-                        "n_intermediates_single_token": len(id_sets),
-                        "n_tokens": len(seq), "readout_pos": pos,
-                    })
+                    item_w.add(record)
 
                 # one transported readout per (layer, lens), unembedded in batches
                 stack = torch.stack([

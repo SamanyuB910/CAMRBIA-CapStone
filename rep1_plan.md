@@ -73,7 +73,7 @@ The test: **large, expensive to recreate, and either shared or must outlive the 
    repo into one `HF_HOME` race on blob writes, and HF's `.locks/` assumes a local filesystem, not an
    MFS mount. One downloader per model, then everyone reads.
 
-Namespace your outputs as `/workspace/results/rep1/…`, not a common `results/`, so four people writing
+Namespace your outputs as `/workspace/results/quantitative-evals/…`, not a common `results/`, so four people writing
 at once don't clobber each other.
 
 ## Phase 0 — Pod bring-up · Tue 14:00–14:20
@@ -141,7 +141,7 @@ Confirmed pod facts: A100-SXM4-80GB **idle, 0 MiB used** · root disk 100 GB / 9
       Qwen3.5-27B `fc05daec18b0a78c049392ed2e771dde82bdf654` ·
       gemma-3-27b-it `005ad3404e59d6023443cb575daa05336842228a`.
 
-- [ ] **0.9** Housekeeping, 5 min, do it before Phase 2:
+- [x] **0.9** Housekeeping, 5 min, do it before Phase 2:
       - `pins.yaml:8` still says `torch: "2.13.0"` - change to `"2.11.0"` (README too)
       - push the pod's 3 unpushed commits **including the modified `uv.lock`** (it is the correct
         lock for 2.11.0 - without it a fresh pod re-resolves to 2.13.0 and the CUDA error returns)
@@ -189,7 +189,7 @@ C1–C3 blocking; C4–C6 can slip to Tuesday evening.
       - **left hardcoded on purpose:** `cmd_fit` still refuses anything but 4b, and `cmd_compare`'s
         report header is 4b-only. Neither is in scope — we run on **released** lenses.
 
-- [ ] **C1b — the `loader:` field (the one piece of C1 still missing)** *(~15 min, blocks Phase 5 only)*
+- [x] **C1b — the `loader:` field (the one piece of C1 still missing)** *(~15 min, blocks Phase 5 only)*
       `_load_model` hardcodes `AutoModelForCausalLM`, which **will not load gemma-3-27b-it**. Add
       `loader: AutoModelForImageTextToText` to the gemma entry in `pins.yaml` (`loader:
       AutoModelForCausalLM` for Qwen, or default to it when the key is absent) and have `_load_model`
@@ -209,7 +209,7 @@ C1–C3 blocking; C4–C6 can slip to Tuesday evening.
       from the same ranks, so the parquet and the report cannot disagree — `test_evals.py` asserts that
       by rebuilding the table from the file.
       Drop rate is now also surfaced in the `.md` report via `df.attrs["n_intermediates"]`.
-      `--ranks-dir` overrides the destination; the default is `/workspace/results/rep1` when
+      `--ranks-dir` overrides the destination; the default is `/workspace/results/quantitative-evals` when
       `/workspace` exists (survives the pod) and `results/` otherwise.
 
 - [x] **C3 — Batch the unembed** *(written, unrun — still needs the parity check)*
@@ -290,7 +290,7 @@ nohup uv run rlens eval --model qwen3.5-27b \
 All items, no `--limit`, four lens arms. Watch the retained-item count per set — **if multihop retains
 < 30 items the headline comparison is underpowered**; say so rather than quietly reporting a noisy number.
 
-Immediately after: copy `/workspace/results/rep1/passk_qwen3.5-27b.parquet` to a second location off the volume. Everything
+Immediately after: copy `/workspace/results/quantitative-evals/passk_qwen3.5-27b.parquet` to a second location off the volume. Everything
 downstream is CPU work.
 
 **Gate 2:** raw parquet off-pod · summary written · R ≥ J in the first half of layers, both well above the
@@ -346,4 +346,19 @@ single-model replication beats two half-finished ones. Fall back to the cross-mo
 3. Correctness filter applies only to sets carrying a `target` (multihop, multilingual);
    association / typo / poetry are unfiltered (`evals.py:102`).
 4. Poetry reads at the newline ending line 1, located by decoding tokens (`evals.py:96`).
-5. Control lens is our addition, not in the original post.
+5. Control lens is our addition, not in the original post (the post's ablations use an MLP-neuron
+   control, not a norm-matched random transport).
+6. **Readout position.** The post reads at "the bolded token position"; the released eval JSONs carry no
+   such marker, so we read at the final prompt token — the prompts already end where the answer goes.
+   Poetry is the exception (deviation 4). `readout_pos` and `readout_token` are stored per item, so the
+   choice is auditable after the fact rather than asserted.
+7. **Correctness filter is not always applicable.** It compares the model's argmax to the target's
+   single-token surface forms; a target like `pequeño` has none, so the item is kept **unfiltered**.
+   Those rows are flagged `filter_applicable = False` — report that count next to `n_kept`, since the
+   post's filter effectively did not run on them.
+8. **Layer grid.** The paper reads 25 evenly spaced layers reindexed to [0, 100]; we read *every*
+   fitted source layer and normalize to `ℓ / (n_layers − 1)` at plot time (C6). Ours is a superset, so
+   the paper's grid can be recovered from the parquet, but a raw "mean over layers" is not weighted the
+   same way as theirs — say which one the report uses.
+9. **order-ops is downloaded but not evaluated.** The reference repo ships six sets; the post's headline
+   uses five. `EVAL_SETS` is the post's five.
