@@ -1,0 +1,38 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "rlens"
+version = "0.1.0"
+description = "Replication of the R-lens (LRP-modified Jacobian lens) fitting harness"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "torch",
+    "transformers>=5.5",
+    "accelerate",
+    "datasets",
+    "huggingface_hub",
+    "safetensors",
+    "einops",
+    "numpy",
+    "pandas",
+    "matplotlib",
+    "pytest",
+    "jupyter",
+    "pyyaml",
+    "jlens",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/rlens"]
+
+[tool.uv]
+package = true
+
+[tool.uv.sources]
+jlens = { git = "https://github.com/anthropics/jacobian-lens", rev = "581d398613e5602a5af361e1c34d3a92ea82ba8e" }
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

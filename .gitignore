@@ -1,0 +1,22 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Reference clones (read-only, re-clonable; pinned in configs/pins.yaml)
+reference/
+
+# Heavy assets (re-downloadable via scripts/download_assets.py)
+models/
+data/pile10k/
+data/eval_prompts/
+lenses/released/**/*.pt
+lenses/ours/**/*.pt
+lenses/**/*.ckpt.pt
+*.ckpt.pt.tmp.*
+
+# Local scratch
+results/plumbing/
