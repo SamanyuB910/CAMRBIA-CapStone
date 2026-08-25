@@ -486,8 +486,11 @@ def cmd_coherence(args) -> None:
     layers = per_layer(df)
     overall = summarize(df, seed=args.seed)
 
-    out_dir = REPO_ROOT / "results"
-    out_dir.mkdir(exist_ok=True)
+    # Default stays in-repo; --out-dir writes straight to a shared volume so the
+    # big artifacts never land on the container disk (see the team's
+    # /workspace/results/<branch> convention).
+    out_dir = Path(args.out_dir).expanduser() if args.out_dir else REPO_ROOT / "results"
+    out_dir.mkdir(parents=True, exist_ok=True)
     tag = model_name
     df.to_parquet(out_dir / f"coherence_readouts_{tag}.parquet")
     layers.to_csv(out_dir / f"coherence_per_layer_{tag}.csv")
@@ -585,6 +588,9 @@ def main() -> None:
     p.add_argument("--trash-set", default=DEFAULT_TRASH_SET, choices=sorted(TRASH_SETS),
                    help="which form categories count as trash (recorded in the report)")
     p.add_argument("--reference", default=None, help="lens arm the contrasts are taken from (default: the R arm)")
+    p.add_argument("--out-dir", default=None, metavar="DIR",
+                   help="write report/CSV/parquet/panel here instead of ./results "
+                        "(e.g. /workspace/results/coherence)")
     p.add_argument("--panel-items", type=int, default=24)
     p.add_argument("--panel-lenses", nargs="+", default=None,
                    help="restrict the blinded panel to these lens arms (default: all present)")

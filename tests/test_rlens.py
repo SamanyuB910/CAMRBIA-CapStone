@@ -912,3 +912,21 @@ def test_lens_device_config_default_is_auto():
 
     assert CoherenceConfig().lens_device == "auto"
     assert CoherenceConfig(lens_device="cpu").lens_device == "cpu"
+
+
+def test_report_renders_absolute_paths_when_out_dir_is_off_repo(tmp_path, monkeypatch):
+    """With --out-dir on a shared volume the panel lives outside the repo, so
+    report()'s relative-path display must fall back instead of raising."""
+    from rlens.coherence import annotate, build_panel, report
+
+    items = [{"prompt": f"prompt {i} ", "intermediates": ["a"]} for i in range(4)]
+    raw, _ = _run_pipeline(monkeypatch, items)
+    df = annotate(raw, lexicon=LEXICON)
+
+    volume = tmp_path / "workspace" / "results" / "coherence"
+    sheet, key = build_panel(df, volume, n_items=4, seed=11)
+    assert sheet.exists()
+
+    text = report(df, model_name="stub", sheet_path=sheet, key_path=key,
+                  repo_root=tmp_path / "repo")     # unrelated root
+    assert str(sheet) in text, "off-repo path must render absolute, not blow up"
