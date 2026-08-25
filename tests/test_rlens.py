@@ -1092,7 +1092,8 @@ def test_hand_entered_scores_unblind_to_the_right_lenses(tmp_path):
 def test_unblind_rejects_duplicate_score_columns():
     """Renaming arm_*_score onto the existing arm_* token columns silently drops
     half the data; refuse it loudly instead."""
-    key = pd.DataFrame([{"entry": "000L00", "arm_A": "ours-R", "arm_B": "ours-J"}])
+    key = pd.DataFrame([{"entry": "000L00", "set": "multihop", "item": 0, "layer": 0,
+                         "arm_A": "ours-R", "arm_B": "ours-J"}])
     import tempfile
 
     with tempfile.TemporaryDirectory() as tmp:
@@ -1213,3 +1214,41 @@ def test_panel_key_carries_the_item_index_for_joining(tmp_path):
     _, key_path = build_panel(df, tmp_path, n_items=4, max_layers=2, seed=33)
     key = [json.loads(l) for l in key_path.read_text(encoding="utf-8").splitlines()]
     assert all({"entry", "set", "item", "layer"} <= set(row) for row in key)
+
+
+def test_unblind_refuses_a_key_from_a_different_panel_generation(tmp_path):
+    """A stale key reuses the same entry ids under a different shuffle, so a
+    silent merge joins ratings to the WRONG lenses and returns a plausible null.
+    This actually happened on the 27B panel."""
+    df = annotate(_synthetic_readouts(n_items=6), lexicon=LEXICON)
+    _, key_path = build_panel(df, tmp_path, n_items=6, max_layers=3, seed=41)
+    key_rows = [json.loads(l) for l in key_path.read_text(encoding="utf-8").splitlines()]
+
+    scores = pd.DataFrame(
+        [{"entry": r["entry"], "set": r["set"], "layer": r["layer"],
+          "arm_A": 3, "arm_B": 0, "arm_C": 1} for r in key_rows]
+    )
+    assert not unblind(scores, key_path).empty          # matching key works
+
+    # 1. a key that predates the item/set/layer fields
+    legacy = tmp_path / "legacy_key.jsonl"
+    legacy.write_text("\n".join(
+        json.dumps({k: v for k, v in r.items() if k == "entry" or k.startswith("arm_")})
+        for r in key_rows
+    ), encoding="utf-8")
+    with pytest.raises(ValueError, match="predates the current panel format"):
+        unblind(scores, legacy)
+
+    # 2. a current-format key that simply lacks some rated entries
+    short = tmp_path / "short_key.jsonl"
+    short.write_text("\n".join(json.dumps(r) for r in key_rows[:-2]), encoding="utf-8")
+    with pytest.raises(ValueError, match="absent from the key"):
+        unblind(scores, short)
+
+    # 3. same entry ids, different (set, layer) -> different generation
+    skewed = tmp_path / "skewed_key.jsonl"
+    skewed.write_text("\n".join(
+        json.dumps({**r, "layer": r["layer"] + 100}) for r in key_rows
+    ), encoding="utf-8")
+    with pytest.raises(ValueError, match="disagree on `layer`"):
+        unblind(scores, skewed)

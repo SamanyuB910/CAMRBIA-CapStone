@@ -846,6 +846,38 @@ def unblind(scores: pd.DataFrame, key_path: Path) -> pd.DataFrame:
     """Join autorater/human arm scores back to lens names via the key."""
     key = pd.DataFrame([json.loads(l) for l in key_path.read_text(encoding="utf-8").splitlines() if l])
     arms = [c for c in key.columns if c.startswith("arm_")]
+
+    # A key from a different panel generation reuses the same entry ids under a
+    # DIFFERENT shuffle, so a silent merge joins ratings to the wrong lenses and
+    # returns a plausible-looking null. Refuse instead.
+    if "item" not in key.columns:
+        raise ValueError(
+            "this key predates the current panel format (no `item`/`set`/`layer` fields). "
+            "It is almost certainly from an earlier panel generation, whose arm order "
+            "differs. Regenerate the panel and rate the new sheet."
+        )
+    missing = set(scores["entry"]) - set(key["entry"])
+    if missing:
+        raise ValueError(
+            f"{len(missing)} rated entries are absent from the key "
+            f"(e.g. {sorted(missing)[:3]}). The key does not belong to this sheet — "
+            "regenerate the panel or locate the matching key."
+        )
+    for column in ("set", "layer"):
+        if column in scores.columns and column in key.columns:
+            merged_check = scores[["entry", column]].merge(
+                key[["entry", column]], on="entry", suffixes=("_sheet", "_key")
+            )
+            bad = merged_check[
+                merged_check[f"{column}_sheet"].astype(str)
+                != merged_check[f"{column}_key"].astype(str)
+            ]
+            if not bad.empty:
+                raise ValueError(
+                    f"{len(bad)} entries disagree on `{column}` between the scores and the "
+                    f"key (e.g. {bad['entry'].tolist()[:3]}). Mismatched panel generation."
+                )
+
     if scores.columns.duplicated().any():
         raise ValueError(
             "scores has duplicate column names "
