@@ -23,6 +23,7 @@ dependencies = [
     "jupyter",
     "pyyaml",
     "jlens",
+    "tabulate>=0.10.0",
 ]
 
 [project.scripts]

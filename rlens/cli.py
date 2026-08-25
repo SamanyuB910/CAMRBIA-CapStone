@@ -4,6 +4,7 @@
     uv run rlens smoke [--skip-model]             released J-lens vs logit-lens sanity readout
     uv run rlens fit --lens {j,r} [--draw ...]    fit our own lens with the released recipe
     uv run rlens compare [--functional]           our fits vs released -> results/verification_report.md
+    uv run rlens eval [--sets ...] [--limit N]    pass@10 battery: R vs J vs logit -> results/
 """
 
 from __future__ import annotations
@@ -337,6 +338,54 @@ def cmd_compare(args) -> None:
 
 
 # ---------------------------------------------------------------------------
+# eval
+# ---------------------------------------------------------------------------
+
+
+def cmd_eval(args) -> None:
+    import jlens
+    from jlens.lens import JacobianLens
+
+    from rlens.evals import EVAL_SETS, run_passk, summarize_passk
+
+    hf, tok = _load_model(args.dtype, args.device)
+    model = jlens.from_hf(hf, tok)
+
+    lenses = {"logit": None}
+    for name, (kind, file) in {
+        "released-J": ("released", "j-lens"),
+        "released-R": ("released", "r-lens"),
+        "ours-J": ("ours", "j-lens"),
+        "ours-R": ("ours", "r-lens"),
+    }.items():
+        if _lens_path(kind, file).exists():
+            lenses[name] = JacobianLens.load(str(_lens_path(kind, file)))
+    print(f"lenses: {list(lenses)}   sets: {args.sets}")
+
+    df = run_passk(
+        model, lenses,
+        sets=args.sets, k=args.k,
+        filter_correct=not args.no_filter_correct, limit=args.limit,
+    )
+    summary = summarize_passk(df)
+
+    out_dir = REPO_ROOT / "results"
+    df.to_csv(out_dir / "passk_per_layer_qwen3.5-4b.csv")
+    lines = [
+        "# pass@%d — qwen3.5-4b\n" % args.k,
+        f"Sets: {args.sets}. Items kept after correctness filter: {df.attrs['n_kept']}.",
+        "Expected on 4b: J ≈ R (the post's null); both well above the logit lens.\n",
+        "## Summary (mean pass@%d over layers)\n" % args.k,
+        summary.to_markdown(floatfmt=".3f"),
+        "\n## Per-layer (mean over sets)\n",
+        df.T.groupby(level="lens").mean().T.to_markdown(floatfmt=".3f"),
+    ]
+    report = out_dir / "passk_qwen3.5-4b.md"
+    report.write_text("\n".join(lines), encoding="utf-8")
+    print(f"\n{summary.to_string(float_format='%.3f')}\nreport -> {report}")
+
+
+# ---------------------------------------------------------------------------
 # entry point
 # ---------------------------------------------------------------------------
 
@@ -375,6 +424,18 @@ def main() -> None:
     p.add_argument("--device", default=default_device)
     p.add_argument("--dtype", choices=["bf16", "fp32"], default="bf16")
     p.set_defaults(func=cmd_compare)
+
+    from rlens.evals import EVAL_SETS
+
+    p = sub.add_parser("eval", help="pass@10 battery: R vs J vs logit lens -> results/")
+    p.add_argument("--sets", nargs="+", default=EVAL_SETS, choices=EVAL_SETS)
+    p.add_argument("--k", type=int, default=10)
+    p.add_argument("--limit", type=int, default=None, help="max items per set (quick checks)")
+    p.add_argument("--no-filter-correct", action="store_true",
+                   help="keep items the model itself answers wrongly")
+    p.add_argument("--device", default=default_device)
+    p.add_argument("--dtype", choices=["bf16", "fp32"], default="bf16")
+    p.set_defaults(func=cmd_eval)
 
     args = parser.parse_args()
     args.func(args)

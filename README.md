@@ -27,7 +27,8 @@ own experiments. The full research plan is in [`plan.md`](plan.md).
 | `rlens/rules.py` | The heart of the project: the three LRP rules (`RulesConfig`) and the patcher that installs/removes them on a HuggingFace model. |
 | `rlens/fit.py` | Patch model → official `jlens.fit` → save in the released `lens.pt` format with provenance. |
 | `rlens/analysis.py` | Readout tables / rank trajectories (notebook) and lens-vs-lens agreement metrics (verification). |
-| `rlens/cli.py` | The **`rlens` command** — every runnable task: `download`, `smoke`, `fit`, `compare`. |
+| `rlens/evals.py` | The pass@10 battery (five official eval sets, post protocol): R vs J vs logit lens per layer. |
+| `rlens/cli.py` | The **`rlens` command** — every runnable task: `download`, `smoke`, `fit`, `compare`, `eval`. |
 | `tests/` | The correctness gates, all in `test_rlens.py` (see [Tests](#tests)). |
 | `01_readouts.ipynb` | Released J vs R side by side on the post's example prompts. |
 | `pins.yaml` | **Every pinned version in one file**: packages, git commits, HF revisions, recipe constants. |
@@ -151,7 +152,12 @@ Everything CPU-checkable is done and green. On a CUDA machine:
 # setup (same as above), then confirm:
 nvidia-smi && uv run python -c "import torch; assert torch.cuda.is_available()"
 
-# the four fits (bf16, checkpoint/resume on; raise --dim-batch to 16-32 on a 24GB+ card)
+# experiment 1 first — needs no fitting (released lenses; ~2 h CPU, minutes on GPU):
+uv run rlens eval                          # pass@10, five sets -> results/passk_*.md
+
+# the four fits (bf16, checkpoint/resume on). Empirical note from the community repo:
+# this hybrid model fits at --dim-batch 8 on a 40 GB A100 (~100 s/prompt => ~40 min
+# per lens, ~3 h for all four); --dim-batch 16 does NOT fit 40 GB.
 uv run rlens fit --lens j --draw primary   # rows [0:25) - the released draw
 uv run rlens fit --lens r --draw primary
 uv run rlens fit --lens j --draw nf1       # rows [25:50)  noise floor
