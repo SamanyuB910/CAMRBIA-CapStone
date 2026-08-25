@@ -143,11 +143,13 @@ def make_random_displacement(delta_norm: float, d: int, seed: int):
 
 
 class EditRunner:
-    """Run one prompt under many single-(layer, position) edits in one batch.
+    """Run one prompt under many position-local edits in one batch.
 
-    Post-forward hook on decoder block ``layer`` (same tensor the lens was fit
-    against); batch element b gets ``edits[b]`` applied to h[b, position] in
-    fp32. Returns final-position logits [n_edits, vocab] (fp32, CPU).
+    Each batch element is a ``{layer: edit_fn}`` dict — usually one layer
+    (layer-local interventions), or several for the persistent anti-self-repair
+    ablation. Post-forward hooks on the decoder blocks (same tensors the lens
+    was fit against); element b's edit for layer l is applied to h[b, position]
+    in fp32. Returns final-position logits [n_edits, vocab] (fp32, CPU).
     """
 
     def __init__(self, hf_model):
@@ -155,7 +157,7 @@ class EditRunner:
         self.layers = hf_model.model.layers
 
     @torch.no_grad()
-    def run(self, input_ids: torch.Tensor, layer: int, position: int, edits: list, batch_size: int = 24) -> torch.Tensor:
+    def run(self, input_ids: torch.Tensor, position: int, edits: list[dict], batch_size: int = 24) -> torch.Tensor:
         out = []
         for start in range(0, len(edits), batch_size):
             chunk = list(edits[start : start + batch_size])
@@ -167,17 +169,24 @@ class EditRunner:
                 chunk += [chunk[-1]] * (batch_size - n_real)
             batch = input_ids.expand(len(chunk), -1)
 
-            def hook(module, args, output, chunk=chunk):
-                h = output[0] if isinstance(output, tuple) else output
-                for b, edit in enumerate(chunk):
-                    h[b, position] = edit(h[b, position].float()).to(h.dtype)
-                return output
+            def make_hook(layer_idx, chunk=chunk):
+                def hook(module, args, output):
+                    h = output[0] if isinstance(output, tuple) else output
+                    for b, per_layer in enumerate(chunk):
+                        edit = per_layer.get(layer_idx)
+                        if edit is not None:
+                            h[b, position] = edit(h[b, position].float()).to(h.dtype)
+                    return output
 
-            handle = self.layers[layer].register_forward_hook(hook)
+                return hook
+
+            hooked = sorted({l for per_layer in chunk for l in per_layer})
+            handles = [self.layers[l].register_forward_hook(make_hook(l)) for l in hooked]
             try:
                 logits = self.hf_model(input_ids=batch, use_cache=False).logits
             finally:
-                handle.remove()
+                for handle in handles:
+                    handle.remove()
             out.append(logits[:n_real, -1].float().cpu())
         return torch.cat(out)
 
@@ -326,29 +335,40 @@ def _layer_jacobians(lenses: dict, layer: int) -> dict[str, torch.Tensor | None]
     return {"R": lenses["R"].jacobians[layer], "J": lenses["J"].jacobians[layer], "logit": None}
 
 
-def _edit_battery(hf_model, jacobians: dict[str, torch.Tensor | None], item: OnsetItem, *, ridge: float, center_mu: torch.Tensor | None):
-    """All (lens, condition, alpha) edits for one (item, layer).
-    Returns (labels, edits) where labels are (lens, condition, alpha) tuples."""
+def _edit_battery(
+    hf_model, jacobians: dict[str, torch.Tensor | None], item: OnsetItem, *,
+    layer: int, c_dirs: dict[str, dict[int, torch.Tensor]], all_layers: list[int],
+    ridge: float, center_mu: torch.Tensor | None,
+):
+    """All (lens, condition, alpha) edits for one (item, layer) as
+    ``{layer: edit_fn}`` dicts. ``c_dirs[lens][l]`` are per-layer concept
+    directions for the persistent (anti-self-repair) ablation."""
     labels, edits = [], []
 
-    def add(lens, condition, alpha, edit):
+    def add(lens, condition, alpha, edit_dict):
         labels.append({"lens": lens, "condition": condition, "alpha": alpha})
-        edits.append(edit)
+        edits.append(edit_dict)
 
-    add("-", "identity", 0.0, lambda h: h)  # alpha=0 numerics check
+    add("-", "identity", 0.0, {layer: lambda h: h})  # alpha=0 numerics check
     for lens in LENSES:
         J = jacobians[lens]
         v_c, v_cp, v_wrong, v_y, v_yp = lens_vectors(
             hf_model, J, [item.c_id, item.c_prime_id, item.c_wrong_id, item.y_id, item.y_prime_id]
         )
-        add(lens, "ablate", 1.0, make_ablation(v_c, 1.0, mu=center_mu))
-        add(lens, "ablate_wrong", 1.0, make_ablation(v_wrong, 1.0, mu=center_mu))
-        add(lens, "ablate_answer", 1.0, make_ablation(v_y, 1.0, mu=center_mu))
+        add(lens, "ablate", 1.0, {layer: make_ablation(v_c, 1.0, mu=center_mu)})
+        # persistent ablation: suppress the concept direction at EVERY layer
+        # >= l (each layer's own direction). N_persist - N_single measures
+        # self-repair (later layers recomputing the concept from the prompt).
+        add(lens, "ablate_persist", 1.0, {
+            l2: make_ablation(c_dirs[lens][l2], 1.0, mu=center_mu) for l2 in all_layers if l2 >= layer
+        })
+        add(lens, "ablate_wrong", 1.0, {layer: make_ablation(v_wrong, 1.0, mu=center_mu)})
+        add(lens, "ablate_answer", 1.0, {layer: make_ablation(v_y, 1.0, mu=center_mu)})
         for alpha in ALPHAS:
-            add(lens, "swap", alpha, make_pinv_swap(v_c, v_cp, alpha, ridge=ridge))
-        add(lens, "swap_reflection", 1.0, make_reflection_swap(v_c, v_cp, 1.0))
-        add(lens, "swap_wrong", 1.0, make_pinv_swap(v_wrong, v_cp, 1.0, ridge=ridge))
-        add(lens, "swap_answer", 1.0, make_pinv_swap(v_y, v_yp, 1.0, ridge=ridge))
+            add(lens, "swap", alpha, {layer: make_pinv_swap(v_c, v_cp, alpha, ridge=ridge)})
+        add(lens, "swap_reflection", 1.0, {layer: make_reflection_swap(v_c, v_cp, 1.0)})
+        add(lens, "swap_wrong", 1.0, {layer: make_pinv_swap(v_wrong, v_cp, 1.0, ridge=ridge)})
+        add(lens, "swap_answer", 1.0, {layer: make_pinv_swap(v_y, v_yp, 1.0, ridge=ridge)})
     return labels, edits
 
 
@@ -403,6 +423,12 @@ def run_measurements(
         # shuffled-label baseline concept for the readout (fixed derangement)
         shuf = items[(item_idx + 1) % len(items)]
 
+        # per-layer concept directions (for the persistent ablation), once per item
+        c_dirs = {
+            lens: {l: lens_vectors(hf_model, _layer_jacobians(lenses, l)[lens], [item.c_id])[0] for l in layers}
+            for lens in LENSES
+        }
+
         for layer in layers:
             h_t = acts[layer][item.t_i].float().cpu()
             jacobians = _layer_jacobians(lenses, layer)
@@ -414,18 +440,26 @@ def run_measurements(
                     ids = token_ids_of(tok, concept)
                     records.append({**base, "layer": layer, "lens": lens, "condition": cond, "alpha": 0.0, "rank_c": rank_of(logits_l, ids)})
 
-            labels, edits = _edit_battery(hf_model, jacobians, item, ridge=ridge, center_mu=mu_by_layer.get(layer))
-            # norm-matched random controls for the real ablation and swap(1) of each lens
+            labels, edits = _edit_battery(
+                hf_model, jacobians, item, layer=layer, c_dirs=c_dirs, all_layers=layers,
+                ridge=ridge, center_mu=mu_by_layer.get(layer),
+            )
+            # displacement norms at this layer (magnitude-confound reporting:
+            # per-lens intervention sizes differ, and effects must be judged
+            # against equally-sized random pushes)
             deltas = {}
-            for label, edit in zip(labels, edits):
+            for label, edit_dict in zip(labels, edits):
+                if layer in edit_dict:
+                    label["delta_norm"] = float((edit_dict[layer](h_t.clone()) - h_t).norm())
                 if label["condition"] in ("ablate", "swap") and label["alpha"] == 1.0:
-                    deltas[(label["lens"], label["condition"])] = float((edit(h_t.clone()) - h_t).norm())
+                    deltas[(label["lens"], label["condition"])] = label["delta_norm"]
+            # norm-matched random controls for the real ablation and swap(1) of each lens
             for (lens, cond), dn in deltas.items():
                 for b in range(N_RANDOM):
-                    labels.append({"lens": lens, "condition": f"random_{cond}", "alpha": 1.0})
-                    edits.append(make_random_displacement(dn, h_t.shape[0], seed=hash((item.name, layer, lens, cond, b)) & 0x7FFFFFFF))
+                    labels.append({"lens": lens, "condition": f"random_{cond}", "alpha": 1.0, "delta_norm": dn})
+                    edits.append({layer: make_random_displacement(dn, h_t.shape[0], seed=hash((item.name, layer, lens, cond, b)) & 0x7FFFFFFF)})
 
-            logits = runner.run(input_ids, layer, item.t_i, edits, batch_size=batch_size)
+            logits = runner.run(input_ids, item.t_i, edits, batch_size=batch_size)
             logp = logits.log_softmax(-1)
             # effects are referenced to the IN-BATCH identity condition
             # (labels[0]): identical kernel shapes -> bf16 shape-noise cancels
@@ -493,6 +527,9 @@ def analyze(df: pd.DataFrame, *, rho: float = 0.2, w: int = 2, n_boot: int = 100
                 "R": by_layer("readout", "hit10") - by_layer("readout_shuffled", "hit10"),
                 "N": by_layer("ablate", "necessity", 1.0) - by_layer("random_ablate", "necessity"),
                 "S": by_layer("swap", "swap_effect", 1.0) - by_layer("random_swap", "swap_effect"),
+                # persistent (all layers >= l) ablation: N_persist - N flags
+                # self-repair; informational, not used for the primary onsets
+                "N_persist": by_layer("ablate_persist", "necessity", 1.0) - by_layer("random_ablate", "necessity"),
             }
         return out
 

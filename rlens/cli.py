@@ -479,6 +479,15 @@ def cmd_onset(args) -> None:
     if len(diag):
         lines.append("\n## Swap-pair conditioning (mid layer)\n")
         lines.append(diag.groupby("lens")[["cos", "kappa"]].describe().to_markdown(floatfmt=".2f"))
+    if "delta_norm" in df:
+        real = df[df.condition.isin(["ablate", "swap"]) & (df.alpha == 1.0)]
+        if len(real):
+            lines.append("\n## Intervention displacement norms (magnitude-confound check)\n")
+            lines.append("Per-lens push sizes; effects are baselined against norm-matched random pushes,")
+            lines.append("but if R >> J here at early layers, run the norm-equalized sensitivity.\n")
+            lines.append(
+                real.groupby(["lens", "condition"])["delta_norm"].agg(["mean", "std", "max"]).to_markdown(floatfmt=".2f")
+            )
     out = REPO_ROOT / "results" / f"onset_{args.model}.md"
     out.write_text("\n".join(lines), encoding="utf-8")
     print(f"report -> {out}")

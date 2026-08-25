@@ -101,9 +101,26 @@ def test_edit_runner_touches_only_requested_element(tiny_qwen, tiny_batch):
         clean = tiny_qwen(input_ids=input_ids, use_cache=False).logits[0, -1].float()
 
     bump = torch.randn(tiny_qwen.config.hidden_size, generator=torch.Generator().manual_seed(0))
-    logits = runner.run(input_ids, layer=1, position=3, edits=[lambda h: h, lambda h: h + 5.0 * bump])
+    logits = runner.run(input_ids, position=3, edits=[{1: lambda h: h}, {1: lambda h: h + 5.0 * bump}])
     assert torch.allclose(logits[0], clean, atol=1e-5), "identity edit changed the forward"
     assert not torch.allclose(logits[1], clean, atol=1e-3), "real edit had no effect"
+
+
+def test_edit_runner_multi_layer_persistent_edit(tiny_qwen, tiny_batch):
+    """A multi-layer (persistent) edit must differ from the single-layer one,
+    and a multi-layer identity must still match the clean forward."""
+    runner = EditRunner(tiny_qwen)
+    input_ids = tiny_batch[:1]
+    with torch.no_grad():
+        clean = tiny_qwen(input_ids=input_ids, use_cache=False).logits[0, -1].float()
+
+    bump = torch.randn(tiny_qwen.config.hidden_size, generator=torch.Generator().manual_seed(1))
+    single = {1: lambda h: h + 3.0 * bump}
+    persist = {l: (lambda h: h + 3.0 * bump) for l in (1, 2, 3)}
+    ident = {l: (lambda h: h) for l in (1, 2, 3)}
+    logits = runner.run(input_ids, position=3, edits=[single, persist, ident])
+    assert not torch.allclose(logits[0], logits[1], atol=1e-3), "persistent edit == single-layer edit"
+    assert torch.allclose(logits[2], clean, atol=1e-5), "multi-layer identity changed the forward"
 
 
 def test_lens_vector_ranking_matches_actual_readout(tiny_qwen):
