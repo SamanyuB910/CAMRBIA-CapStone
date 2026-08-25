@@ -35,7 +35,7 @@ packages = ["rlens"]
 [tool.uv]
 package = true
 
-[tool.uv.index]
+[[tool.uv.index]]
 name = "pytorch-cu128"
 url = "https://download.pytorch.org/whl/cu128"
 explicit = true
