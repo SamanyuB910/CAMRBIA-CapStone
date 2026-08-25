@@ -1231,3 +1231,86 @@ def metric_vs_rating(readouts: pd.DataFrame, scores: pd.DataFrame) -> pd.DataFra
     out = pd.DataFrame(rows).set_index("metric")
     out.attrs["joined"] = joined
     return out
+
+
+def judge_panel_local(
+    sheet_path: Path,
+    *,
+    model_id: str = "Qwen/Qwen3.5-4B",
+    revision: str | None = None,
+    device: str = "cuda",
+    dtype: str = "bf16",
+    limit: int | None = None,
+    max_new_tokens: int = 64,
+) -> pd.DataFrame:
+    """Rate a blinded sheet with a locally-hosted model — no API, no spend.
+
+    Independent of any rater who has seen the aggregate diagnostics, which is
+    the point: it supplies the second opinion needed for an agreement statistic
+    when no second human is available.
+
+    Two limitations belong in any write-up that uses this. It is not a human,
+    so it is a proxy for the §6.2.2 qualitative replication rather than the
+    replication itself. And if ``model_id`` is the model under study (or its
+    family), it is grading readouts derived from its own activations — prefer a
+    different model where one is available, and state which was used.
+    """
+    import torch
+    import transformers
+
+    entries = [json.loads(l) for l in sheet_path.read_text(encoding="utf-8").splitlines() if l]
+    entries = entries[:limit]
+
+    torch_dtype = {"bf16": torch.bfloat16, "fp32": torch.float32}[dtype]
+    tok = transformers.AutoTokenizer.from_pretrained(model_id, revision=revision)
+    model = transformers.AutoModelForCausalLM.from_pretrained(
+        model_id, revision=revision, dtype=torch_dtype, device_map=device
+    ).eval()
+
+    rows = []
+    for entry in entries:
+        arms = {k: v for k, v in entry.items() if k.startswith("arm_")}
+        messages = [
+            {"role": "system", "content": RUBRIC},
+            {"role": "user", "content": json.dumps(arms, ensure_ascii=False)},
+        ]
+        prompt = tok.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+        inputs = tok(prompt, return_tensors="pt").to(model.device)
+        with torch.no_grad():
+            out = model.generate(
+                **inputs, max_new_tokens=max_new_tokens, do_sample=False,
+                pad_token_id=tok.pad_token_id or tok.eos_token_id,
+            )
+        text = tok.decode(out[0, inputs["input_ids"].shape[1]:], skip_special_tokens=True)
+
+        scores = _parse_arm_scores(text, list(arms))
+        if scores is None:
+            print(f"  {entry['entry']}: unparseable rater output {text[:60]!r} — skipped")
+            continue
+        rows.append({"entry": entry["entry"], "set": entry["set"], "layer": entry["layer"], **scores})
+
+    if not rows:
+        raise SystemExit("the local rater produced no parseable scores; try a larger model")
+    print(f"local rater scored {len(rows)}/{len(entries)} entries")
+    return pd.DataFrame(rows)
+
+
+def _parse_arm_scores(text: str, arm_names: list[str]) -> dict | None:
+    """Pull one 0-3 score per arm out of a rater's reply.
+
+    Small models drift from strict JSON, so fall back to positional digits
+    rather than discarding the judgement — but never invent a missing arm.
+    """
+    match = re.search(r"\{[^{}]*\}", text, re.S)
+    if match:
+        try:
+            parsed = json.loads(match.group())
+            got = {a: int(parsed[a]) for a in arm_names if a in parsed}
+            if len(got) == len(arm_names) and all(0 <= v <= 3 for v in got.values()):
+                return got
+        except (ValueError, TypeError):
+            pass
+    digits = [int(d) for d in re.findall(r"\b([0-3])\b", text)]
+    if len(digits) >= len(arm_names):
+        return dict(zip(arm_names, digits[: len(arm_names)]))
+    return None

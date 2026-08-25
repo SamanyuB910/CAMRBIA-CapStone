@@ -1252,3 +1252,29 @@ def test_unblind_refuses_a_key_from_a_different_panel_generation(tmp_path):
     ), encoding="utf-8")
     with pytest.raises(ValueError, match="disagree on `layer`"):
         unblind(scores, skewed)
+
+
+@pytest.mark.parametrize(
+    "reply,expected",
+    [
+        ('{"arm_A": 3, "arm_B": 0, "arm_C": 2}', {"arm_A": 3, "arm_B": 0, "arm_C": 2}),
+        ('Sure! ```json\n{"arm_A":1,"arm_B":1,"arm_C":3}\n```', {"arm_A": 1, "arm_B": 1, "arm_C": 3}),
+        ("arm_A: 2, arm_B: 0, arm_C: 1", {"arm_A": 2, "arm_B": 0, "arm_C": 1}),  # digit fallback
+        # An out-of-range score means the rater is confused: drop the entry rather
+        # than salvaging a partial judgement (the digit fallback finds only 3 and 2).
+        ('{"arm_A": 3, "arm_B": 9, "arm_C": 2}', None),
+    ],
+)
+def test_local_rater_output_parsing(reply, expected):
+    from rlens.coherence import _parse_arm_scores
+
+    assert _parse_arm_scores(reply, ["arm_A", "arm_B", "arm_C"]) == expected
+
+
+def test_local_rater_refuses_to_invent_a_missing_arm():
+    """Better to drop an entry than to fabricate a judgement for it."""
+    from rlens.coherence import _parse_arm_scores
+
+    assert _parse_arm_scores("I think 2", ["arm_A", "arm_B", "arm_C"]) is None
+    assert _parse_arm_scores("", ["arm_A", "arm_B"]) is None
+    assert _parse_arm_scores('{"arm_A": 3}', ["arm_A", "arm_B"]) is None

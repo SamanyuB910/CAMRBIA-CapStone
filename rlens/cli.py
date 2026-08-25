@@ -8,6 +8,7 @@
     uv run rlens coherence [--judge] [...]        early-layer coherence -> results/
     uv run rlens rescore <readouts.parquet>       re-score saved readouts, no GPU
     uv run rlens unblind <scores.csv> --key ...   join hand ratings to lens names
+    uv run rlens rate-local <panel.jsonl>         second rater, local model, no API
 """
 
 from __future__ import annotations
@@ -666,6 +667,36 @@ def cmd_unblind(args) -> None:
 
 
 # ---------------------------------------------------------------------------
+# rate-local
+# ---------------------------------------------------------------------------
+
+
+def cmd_rate_local(args) -> None:
+    """Score a blinded panel with a local model — a second rater, no API spend."""
+    from rlens.coherence import judge_panel_local
+
+    sheet = Path(args.sheet)
+    if sheet.suffix == ".csv":
+        raise SystemExit(
+            f"{sheet} is the human rating sheet. Pass coherence_panel.jsonl "
+            "(same directory) — the local rater reads the JSONL form."
+        )
+    scores = judge_panel_local(
+        sheet, model_id=args.model, revision=args.revision, device=args.device,
+        dtype=args.dtype, limit=args.limit,
+    )
+    out = Path(args.out) if args.out else sheet.parent / f"{args.rater_name}.csv"
+    # Emit in the same shape as the human sheet so `rlens unblind` treats every
+    # rater identically.
+    scores = scores.rename(columns={c: f"{c}_score" for c in scores.columns if c.startswith("arm_")})
+    scores.to_csv(out, index=False)
+    print(f"\nlocal rater scores -> {out}")
+    print("Join with the human rating via:")
+    print(f"  rlens unblind <human>.csv {out} --key <key>.jsonl --n-layers <L>")
+
+
+
+# ---------------------------------------------------------------------------
 # entry point
 # ---------------------------------------------------------------------------
 
@@ -777,6 +808,18 @@ def main() -> None:
     p.add_argument("--seed", type=int, default=20260825)
     p.add_argument("--out", default=None, help="write the unblinded long-form scores here")
     p.set_defaults(func=cmd_unblind)
+
+    p = sub.add_parser("rate-local", help="score a blinded panel with a local model (no API)")
+    p.add_argument("sheet", help="coherence_panel.jsonl (not the .csv)")
+    p.add_argument("--model", default="Qwen/Qwen3.5-4B",
+                   help="rater model; prefer one that is NOT the model under study")
+    p.add_argument("--revision", default=None)
+    p.add_argument("--rater-name", default="local-rater", help="becomes the output filename stem")
+    p.add_argument("--out", default=None)
+    p.add_argument("--limit", type=int, default=None)
+    p.add_argument("--device", default=default_device)
+    p.add_argument("--dtype", choices=["bf16", "fp32"], default="bf16")
+    p.set_defaults(func=cmd_rate_local)
 
     args = parser.parse_args()
     args.func(args)
