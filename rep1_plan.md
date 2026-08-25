@@ -7,6 +7,17 @@
 **Qwen/Qwen3.5-27B** (must-have) and **google/gemma-3-27b-it** (stretch), plus the post's headline bar
 chart and a `results/` writeup the rest of the team can build on.
 
+> ### Status — end of Tue afternoon
+> **Done:** pod up · torch 2.11.0+cu128 on the A100 (`pytest` green) · both 27B models + their
+> released j/r lens pairs downloaded and revision-pinned · **C1 shipped**.
+> **C2 + C3 + C4 written on the Mac** (`rlens/evals.py`, `tests/test_evals.py`) — unverified: nothing in
+> this repo is runnable on the Mac, so they are green only once `uv run pytest` passes on the pod.
+> **Next, in order:** `mv jacobian-lens reference/` → `rlens download` →
+> `uv run pytest` (now covers the eval path) → `smoke --model qwen3.5-27b --skip-model` →
+> C3 parity check against the 4b results → Gate 1 → Phase 3.
+> **Still open:** C1b (`loader:` for gemma, Wednesday), C5–C6 — both read the C2 parquet, so they are
+> written *during* the run, not before it. Nothing else blocks Phase 3.
+
 **Starting point:** `rlens eval` already works end-to-end and there are committed 4b results
 (`results/passk_qwen3.5-4b.md`, 20 items/set, CPU, released lenses). This is a scale-up to 27B plus the
 missing analysis layer — not a build from scratch.
@@ -80,6 +91,11 @@ Confirmed pod facts: A100-SXM4-80GB **idle, 0 MiB used** · root disk 100 GB / 9
       uv sync
       git clone https://github.com/anthropics/jacobian-lens reference/jacobian-lens
       ```
+      ⚠️ **The jlens clone landed at the repo root as `jacobian-lens/`, not `reference/jacobian-lens/`**
+      (true on both the Mac and the pod). `cmd_download` checks `reference/jacobian-lens/data` and
+      **raises** if it is missing, so `rlens download` cannot copy the eval JSONs until this moves:
+      `mkdir -p reference && mv jacobian-lens reference/`. `.gitignore` covers `reference/`; the
+      root-level copy shows up as untracked noise in `git status`.
 - [x] **0.2** Environment — HF cache shared, uv cache local:
       ```bash
       export HF_HOME=/workspace/hf        # inherits 4b + released lenses + pile-10k already cached
@@ -91,21 +107,68 @@ Confirmed pod facts: A100-SXM4-80GB **idle, 0 MiB used** · root disk 100 GB / 9
       to rebuild, and it is thousands of small files.
 - [x] **0.3** **Accept the Gemma license now** — <https://huggingface.co/google/gemma-3-27b-it>.
       Approval is not instant and you need it Wednesday morning, not Wednesday noon.
-- [ ] **0.4** **Say in Slack that you are pulling Qwen-27B**, then start it and walk away
+- [x] **0.4** **Say in Slack that you are pulling Qwen-27B**, then start it and walk away
       (~56 GB; the lens files are already cached, so this is the only large download you need):
       ```bash
       nohup hf download Qwen/Qwen3.5-27B      > /workspace/dl_qwen.log  2>&1 &
       nohup hf download google/gemma-3-27b-it > /workspace/dl_gemma.log 2>&1 &
       ```
-- [ ] **0.5** Meanwhile: `uv run rlens download` (copies `data/eval_prompts/**` out of the jlens
+- [x] **0.5** Meanwhile: `uv run rlens download` (copies `data/eval_prompts/**` out of the jlens
       clone) then `uv run pytest` — must be green before touching anything.
-- [ ] **0.6** Fix pushing *from* the pod before you have results worth pushing: `origin` is HTTPS and
+- [x] **0.6** Fix pushing *from* the pod before you have results worth pushing: `origin` is HTTPS and
       the pod has no credential. Either `ssh -A cambria-charles` +
       `git remote set-url origin git@github.com:SamanyuB910/CAMRBIA-CapStone.git`, or drop a PAT on the pod.
+
+- [x] **0.7** **CUDA/torch pin fixed** (this cost ~40 min and is the single most likely thing to
+      re-break). The A100's driver 550.127.05 is **CUDA 12.8**; torch 2.13.0 resolves to a cu130 wheel
+      and dies with `The NVIDIA driver on your system is too old (found version 12080)`. Resolution:
+      pin `torch==2.11.0` (newest on the cu128 index) via an explicit index in `pyproject.toml`:
+      ```toml
+      [[tool.uv.index]]                     # note the DOUBLE brackets - array of tables
+      name = "pytorch-cu128"
+      url = "https://download.pytorch.org/whl/cu128"
+      explicit = true
+
+      [tool.uv.sources]
+      torch = { index = "pytorch-cu128" }
+      ```
+      Verified on the pod: `2.11.0+cu128 True NVIDIA A100-SXM4-80GB`, `pytest` 21 passed / 1 skipped.
+      **Consequence: `uv sync` no longer works on the Mac** — the cu128 index publishes no macOS
+      wheels. Edit locally, sync only on the pod.
+
+- [x] **0.8** Both 27B models downloaded (~600-720 MB/s) with their released j/r lens pairs
+      (~3.5 GB each), and both revisions now pinned in `pins.yaml`:
+      Qwen3.5-27B `fc05daec18b0a78c049392ed2e771dde82bdf654` ·
+      gemma-3-27b-it `005ad3404e59d6023443cb575daa05336842228a`.
+
+- [ ] **0.9** Housekeeping, 5 min, do it before Phase 2:
+      - `pins.yaml:8` still says `torch: "2.13.0"` - change to `"2.11.0"` (README too)
+      - push the pod's 3 unpushed commits **including the modified `uv.lock`** (it is the correct
+        lock for 2.11.0 - without it a fresh pod re-resolves to 2.13.0 and the CUDA error returns)
+      - `mv jacobian-lens reference/` on both machines (see 0.1)
 
 **Gate 0:** `pytest` green · five `lens-eval-*.json` files present · record the **actual item count per
 set**. The 4b run used `--limit 20` and kept only 9 multihop items; at 27B the correctness filter is far
 less brutal, so plan to run **every** item.
+
+### Git: one direction only
+
+The branch diverged four separate times on Tuesday, every time for the same reason — **the same file
+was edited in two places**. The rule that stops it:
+
+> **Edit on the Mac. Commit and push from the Mac. The pod only ever pulls.**
+
+```bash
+# on the pod, once - makes drift fail loudly instead of auto-merging
+git config pull.ff only
+# every sync thereafter
+cd /root/CAMRBIA-CapStone && git pull
+```
+
+If `git pull` refuses, the pod has local edits. Do not merge — throw them away
+(`git checkout -- <file>`) and re-pull, unless the change is one you actually want, in which case
+commit and push it *from the pod* and then never touch that file locally again until you have.
+The only file legitimately modified on the pod is `uv.lock`, and that should be committed once (0.9).
 
 ---
 
@@ -113,37 +176,65 @@ less brutal, so plan to run **every** item.
 
 C1–C3 blocking; C4–C6 can slip to Tuesday evening.
 
-- [ ] **C1 — Un-hardcode the model** *(~30 min)*
-      `_lens_path` (`rlens/cli.py:51`) and `_load_model` (`rlens/cli.py:34`) both assume `qwen3.5-4b`;
-      `cmd_eval` bakes it into output filenames (`cli.py:373`, `:383`). `eval` has no `--model` flag
-      though `fit` does (`cli.py:412`).
-      - `_pins_for(model_key)` looking up `pins["model"] | pins["experiment_models"]`
-      - thread `--model` through `eval`; outputs become `results/passk_{model_key}.{md,csv}`
-      - add `loader:` to each `pins.yaml` experiment-model entry: `AutoModelForCausalLM` for Qwen,
-        **`AutoModelForImageTextToText` for gemma-3-27b-it** (`AutoModelForCausalLM` will not load it)
-      - pin each `revision:` (currently `null`) as soon as `hf download` resolves the sha
+- [x] **C1 — Un-hardcode the model** *(done — 73 lines in `rlens/cli.py`, uncommitted on the Mac)*
+      - `_model_spec(model)` resolves a nickname: `DEFAULT_MODEL = "qwen3.5-4b"` reads the top-level
+        `pins["model"]` block, everything else `pins["experiment_models"]`; unknown names exit with
+        the list of valid keys
+      - `--model` threaded through `smoke` and `eval`; `_load_model` and `_lens_path` both take it
+      - outputs are now `results/passk_{model}.{md,csv}` and `results/provenance_{model}.json`
+        (the default still writes `provenance_qwen3.5-4b.json`, which `tests/test_rlens.py:207`
+        expects — the released-lens config tests still pass)
+      - `eval` exits early with a useful message if no lens file is found under `lenses/*/{model}/`
+      - `revision:` pinned for both 27B models (see 0.8)
+      - **left hardcoded on purpose:** `cmd_fit` still refuses anything but 4b, and `cmd_compare`'s
+        report header is 4b-only. Neither is in scope — we run on **released** lenses.
 
-- [ ] **C2 — Persist per-item raw ranks** *(~45 min — the most important change)*
-      `run_passk` (`rlens/evals.py:110-114`) discards everything but a pooled boolean mean. Emit one
-      record per `(set, item_id, intermediate, layer, lens)` holding the **integer rank**, written to
-      `/workspace/results/rep1/passk_{model}.parquet`. **Append per eval set, not once at the end** —
-      a crash at item 400 of 500 should still leave you 400 items.
-      Also record per item `n_intermediates_total` vs `n_intermediates_single_token`: `token_ids_of`
-      (`evals.py:52`) silently drops intermediates with no single-token surface form (the walrus filter
-      at `evals.py:107`). That drop rate is a protocol deviation and belongs in the writeup.
+- [ ] **C1b — the `loader:` field (the one piece of C1 still missing)** *(~15 min, blocks Phase 5 only)*
+      `_load_model` hardcodes `AutoModelForCausalLM`, which **will not load gemma-3-27b-it**. Add
+      `loader: AutoModelForImageTextToText` to the gemma entry in `pins.yaml` (`loader:
+      AutoModelForCausalLM` for Qwen, or default to it when the key is absent) and have `_load_model`
+      do `getattr(transformers, spec.get("loader", "AutoModelForCausalLM"))`. Qwen does not need this,
+      so it is safe to defer to Wednesday morning — but do not discover it at 09:00 Wednesday.
 
-- [ ] **C3 — Batch the unembed** *(~20 min)*
-      `evals.py:110-114` calls `model.unembed` once per (layer, lens) — 256 matrix-vector products per
-      item, each re-reading the 1.5 GB unembedding matrix. Stack transported residuals into a
-      `[n_layers × n_lenses, d_model]` matrix, do **one** matmul. Verify against
-      `results/passk_qwen3.5-4b.md` before trusting it.
+- [x] **C2 — Persist per-item raw ranks** *(written, unrun)*
+      `run_passk` takes `ranks_dir=` / `model_name=` and streams two parquet files through
+      `_ParquetAppender` (pyarrow `ParquetWriter`, zstd; pyarrow is already in `uv.lock` at 25.0.1 via
+      `datasets`, so no dependency change and no `uv sync`):
+      - `passk_{model}.parquet` — one row per `(set, item_id, item_index, intermediate, layer, lens)`
+        with the **integer rank**
+      - `passk_{model}_items.parquet` — one row per item: `kept` (so filtered-out items are still
+        counted), `n_intermediates_total` vs `n_intermediates_single_token`, `n_tokens`, `readout_pos`
+      Flushed as a row group every `FLUSH_EVERY_ITEMS = 20` items **and** at the end of each set, so a
+      crash costs at most 20 items, not a whole set. The pooled table `run_passk` returns is computed
+      from the same ranks, so the parquet and the report cannot disagree — `test_evals.py` asserts that
+      by rebuilding the table from the file.
+      Drop rate is now also surfaced in the `.md` report via `df.attrs["n_intermediates"]`.
+      `--ranks-dir` overrides the destination; the default is `/workspace/results/rep1` when
+      `/workspace` exists (survives the pod) and `results/` otherwise.
 
-- [ ] **C4 — Control lens** *(~20 min)*
-      Random norm-matched transport: per layer a Gaussian matrix rescaled so `‖J_ctrl‖_F = ‖J_R‖_F`,
-      seeded from `pins.yaml`. Required for Core Experiment 3 anyway; as a row here it answers "is R-lens
-      beating J-lens, or is any dense transport better than identity?"
+- [x] **C3 — Batch the unembed** *(written, unrun — still needs the parity check)*
+      All `(layer, lens)` readouts for an item are stacked into `[n_readouts, d_model]` and unembedded
+      in chunks of `UNEMBED_CHUNK = 64` rows: ~4 matmuls per item instead of ~240, and the unembedding
+      matrix is read 4 times per item instead of 240. Ranking happens **inside** the chunk loop so the
+      full `[240 × 151k]` fp32 logit block (~145 MB) is never materialised — peak is ~38 MB.
+      `ranks_of` is the batched form of `rank_of`; `test_evals.py` asserts they agree row for row.
+      **Parity check before trusting it:** rerun the committed 4b config
+      (`rlens eval --limit 20`) and diff against `results/passk_qwen3.5-4b.md`. Expect equality or a
+      last-digit wobble on near-ties only — batched and single-row GEMM kernels are not bit-identical.
 
-- [ ] **C5 — Statistics** *(~30 min, CPU, runs fine after the GPU dies)*
+- [x] **C4 — Control lens** *(written, unrun — `rlens/control.py`)*
+      **This one had to land before the run, not after**: the control is an arm *inside* `eval`, so if it
+      is missing from the 27B pass there is no way to add it without a second GPU run.
+      `ControlLens` duck-types `JacobianLens` (`source_layers` + `transport`), so `run_passk` needed no
+      change. Per layer: iid Gaussian rescaled to `‖J_ctrl‖_F = ‖J_R‖_F` exactly, seeded
+      `pins.yaml fitting.seed + layer`, matched against `released-R` (falling back to `ours-R`).
+      Matrices are **regenerated per call, not stored** — a 27B layer is 5120² fp32 = 105 MB, so keeping
+      all ~60 would cost ~6.3 GB of VRAM beside a 56 GB model and two ~6 GB lenses; `torch.randn` on an
+      A100 is cheaper than that headroom. Lenses under 2 GB (4b) are cached instead.
+      Reproducible from the seed alone — no extra file to ship — but CUDA and CPU RNG streams differ, so
+      record which device produced a results file. `--no-control` opts out.
+
+- [ ] **C5 — Statistics** *(~30 min, CPU — write it while the GPU run is going, not before)*
       One item contributes several intermediates, so observations are **clustered** — a naive Wilson
       interval on the pooled rate is too narrow. Report:
       - Wilson CI on the pooled per-layer rate (comparable to the post)
@@ -151,7 +242,7 @@ C1–C3 blocking; C4–C6 can slip to Tuesday evening.
       - **paired R−J difference per item, bootstrapped** — the honest test of "R > J", not two
         overlapping marginal CIs
 
-- [ ] **C6 — Figures** *(~30 min, CPU)*
+- [ ] **C6 — Figures** *(~30 min, CPU — same: reads the parquet, so it can be written during the run)*
       - headline bar chart: mean per-layer pass@10 per lens, grouped by model (the post's first figure)
       - per-layer curves, one panel per eval category, lens as colour
       - plot against **normalized depth** `ℓ / (n_layers − 1)`, never raw layer index — 4b has 32 layers,
@@ -161,10 +252,21 @@ C1–C3 blocking; C4–C6 can slip to Tuesday evening.
 
 ## Phase 2 — Smoke on the real model · Tue 16:20–17:00
 
+**`uv run pytest` does not test `cli.py`.** The 15 tests import only `rlens.rules` — they cover the
+three LRP stop-gradients and forward bit-exactness, nothing else. "21 passed" says nothing about
+whether C1 works. Verify the CLI by climbing a cost ladder instead:
+
 ```bash
+uv run rlens eval --help                         # argparse wiring — instant
+uv run rlens eval --model bogus --limit 1        # should print "unknown --model 'bogus'; known: ..."
+uv run rlens smoke --model qwen3.5-27b --skip-model   # ~2s, no weights: proves _lens_path + torch.load
+uv run rlens eval  --sets multihop --limit 3     # 4b regression against results/passk_qwen3.5-4b.md
 uv run rlens smoke --model qwen3.5-27b
 uv run rlens eval  --model qwen3.5-27b --sets multihop --limit 3
 ```
+
+`smoke --skip-model` is the decisive cheap check for C1: it resolves the 27B lens files at the new
+path without touching 54 GB of weights.
 
 **Gate 1 — do not start the full run until all four hold:**
 1. Lens metadata matches `pins.yaml`: `source_layers` 0..62, `d_model == 5120`, and `J[62] == I`

@@ -160,6 +160,7 @@ def run_passk(
     limit: int | None = None,
     ranks_dir: Path | str | None = None,
     model_name: str = "model",
+    unembed_chunk: int = UNEMBED_CHUNK,
 ) -> pd.DataFrame:
     """Per-layer pass@k for every (eval set, lens): the fraction of
     intermediates whose best surface-form rank at that layer is <= k.
@@ -169,7 +170,11 @@ def run_passk(
     streamed to ``{ranks_dir}/passk_{model_name}.parquet`` (and per-item
     intermediate counts to ``..._items.parquet``) as the run proceeds - see the
     module docstring. The returned table is computed from those same ranks, so
-    the parquet and the report can never disagree."""
+    the parquet and the report can never disagree.
+
+    ``unembed_chunk=1`` reproduces the pre-C3 one-readout-at-a-time unembed, so
+    running it against the default is a direct parity check on the batching with
+    no device or dtype confound."""
     layers = next(l for l in lenses.values() if l is not None).source_layers
     final_layer = model.n_layers - 1
     record_at = sorted(set(layers) | {final_layer})
@@ -240,8 +245,8 @@ def run_passk(
                 # rank inside the chunk loop: the full [n_readouts, vocab] logit
                 # block is never materialised (240 x 151k x fp32 would be ~145 MB)
                 ranks_per_intermediate: list[list[int]] = [[] for _ in id_sets]
-                for i in range(0, stack.shape[0], UNEMBED_CHUNK):
-                    chunk_logits = model.unembed(stack[i:i + UNEMBED_CHUNK]).float()
+                for i in range(0, stack.shape[0], unembed_chunk):
+                    chunk_logits = model.unembed(stack[i:i + unembed_chunk]).float()
                     for j, (_, ids) in enumerate(id_sets):
                         ranks_per_intermediate[j].extend(ranks_of(chunk_logits, ids))
 

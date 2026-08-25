@@ -410,6 +410,7 @@ def cmd_eval(args) -> None:
         sets=args.sets, k=args.k,
         filter_correct=not args.no_filter_correct, limit=args.limit,
         ranks_dir=_ranks_dir(args.ranks_dir), model_name=args.model,
+        unembed_chunk=args.unembed_chunk,
     )
     summary = summarize_passk(df)
 
@@ -477,7 +478,7 @@ def main() -> None:
     p.add_argument("--dtype", choices=["bf16", "fp32"], default="bf16")
     p.set_defaults(func=cmd_compare)
 
-    from rlens.evals import EVAL_SETS
+    from rlens.evals import EVAL_SETS, UNEMBED_CHUNK
 
     p = sub.add_parser("eval", help="pass@10 battery: R vs J vs logit lens -> results/")
     p.add_argument("--model", default=DEFAULT_MODEL,
@@ -487,6 +488,8 @@ def main() -> None:
     p.add_argument("--limit", type=int, default=None, help="max items per set (quick checks)")
     p.add_argument("--no-filter-correct", action="store_true",
                    help="keep items the model itself answers wrongly")
+    p.add_argument("--unembed-chunk", type=int, default=UNEMBED_CHUNK,
+                   help="readout rows per unembed call; 1 = the pre-C3 path, for parity checks")
     p.add_argument("--no-control", action="store_true",
                    help="skip the random norm-matched control arm")
     p.add_argument("--ranks-dir", default=None,
