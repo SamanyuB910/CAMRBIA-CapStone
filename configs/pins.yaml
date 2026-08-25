@@ -24,7 +24,7 @@ reference_repos:
 models:
   qwen3.5-4b:
     hf_id: Qwen/Qwen3.5-4B
-    revision: null            # filled by scripts/download_assets.py (prefer revision from released provenance if recorded there)
+    revision: 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a  # released provenance records no revision; main @ 2026-08-24
     n_layers: 32
     d_model: 2560
     target_layer: 30          # penultimate; released convention
@@ -32,7 +32,7 @@ models:
 
 lenses_released:
   repo: camilablank/workspace-lenses
-  revision: null              # filled by scripts/download_assets.py
+  revision: d740106d1e0f95456dc8718fba2895e9c8ffd6ef
   files:
     - qwen3.5-4b/j-lens/lens.pt
     - qwen3.5-4b/r-lens/lens.pt
@@ -40,7 +40,7 @@ lenses_released:
 datasets:
   pile10k:
     hf_id: NeelNanda/pile-10k
-    revision: null            # filled by scripts/download_assets.py
+    revision: 127bfedcd5047750df5ccf3a12979a47bfa0bafa
     n_rows_downloaded: 200
 
 fitting:
