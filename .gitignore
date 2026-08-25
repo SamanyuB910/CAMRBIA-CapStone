@@ -27,3 +27,8 @@ data/lexicon/
 
 # Coherence: the full readout table is large and regenerable
 results/coherence_readouts_*.parquet
+
+# Blinded-panel key: committing it would let anyone (including an LLM rater
+# working from the repo) unblind the panel before rating. Keep it local until
+# ratings are in, then commit deliberately with `git add -f`.
+**/coherence_panel_key.jsonl
