@@ -537,7 +537,9 @@ def cmd_coherence(args) -> None:
 def cmd_rescore(args) -> None:
     import pandas as pd
 
-    from rlens.coherence import build_panel, load_lexicon, per_layer, report, rescore, summarize
+    from rlens.coherence import (
+        build_panel, judge_panel, load_lexicon, per_layer, report, rescore, summarize, unblind,
+    )
 
     src = Path(args.readouts).expanduser()
     df = pd.read_parquet(src)
@@ -550,11 +552,24 @@ def cmd_rescore(args) -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
 
     sheet_path, key_path = build_panel(df, out_dir / "panel", n_items=args.panel_items, seed=args.seed)
+
+    judged = None
+    if args.judge:
+        api_key = os.environ.get("OPENROUTER_API_KEY")
+        if not api_key:
+            raise SystemExit("--judge needs OPENROUTER_API_KEY in the environment")
+        scores = judge_panel(sheet_path, model=args.judge_model, api_key=api_key, limit=args.judge_limit)
+        judged = unblind(scores, key_path)
+        judged.to_csv(out_dir / f"coherence_panel_scores_{tag}.csv", index=False)
+        print(judged.groupby("lens")["score"].agg(["mean", "count"]).to_string())
+
     per_layer(df).to_csv(out_dir / f"coherence_per_layer_{tag}.{args.trash_set}.csv")
     report_path = out_dir / f"coherence_{tag}.{args.trash_set}.md"
     report_path.write_text(
         report(df, model_name=f"{tag} (rescored: --trash-set {args.trash_set})",
-               sheet_path=sheet_path, key_path=key_path, seed=args.seed),
+               sheet_path=sheet_path, key_path=key_path, seed=args.seed,
+               judged=judged, judge_model=args.judge_model if args.judge else None,
+               panel_items=args.panel_items),
         encoding="utf-8",
     )
     print(f"{summarize(df, seed=args.seed).to_string(float_format='%.4f')}\n\nreport -> {report_path}")
@@ -652,6 +667,10 @@ def main() -> None:
     p.add_argument("--tag", default=None, help="model label for filenames (default: from the parquet name)")
     p.add_argument("--n-layers", type=int, default=None, help="override the first-half boundary")
     p.add_argument("--panel-items", type=int, default=24)
+    p.add_argument("--judge", action="store_true",
+                   help="rate the blinded panel via OpenRouter (no GPU needed)")
+    p.add_argument("--judge-model", default="openai/gpt-5.4-nano")
+    p.add_argument("--judge-limit", type=int, default=None)
     p.add_argument("--seed", type=int, default=20260825)
     p.set_defaults(func=cmd_rescore)
 
