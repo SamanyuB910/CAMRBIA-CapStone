@@ -67,10 +67,17 @@ columns to every rank table. On 4b expect ours ≈ released and J ≈ R (the exp
 
 ## 5. Next actions after verification passes
 
-1. **9b pair** (the real R>J effect): download `Qwen/Qwen3.5-9B` +
-   `qwen3.5-9b/{j-lens,r-lens}/lens.pt`, extend `DRAWS`/recipe (target_layer=30 per
-   the released table, d_model 4096), fit J+R, compare released-vs-ours, then look for
-   the early-layer R advantage in readouts/pass@10.
+1. **Experiment models** (decided 2026-08-25; the post reports an R>J advantage on both):
+   `Qwen/Qwen3.5-27B` (same qwen3_5 architecture the registry already verifies) and
+   `google/gemma-3-27b-it` (gated — accept the license + set HF_TOKEN). Download with
+   `uv run python scripts/download_assets.py --experiment-models` (~110 GB), pin the
+   printed revisions in pins.yaml. **First round needs no fitting**: run readouts/pass@10
+   with the *released* 27b pairs (forward passes only). Fit our own 27b pairs only after
+   the 4b verification passes and only where experiments require it (~13x the 4b cost
+   per lens). Fitting gemma additionally needs a `ModelPatchSpec` for Gemma3's RMSNorm
+   (mirror transformers' exact ops, like we did for Qwen3.5) + its forward-equivalence
+   tests. `Qwen/Qwen3.5-9B` remains the fallback effect model if 27b fitting is too
+   slow on the available GPU.
 2. **pass@10 battery** (new module, e.g. `rlens/evals.py`): eval prompt sets are already in
    `data/eval_prompts/evaluations/` (multihop, multilingual, association, typo, poetry,
    order-ops). Filter to questions the model answers correctly, report per-layer

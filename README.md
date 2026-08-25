@@ -132,7 +132,11 @@ Exact versions live in `uv.lock` (installed by `uv sync`) and are mirrored in `p
   `AutoModelForCausalLM` loads the text-only `Qwen3_5ForCausalLM` and skips vision weights.
   **Why 4b:** the post reports *no* R-vs-J advantage at this size, so it's the cheap place
   to verify our fitting code reproduces the released weights (including that null).
-  The real R>J effect is expected on 9b/27b — that's the next phase.
+- **Experiment models (the R>J phase):** `Qwen/Qwen3.5-27B` and `google/gemma-3-27b-it` —
+  matched ~27B scale, one per architecture family, and the post reports an R-lens
+  advantage on both. Qwen3.5-27B reuses the exact patch registry we verified on 4b;
+  Gemma is the (1+w)-RMSNorm generality test (and is gated on HF — license + HF_TOKEN).
+  Details and pinned dims in `pins.yaml` (`experiment_models:`); workflow in `HANDOFF.md`.
 - **Released lenses:** [`camilablank/workspace-lenses`](https://huggingface.co/camilablank/workspace-lenses)
   → `qwen3.5-4b/{j-lens,r-lens}/lens.pt` (406 MB each, fp16). We download only those two
   files, never the 46.7 GB repo.
@@ -158,8 +162,9 @@ Exact versions live in `uv.lock` (installed by `uv sync`) and are mirrored in `p
 Everything CPU-checkable is done and green (env, assets, rules harness, all gates,
 readout notebook, fit/compare scripts dry-run on a tiny model). What remains is the
 GPU part: four real fits on qwen3.5-4b and the verification report against the released
-weights — the exact commands are in [`HANDOFF.md`](HANDOFF.md). After that: the 9b pair
-(where the real R>J effect should appear), the pass@10 battery, and per-rule ablations.
+weights — the exact commands are in [`HANDOFF.md`](HANDOFF.md). After that: the R>J
+experiments on qwen3.5-27b + gemma-3-27b-it (released pairs first — no fitting needed),
+the pass@10 battery, and per-rule ablations.
 
 ## Contributing notes
 

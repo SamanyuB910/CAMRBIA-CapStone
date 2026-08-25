@@ -22,13 +22,33 @@ reference_repos:             # cloned into reference/ (gitignored, read-only)
     url: https://github.com/idhantgulati/j-lens
     commit: 38e4f95ceb9bd6ff0c90798400197a589430f4ae
 
-model:
-  hf_id: Qwen/Qwen3.5-4B
+model:                       # harness-VERIFICATION model (post reports the R=J null here; that's fine —
+  hf_id: Qwen/Qwen3.5-4B     # it's the cheapest place to prove our fits reproduce the released weights)
   revision: 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a   # released provenance records no revision; main @ 2026-08-24
   n_layers: 32
   d_model: 2560
   target_layer: 30           # penultimate; released convention
   skip_first: 4              # released recipe (jlens default is 16)
+
+experiment_models:           # R>J effect phase: post reports an R-lens advantage on BOTH of these.
+  qwen3.5-27b:               # same qwen3_5 architecture our patch registry already verifies (no new code)
+    hf_id: Qwen/Qwen3.5-27B
+    revision: null           # resolve + pin when downloading on the GPU box (~56 GB)
+    n_layers: 64
+    d_model: 5120
+    target_layer: 62
+    lens_files:
+      - qwen3.5-27b/j-lens/lens.pt
+      - qwen3.5-27b/r-lens/lens.pt
+  gemma-3-27b-it:            # only Gemma in the released set; (1+w) RMSNorm in a different codebase.
+    hf_id: google/gemma-3-27b-it   # GATED on HF: accept Google's license + set HF_TOKEN before downloading (~54 GB)
+    revision: null
+    n_layers: 62
+    d_model: 5376
+    target_layer: 60
+    lens_files:
+      - gemma-3-27b-it/j-lens/lens.pt
+      - gemma-3-27b-it/r-lens/lens.pt
 
 lenses_released:
   repo: camilablank/workspace-lenses

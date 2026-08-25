@@ -44,7 +44,7 @@ Released recipe (per the HF model card): `target_layer = n_layers − 2` (penult
 
 **Model roles in this plan:**
 - **qwen3.5-4b — harness validation.** The post reports *no* R advantage on the smallest dense model, so 4b is where we cheaply verify our fitting code reproduces the released weights (including the null).
-- **qwen3.5-9b (then a 27b) — effect demonstration.** The R>J advantage should appear here; this is where we replicate the headline results.
+- **qwen3.5-27b + gemma-3-27b-it — effect demonstration** *(updated 2026-08-25; was "9b then a 27b")*: matched ~27B scale, one model per architecture family, post reports R>J on both. Released pairs first (no fitting); our own 27b fits only after the 4b gate passes. qwen3.5-9b stays as the compute fallback.
 - **MoE models — deferred** to a later phase (extra rules, big infra; DeepSeek-V4-Flash likely out of budget).
 
 ## 3. Phases
