@@ -73,7 +73,8 @@ Deliverable: `results/verification_report.md` with all numbers, plus the fitted 
 ### Phase 4 — Replicate headline results
 On 9b (and one 27b if compute allows), using released pairs first and our fitted pairs second:
 - **pass@10 battery** across the five eval categories (eval prompts from the anthropics repo; filter to questions the model answers correctly, as the post did), reported per-layer and averaged over the first half of layers vs. all layers.
-- **Qualitative:** earlier concept surfacing + trash-token frequency in early layers (define a trash-token heuristic; also run the rare-vocab-row diagnostic from Anne Halsall's comment as a cheap add-on).
+- **Coherence (`rlens coherence`)** — *done, pending the GPU run.* The post released no scorer (the claim is qualitative; the quantification is only inside a figure), so per capstone §6.2 this ships as: a **blinded rating panel** (the primary, qualitative), a **form-based trash rate** clearly labelled as ours and as a lower bound (2.4% uniform-draw baseline printed alongside), and the **untrained-vocab-row diagnostic** from Anne Halsall's comment. Recorded negative result: lexicon-OOV cannot serve as a trash proxy — it flags 26.5% of the vocabulary (word-initial BPE prefixes) while missing the post's own `tav`/`euw` examples.
+- **Qualitative:** earlier concept surfacing (rank trajectories, `01_readouts.ipynb`).
 - **Scale claim:** confirm null on 4b, advantage on 9b/27b.
 - If replicating the ablation study: 30 multihop prompts, ablate lens directions on the penultimate position, autorater judges accuracy — hold the grader fixed across lens conditions.
 

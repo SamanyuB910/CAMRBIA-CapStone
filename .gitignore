@@ -21,3 +21,9 @@ lenses/**/*.ckpt.pt
 
 # Local scratch
 results/plumbing/
+
+# Downloaded lexicon (pinned by url+sha256 in pins.yaml, re-fetched by `rlens download`)
+data/lexicon/
+
+# Coherence: the full readout table is large and regenerable
+results/coherence_readouts_*.parquet

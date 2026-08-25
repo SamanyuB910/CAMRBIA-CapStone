@@ -1,0 +1,798 @@
+"""Replication 2 — early-layer coherence: R-lens vs J-lens vs logit lens.
+
+**Evidence status (read this before quoting any number from here).** The post
+states the coherence result qualitatively and never released a scorer:
+
+    "In early layers, J-lens tends to contain what we refer to as 'trash
+    tokens': tokens that are seemingly non-semantic, incoherent, or unrelated
+    to the prompt [...] We can quantify this and see that R-lens seems to
+    contain drastically fewer trash tokens in the early layers."
+
+No rubric, no label set, and no numbers appear in the post's text — the
+quantification exists only inside a figure image. Capstone protocol s6.2
+therefore forbids inventing a scorer and calling it a replication, and routes
+us to branches (2) and (3):
+
+  A. BLINDED QUALITATIVE PANEL (primary, s6.2.2). Same prompts, same readout
+     position, top-k per layer for each lens, lens identity hidden behind
+     per-item shuffled arm labels. Rated by a human or one fixed autorater.
+     Reported as *qualitative*, never as a reproduction of the post's number.
+  B. FORM-BASED TRASH RATE (exploratory, ours). A pre-registered, deterministic
+     classifier built only from the token *forms* the post names as examples.
+     It deliberately does not judge semantics, so it under-counts the post's
+     definition; it is a lower bound on trash, not a reimplementation.
+  C. VOCAB-FREQUENCY DIAGNOSTIC (s6.2.3 + Anne Halsall's comment on the post:
+     "did you check them against untrained-vocab-row diagnostics? [...] the
+     leading component of any W_U-derived object is dominated by near-zero-
+     frequency rows"). Rare/untrained rows can make a readout *look* incoherent
+     for reasons that have nothing to do with the lens, so every trash number
+     is reported alongside a zero-frequency rate and re-reported with
+     zero-frequency rows excluded.
+
+Sampling protocol is inherited from ``rlens.evals`` (same eval sets, same
+readout position, same correctness filter) so coherence and pass@10 are
+measured on exactly the same readouts.
+"""
+
+from __future__ import annotations
+
+import json
+import random
+import re
+import string
+import unicodedata
+from collections import Counter
+from dataclasses import dataclass
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+
+from rlens.evals import EVAL_SETS, load_items, readout_position, token_ids_of
+
+# ``torch`` and ``jlens`` are imported inside the two functions that touch a
+# model. Everything else here is a pure function of decoded token strings, so
+# the scorer, the panel builder and their tests run on pandas alone -- which is
+# what lets the analysis pod re-score a saved readout table with no GPU stack.
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+LEXICON_PATH = REPO_ROOT / "data" / "lexicon" / "english_words.txt"
+
+# ---------------------------------------------------------------------------
+# A. Token form classifier
+# ---------------------------------------------------------------------------
+#
+# Categories are *forms*, not verdicts. Which forms count as trash is chosen by
+# TRASH_SETS below and recorded in every report, because the choice is ours and
+# a reader must be able to undo it.
+
+CATEGORIES = (
+    "empty",        # decodes to ""
+    "special",      # the tokenizer's own special/added ids, or a <|...|> form
+    "undecodable",  # U+FFFD or an unpaired surrogate: a broken byte-fallback piece
+    "whitespace",   # whitespace only
+    "punct",        # no alphanumerics (post ex.: "＊＊＊＊＊＊＊＊", "......", " ...\n\n")
+    "numeric",      # digits / digit-punctuation
+    "cjk_single",   # exactly one CJK/kana/hangul char (post ex.: "尷", half of a word)
+    "cjk_multi",    # >=2 such chars (post ex.: "锁定"; but ALSO the post's *praised*
+                    #                 "颜色的" / "是什么呢" -- see the note below)
+    "latin_oov",    # word-initial latin run, not in the pinned lexicon
+                    #                 (post ex.: "euw", "zinho")
+    "subword_oov",  # mid-word continuation piece, not in the lexicon ("ation", "ction")
+    "word",         # in-lexicon word, or lexicon unavailable
+)
+
+# Which categories count as trash.
+#
+# CALIBRATION (Qwen3.5-4B, V=248077, full vocabulary). These are the shares a
+# *uniform random* top-k draw would score, i.e. the floor every measured rate
+# must be read against:
+#
+#   word 27.8% | latin_oov 26.5% | cjk_multi 23.5% | subword_oov 16.8%
+#   cjk_single 3.0% | punct 1.8% | undecodable 0.4% | whitespace 0.2% | special 0.01%
+#
+# NEGATIVE RESULT, recorded so nobody re-derives it: the lexicon-OOV categories
+# do NOT work as trash proxies, and we do not use them.
+#   * `latin_oov` is 26.5% of the vocabulary because word-initial BPE *prefixes*
+#     of ordinary words (" ent", " prot", " http", " som") are not in any word
+#     list. A prefix piece in a top-k is unremarkable, not incoherent.
+#   * `subword_oov` (16.8%) is the same story for mid-word pieces ("ation", "ou").
+#   * Worse, the classifier cannot reproduce the post's own latin examples:
+#     "euw"/"zinho" land in `subword_oov` and "tav" is a real dictionary word
+#     (`word`). Separating "nonsense fragment" from "prefix of a real word"
+#     needs the context the form classifier deliberately never sees.
+# The blinded panel in section A is what covers this ground; the OOV sets stay
+# available only so the claim above can be re-checked, never as the default.
+TRASH_SETS = {
+    # The default, and the only set defensible without external data or a
+    # semantic judgement: 2.4% of the vocabulary, so a rate above that means a
+    # lens really is concentrating mass on non-semantic rows.
+    "form": ("empty", "special", "undecodable", "whitespace", "punct"),
+    # NOT RECOMMENDED (28.9% uniform baseline) - see the negative result above.
+    "form+oov": ("empty", "special", "undecodable", "whitespace", "punct", "latin_oov"),
+    # NOT RECOMMENDED (45.7% uniform baseline).
+    "form+oov+subword": (
+        "empty", "special", "undecodable", "whitespace", "punct", "latin_oov", "subword_oov",
+    ),
+    # NOT RECOMMENDED (31.9%): the post's "尷" is a cjk_single, but so is any
+    # legitimate single-character CJK token, so this penalises multilingual
+    # readouts for being multilingual - and the post *praises* R-lens for
+    # surfacing "颜色的" and "是什么呢".
+    "form+oov+cjk": (
+        "empty", "special", "undecodable", "whitespace", "punct", "latin_oov", "cjk_single",
+    ),
+}
+DEFAULT_TRASH_SET = "form"
+
+# Only the ``<|...|>`` convention. A looser ``<...>`` pattern misclassified real
+# ASCII tokens ("<?>", "<->", "<()>") as special; the authoritative list is the
+# tokenizer's own special ids, passed in via ``special_ids``.
+_SPECIAL_RE = re.compile(r"^<\|.*\|>$")
+_CJK_RANGES = (
+    (0x3400, 0x4DBF), (0x4E00, 0x9FFF), (0xF900, 0xFAFF),  # Han
+    (0x3040, 0x30FF),                                       # kana
+    (0xAC00, 0xD7AF),                                       # hangul syllables
+    (0x20000, 0x2FA1F),                                     # Han ext B+
+)
+
+
+def _is_cjk(ch: str) -> bool:
+    return any(lo <= ord(ch) <= hi for lo, hi in _CJK_RANGES)
+
+
+def load_lexicon(path: Path = LEXICON_PATH) -> frozenset[str] | None:
+    """The pinned English word list (``rlens download`` fetches it). Returns
+    None when absent, which disables the ``latin_oov`` category so a missing
+    file can never silently change a number."""
+    if not path.exists():
+        return None
+    words = (w.strip().lower() for w in path.read_text(encoding="utf-8", errors="ignore").splitlines())
+    return frozenset(w for w in words if w)
+
+
+def classify_token(
+    text: str,
+    lexicon: frozenset[str] | None = None,
+    *,
+    is_special: bool = False,
+) -> str:
+    """Form category of one decoded token string.
+
+    A pure function of the string (plus the tokenizer's own special flag): it
+    never sees which lens produced the token, which is what makes the metric
+    incapable of favouring one arm.
+
+    ``is_special`` should come from the tokenizer's special/added-token ids —
+    matching ``<|...|>`` by eye is not enough for every vocabulary.
+    """
+    if text == "":
+        return "empty"
+    if is_special or _SPECIAL_RE.match(text.strip()):
+        return "special"
+    if "\ufffd" in text or any(0xD800 <= ord(c) <= 0xDFFF for c in text):
+        return "undecodable"
+    core = text.strip()
+    if core == "":
+        return "whitespace"
+    if not any(ch.isalnum() for ch in core):
+        return "punct"
+    if any(_is_cjk(ch) for ch in core):
+        return "cjk_single" if len(core) == 1 else "cjk_multi"
+    if any(ch.isdigit() for ch in core) and not any(ch.isalpha() for ch in core):
+        return "numeric"
+    if lexicon is None:
+        return "word"
+
+    letters = "".join(ch for ch in core if ch.isalpha() or ch in "'-")
+    if not letters:
+        return "word"
+    lowered = letters.lower()
+    if lowered in lexicon:
+        return "word"
+    # Fold accents once before giving up ("café" -> "cafe").
+    folded = "".join(
+        c for c in unicodedata.normalize("NFKD", lowered) if not unicodedata.combining(c)
+    )
+    if folded in lexicon:
+        return "word"
+    # Word-initial (leading space, or sentence-initial capital) vs a mid-word
+    # continuation piece. 35% of this vocabulary is ordinary continuation BPE,
+    # so collapsing the two would make the OOV signal meaningless.
+    word_initial = text[:1].isspace() or text[:1].isupper()
+    return "latin_oov" if word_initial else "subword_oov"
+
+
+# ---------------------------------------------------------------------------
+# C. Vocabulary-frequency diagnostic (Halsall confound)
+# ---------------------------------------------------------------------------
+
+
+def corpus_token_counts(tokenizer, texts: list[str], *, max_chars: int = 20000) -> Counter:
+    """Unigram counts over the pinned pile-10k rows we already download. Used
+    as the frequency proxy: count == 0 means "this vocab row never occurs in
+    200 rows of the model's own pretraining distribution"."""
+    counts: Counter = Counter()
+    for text in texts:
+        counts.update(tokenizer.encode(text[:max_chars], add_special_tokens=False))
+    return counts
+
+
+def unembedding_matrix(model):
+    """W_U [vocab, d_model] from a jlens model wrapper, whatever it wraps.
+
+    Probed rather than hard-coded: the wrapper's attribute name for the HF model
+    is not part of the jlens public API we depend on, and a wrong guess here
+    would silently disable the Halsall diagnostic rather than fail loudly.
+    """
+    import torch
+
+    candidates = [model]
+    for attr in ("hf_model", "model", "hf", "_model"):
+        inner = getattr(model, attr, None)
+        if inner is not None:
+            candidates.append(inner)
+    for obj in candidates:
+        get = getattr(obj, "get_output_embeddings", None)
+        head = get() if callable(get) else None
+        if head is not None and hasattr(head, "weight"):
+            return head.weight
+        for attr in ("lm_head", "unembed_weight", "W_U"):
+            head = getattr(obj, attr, None)
+            if head is None:
+                continue
+            weight = getattr(head, "weight", head)
+            if isinstance(weight, torch.Tensor) and weight.ndim == 2:
+                return weight
+    raise AttributeError(
+        f"cannot locate W_U on {type(model).__name__}; pass row_pct=None to skip the "
+        "unembedding-norm diagnostic, or extend unembedding_matrix()"
+    )
+
+
+def unembed_row_percentiles(model):
+    """Percentile rank (0-1) of every vocab row's unembedding norm. Near-zero
+    norms are the untrained/rare rows Halsall flagged."""
+    import torch
+
+    norms = unembedding_matrix(model).detach().float().norm(dim=-1).cpu()
+    order = norms.argsort()
+    pct = torch.empty_like(norms)
+    pct[order] = torch.linspace(0, 1, len(norms))
+    return pct
+
+
+# ---------------------------------------------------------------------------
+# Readout collection
+# ---------------------------------------------------------------------------
+
+
+@dataclass
+class CoherenceConfig:
+    sets: tuple[str, ...] = tuple(EVAL_SETS)
+    k: int = 10
+    limit: int | None = None
+    filter_correct: bool = True
+    trash_set: str = DEFAULT_TRASH_SET
+    seed: int = 20260825
+
+
+def collect_readouts(model, lenses: dict, cfg: CoherenceConfig) -> pd.DataFrame:
+    """Long-form top-k readouts: one row per (set, item, layer, lens, rank).
+
+    Shares one forward pass per item across all lenses, and reuses the pass@10
+    protocol verbatim (readout position, rstrip, correctness filter) so the two
+    replications are measured on identical activations.
+    """
+    import torch
+
+    from jlens.hooks import ActivationRecorder
+
+    with torch.no_grad():
+        return _collect_readouts(model, lenses, cfg, ActivationRecorder)
+
+
+def _collect_readouts(model, lenses: dict, cfg: CoherenceConfig, ActivationRecorder) -> pd.DataFrame:
+    layers = next(l for l in lenses.values() if l is not None).source_layers
+    final_layer = model.n_layers - 1
+    record_at = sorted(set(layers) | {final_layer})
+    tok = model.tokenizer
+
+    rows: list[dict] = []
+    n_kept: dict[str, int] = {}
+    for set_name in cfg.sets:
+        kept = 0
+        for item_idx, item in enumerate(load_items(set_name)[: cfg.limit]):
+            prompt = item["prompt"].rstrip()
+            input_ids = model.encode(prompt, max_length=512)
+            seq = input_ids[0].tolist()
+            pos = readout_position(tok, seq, set_name)
+
+            with ActivationRecorder(model.layers, at=record_at) as rec:
+                model.forward(input_ids)
+                acts = {l: rec.activations[l][0].detach().float() for l in record_at}
+
+            if cfg.filter_correct and "target" in item:
+                target_ids = token_ids_of(tok, item["target"])
+                final_logits = model.unembed(acts[final_layer][-1]).float()
+                if target_ids and int(final_logits.argmax()) not in target_ids:
+                    continue
+            kept += 1
+            prompt_ids = set(seq)
+            prompt_lower = prompt.lower()
+
+            for layer in layers:
+                residual = acts[layer][pos]
+                for name, lens in lenses.items():
+                    read = residual if lens is None else lens.transport(residual, layer)
+                    logits = model.unembed(read).float()
+                    top = logits.topk(cfg.k).indices.tolist()
+                    for rank, token_id in enumerate(top, start=1):
+                        text = tok.decode([token_id])
+                        stripped = text.strip().lower()
+                        rows.append(
+                            {
+                                "set": set_name,
+                                "item": item_idx,
+                                "layer": layer,
+                                "lens": name,
+                                "rank": rank,
+                                "token_id": token_id,
+                                "token": text,
+                                "in_prompt": token_id in prompt_ids
+                                or (len(stripped) > 2 and stripped in prompt_lower),
+                            }
+                        )
+        n_kept[set_name] = kept
+
+    df = pd.DataFrame(rows)
+    df.attrs["n_kept"] = n_kept
+    df.attrs["k"] = cfg.k
+    df.attrs["n_layers"] = model.n_layers
+    return df
+
+
+def annotate(
+    df: pd.DataFrame,
+    *,
+    lexicon: frozenset[str] | None = None,
+    special_ids: set[int] | None = None,
+    counts: Counter | None = None,
+    row_pct=None,  # optional 1-D tensor of per-vocab-row percentiles
+    trash_set: str = DEFAULT_TRASH_SET,
+) -> pd.DataFrame:
+    """Attach the form category, the trash flag, and the frequency diagnostics.
+
+    Classification is cached per token id: the same id decodes to the same
+    string for every lens, layer and item, so a lens can never be advantaged by
+    the classifier taking a different path on its tokens.
+    """
+    df = df.copy()
+    vocab = df[["token_id", "token"]].drop_duplicates("token_id")
+    special = special_ids or set()
+    category = {
+        int(tid): classify_token(text, lexicon, is_special=int(tid) in special)
+        for tid, text in vocab.itertuples(index=False)
+    }
+    df["category"] = df["token_id"].map(category)
+    df["trash"] = df["category"].isin(TRASH_SETS[trash_set])
+
+    if counts is not None:
+        df["corpus_count"] = df["token_id"].map(lambda t: counts.get(t, 0)).astype(int)
+        df["zero_freq"] = df["corpus_count"] == 0
+    if row_pct is not None:
+        df["wu_norm_pct"] = df["token_id"].map(lambda t: float(row_pct[t]))
+
+    df.attrs.update(getattr(df, "attrs", {}))
+    df.attrs["trash_set"] = trash_set
+    df.attrs["lexicon"] = lexicon is not None
+    return df
+
+
+# ---------------------------------------------------------------------------
+# Metrics
+# ---------------------------------------------------------------------------
+
+_METRICS = ["trash", "zero_freq", "in_prompt"]
+
+
+def _available(df: pd.DataFrame) -> list[str]:
+    return [m for m in _METRICS if m in df.columns]
+
+
+def per_layer(df: pd.DataFrame) -> pd.DataFrame:
+    """Per-(layer, lens) rate of each diagnostic, averaged over all top-k slots
+    of all items. Columns are a (metric, lens) MultiIndex, rows are layers."""
+    metrics = _available(df)
+    grouped = df.groupby(["layer", "lens"])[metrics].mean().unstack("lens")
+    grouped.columns.names = ["metric", "lens"]
+    return grouped.sort_index()
+
+
+def _band_mask(df: pd.DataFrame) -> pd.Series:
+    """First half of layers, by the post's convention (n_layers, not the lens's
+    source_layers, so the band matches the ablation experiment's band)."""
+    n_layers = df.attrs.get("n_layers") or (int(df["layer"].max()) + 1)
+    return df["layer"] < (n_layers + 1) // 2
+
+
+def per_item(df: pd.DataFrame, band: str) -> pd.DataFrame:
+    """One value per (set, item, lens): the item's mean rate inside ``band``.
+    This is the unit the bootstrap resamples — items, not top-k slots, because
+    the k slots of one readout are anything but independent."""
+    sub = df[_band_mask(df)] if band == "first half" else df
+    return sub.groupby(["set", "item", "lens"])[_available(df)].mean()
+
+
+def paired_bootstrap(
+    per_item_df: pd.DataFrame,
+    metric: str,
+    lens_a: str,
+    lens_b: str,
+    *,
+    n: int = 10000,
+    seed: int = 20260825,
+) -> dict:
+    """Paired item-level bootstrap of ``mean(a) - mean(b)`` for one metric.
+
+    Paired because every item is read by every lens off the *same* forward pass,
+    so the item is a block: resample items, keep both arms of the pair.
+    """
+    wide = per_item_df[metric].unstack("lens")
+    if lens_a not in wide.columns or lens_b not in wide.columns:
+        return {}
+    diff = (wide[lens_a] - wide[lens_b]).dropna().to_numpy()
+    if diff.size == 0:
+        return {}
+    rng = np.random.default_rng(seed)
+    idx = rng.integers(0, diff.size, size=(n, diff.size))
+    boot = diff[idx].mean(axis=1)
+    boot.sort()
+    return {
+        "delta": float(diff.mean()),
+        "ci_lo": float(boot[int(0.025 * n)]),
+        "ci_hi": float(boot[int(0.975 * n)]),
+        # Capped at 1: a degenerate (all-identical) resample makes both tails 1.0.
+        "p_two_sided": min(1.0, float(2 * min((boot <= 0).mean(), (boot >= 0).mean()))),
+        "n_items": int(diff.size),
+    }
+
+
+def summarize(df: pd.DataFrame, *, seed: int = 20260825, n_boot: int = 10000) -> pd.DataFrame:
+    """Per-lens rates in both layer bands, plus paired contrasts against every
+    other lens. This is the table the report leads with."""
+    rows = {}
+    for band in ("first half", "all layers"):
+        items = per_item(df, band)
+        means = items.groupby("lens").mean()
+        for lens, values in means.iterrows():
+            rows[(band, lens)] = values.to_dict()
+    out = pd.DataFrame(rows).T
+    out.index.names = ["band", "lens"]
+    return out
+
+
+def contrasts(
+    df: pd.DataFrame, *, reference: str | None = None, seed: int = 20260825, n_boot: int = 10000
+) -> pd.DataFrame:
+    """Paired R-vs-X contrasts with bootstrap CIs, per band and metric.
+
+    ``reference`` defaults to the R-lens arm if exactly one is present.
+    Negative ``delta`` on ``trash``/``zero_freq`` means R is cleaner.
+    """
+    lenses = sorted(df["lens"].unique())
+    if reference is None:
+        candidates = [l for l in lenses if l.lower().endswith("-r") or l.lower() == "r"]
+        if len(candidates) != 1:
+            raise ValueError(f"pass reference=; cannot pick an R arm from {lenses}")
+        reference = candidates[0]
+    rows = []
+    for band in ("first half", "all layers"):
+        items = per_item(df, band)
+        for metric in _available(df):
+            for other in lenses:
+                if other == reference:
+                    continue
+                stats = paired_bootstrap(items, metric, reference, other, n=n_boot, seed=seed)
+                if stats:
+                    rows.append({"band": band, "metric": metric, "contrast": f"{reference} - {other}", **stats})
+    keys = ["band", "metric", "contrast"]
+    if not rows:  # a single-lens run has nothing to contrast against
+        return pd.DataFrame(columns=[*keys, "delta", "ci_lo", "ci_hi", "p_two_sided", "n_items"]).set_index(keys)
+    return pd.DataFrame(rows).set_index(keys)
+
+
+def category_mix(df: pd.DataFrame, *, band: str = "first half") -> pd.DataFrame:
+    """Share of each form category in the top-k, per lens. The trash rate is a
+    sum over a chosen subset of these; showing the whole mix is what lets a
+    reader disagree with the choice."""
+    sub = df[_band_mask(df)] if band == "first half" else df
+    table = sub.groupby(["lens", "category"]).size().unstack("category").fillna(0)
+    return (table.T / table.sum(axis=1)).T.reindex(columns=[c for c in CATEGORIES if c in table.columns])
+
+
+def trash_excluding_rare(df: pd.DataFrame, *, band: str = "first half") -> pd.DataFrame:
+    """The trash rate recomputed over corpus-attested rows only — the direct
+    answer to Halsall's confound. If the R-vs-J gap survives here, it is not an
+    untrained-vocab-row artefact."""
+    if "zero_freq" not in df.columns:
+        return pd.DataFrame()
+    sub = df[_band_mask(df)] if band == "first half" else df
+    attested = sub[~sub["zero_freq"]]
+    columns = {
+        "trash_all_rows": sub.groupby("lens")["trash"].mean(),
+        "trash_attested_rows_only": attested.groupby("lens")["trash"].mean(),
+        "zero_freq_rate": sub.groupby("lens")["zero_freq"].mean(),
+    }
+    if "wu_norm_pct" in sub.columns:  # only when the model was reachable
+        columns["median_wu_norm_pct"] = sub.groupby("lens")["wu_norm_pct"].median()
+    return pd.DataFrame(columns)
+
+
+# ---------------------------------------------------------------------------
+# A. Blinded qualitative panel (the primary, per capstone s6.2.2)
+# ---------------------------------------------------------------------------
+
+
+def build_panel(
+    df: pd.DataFrame,
+    out_dir: Path,
+    *,
+    n_items: int = 24,
+    layers: list[int] | None = None,
+    lenses: list[str] | None = None,
+    seed: int = 20260825,
+) -> tuple[Path, Path]:
+    """Write a blinded rating sheet and its key.
+
+    Each sheet entry is one (item, layer): the top-k lists of all lenses, in an
+    order shuffled independently per entry and labelled arm_A/arm_B/arm_C. The
+    rater sees prompt, readout token, and the arms — never which lens is which,
+    and never the same lens under the same label twice in a row. The key file
+    is written separately so it can be withheld until ratings are in.
+    """
+    rng = random.Random(seed)
+    present = sorted(df["lens"].unique())
+    if lenses is None:
+        lenses = present
+    missing = set(lenses) - set(present)
+    if missing:
+        raise ValueError(f"no readouts for {sorted(missing)}; present: {present}")
+    # One arm label per lens. A fixed "ABC" here silently dropped arms 4+ when a
+    # run carried both the released and our own J/R pairs.
+    arm_labels = [f"arm_{c}" for c in string.ascii_uppercase[: len(lenses)]]
+    if len(lenses) > len(string.ascii_uppercase):
+        raise ValueError(f"{len(lenses)} lenses is more arms than the sheet can label")
+    if layers is None:  # early layers are where the claim lives; sample across them
+        all_layers = sorted(df["layer"].unique())
+        layers = all_layers[: max(1, len(all_layers) // 2)]
+
+    pairs = sorted({(s, i) for s, i in df[["set", "item"]].itertuples(index=False)})
+    rng.shuffle(pairs)
+    pairs = pairs[:n_items]
+
+    sheet, key = [], []
+    for entry_id, (set_name, item) in enumerate(pairs):
+        item_rows = df[(df["set"] == set_name) & (df["item"] == item)]
+        for layer in layers:
+            layer_rows = item_rows[item_rows["layer"] == layer]
+            if layer_rows.empty:
+                continue
+            order = lenses[:]
+            rng.shuffle(order)
+            arms = {
+                arm: layer_rows[layer_rows["lens"] == lens].sort_values("rank")["token"].tolist()
+                for arm, lens in zip(arm_labels, order)
+            }
+            entry = {"entry": f"{entry_id:03d}L{layer:02d}", "set": set_name, "layer": int(layer), **arms}
+            sheet.append(entry)
+            key.append({"entry": entry["entry"], **dict(zip(arm_labels, order))})
+
+    out_dir.mkdir(parents=True, exist_ok=True)
+    sheet_path = out_dir / "coherence_panel.jsonl"
+    key_path = out_dir / "coherence_panel_key.jsonl"
+    sheet_path.write_text("\n".join(json.dumps(e, ensure_ascii=False) for e in sheet), encoding="utf-8")
+    key_path.write_text("\n".join(json.dumps(e) for e in key), encoding="utf-8")
+    return sheet_path, key_path
+
+
+RUBRIC = """You are rating several anonymised readouts of the SAME hidden state of a
+language model at the SAME layer and token position. Each arm is a top-10 token
+list produced by a different decoding method. You do not know which is which.
+
+Rate each arm on coherence, 0-3:
+  3 - all or nearly all tokens are meaningful units that plausibly relate to the
+      prompt's content, its current token, or a natural continuation.
+  2 - a clear semantic theme, with a minority of unrelated or non-word tokens.
+  1 - a hint of structure, but mostly unrelated or non-word tokens.
+  0 - no discernible structure: punctuation runs, whitespace, broken byte
+      fragments, or unrelated character salad.
+
+Tokens in a language other than the prompt's are NOT automatically incoherent:
+judge whether the token is a meaningful word or morpheme, not which script it is
+written in. A single broken character of a multi-character word IS incoherent.
+
+Return strict JSON only: {"arm_A": <0-3>, "arm_B": <0-3>, "arm_C": <0-3>}"""
+
+
+def judge_panel(
+    sheet_path: Path,
+    *,
+    model: str = "openai/gpt-5.4-nano",
+    api_key: str,
+    limit: int | None = None,
+) -> pd.DataFrame:
+    """Score a blinded sheet with one fixed autorater held constant across arms.
+
+    This is a methodological ADDITION, not a replication of the post's scorer
+    (there is none). ``model`` mirrors the autorater the post used for its
+    ablation experiment so the project uses one grader throughout.
+    """
+    import urllib.request
+
+    entries = [json.loads(l) for l in sheet_path.read_text(encoding="utf-8").splitlines() if l]
+    rows = []
+    for entry in entries[:limit]:
+        arms = {k: v for k, v in entry.items() if k.startswith("arm_")}
+        payload = json.dumps(
+            {
+                "model": model,
+                "temperature": 0,
+                "messages": [
+                    {"role": "system", "content": RUBRIC},
+                    {"role": "user", "content": json.dumps(arms, ensure_ascii=False)},
+                ],
+            }
+        ).encode()
+        request = urllib.request.Request(
+            "https://openrouter.ai/api/v1/chat/completions",
+            data=payload,
+            headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+        )
+        with urllib.request.urlopen(request, timeout=120) as response:
+            body = json.loads(response.read())
+        content = body["choices"][0]["message"]["content"]
+        scores = json.loads(re.search(r"\{.*\}", content, re.S).group())
+        rows.append({"entry": entry["entry"], "layer": entry["layer"], "set": entry["set"], **scores})
+    return pd.DataFrame(rows)
+
+
+def unblind(scores: pd.DataFrame, key_path: Path) -> pd.DataFrame:
+    """Join autorater/human arm scores back to lens names via the key."""
+    key = pd.DataFrame([json.loads(l) for l in key_path.read_text(encoding="utf-8").splitlines() if l])
+    arms = [c for c in key.columns if c.startswith("arm_")]
+    merged = scores.merge(key, on="entry", suffixes=("_score", "_lens"))
+    rows = [
+        {
+            "entry": row["entry"],
+            "set": row.get("set"),
+            "layer": row.get("layer"),
+            "lens": row[f"{arm}_lens"],
+            "score": row[f"{arm}_score"],
+        }
+        for row in merged.to_dict("records")
+        for arm in arms
+        if f"{arm}_score" in row and f"{arm}_lens" in row
+    ]
+    return pd.DataFrame(rows)
+
+
+# ---------------------------------------------------------------------------
+# Report
+# ---------------------------------------------------------------------------
+
+
+def report(
+    df: pd.DataFrame,
+    *,
+    model_name: str,
+    sheet_path: Path,
+    key_path: Path,
+    judged: pd.DataFrame | None = None,
+    judge_model: str | None = None,
+    panel_items: int = 24,
+    seed: int = 20260825,
+    repo_root: Path = REPO_ROOT,
+) -> str:
+    """Assemble the markdown report. Kept out of the CLI so the whole thing is
+    testable without a model, and so the analysis pod can re-render a saved
+    readout table with different options."""
+    n_layers = df.attrs.get("n_layers") or (int(df["layer"].max()) + 1)
+    trash_set = df.attrs.get("trash_set", DEFAULT_TRASH_SET)
+    k = df.attrs.get("k", "?")
+
+    def rel(path: Path) -> str:
+        try:
+            return str(path.relative_to(repo_root))
+        except ValueError:
+            return str(path)
+
+    lines = [
+        f"# Early-layer coherence — {model_name}\n",
+        "**Evidence status — read before quoting any number here.** The R-lens post states",
+        "this result qualitatively and released no coherence scorer, no rubric, and no",
+        "numbers in text (its quantification appears only inside a figure image). Per",
+        "capstone §6.2 this is therefore **not** a quantitative reproduction of the post's",
+        "metric. §1 is the qualitative replication (blinded panel, §6.2.2); §2–3 are our own",
+        "pre-registered exploratory diagnostics; §4 is the untrained-vocab-row confound",
+        "check (§6.2.3).\n",
+        f"Sets: {sorted(df['set'].unique())}. k={k}. Items kept after the correctness filter:",
+        f"{df.attrs.get('n_kept', {})}. Layers: {n_layers} "
+        f"(first half = layers < {(n_layers + 1) // 2}).",
+        f"Trash categories (`--trash-set {trash_set}`): {list(TRASH_SETS[trash_set])}.",
+        f"`latin_oov` active (lexicon present): {df.attrs.get('lexicon')}. Seed: {seed}.\n",
+        "## 1. Blinded qualitative panel — the primary result (§6.2.2)\n",
+        f"- sheet: `{rel(sheet_path)}` — {panel_items} items × early layers, arms shuffled",
+        "  independently per entry, no lens name anywhere in the file",
+        f"- key: `{rel(key_path)}` — **withhold until ratings are in**\n",
+    ]
+    if judged is not None and not judged.empty:
+        by_lens = judged.groupby("lens")["score"].agg(["mean", "std", "count"])
+        early = judged[judged["layer"] < (n_layers + 1) // 2]
+        lines += [
+            f"Rater: `{judge_model}`, temperature 0, one grader across all arms, blinded to",
+            "the lens. A methodological addition, **not** the post's scorer — there is none.\n",
+            "Mean coherence score (0–3), all rated layers:\n",
+            by_lens.to_markdown(floatfmt=".2f"),
+            "\nFirst half of layers only:\n",
+            early.groupby("lens")["score"].agg(["mean", "count"]).to_markdown(floatfmt=".2f"),
+            "",
+        ]
+    else:
+        lines += [
+            "_Not yet rated._ Rate the sheet by hand, or re-run with `--judge`, then join",
+            "ratings to lenses with `rlens.coherence.unblind(scores, key_path)`.\n",
+        ]
+
+    lines += [
+        f"## 2. Form-based trash rate — exploratory, ours (`{trash_set}`)\n",
+        "A deterministic classifier over token *forms* only. It never judges semantics, so",
+        'it **under-counts** the post\'s definition ("non-semantic, incoherent, **or**',
+        '**unrelated to the prompt**"). Read it as a lower bound.\n',
+        "Uniform-draw baseline for this set on the Qwen3.5-4B vocabulary: **2.4%** — a rate",
+        "at or below that is indistinguishable from random vocabulary rows.\n",
+        "`in_prompt` is the share of top-k tokens echoing the prompt: the cheap stand-in for",
+        'the post\'s observation that R-lens early readouts "show clear structure, e.g.',
+        'representing the current token or similar tokens".\n',
+        summarize(df, seed=seed).to_markdown(floatfmt=".4f"),
+        "",
+        "### Paired contrasts (item-level bootstrap, 10k resamples)\n",
+        "Items are the resampling unit, not top-k slots — the k slots of one readout are not",
+        "independent. Negative `delta` on `trash`/`zero_freq` means the reference arm is",
+        "cleaner.\n",
+    ]
+    try:
+        table = contrasts(df, seed=seed)
+        lines.append(
+            table.to_markdown(floatfmt=".4f")
+            if not table.empty
+            else "_Skipped: only one lens arm in this run — nothing to contrast against._"
+        )
+    except ValueError as exc:
+        lines.append(f"_Skipped: {exc}_")
+    lines += [
+        "",
+        "### Per-layer\n",
+        per_layer(df).to_markdown(floatfmt=".3f"),
+        "",
+        "## 3. Form-category mix, first half of layers\n",
+        "The trash rate is a sum over a chosen subset of these columns; the full mix is here",
+        "so the choice can be disagreed with. Note `cjk_multi` covers both the post's trash",
+        'example ("锁定") and its *praised* examples ("颜色的", "是什么呢") — which is exactly why',
+        "script is never used as a trash criterion. See `TRASH_SETS` for the measured",
+        "uniform-draw baseline of every category, and for why the lexicon-OOV sets are not",
+        "used.\n",
+        category_mix(df).to_markdown(floatfmt=".3f"),
+        "",
+        "## 4. Untrained-vocab-row confound (§6.2.3)\n",
+        "Anne K. Halsall, in the comments on the post: *\"Question on the trash tokens: did",
+        "you check them against untrained-vocab-row diagnostics? On Gemma 2, the leading",
+        "component of any W_U-derived object is dominated by near-zero-frequency rows.\"*\n",
+        "`zero_freq` = the vocab row never occurs in the 200 pinned pile-10k rows.",
+        "`median_wu_norm_pct` = median percentile of the token's unembedding-row norm; near",
+        "0 means near-untrained rows. **If the R-vs-J gap survives in**",
+        "**`trash_attested_rows_only`, it is not a rare-row artefact.**\n",
+    ]
+    rare = trash_excluding_rare(df)
+    lines.append(rare.to_markdown(floatfmt=".4f") if not rare.empty else "_No frequency data._")
+    lines.append("")
+    return "\n".join(lines)

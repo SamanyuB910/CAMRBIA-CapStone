@@ -28,7 +28,8 @@ own experiments. The full research plan is in [`plan.md`](plan.md).
 | `rlens/fit.py` | Patch model → official `jlens.fit` → save in the released `lens.pt` format with provenance. |
 | `rlens/analysis.py` | Readout tables / rank trajectories (notebook) and lens-vs-lens agreement metrics (verification). |
 | `rlens/evals.py` | The pass@10 battery (five official eval sets, post protocol): R vs J vs logit lens per layer. |
-| `rlens/cli.py` | The **`rlens` command** — every runnable task: `download`, `smoke`, `fit`, `compare`, `eval`. |
+| `rlens/coherence.py` | Replication 2 — early-layer coherence: blinded rating panel + form-based trash rate + the untrained-vocab-row confound check. |
+| `rlens/cli.py` | The **`rlens` command** — every runnable task: `download`, `smoke`, `fit`, `compare`, `eval`, `coherence`. |
 | `tests/` | The correctness gates, all in `test_rlens.py` (see [Tests](#tests)). |
 | `01_readouts.ipynb` | Released J vs R side by side on the post's example prompts. |
 | `pins.yaml` | **Every pinned version in one file**: packages, git commits, HF revisions, recipe constants. |
@@ -135,6 +136,12 @@ Exact versions live in `uv.lock` (installed by `uv sync`) and are mirrored in `p
 
 `uv run pytest` — one file, three sections, all must stay green:
 
+0. **Coherence scoring** — the form classifier reproduces the post's own trash
+   examples (and a test *pins the negative result* that a word list cannot
+   reproduce its `euw`/`tav`/`zinho` examples); the metrics recover a planted
+   early-layer effect; the bootstrap resamples items rather than top-k slots;
+   the blinded panel leaks no lens name and its key round-trips. Runs on
+   pandas alone — no model, no `jlens`.
 1. **Analytic gradients** — each rule changes the backward pass *exactly* as intended
    (silu grad ≡ `sigmoid(x)`, product branches get exactly half, RMSNorm grad matches
    the detached-denominator closed form).
@@ -152,8 +159,10 @@ Everything CPU-checkable is done and green. On a CUDA machine:
 # setup (same as above), then confirm:
 nvidia-smi && uv run python -c "import torch; assert torch.cuda.is_available()"
 
-# experiment 1 first — needs no fitting (released lenses; ~2 h CPU, minutes on GPU):
+# experiments 1 and 2 first — neither needs fitting (released lenses;
+# ~2 h CPU each, minutes on GPU):
 uv run rlens eval                          # pass@10, five sets -> results/passk_*.md
+uv run rlens coherence                     # coherence -> results/coherence_*.md + panel/
 
 # the four fits (bf16, checkpoint/resume on). Empirical note from the community repo:
 # this hybrid model fits at --dim-batch 8 on a 40 GB A100 (~100 s/prompt => ~40 min
@@ -186,6 +195,50 @@ then per-rule ablations via `RulesConfig` toggles. Fitting Gemma additionally ne
 **Footguns:** don't pass `compile=True` to `jlens.from_hf` (can bypass the per-instance
 patches); keep `force_bos` at its default; the 4B checkpoint is multimodal but
 `AutoModelForCausalLM` correctly loads the text-only class; lens files store J in fp16.
+
+## Experiment 2: early-layer coherence
+
+```bash
+uv run rlens coherence                       # released lenses, five eval sets
+uv run rlens coherence --limit 5             # quick plumbing check
+OPENROUTER_API_KEY=... uv run rlens coherence --judge   # + autorate the blind panel
+```
+
+**What the post actually released.** Nothing. The coherence claim is stated
+qualitatively — *"J-lens tends to contain what we refer to as 'trash tokens' […]
+We can quantify this and see that R-lens seems to contain drastically fewer trash
+tokens in the early layers"* — with no rubric, no label set, and no numbers in
+the text; the quantification lives only inside a figure image. Capstone §6.2
+forbids substituting an invented scorer and calling it a replication, so this
+command produces three clearly separated things:
+
+1. **A blinded rating panel — the primary** (§6.2.2). Same prompts, same readout
+   position as `rlens eval`, top-k per layer for every lens, arms shuffled per
+   entry into `arm_A/B/C`. `results/panel/coherence_panel.jsonl` contains no lens
+   name; the key is a separate file to withhold until ratings are in. Rate it by
+   hand or with `--judge` (one fixed grader, blinded, held constant across arms —
+   an addition, *not* the post's scorer).
+2. **A form-based trash rate — exploratory, ours.** A deterministic classifier
+   over token *forms only*: punctuation runs, whitespace, broken byte-fallback
+   pieces, special tokens. It never judges semantics, so it under-counts the
+   post's definition ("…**or unrelated to the prompt**") and is a **lower bound**.
+   Its uniform-draw baseline on the Qwen3.5-4B vocabulary is **2.4%** — printed in
+   every report, because a rate near that is indistinguishable from random rows.
+3. **The untrained-vocab-row confound check** (§6.2.3, and Anne Halsall's comment
+   on the post). Every trash number is reported next to a zero-frequency rate and
+   recomputed over corpus-attested rows only. If the R-vs-J gap survives there, it
+   is not a rare-row artefact.
+
+**Two things the classifier deliberately does not do**, both recorded in
+`TRASH_SETS` with measured baselines and pinned by tests:
+
+- *It never uses script as a criterion.* The post's trash example 锁定 and the
+  readouts it **praises** (颜色的, 是什么呢) are the same form category. Only a
+  semantic rater separates them — which is what the panel is for.
+- *It does not use the lexicon-OOV categories.* A 370k-word list cannot tell a
+  nonsense fragment from a prefix of a real word: `latin_oov` is 26.5% of the
+  vocabulary because " prot", " som", " http" are not dictionary words, while the
+  post's own `tav` **is** one. `--trash-set form` is the default for that reason.
 
 ## Contributing notes
 

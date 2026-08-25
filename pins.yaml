@@ -57,6 +57,15 @@ lenses_released:
     - qwen3.5-4b/j-lens/lens.pt
     - qwen3.5-4b/r-lens/lens.pt
 
+lexicon:                     # English word list for the coherence classifier's `latin_oov`
+  url: https://raw.githubusercontent.com/dwyl/english-words/a77cb15f4f5beb59c15b945f2415328a6b33c3b0/words_alpha.txt
+  sha256: fe1f2a9bf0d872f1c8367fc349e4a6f8e8300b06b6294ea5167483b2bc496127
+  path: data/lexicon/english_words.txt
+  note: |
+    Gates only the `latin_oov` form category (the post's "euw"/"tav"/"zinho"
+    examples). If the file is absent the category is disabled and the coherence
+    report says so, so a missing download can never silently move a number.
+
 dataset:
   hf_id: NeelNanda/pile-10k
   revision: 127bfedcd5047750df5ccf3a12979a47bfa0bafa

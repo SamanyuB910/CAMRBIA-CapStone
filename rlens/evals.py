@@ -22,7 +22,9 @@ from pathlib import Path
 import pandas as pd
 import torch
 
-from jlens.hooks import ActivationRecorder
+# ``jlens`` is imported inside ``run_passk``: the prompt/position/surface-form
+# helpers above it are pure and are reused by ``rlens.coherence``, which must
+# stay importable on an analysis box with no jlens install.
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 EVAL_SETS = ["multihop", "multilingual", "association", "typo", "poetry"]
@@ -59,6 +61,17 @@ def rank_of(logits: torch.Tensor, ids: list[int]) -> int:
     return int((logits > best).sum().item()) + 1
 
 
+def readout_position(tok, seq: list[int], set_name: str) -> int:
+    """The protocol's readout position for one tokenized prompt: the final
+    prompt token, except poetry, which is read at the newline ending line 1.
+    Shared with ``rlens.coherence`` so both replications read the same slot."""
+    if set_name == "poetry":
+        newlines = [i for i, t in enumerate(seq) if "\n" in tok.decode([t])]
+        if newlines:
+            return newlines[-1]
+    return len(seq) - 1
+
+
 def load_items(name: str) -> list[dict]:
     path = REPO_ROOT / "data" / "eval_prompts" / "evaluations" / f"lens-eval-{name}.json"
     return json.loads(path.read_text(encoding="utf-8"))["items"]
@@ -77,6 +90,8 @@ def run_passk(
     """Per-layer pass@k for every (eval set, lens): the fraction of
     intermediates whose best surface-form rank at that layer is <= k.
     Returns a DataFrame indexed by layer, columns (set, lens_name)."""
+    from jlens.hooks import ActivationRecorder
+
     layers = next(l for l in lenses.values() if l is not None).source_layers
     final_layer = model.n_layers - 1
     record_at = sorted(set(layers) | {final_layer})
@@ -90,10 +105,7 @@ def run_passk(
             prompt = item["prompt"].rstrip()
             input_ids = model.encode(prompt, max_length=512)
             seq = input_ids[0].tolist()
-            pos = len(seq) - 1
-            if set_name == "poetry":  # read at the newline ending line 1
-                newlines = [i for i, t in enumerate(seq) if "\n" in tok.decode([t])]
-                pos = newlines[-1] if newlines else pos
+            pos = readout_position(tok, seq, set_name)
 
             with ActivationRecorder(model.layers, at=record_at) as rec:
                 model.forward(input_ids)

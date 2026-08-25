@@ -5,6 +5,7 @@
     uv run rlens fit --lens {j,r} [--draw ...]    fit our own lens with the released recipe
     uv run rlens compare [--functional]           our fits vs released -> results/verification_report.md
     uv run rlens eval [--sets ...] [--limit N]    pass@10 battery: R vs J vs logit -> results/
+    uv run rlens coherence [--judge] [...]        early-layer coherence -> results/
 """
 
 from __future__ import annotations
@@ -31,24 +32,39 @@ def _pins() -> dict:
     return yaml.safe_load((REPO_ROOT / "pins.yaml").read_text(encoding="utf-8"))
 
 
-def _load_model(dtype: str, device: str):
+def _model_pin(name: str = "qwen3.5-4b") -> dict:
+    """Pin block for a model directory name: the harness model or one of the
+    experiment models. `revision: null` means "resolve on the GPU box and pin"."""
+    pins = _pins()
+    if name == "qwen3.5-4b":
+        return pins["model"]
+    try:
+        return pins["experiment_models"][name]
+    except KeyError:
+        known = ["qwen3.5-4b", *pins["experiment_models"]]
+        raise SystemExit(f"unknown model {name!r}; pins.yaml knows {known}") from None
+
+
+def _load_model(dtype: str, device: str, name: str = "qwen3.5-4b"):
     import torch
     import transformers
 
-    model = _pins()["model"]
+    model = _model_pin(name)
+    revision = model["revision"]
     torch_dtype = {"bf16": torch.bfloat16, "fp32": torch.float32}[dtype]
-    print(f"loading {model['hf_id']}@{model['revision'][:8]} dtype={dtype} device={device} ...")
+    shown = revision[:8] if revision else "UNPINNED(main)"
+    print(f"loading {model['hf_id']}@{shown} dtype={dtype} device={device} ...")
     t0 = time.perf_counter()
     hf = transformers.AutoModelForCausalLM.from_pretrained(
-        model["hf_id"], revision=model["revision"], dtype=torch_dtype, device_map=device
+        model["hf_id"], revision=revision, dtype=torch_dtype, device_map=device
     )
-    tok = transformers.AutoTokenizer.from_pretrained(model["hf_id"], revision=model["revision"])
+    tok = transformers.AutoTokenizer.from_pretrained(model["hf_id"], revision=revision)
     print(f"loaded {type(hf).__name__} in {time.perf_counter() - t0:.0f}s")
     return hf, tok
 
 
-def _lens_path(kind: str, name: str) -> Path:
-    return REPO_ROOT / "lenses" / kind / "qwen3.5-4b" / name / "lens.pt"
+def _lens_path(kind: str, name: str, model: str = "qwen3.5-4b") -> Path:
+    return REPO_ROOT / "lenses" / kind / model / name / "lens.pt"
 
 
 # ---------------------------------------------------------------------------
@@ -91,6 +107,25 @@ def cmd_download(args) -> None:
         out_path.parent.mkdir(parents=True, exist_ok=True)
         ds.to_parquet(str(out_path))
         print(f"[pile10k] {len(ds)} rows -> {out_path}")
+
+    lex = pins["lexicon"]
+    lex_path = REPO_ROOT / lex["path"]
+    if lex_path.exists():
+        print(f"[lexicon] already present -> {lex_path}")
+    else:
+        import hashlib
+        import urllib.request
+
+        lex_path.parent.mkdir(parents=True, exist_ok=True)
+        with urllib.request.urlopen(lex["url"], timeout=120) as response:
+            blob = response.read()
+        digest = hashlib.sha256(blob).hexdigest()
+        if lex["sha256"] and digest != lex["sha256"]:
+            raise SystemExit(f"[lexicon] sha256 mismatch: got {digest}, pins.yaml says {lex['sha256']}")
+        lex_path.write_bytes(blob)
+        print(f"[lexicon] {len(blob) / 1e6:.1f} MB -> {lex_path}")
+        if not lex["sha256"]:
+            print(f"[lexicon] NOTE: pin this sha256 in pins.yaml: {digest}")
 
     src = REPO_ROOT / "reference" / "jacobian-lens" / "data"
     dest = REPO_ROOT / "data" / "eval_prompts"
@@ -386,12 +421,107 @@ def cmd_eval(args) -> None:
 
 
 # ---------------------------------------------------------------------------
+# coherence
+# ---------------------------------------------------------------------------
+
+
+def cmd_coherence(args) -> None:
+    import pandas as pd
+
+    import jlens
+    from jlens.lens import JacobianLens
+
+    from rlens.coherence import (
+        CoherenceConfig, annotate, build_panel, collect_readouts, corpus_token_counts,
+        judge_panel, load_lexicon, per_layer, report, summarize, unblind,
+        unembed_row_percentiles,
+    )
+
+    model_name = args.model
+    hf, tok = _load_model(args.dtype, args.device, model_name)
+    model = jlens.from_hf(hf, tok)
+
+    lenses = {"logit": None}
+    for name, (kind, file) in {
+        "released-J": ("released", "j-lens"),
+        "released-R": ("released", "r-lens"),
+        "ours-J": ("ours", "j-lens"),
+        "ours-R": ("ours", "r-lens"),
+    }.items():
+        path = _lens_path(kind, file, model_name)
+        if path.exists():
+            lenses[name] = JacobianLens.load(str(path))
+    print(f"lenses: {list(lenses)}   sets: {args.sets}   trash set: {args.trash_set}")
+
+    cfg = CoherenceConfig(
+        sets=tuple(args.sets), k=args.k, limit=args.limit,
+        filter_correct=not args.no_filter_correct, trash_set=args.trash_set, seed=args.seed,
+    )
+    raw = collect_readouts(model, lenses, cfg)
+
+    lexicon = load_lexicon()
+    if lexicon is None:
+        print("NOTE: no lexicon at data/lexicon/english_words.txt -> 'latin_oov' disabled "
+              "(run `rlens download`).")
+    prompts = pd.read_parquet(REPO_ROOT / "data" / "pile10k" / "pile10k_first200.parquet")["text"].tolist()
+    counts = corpus_token_counts(tok, prompts)
+    try:
+        row_pct = unembed_row_percentiles(model)
+    except AttributeError as exc:  # diagnostic is optional; never fail the run over it
+        print(f"NOTE: unembedding-norm diagnostic skipped ({exc})")
+        row_pct = None
+    special_ids = set(getattr(tok, "all_special_ids", []) or []) | set(
+        getattr(tok, "added_tokens_decoder", {}) or {}
+    )
+    df = annotate(raw, lexicon=lexicon, special_ids=special_ids, counts=counts,
+                  row_pct=row_pct, trash_set=args.trash_set)
+
+    layers = per_layer(df)
+    overall = summarize(df, seed=args.seed)
+
+    out_dir = REPO_ROOT / "results"
+    out_dir.mkdir(exist_ok=True)
+    tag = model_name
+    df.to_parquet(out_dir / f"coherence_readouts_{tag}.parquet")
+    layers.to_csv(out_dir / f"coherence_per_layer_{tag}.csv")
+
+    sheet_path, key_path = build_panel(
+        df, out_dir / "panel",
+        n_items=args.panel_items, lenses=args.panel_lenses, seed=args.seed,
+    )
+    print(f"blinded panel -> {sheet_path} (key: {key_path})")
+
+    judged = None
+    if args.judge:
+        api_key = os.environ.get("OPENROUTER_API_KEY")
+        if not api_key:
+            raise SystemExit("--judge needs OPENROUTER_API_KEY in the environment")
+        scores = judge_panel(sheet_path, model=args.judge_model, api_key=api_key, limit=args.judge_limit)
+        judged = unblind(scores, key_path)
+        judged.to_csv(out_dir / f"coherence_panel_scores_{tag}.csv", index=False)
+
+    report_path = out_dir / f"coherence_{tag}.md"
+    report_path.write_text(
+        report(
+            df, model_name=tag, sheet_path=sheet_path, key_path=key_path,
+            judged=judged, judge_model=args.judge_model if args.judge else None,
+            panel_items=args.panel_items, seed=args.seed,
+        ),
+        encoding="utf-8",
+    )
+    print(f"\n{overall.to_string(float_format='%.4f')}\n\nreport -> {report_path}")
+
+
+# ---------------------------------------------------------------------------
 # entry point
 # ---------------------------------------------------------------------------
 
 
 def main() -> None:
     import torch
+
+    from rlens.coherence import DEFAULT_TRASH_SET, TRASH_SETS
+    from rlens.evals import EVAL_SETS
 
     parser = argparse.ArgumentParser(prog="rlens", description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
@@ -425,7 +555,6 @@ def main() -> None:
     p.add_argument("--dtype", choices=["bf16", "fp32"], default="bf16")
     p.set_defaults(func=cmd_compare)
 
-    from rlens.evals import EVAL_SETS
 
     p = sub.add_parser("eval", help="pass@10 battery: R vs J vs logit lens -> results/")
     p.add_argument("--sets", nargs="+", default=EVAL_SETS, choices=EVAL_SETS)
@@ -436,6 +565,26 @@ def main() -> None:
     p.add_argument("--device", default=default_device)
     p.add_argument("--dtype", choices=["bf16", "fp32"], default="bf16")
     p.set_defaults(func=cmd_eval)
+
+    p = sub.add_parser("coherence", help="early-layer coherence: blinded panel + trash/rare-row diagnostics")
+    p.add_argument("--model", default="qwen3.5-4b")
+    p.add_argument("--sets", nargs="+", default=EVAL_SETS, choices=EVAL_SETS)
+    p.add_argument("--k", type=int, default=10, help="top-k slots scored per (layer, lens)")
+    p.add_argument("--limit", type=int, default=None, help="max items per set (quick checks)")
+    p.add_argument("--no-filter-correct", action="store_true")
+    p.add_argument("--trash-set", default=DEFAULT_TRASH_SET, choices=sorted(TRASH_SETS),
+                   help="which form categories count as trash (recorded in the report)")
+    p.add_argument("--reference", default=None, help="lens arm the contrasts are taken from (default: the R arm)")
+    p.add_argument("--panel-items", type=int, default=24)
+    p.add_argument("--panel-lenses", nargs="+", default=None,
+                   help="restrict the blinded panel to these lens arms (default: all present)")
+    p.add_argument("--judge", action="store_true", help="score the blinded panel via OpenRouter")
+    p.add_argument("--judge-model", default="openai/gpt-5.4-nano")
+    p.add_argument("--judge-limit", type=int, default=None)
+    p.add_argument("--seed", type=int, default=20260825)
+    p.add_argument("--device", default=default_device)
+    p.add_argument("--dtype", choices=["bf16", "fp32"], default="bf16")
+    p.set_defaults(func=cmd_coherence)
 
     args = parser.parse_args()
     args.func(args)
