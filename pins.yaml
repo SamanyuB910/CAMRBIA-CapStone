@@ -69,4 +69,4 @@ fitting:
 
 gpu:
   local: false               # HP OmniBook dev box, Intel iGPU only — CPU work only here
-  gpu_gate_deferred_to: remote SSH Linux machine (available 2026-08-25); see HANDOFF.md
+  gpu_gate_deferred_to: remote SSH Linux machine; see the GPU runbook in README.md

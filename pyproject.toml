@@ -25,6 +25,9 @@ dependencies = [
     "jlens",
 ]
 
+[project.scripts]
+rlens = "rlens.cli:main"
+
 [tool.hatch.build.targets.wheel]
 packages = ["rlens"]
 

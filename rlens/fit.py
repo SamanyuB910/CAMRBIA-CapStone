@@ -17,8 +17,7 @@ import torch
 import jlens
 from jlens.lens import JacobianLens
 
-from rlens.patching import RulesPatcher
-from rlens.rules import RulesConfig
+from rlens.rules import RulesConfig, RulesPatcher
 
 
 @dataclass(frozen=True)
