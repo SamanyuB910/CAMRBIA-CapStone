@@ -21,3 +21,4 @@ lenses/**/*.ckpt.pt
 
 # Local scratch
 results/plumbing/
+NUL

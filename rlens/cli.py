@@ -386,6 +386,101 @@ def cmd_eval(args) -> None:
 
 
 # ---------------------------------------------------------------------------
+# onset (temporal faithfulness experiment; causal-onset branch)
+# ---------------------------------------------------------------------------
+
+
+def _onset_model(name: str, dtype: str, device: str):
+    import torch
+    import transformers
+
+    pins = _pins()
+    spec = pins["model"] if name == "qwen3.5-4b" else pins["experiment_models"][name]
+    torch_dtype = {"bf16": torch.bfloat16, "fp32": torch.float32}[dtype]
+    hf = transformers.AutoModelForCausalLM.from_pretrained(
+        spec["hf_id"], revision=spec.get("revision"), dtype=torch_dtype, device_map=device
+    ).eval()
+    tok = transformers.AutoTokenizer.from_pretrained(spec["hf_id"], revision=spec.get("revision"))
+    return hf, tok
+
+
+def cmd_onset(args) -> None:
+    from dataclasses import asdict
+
+    import pandas as pd
+
+    from rlens import onset
+
+    items_path = REPO_ROOT / "data" / f"onset_items_{args.model}.json"
+    records_path = REPO_ROOT / "results" / f"onset_records_{args.model}.parquet"
+
+    if args.stage == "data":
+        hf, tok = _onset_model(args.model, args.dtype, args.device)
+        items, log = onset.build_dataset(hf, tok, position=args.position, limit=args.limit)
+        items_path.write_text(
+            json.dumps({"position": args.position, "items": [asdict(i) for i in items], "filter_log": log}, indent=1),
+            encoding="utf-8",
+        )
+        n_dropped = sum(not e["kept"] for e in log)
+        print(f"{len(items)} items kept, {n_dropped} dropped -> {items_path}")
+        for e in log:
+            if not e["kept"]:
+                print(f"  dropped {e['name']}: {e['reason']}")
+        return
+
+    if args.stage == "run":
+        from jlens.lens import JacobianLens
+
+        data = json.loads(items_path.read_text(encoding="utf-8"))
+        items = [onset.OnsetItem(**d) for d in data["items"]][: args.limit]
+        hf, tok = _onset_model(args.model, args.dtype, args.device)
+        lens_dir = REPO_ROOT / "lenses" / "released" / args.model
+        lenses = {
+            "R": JacobianLens.load(str(lens_dir / "r-lens" / "lens.pt")),
+            "J": JacobianLens.load(str(lens_dir / "j-lens" / "lens.pt")),
+        }
+        layers = args.layers or lenses["J"].source_layers
+        print(f"{len(items)} items x {len(layers)} layers on {args.model} (ridge={args.ridge}, center={args.center})")
+        df = onset.run_measurements(
+            hf, tok, lenses, items, layers=layers,
+            ridge=args.ridge, center=args.center, batch_size=args.batch_size,
+        )
+        # alpha=0 numerics check: identity condition must reproduce clean margins
+        ident = df[df.condition == "identity"]
+        worst = (ident["margin"] - ident["clean_margin"]).abs().max()
+        print(f"identity-condition max |margin drift| = {worst:.2e} (must be ~0)")
+        records_path.parent.mkdir(exist_ok=True)
+        df.to_parquet(records_path)
+        print(f"{len(df)} records -> {records_path}")
+        return
+
+    # analyze
+    df = pd.read_parquet(records_path)
+    result = onset.analyze(df, rho=args.rho)
+    lines = [f"# Causal concept onset — {args.model}\n"]
+    lines.append(f"Items: {df['item'].nunique()}; layers: {df['layer'].nunique()}; rho={args.rho}, w=2.")
+    lines.append("Curves are EXCESS over matched controls (shuffled labels / norm-matched random).\n")
+    lines.append("## Onsets (layer index; None = never exceeded threshold)\n")
+    onset_rows = {lens: result["onsets"][lens] for lens in onset.LENSES}
+    lines.append(pd.DataFrame(onset_rows).T.to_markdown())
+    lines.append("")
+    lines.append(f"**Gap Δ = L_causal − L_R:  Δ_R = {result['gap_R']}, Δ_J = {result['gap_J']}**")
+    lines.append(f"**Principal comparison Δ_R − Δ_J = {result['delta_R_minus_delta_J']}**")
+    if result["boot_ci"]:
+        lines.append(f"Paired bootstrap 95% CI: {result['boot_ci']} (defined in {result['boot_defined_frac']:.0%} of resamples)")
+    for lens in onset.LENSES:
+        lines.append(f"\n## Excess curves — {lens}\n")
+        lines.append(pd.DataFrame(result["curves"][lens]).to_markdown(floatfmt=".3f"))
+    diag = df[df.condition == "diagnostics"]
+    if len(diag):
+        lines.append("\n## Swap-pair conditioning (mid layer)\n")
+        lines.append(diag.groupby("lens")[["cos", "kappa"]].describe().to_markdown(floatfmt=".2f"))
+    out = REPO_ROOT / "results" / f"onset_{args.model}.md"
+    out.write_text("\n".join(lines), encoding="utf-8")
+    print(f"report -> {out}")
+
+
+# ---------------------------------------------------------------------------
 # entry point
 # ---------------------------------------------------------------------------
 
@@ -436,6 +531,20 @@ def main() -> None:
     p.add_argument("--device", default=default_device)
     p.add_argument("--dtype", choices=["bf16", "fp32"], default="bf16")
     p.set_defaults(func=cmd_eval)
+
+    p = sub.add_parser("onset", help="temporal faithfulness experiment (causal concept onset)")
+    p.add_argument("--stage", choices=["data", "run", "analyze"], required=True)
+    p.add_argument("--model", choices=["qwen3.5-4b", "qwen3.5-27b"], default="qwen3.5-4b")
+    p.add_argument("--position", type=int, default=-1, help="t_i: -1 primary, -2 sensitivity")
+    p.add_argument("--limit", type=int, default=None, help="max items (smoke runs)")
+    p.add_argument("--layers", type=int, nargs="+", default=None)
+    p.add_argument("--ridge", type=float, default=0.0, help="ridge lambda for the pinv swap")
+    p.add_argument("--center", action="store_true", help="mu-centered ablation loading (sensitivity)")
+    p.add_argument("--batch-size", type=int, default=24)
+    p.add_argument("--rho", type=float, default=0.2, help="onset threshold")
+    p.add_argument("--device", default=default_device)
+    p.add_argument("--dtype", choices=["bf16", "fp32"], default="bf16")
+    p.set_defaults(func=cmd_onset)
 
     args = parser.parse_args()
     args.func(args)
