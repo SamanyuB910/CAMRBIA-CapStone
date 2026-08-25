@@ -116,10 +116,13 @@ def test_edit_runner_multi_layer_persistent_edit(tiny_qwen, tiny_batch):
 
     bump = torch.randn(tiny_qwen.config.hidden_size, generator=torch.Generator().manual_seed(1))
     single = {1: lambda h: h + 3.0 * bump}
-    persist = {l: (lambda h: h + 3.0 * bump) for l in (1, 2, 3)}
+    # NB: repeating the same additive bump saturates RMSNorm (blocks read
+    # norm(h), which is scale-invariant), so the second edit must change the
+    # DIRECTION, not the magnitude — zeroing does.
+    persist = {1: lambda h: h + 3.0 * bump, 2: lambda h: torch.zeros_like(h)}
     ident = {l: (lambda h: h) for l in (1, 2, 3)}
     logits = runner.run(input_ids, position=3, edits=[single, persist, ident])
-    assert not torch.allclose(logits[0], logits[1], atol=1e-3), "persistent edit == single-layer edit"
+    assert not torch.allclose(logits[0], logits[1], atol=1e-3), "second-layer edit had no effect"
     assert torch.allclose(logits[2], clean, atol=1e-5), "multi-layer identity changed the forward"
 
 
