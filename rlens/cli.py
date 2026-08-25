@@ -19,6 +19,7 @@ from pathlib import Path
 os.environ.setdefault("HF_HUB_DISABLE_SYMLINKS_WARNING", "1")
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_MODEL = "qwen3.5-4b"  # the pins.yaml `model:` block; others live under `experiment_models:`
 DRAWS = {"primary": (0, 25), "nf1": (25, 50), "nf2": (50, 75)}  # pile-10k row ranges
 JACCARD_POSITIONS = [8, 24, 48, 72, 96, 120]
 NOISE_FLOOR_MARGIN = 1.5
@@ -31,24 +32,44 @@ def _pins() -> dict:
     return yaml.safe_load((REPO_ROOT / "pins.yaml").read_text(encoding="utf-8"))
 
 
-def _load_model(dtype: str, device: str):
+def _model_spec(model: str = DEFAULT_MODEL) -> dict:
+    """Resolve a model nickname to its pins entry.
+
+    ``qwen3.5-4b`` is the top-level ``model:`` block (the harness-verification
+    model); everything else comes from ``experiment_models:``.
+    """
+    pins = _pins()
+    if model == DEFAULT_MODEL:
+        return pins["model"]
+    try:
+        return pins["experiment_models"][model]
+    except KeyError:
+        known = ", ".join([DEFAULT_MODEL, *pins["experiment_models"]])
+        raise SystemExit(f"unknown --model {model!r}; known: {known}") from None
+
+
+def _load_model(dtype: str, device: str, model: str = DEFAULT_MODEL):
     import torch
     import transformers
 
-    model = _pins()["model"]
+    spec = _model_spec(model)
+    revision = spec["revision"]
+    if revision is None:
+        print(f"WARNING: {model} has revision: null in pins.yaml - this run is not reproducible")
     torch_dtype = {"bf16": torch.bfloat16, "fp32": torch.float32}[dtype]
-    print(f"loading {model['hf_id']}@{model['revision'][:8]} dtype={dtype} device={device} ...")
+    rev_tag = revision[:8] if revision else "unpinned"
+    print(f"loading {spec['hf_id']}@{rev_tag} dtype={dtype} device={device} ...")
     t0 = time.perf_counter()
     hf = transformers.AutoModelForCausalLM.from_pretrained(
-        model["hf_id"], revision=model["revision"], dtype=torch_dtype, device_map=device
+        spec["hf_id"], revision=revision, dtype=torch_dtype, device_map=device
     )
-    tok = transformers.AutoTokenizer.from_pretrained(model["hf_id"], revision=model["revision"])
+    tok = transformers.AutoTokenizer.from_pretrained(spec["hf_id"], revision=revision)
     print(f"loaded {type(hf).__name__} in {time.perf_counter() - t0:.0f}s")
     return hf, tok
 
 
-def _lens_path(kind: str, name: str) -> Path:
-    return REPO_ROOT / "lenses" / kind / "qwen3.5-4b" / name / "lens.pt"
+def _lens_path(kind: str, name: str, model: str = DEFAULT_MODEL) -> Path:
+    return REPO_ROOT / "lenses" / kind / model / name / "lens.pt"
 
 
 # ---------------------------------------------------------------------------
@@ -123,22 +144,22 @@ def cmd_smoke(args) -> None:
 
     out = {}
     for arm in ("j-lens", "r-lens"):
-        path = _lens_path("released", arm)
+        path = _lens_path("released", arm, args.model)
         raw = torch.load(path, map_location="cpu", weights_only=False)
         print(f"\n{arm} keys: {sorted(raw)}")
         prov = raw.get("provenance")
         print(f"{arm} provenance: {prov}")
         out[arm] = prov
-    dest = REPO_ROOT / "results" / "provenance_qwen3.5-4b.json"
+    dest = REPO_ROOT / "results" / f"provenance_{args.model}.json"
     dest.parent.mkdir(exist_ok=True)
     dest.write_text(json.dumps(out, indent=2, default=str), encoding="utf-8")
     print(f"\nprovenance saved -> {dest}")
     if args.skip_model:
         return
 
-    hf, tok = _load_model(args.dtype, args.device)
+    hf, tok = _load_model(args.dtype, args.device, args.model)
     model = jlens.from_hf(hf, tok)
-    lens = jlens.JacobianLens.from_pretrained(str(_lens_path("released", "j-lens")))
+    lens = jlens.JacobianLens.from_pretrained(str(_lens_path("released", "j-lens", args.model)))
     print(f"\nlens: {lens}")
 
     def print_readout(title: str, lens_logits: dict, every: int = 2) -> None:
@@ -348,7 +369,7 @@ def cmd_eval(args) -> None:
 
     from rlens.evals import EVAL_SETS, run_passk, summarize_passk
 
-    hf, tok = _load_model(args.dtype, args.device)
+    hf, tok = _load_model(args.dtype, args.device, args.model)
     model = jlens.from_hf(hf, tok)
 
     lenses = {"logit": None}
@@ -358,9 +379,13 @@ def cmd_eval(args) -> None:
         "ours-J": ("ours", "j-lens"),
         "ours-R": ("ours", "r-lens"),
     }.items():
-        if _lens_path(kind, file).exists():
-            lenses[name] = JacobianLens.load(str(_lens_path(kind, file)))
-    print(f"lenses: {list(lenses)}   sets: {args.sets}")
+        if _lens_path(kind, file, args.model).exists():
+            lenses[name] = JacobianLens.load(str(_lens_path(kind, file, args.model)))
+    print(f"model: {args.model}   lenses: {list(lenses)}   sets: {args.sets}")
+    if len(lenses) == 1:
+        raise SystemExit(
+            f"no lens files under lenses/*/{args.model}/ - run `rlens download --experiment-models`"
+        )
 
     df = run_passk(
         model, lenses,
@@ -370,17 +395,22 @@ def cmd_eval(args) -> None:
     summary = summarize_passk(df)
 
     out_dir = REPO_ROOT / "results"
-    df.to_csv(out_dir / "passk_per_layer_qwen3.5-4b.csv")
+    df.to_csv(out_dir / f"passk_per_layer_{args.model}.csv")
+    expectation = (
+        "Expected on 4b: J ≈ R (the post's null); both well above the logit lens."
+        if args.model == DEFAULT_MODEL
+        else "Post reports an R-lens advantage over J-lens at this scale, strongest on early layers."
+    )
     lines = [
-        "# pass@%d — qwen3.5-4b\n" % args.k,
+        "# pass@%d — %s\n" % (args.k, args.model),
         f"Sets: {args.sets}. Items kept after correctness filter: {df.attrs['n_kept']}.",
-        "Expected on 4b: J ≈ R (the post's null); both well above the logit lens.\n",
+        expectation + "\n",
         "## Summary (mean pass@%d over layers)\n" % args.k,
         summary.to_markdown(floatfmt=".3f"),
         "\n## Per-layer (mean over sets)\n",
         df.T.groupby(level="lens").mean().T.to_markdown(floatfmt=".3f"),
     ]
-    report = out_dir / "passk_qwen3.5-4b.md"
+    report = out_dir / f"passk_{args.model}.md"
     report.write_text("\n".join(lines), encoding="utf-8")
     print(f"\n{summary.to_string(float_format='%.3f')}\nreport -> {report}")
 
@@ -403,13 +433,14 @@ def main() -> None:
     p.set_defaults(func=cmd_download)
 
     p = sub.add_parser("smoke", help="released J-lens vs logit-lens readout + provenance dump")
+    p.add_argument("--model", default=DEFAULT_MODEL)
     p.add_argument("--dtype", choices=["bf16", "fp32"], default="bf16")
     p.add_argument("--device", default=default_device)
     p.add_argument("--skip-model", action="store_true", help="provenance dump only")
     p.set_defaults(func=cmd_smoke)
 
     p = sub.add_parser("fit", help="fit a J- or R-lens with the released recipe")
-    p.add_argument("--model", default="qwen3.5-4b")
+    p.add_argument("--model", default=DEFAULT_MODEL)
     p.add_argument("--lens", choices=["j", "r"], required=True)
     p.add_argument("--draw", choices=sorted(DRAWS), default="primary")
     p.add_argument("--n", type=int, default=25)
@@ -428,6 +459,8 @@ def main() -> None:
     from rlens.evals import EVAL_SETS
 
     p = sub.add_parser("eval", help="pass@10 battery: R vs J vs logit lens -> results/")
+    p.add_argument("--model", default=DEFAULT_MODEL,
+                   help="qwen3.5-4b (default) or any key under experiment_models: in pins.yaml")
     p.add_argument("--sets", nargs="+", default=EVAL_SETS, choices=EVAL_SETS)
     p.add_argument("--k", type=int, default=10)
     p.add_argument("--limit", type=int, default=None, help="max items per set (quick checks)")

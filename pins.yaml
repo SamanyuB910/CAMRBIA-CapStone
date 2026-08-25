@@ -5,7 +5,7 @@
 python: "3.11.9"
 
 packages:
-  torch: "2.13.0"            # CPU wheel on Windows dev box; CUDA-bundled wheel on Linux via the same uv.lock
+  torch: "2.11.0"
   transformers: "5.15.1"
   datasets: "5.0.1"
   huggingface_hub: "1.28.0"
