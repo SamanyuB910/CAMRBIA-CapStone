@@ -724,9 +724,23 @@ def build_panel(
         step = max(1, len(early) // max_layers)
         layers = early[::step][:max_layers]
 
-    pairs = sorted({(s, i) for s, i in df[["set", "item"]].itertuples(index=False)})
-    rng.shuffle(pairs)
-    pairs = pairs[:n_items]
+    # Stratify by eval set. A flat shuffle over all items gave 6/12 poetry on the
+    # first 27B panel — a rater would have been scoring mostly one protocol, and
+    # poetry is the set whose readout position (a newline) most distorts what
+    # "coherent" looks like.
+    by_set: dict[str, list] = {}
+    for set_name, item in sorted({(a, b) for a, b in df[["set", "item"]].itertuples(index=False)}):
+        by_set.setdefault(set_name, []).append((set_name, item))
+    for pool in by_set.values():
+        rng.shuffle(pool)
+
+    pairs = []
+    sets_cycle = sorted(by_set)
+    while len(pairs) < n_items and any(by_set.values()):
+        for set_name in sets_cycle:          # round-robin: even coverage per set
+            if by_set[set_name] and len(pairs) < n_items:
+                pairs.append(by_set[set_name].pop())
+    rng.shuffle(pairs)                        # then randomise presentation order
 
     sheet, key = [], []
     for entry_id, (set_name, item) in enumerate(pairs):

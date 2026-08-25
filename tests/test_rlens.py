@@ -1100,3 +1100,29 @@ def test_unblind_rejects_duplicate_score_columns():
         bad.insert(0, "entry", "000L00")
         with pytest.raises(ValueError, match="duplicate column names"):
             unblind(bad, key_path)
+
+
+def test_panel_is_stratified_across_eval_sets():
+    """A flat shuffle gave 6/12 poetry on the first 27B panel. With five sets and
+    ten slots the panel must take two from each, not whatever the draw yields."""
+    import collections
+    import tempfile
+
+    rows = []
+    for set_name in ("multihop", "multilingual", "association", "typo", "poetry"):
+        for item in range(20):
+            for layer in range(4):
+                for lens in ("ours-R", "ours-J"):
+                    rows.append({"set": set_name, "item": item, "layer": layer, "lens": lens,
+                                 "rank": 1, "token_id": 1, "token": " against", "in_prompt": False})
+    df = pd.DataFrame(rows)
+    df.attrs["n_layers"] = 4
+    df = annotate(df, lexicon=LEXICON)
+
+    with tempfile.TemporaryDirectory() as tmp:
+        sheet_path, _ = build_panel(df, Path(tmp), n_items=10, max_layers=2, seed=21)
+        sheet = [json.loads(l) for l in sheet_path.read_text(encoding="utf-8").splitlines()]
+
+    counts = collections.Counter(e["set"] for e in sheet)
+    assert len(counts) == 5, "every eval set represented"
+    assert max(counts.values()) - min(counts.values()) <= 1, f"unbalanced: {counts}"
