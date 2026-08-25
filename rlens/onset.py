@@ -280,10 +280,14 @@ def build_dataset(hf_model, tok, *, position: int = -1, min_p_answer: float = 1e
         if not control_ok:
             drop(item, "control answer wrong"); continue
 
+        # wrong-concept control: same-category preferred (§7.7.3); global pool
+        # fallback for singleton categories (documented deviation)
         cat_items = by_cat[item["category"]]
         nxt = cat_items[(cat_items.index(item) + 1) % len(cat_items)]
+        candidates = [nxt["swap_to"], nxt["intermediate"]]
+        candidates += [w for other in raw for w in (other["intermediate"], other["swap_to"])]
         c_wrong = next(
-            (w for w in (nxt["swap_to"], nxt["intermediate"]) if w.lower() not in (c.lower(), c_prime.lower()) and _direction_id(tok, w)),
+            (w for w in candidates if w.lower() not in (c.lower(), c_prime.lower()) and _direction_id(tok, w)),
             None,
         )
         if c_wrong is None:
