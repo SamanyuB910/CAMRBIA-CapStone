@@ -677,5 +677,6 @@ def analyze(df: pd.DataFrame, *, rho: float = 0.2, w: int = 2, n_boot: int = 100
         "onset_cis": {lens: {k: ci_of(v) for k, v in dists.items()} for lens, dists in boot_onsets.items()},
         "gap_R": gap_diff[0], "gap_J": gap_diff[1],
         "delta_R_minus_delta_J": (gap_diff[0] - gap_diff[1]) if None not in gap_diff else None,
-        "boot_ci": ci_of(boot_gaps)[:2] if boot_gaps else None, "boot_defined_frac": len(boot_gaps) / n_boot,
+        "boot_ci": ci_of(boot_gaps)[:2] if boot_gaps else None,
+        "boot_defined_frac": (len(boot_gaps) / n_boot) if n_boot else 0.0,
     }

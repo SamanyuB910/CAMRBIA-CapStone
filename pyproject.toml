@@ -24,6 +24,7 @@ dependencies = [
     "pyyaml",
     "jlens",
     "tabulate>=0.10.0",
+    "plotly>=7.0.0",
 ]
 
 [project.scripts]

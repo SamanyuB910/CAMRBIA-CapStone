@@ -5,6 +5,8 @@
     uv run rlens fit --lens {j,r} [--draw ...]    fit our own lens with the released recipe
     uv run rlens compare [--functional]           our fits vs released -> results/verification_report.md
     uv run rlens eval [--sets ...] [--limit N]    pass@10 battery: R vs J vs logit -> results/
+    uv run rlens onset --stage {data,run,analyze}  causal-onset experiment (add --at-cue for cue site)
+    uv run rlens figures                          tables + interactive plots from the records (no GPU)
 """
 
 from __future__ import annotations
@@ -13,6 +15,7 @@ import argparse
 import json
 import logging
 import os
+import sys
 import time
 from pathlib import Path
 
@@ -530,6 +533,33 @@ def cmd_onset(args) -> None:
 
 
 # ---------------------------------------------------------------------------
+# figures (no GPU: reads the committed records)
+# ---------------------------------------------------------------------------
+
+
+def cmd_figures(args) -> None:
+    import webbrowser
+
+    from rlens.figures import build, write_html
+
+    # Windows consoles are cp1252; never let a stray unicode glyph kill a run
+    sys.stdout.reconfigure(errors="replace")
+    figs, tables = build(args.model)
+    for name, table in tables.items():
+        print(f"\n=== {name} ===")
+        print(table.to_string())
+
+    out = REPO_ROOT / "results" / f"figures_{args.model}.html"
+    write_html(figs, out, args.model)
+    print(f"\n{len(figs)} figures -> {out}")
+    print("open it in a browser, or explore the raw records yourself:")
+    print(f"  df = pd.read_parquet('results/onset_records_{args.model}_cue.parquet')")
+    print("  df.groupby(['lens','condition','layer'])['logp_y'].mean()")
+    if not args.no_open:
+        webbrowser.open(out.as_uri())
+
+
+# ---------------------------------------------------------------------------
 # entry point
 # ---------------------------------------------------------------------------
 
@@ -597,6 +627,11 @@ def main() -> None:
     p.add_argument("--device", default=default_device)
     p.add_argument("--dtype", choices=["bf16", "fp32"], default="bf16")
     p.set_defaults(func=cmd_onset)
+
+    p = sub.add_parser("figures", help="interactive plots + comparison tables from the records (no GPU)")
+    p.add_argument("--model", choices=["qwen3.5-4b", "qwen3.5-27b"], default="qwen3.5-27b")
+    p.add_argument("--no-open", action="store_true", help="write the HTML without opening a browser")
+    p.set_defaults(func=cmd_figures)
 
     args = parser.parse_args()
     args.func(args)
