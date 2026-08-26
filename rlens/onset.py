@@ -234,8 +234,12 @@ def find_cue(token_strs: list[str], override_word: str | None = None) -> int:
     """
     stripped = [t.strip() for t in token_strs]
     if override_word is not None:
+        w = override_word.lower()
         for i in range(len(stripped) - 1, -1, -1):
-            if override_word.lower() in stripped[i].lower():
+            t = stripped[i].lower()
+            # match whole word in one token, or a subtoken of a multi-token
+            # word (>=3 chars, or a digit string like atomic numbers)
+            if t and (w in t or (t in w and (len(t) >= 3 or t.isdigit()))):
                 return i
     for i in range(len(stripped) - 1, 0, -1):
         t = stripped[i]
