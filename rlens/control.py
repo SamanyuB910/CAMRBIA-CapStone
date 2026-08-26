@@ -35,7 +35,10 @@ class ControlLens:
         """Args:
             reference: the lens whose per-layer Frobenius norms are matched
                 (use the R-lens — it is the arm the control is the null for).
-            seed: base seed; layer ``l`` uses ``seed + l``.
+            seed: base seed; layer ``l`` uses ``seed + l``. Because the streams
+                are consecutive, two "replicate" seeds less than ``n_layers``
+                apart reuse the same Gaussian matrices one layer over (only the
+                norm rescale differs) - space replicate seeds by 1000, not by 1.
         """
         self.source_layers = list(reference.source_layers)
         self.d_model = int(reference.d_model)

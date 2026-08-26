@@ -403,7 +403,8 @@ def cmd_eval(args) -> None:
         if reference is None:
             print("WARNING: no R-lens loaded - skipping the control arm")
         else:
-            lenses["control"] = ControlLens(reference, seed=_pins()["fitting"]["seed"])
+            control_seed = args.control_seed if args.control_seed is not None else _pins()["fitting"]["seed"]
+            lenses["control"] = ControlLens(reference, seed=control_seed)
             print(f"control: {lenses['control']}")
     print(f"model: {args.model}   lenses: {list(lenses)}   sets: {args.sets}")
 
@@ -578,6 +579,10 @@ def main() -> None:
                    help="readout rows per unembed call; 1 = the pre-C3 path, for parity checks")
     p.add_argument("--no-control", action="store_true",
                    help="skip the random norm-matched control arm")
+    p.add_argument("--control-seed", type=int, default=None,
+                   help="base seed for the control lens (default: pins.yaml fitting.seed). "
+                        "Layer l uses seed+l, so replicate seeds must differ by MORE than "
+                        "n_layers or the runs share matrices - space them by 1000.")
     p.add_argument("--ranks-dir", default=None,
                    help="per-item rank parquet dir (default: /workspace/results/quantitative-evals on the pod, "
                         "else results/)")
