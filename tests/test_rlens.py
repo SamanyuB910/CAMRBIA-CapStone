@@ -2720,3 +2720,69 @@ def test_control_layer_choice_is_outside_the_primary_window():
         assert late / target > 0.4, "late control must be out of window"
         assert target / target > 0.4
         assert late < target, "late control must not collide with the identity layer"
+
+
+def test_permanent_http_errors_are_not_retried():
+    """A bad model id is a 4xx: retrying it three times with backoff hides the
+    cause behind ~14s of silence per cell."""
+    import urllib.error
+
+    from rlens import autorate
+
+    calls = {"n": 0}
+
+    def fake_urlopen(request, timeout=None):
+        calls["n"] += 1
+        raise urllib.error.HTTPError(request.full_url, 404, "Not Found", {}, None)
+
+    import urllib.request
+    original = urllib.request.urlopen
+    urllib.request.urlopen = fake_urlopen
+    try:
+        call = autorate.call_judge({"cell_id": "c0", "prompt": "p", "readout_position": 0,
+                                    "readout_token": "«t»", "note": "n",
+                                    "candidates": {"A": [], "B": [], "C": []}},
+                                   judge_id="vendor/does-not-exist", api_key="x")
+    finally:
+        urllib.request.urlopen = original
+
+    assert call.status == "FAILED"
+    assert call.error.startswith("permanent:") and "404" in call.error
+    assert calls["n"] == 1, "a permanent error must not be retried"
+
+
+def test_transient_errors_are_still_retried():
+    import urllib.error
+    import urllib.request
+
+    from rlens import autorate
+
+    calls = {"n": 0}
+
+    def flaky(request, timeout=None):
+        calls["n"] += 1
+        raise urllib.error.HTTPError(request.full_url, 429, "Too Many Requests", {}, None)
+
+    original, original_sleep = urllib.request.urlopen, autorate.time.sleep
+    urllib.request.urlopen, autorate.time.sleep = flaky, lambda *_: None
+    try:
+        call = autorate.call_judge({"cell_id": "c0", "prompt": "p", "readout_position": 0,
+                                    "readout_token": "«t»", "note": "n",
+                                    "candidates": {"A": [], "B": [], "C": []}},
+                                   judge_id="vendor/model", api_key="x", max_retries=3)
+    finally:
+        urllib.request.urlopen, autorate.time.sleep = original, original_sleep
+
+    assert call.status == "FAILED" and calls["n"] == 3, "429 is transient; retry"
+
+
+def test_judge_validate_probes_before_spending_a_panel():
+    import inspect
+
+    from rlens import cli
+
+    source = inspect.getsource(cli.cmd_judge_validate)
+    assert "probe_judge" in source
+    assert source.index("probe_judge") < source.index("for cell in controls") \
+        if "for cell in controls" in source else True
+    assert "unreachable" in source

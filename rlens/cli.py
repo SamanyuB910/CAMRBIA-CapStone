@@ -1213,7 +1213,7 @@ def cmd_judge_validate(args) -> None:
     """Build and run the judge-validation panel. Stops before the main run."""
     import json
 
-    from rlens.autorate import call_judge, judge_validation_report
+    from rlens.autorate import call_judge, judge_validation_report, probe_judge
     from rlens.panel_v2 import PanelCell, build_validation_panel
 
     api_key = os.environ.get("OPENROUTER_API_KEY")
@@ -1268,11 +1268,23 @@ def cmd_judge_validate(args) -> None:
     (val_dir / "control_key.jsonl").write_text("\n".join(json.dumps(m) for m in meta),
                                                encoding="utf-8")
 
+    for judge_id in args.judges:      # fail fast on a bad id, before 50 calls
+        ok, detail = probe_judge(judge_id, api_key)
+        print(f"  probe {judge_id}: {'OK -> ' + detail if ok else 'FAILED — ' + detail}")
+        if not ok:
+            raise SystemExit(f"judge {judge_id!r} is unreachable; fix the model id "
+                             "or credentials before spending a panel on it")
+
     reports = []
     for judge_id in args.judges:
         results, raw = {}, []
-        for cell in controls:
+        print(f"\n=== {judge_id}: rating {len(controls)} control cells ===")
+        for i, cell in enumerate(controls, start=1):
             call = call_judge(cell.public(), judge_id=judge_id, api_key=api_key)
+            mark = "." if call.status == "ok" else "F"
+            print(mark, end="", flush=True)
+            if i % 50 == 0 or i == len(controls):
+                print(f"  {i}/{len(controls)}", flush=True)
             raw.append({"judge_id": judge_id, "cell_id": call.cell_id, "status": call.status,
                         "attempts": call.attempts, "error": call.error, "raw": call.raw,
                         "usage": call.usage, "timestamp": call.timestamp})

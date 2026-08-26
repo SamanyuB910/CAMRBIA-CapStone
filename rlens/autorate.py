@@ -182,6 +182,21 @@ def call_judge(cell_public: dict, *, judge_id: str, api_key: str,
                              status="ok", scores=parse_scores(raw), raw=raw,
                              attempts=attempt, usage=payload.get("usage", {}),
                              timestamp=time.time())
+        except urllib.error.HTTPError as exc:
+            detail = ""
+            try:
+                detail = exc.read().decode()[:300]
+            except Exception:  # noqa: BLE001
+                pass
+            last_error = f"HTTP {exc.code}: {detail}"
+            # 4xx other than 429 is a permanent request error (bad model id, bad
+            # auth, bad payload). Retrying it wastes ~14s per cell and hides the
+            # cause behind a long silence.
+            if 400 <= exc.code < 500 and exc.code != 429:
+                return JudgeCall(judge_id=judge_id, cell_id=cell_public["cell_id"],
+                                 status="FAILED", raw=detail, attempts=attempt,
+                                 error=f"permanent: {last_error}", timestamp=time.time())
+            time.sleep(min(2 ** attempt, 8))
         except (SchemaError, urllib.error.URLError, KeyError, TimeoutError) as exc:
             last_error = f"{type(exc).__name__}: {exc}"
             time.sleep(min(2 ** attempt, 8))
@@ -413,3 +428,29 @@ def incomplete_ratings(expected_cells, results_by_judge: dict) -> dict:
         f"{j}: {v['n_failed']} FAILED, {len(v['missing'])} missing"
         for j, v in judges.items() if v["blocks_analysis"])
     return out
+
+
+def probe_judge(judge_id: str, api_key: str) -> tuple[bool, str]:
+    """One cheap call to verify the model id and credentials before committing
+    to a full panel. A wrong id otherwise surfaces only after every cell has
+    retried and backed off."""
+    import urllib.error
+    import urllib.request
+
+    body = {"model": judge_id, "temperature": 0, "max_tokens": 4,
+            "messages": [{"role": "user", "content": "Reply with the single word: ok"}]}
+    try:
+        request = urllib.request.Request(
+            "https://openrouter.ai/api/v1/chat/completions",
+            data=json.dumps(body).encode(),
+            headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"})
+        with urllib.request.urlopen(request, timeout=60) as response:
+            payload = json.loads(response.read())
+        return True, payload.get("model", judge_id)
+    except urllib.error.HTTPError as exc:
+        try:
+            return False, f"HTTP {exc.code}: {exc.read().decode()[:200]}"
+        except Exception:  # noqa: BLE001
+            return False, f"HTTP {exc.code}"
+    except Exception as exc:  # noqa: BLE001
+        return False, f"{type(exc).__name__}: {exc}"
