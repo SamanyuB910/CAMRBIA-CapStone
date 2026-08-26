@@ -2692,3 +2692,31 @@ def test_identity_layer_control_requires_ties():
     picks = {cid: _score(3, 3, 3, "A") for cid in ident}
     assert next(c for c in judge_validation_report(picks, meta, judge_id="j")["checks"]
                 if c["name"] == "identity_layer_returns_tie")["status"] == "FAIL"
+
+
+def test_late_positive_controls_must_come_from_outside_the_experimental_window():
+    """A regression guard for a real bug: `judge-validate` took the first N
+    PANEL cells — all z<=0.4 — and labelled them 'late_layer_positive', so the
+    dynamic-range criterion compared early cells against early cells."""
+    import inspect
+
+    from rlens import cli
+
+    source = inspect.getsource(cli.cmd_judge_validate)
+    assert "[: args.n_late]" not in source.split("control cells loaded")[0] or \
+        "control_cells" in source, "late controls must be read from control_cells.jsonl"
+    assert "control_cells" in source and "late_layer_positive" in source
+    assert "raise SystemExit" in source, "missing controls must block, not silently pass"
+
+    panel_source = inspect.getsource(cli.cmd_panel_v2)
+    assert "target_layer" in panel_source and "late_depth" in panel_source, \
+        "panel-v2 must emit both out-of-window control layers"
+
+
+def test_control_layer_choice_is_outside_the_primary_window():
+    """late-depth 0.8 and the target layer are both far above z=0.4."""
+    for target in (62, 60):
+        late = round(target * 0.8)
+        assert late / target > 0.4, "late control must be out of window"
+        assert target / target > 0.4
+        assert late < target, "late control must not collide with the identity layer"

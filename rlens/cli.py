@@ -1108,13 +1108,31 @@ def cmd_panel_v2(args) -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
     key_dir.mkdir(parents=True, exist_ok=True)
 
-    frames = []
+    frames, control_frames, control_meta = [], [], []
     for model_key in sorted({c["model_key"] for c in sample["cells"]}):
         cells = [c for c in sample["cells"] if c["model_key"] == model_key]
         print(f"[{model_key}] computing readouts for {len(cells)} cells ...")
         frames.append(_v2_readouts(model_key, cells, args))
+
+        # Control readouts live OUTSIDE the z<=0.4 experimental window and are
+        # never analysed: a late layer (dynamic-range check) and the target layer
+        # (where ||J - I|| = 0, so all three lenses are provably identical).
+        pin = _model_pin(model_key)
+        target = int(pin["target_layer"])
+        late = int(round(target * args.late_depth))
+        prompts = sorted({(c["set"], c["item_id"]) for c in cells})[: args.n_control_prompts]
+        extra = [{"model_key": model_key, "set": s_, "item_id": i_, "layer": l}
+                 for (s_, i_) in prompts for l in (late, target)]
+        print(f"[{model_key}] control readouts at L{late} (late) and L{target} (identity) "
+              f"for {len(prompts)} prompts ...")
+        control_frames.append(_v2_readouts(model_key, extra, args))
+        control_meta += [{"model_key": model_key, "layer": late, "kind": "late_layer_positive"},
+                         {"model_key": model_key, "layer": target, "kind": "identity_layer_equal"}]
+
     readouts = pd.concat(frames, ignore_index=True)
     readouts.to_parquet(out_dir / "readouts.parquet")
+    controls_df = pd.concat(control_frames, ignore_index=True)
+    controls_df.to_parquet(out_dir / "control_readouts.parquet")
 
     public, key = build_cells(readouts, sample, rater_id=args.rater_id)
     checks = validate_panel(public, key, sample,
@@ -1126,6 +1144,31 @@ def cmd_panel_v2(args) -> None:
                           encoding="utf-8")
     key_path.write_text("\n".join(json.dumps(k) for k in key), encoding="utf-8")
     key_path.chmod(0o600)
+
+    # control cells: same construction, separate files, tagged by kind
+    control_sample = {"sample_sha256": sample["sample_sha256"] + "-controls",
+                      "cells": [{"model_key": r["model_key"], "set": r["set"],
+                                 "item_id": r["item_id"], "layer": r["layer"]}
+                                for r in controls_df[["model_key", "set", "item_id", "layer"]]
+                                .drop_duplicates().to_dict("records")]}
+    ctrl_public, ctrl_key = build_cells(controls_df, control_sample, rater_id=args.rater_id)
+    kind_by_layer = {(m["model_key"], m["layer"]): m["kind"] for m in control_meta}
+    for row in ctrl_key:
+        row["kind"] = kind_by_layer.get((row["model_key"], row["layer"]), "unknown")
+    (out_dir / "control_cells.jsonl").write_text(
+        "\n".join(json.dumps(c.public(), ensure_ascii=False) for c in ctrl_public),
+        encoding="utf-8")
+    (key_dir / "control_key.jsonl").write_text(
+        "\n".join(json.dumps(k) for k in ctrl_key), encoding="utf-8")
+    (key_dir / "control_key.jsonl").chmod(0o600)
+    n_identity_equal = sum(
+        1 for c, k in zip(ctrl_public, ctrl_key)
+        if k["kind"] == "identity_layer_equal"
+        and len({json.dumps(c.arms[l], sort_keys=True) for l in ("A", "B", "C")}) == 1)
+    print(f"control cells: {len(ctrl_public)} "
+          f"({sum(1 for k in ctrl_key if k['kind'] == 'late_layer_positive')} late, "
+          f"{sum(1 for k in ctrl_key if k['kind'] == 'identity_layer_equal')} identity, "
+          f"of which {n_identity_equal} have byte-identical arms)")
 
     leak_rows = []
     for cell in public:
@@ -1190,11 +1233,29 @@ def cmd_judge_validate(args) -> None:
                          arms={k: v for k, v in d["candidates"].items()})
 
     cells = [to_cell(d) for d in panel]
-    late = [to_cell(d) for d in panel][: args.n_late]
-    identity = []
-    if args.identity_panel:
-        identity = [to_cell(json.loads(l))
-                    for l in Path(args.identity_panel).read_text().splitlines() if l]
+
+    # Real out-of-window control cells, emitted by `panel-v2`. Previously this
+    # took the first N PANEL cells and labelled them "late_layer_positive" —
+    # they are z<=0.4 early cells, so the dynamic-range criterion was comparing
+    # early against early.
+    ctrl_path = Path(args.control_cells or (out_dir / "control_cells.jsonl"))
+    ctrl_key_path = Path(args.control_key or (Path(args.key).parent / "control_key.jsonl"))
+    late, identity = [], []
+    if ctrl_path.exists() and ctrl_key_path.exists():
+        ctrl_cells = {json.loads(l)["cell_id"]: to_cell(json.loads(l))
+                      for l in ctrl_path.read_text().splitlines() if l}
+        for row in (json.loads(l) for l in ctrl_key_path.read_text().splitlines() if l):
+            cell = ctrl_cells.get(row["cell_id"])
+            if cell is None:
+                continue
+            (late if row["kind"] == "late_layer_positive" else identity).append(cell)
+        late, identity = late[: args.n_late], identity[: args.n_late]
+        print(f"control cells loaded: {len(late)} late-layer, {len(identity)} identity-layer")
+    else:
+        raise SystemExit(
+            f"control cells not found ({ctrl_path}). Re-run `rlens panel-v2` to emit them; "
+            "without real out-of-window controls the late-positive and identity-layer "
+            "criteria cannot be evaluated.")
 
     controls, meta = build_validation_panel(cells, key, n_each=args.n_each,
                                             late_cells=late, identity_cells=identity)
@@ -1419,6 +1480,9 @@ def main() -> None:
     p.add_argument("--out-dir", required=True, help="FRESH versioned destination")
     p.add_argument("--key-dir", required=True, help="key destination, OUTSIDE the repo")
     p.add_argument("--rater-id", default="panel")
+    p.add_argument("--late-depth", type=float, default=0.8,
+                   help="normalized depth for the late-layer positive control (out of window)")
+    p.add_argument("--n-control-prompts", type=int, default=5)
     p.add_argument("--lens-device", default="auto")
     p.add_argument("--device", default=default_device)
     p.add_argument("--dtype", choices=["bf16", "fp32"], default="bf16")
@@ -1429,8 +1493,10 @@ def main() -> None:
     p.add_argument("--key", required=True)
     p.add_argument("--judges", nargs="+", required=True,
                    help="two explicit OpenRouter model ids from different families")
-    p.add_argument("--identity-panel", default=None,
-                   help="target-layer panel (out-of-window instrument control)")
+    p.add_argument("--control-cells", default=None,
+                   help="control_cells.jsonl from panel-v2 (default: alongside the panel)")
+    p.add_argument("--control-key", default=None,
+                   help="control_key.jsonl (default: alongside the panel key)")
     p.add_argument("--n-each", type=int, default=10)
     p.add_argument("--n-late", type=int, default=5)
     p.set_defaults(func=cmd_judge_validate)
