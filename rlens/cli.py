@@ -1012,6 +1012,234 @@ def cmd_freeze_panel(args) -> None:
 
 
 # ---------------------------------------------------------------------------
+# panel-v2 / judge-validate  (Coherence v2, Stage 4/5)
+# ---------------------------------------------------------------------------
+
+
+def _v2_readouts(model_name, cells_for_model, args):
+    """Top-10 readouts at the dataset-designated position. No position search."""
+    import pandas as pd
+    import torch
+
+    import jlens
+    from jlens.hooks import ActivationRecorder
+    from jlens.lens import JacobianLens
+
+    from rlens.eligibility import item_id
+    from rlens.evals import load_items, readout_position
+
+    hf, tok = _load_model(args.dtype, args.device, model_name)
+    model = jlens.from_hf(hf, tok)
+    lenses = {"logit": None}
+    for arm, file in (("released-J", "j-lens"), ("released-R", "r-lens")):
+        path = _lens_path("released", file, model_name)
+        if not path.exists():
+            raise SystemExit(f"missing lens artifact {path}")
+        lenses[arm] = JacobianLens.load(str(path))
+
+    from rlens.coherence import model_device, pin_lenses
+
+    restore = pin_lenses(lenses, None if args.lens_device == "cpu" else model_device(model))
+    wanted = {}
+    for c in cells_for_model:
+        wanted.setdefault((c["set"], c["item_id"]), set()).add(c["layer"])
+
+    rows = []
+    try:
+        for set_name in sorted({s for s, _ in wanted}):
+            for index, item in enumerate(load_items(set_name)):
+                ident = item_id(item, index)
+                layers = wanted.get((set_name, ident))
+                if not layers:
+                    continue
+                prompt = item["prompt"].rstrip()
+                input_ids = model.encode(prompt, max_length=512)
+                seq = input_ids[0].tolist()
+                pos = readout_position(tok, seq, set_name)
+                prompt_tokens = [tok.decode([t]) for t in seq]
+                with torch.no_grad(), ActivationRecorder(model.layers, at=sorted(layers)) as rec:
+                    model.forward(input_ids)
+                    acts = {l: rec.activations[l][0].detach().float() for l in layers}
+                for layer in sorted(layers):
+                    residual = acts[layer][pos]
+                    for lens_name, lens in lenses.items():
+                        read = residual if lens is None else lens.transport(residual, layer)
+                        logits = model.unembed(read).float()
+                        top = logits.topk(10)
+                        for rank, (score, tid) in enumerate(
+                                zip(top.values.tolist(), top.indices.tolist()), start=1):
+                            rows.append({
+                                "model_key": model_name, "set": set_name, "item_id": ident,
+                                "layer": int(layer), "lens": lens_name, "rank": rank,
+                                "token_id": tid, "token": tok.decode([tid]),
+                                "score": float(score),
+                                "prompt_tokens": prompt_tokens, "readout_pos": pos,
+                            })
+    finally:
+        restore()
+    return pd.DataFrame(rows)
+
+
+def cmd_panel_v2(args) -> None:
+    """Build the frozen blinded panel from the frozen sample. Never overwrites."""
+    import json
+
+    import pandas as pd
+
+    from rlens.eligibility import verify_sample_hash
+    from rlens.panel_v2 import (
+        audit_outgoing_payload, build_cells, panel_hash, validate_panel,
+    )
+    from rlens.autorate import render_cell
+
+    sample_path = Path(args.sample)
+    sample = json.loads(sample_path.read_text(encoding="utf-8"))
+    if not verify_sample_hash(sample):
+        raise SystemExit(f"{sample_path} fails its own content hash; refusing to build (§14)")
+
+    out_dir = Path(args.out_dir).expanduser()
+    key_dir = Path(args.key_dir).expanduser()
+    panel_path = out_dir / "panel_public.jsonl"
+    key_path = key_dir / "panel_key.jsonl"
+    for path in (panel_path, key_path):
+        if path.exists():
+            raise SystemExit(f"{path} exists; §8 forbids overwriting a panel or key. "
+                             "Use a fresh versioned destination.")
+    out_dir.mkdir(parents=True, exist_ok=True)
+    key_dir.mkdir(parents=True, exist_ok=True)
+
+    frames = []
+    for model_key in sorted({c["model_key"] for c in sample["cells"]}):
+        cells = [c for c in sample["cells"] if c["model_key"] == model_key]
+        print(f"[{model_key}] computing readouts for {len(cells)} cells ...")
+        frames.append(_v2_readouts(model_key, cells, args))
+    readouts = pd.concat(frames, ignore_index=True)
+    readouts.to_parquet(out_dir / "readouts.parquet")
+
+    public, key = build_cells(readouts, sample, rater_id=args.rater_id)
+    checks = validate_panel(public, key, sample,
+                            expected_cells=sample["n_cells"],
+                            expected_prompts=sum(v["n_selected"] for v in sample["selection"].values()),
+                            key_path=key_path, repo_root=REPO_ROOT)
+
+    panel_path.write_text("\n".join(json.dumps(c.public(), ensure_ascii=False) for c in public),
+                          encoding="utf-8")
+    key_path.write_text("\n".join(json.dumps(k) for k in key), encoding="utf-8")
+    key_path.chmod(0o600)
+
+    leak_rows = []
+    for cell in public:
+        findings = audit_outgoing_payload(render_cell(cell.public()))
+        if findings:
+            leak_rows.append({"cell_id": cell.cell_id, "findings": findings})
+    (out_dir / "leakage_audit.json").write_text(json.dumps({
+        "n_cells_audited": len(public), "n_with_findings": len(leak_rows),
+        "findings": leak_rows}, indent=2), encoding="utf-8")
+
+    manifest = {
+        "sample_sha256": sample["sample_sha256"],
+        "panel_sha256": panel_hash(public),
+        "n_cells": len(public), "n_prompts": len({(k["set"], k["item_id"]) for k in key}),
+        "per_model": {m: sum(1 for k in key if k["model_key"] == m)
+                      for m in sorted({k["model_key"] for k in key})},
+        "per_set": {s: sum(1 for k in key if k["set"] == s)
+                    for s in sorted({k["set"] for k in key})},
+        "per_layer": {f"{k['model_key']}:L{k['layer']}": 0 for k in key},
+        "prompts": sorted({(k["set"], k["item_id"]) for k in key}),
+        "key_path": str(key_path), "panel_path": str(panel_path),
+        "leakage_findings": len(leak_rows),
+        "checks": [{"name": n, "status": st, "detail": d} for n, st, d in checks],
+    }
+    for k in key:
+        manifest["per_layer"][f"{k['model_key']}:L{k['layer']}"] += 1
+    (out_dir / "panel_manifest.json").write_text(json.dumps(manifest, indent=2, default=str),
+                                                 encoding="utf-8")
+
+    for n, st, d in checks:
+        print(f"  [{st:4s}] {n}: {d}")
+    print(f"\ncells {manifest['n_cells']}  prompts {manifest['n_prompts']}  "
+          f"panel sha {manifest['panel_sha256'][:16]}")
+    print(f"leakage findings: {len(leak_rows)}")
+    print(f"panel -> {panel_path}\nkey   -> {key_path}\nmanifest -> "
+          f"{out_dir / 'panel_manifest.json'}")
+    if any(st == "FAIL" for _, st, _ in checks) or leak_rows:
+        raise SystemExit(2)
+
+
+def cmd_judge_validate(args) -> None:
+    """Build and run the judge-validation panel. Stops before the main run."""
+    import json
+
+    from rlens.autorate import call_judge, judge_validation_report
+    from rlens.panel_v2 import PanelCell, build_validation_panel
+
+    api_key = os.environ.get("OPENROUTER_API_KEY")
+    if not api_key:
+        raise SystemExit("set OPENROUTER_API_KEY")
+    if not args.judges or len(args.judges) < 2:
+        raise SystemExit("--judges requires two explicit model ids from different families")
+
+    out_dir = Path(args.out_dir).expanduser()
+    panel = [json.loads(l) for l in (out_dir / "panel_public.jsonl").read_text().splitlines() if l]
+    key = [json.loads(l) for l in Path(args.key).read_text().splitlines() if l]
+
+    def to_cell(d):
+        return PanelCell(cell_id=d["cell_id"], prompt_display=d["prompt"],
+                         readout_position=d["readout_position"],
+                         readout_token=d["readout_token"],
+                         arms={k: v for k, v in d["candidates"].items()})
+
+    cells = [to_cell(d) for d in panel]
+    late = [to_cell(d) for d in panel][: args.n_late]
+    identity = []
+    if args.identity_panel:
+        identity = [to_cell(json.loads(l))
+                    for l in Path(args.identity_panel).read_text().splitlines() if l]
+
+    controls, meta = build_validation_panel(cells, key, n_each=args.n_each,
+                                            late_cells=late, identity_cells=identity)
+    val_dir = out_dir / "judge_validation"
+    if val_dir.exists() and any(val_dir.iterdir()):
+        raise SystemExit(f"{val_dir} exists; use a fresh versioned destination")
+    val_dir.mkdir(parents=True, exist_ok=True)
+    (val_dir / "controls.jsonl").write_text(
+        "\n".join(json.dumps(c.public(), ensure_ascii=False) for c in controls), encoding="utf-8")
+    (val_dir / "control_key.jsonl").write_text("\n".join(json.dumps(m) for m in meta),
+                                               encoding="utf-8")
+
+    reports = []
+    for judge_id in args.judges:
+        results, raw = {}, []
+        for cell in controls:
+            call = call_judge(cell.public(), judge_id=judge_id, api_key=api_key)
+            raw.append({"judge_id": judge_id, "cell_id": call.cell_id, "status": call.status,
+                        "attempts": call.attempts, "error": call.error, "raw": call.raw,
+                        "usage": call.usage, "timestamp": call.timestamp})
+            if call.status == "ok":
+                results[call.cell_id] = call.scores
+        slug = judge_id.replace("/", "_")
+        (val_dir / f"raw_{slug}.jsonl").write_text(
+            "\n".join(json.dumps(r) for r in raw), encoding="utf-8")
+        report = judge_validation_report(results, meta, judge_id=judge_id)
+        report["n_scored"] = len(results)
+        report["n_failed"] = sum(1 for r in raw if r["status"] == "FAILED")
+        reports.append(report)
+        print(f"\n=== {judge_id} — {'PASS' if report['passed'] else 'FAIL'} "
+              f"({len(results)}/{len(controls)} scored, {report['n_failed']} FAILED) ===")
+        for c in report["checks"]:
+            print(f"  [{c['status']:4s}] {c['name']}: {c['detail']}")
+
+    (val_dir / "judge_validation_report.json").write_text(
+        json.dumps(reports, indent=2), encoding="utf-8")
+    print(f"\nreport -> {val_dir / 'judge_validation_report.json'}")
+    if not all(r["passed"] for r in reports):
+        print("\nAt least one judge FAILED validation; do not launch the 200-cell run.")
+        raise SystemExit(2)
+    print("\nBoth judges passed. Stop here for review before the full run.")
+
+
+
+# ---------------------------------------------------------------------------
 # entry point
 # ---------------------------------------------------------------------------
 
@@ -1185,6 +1413,27 @@ def main() -> None:
     p.add_argument("--prompts-per-set", type=int, default=8)
     p.add_argument("--force", action="store_true")
     p.set_defaults(func=cmd_freeze_panel)
+
+    p = sub.add_parser("panel-v2", help="v2 Stage 4: build the frozen blinded panel")
+    p.add_argument("--sample", required=True, help="shared_panel_sample.json")
+    p.add_argument("--out-dir", required=True, help="FRESH versioned destination")
+    p.add_argument("--key-dir", required=True, help="key destination, OUTSIDE the repo")
+    p.add_argument("--rater-id", default="panel")
+    p.add_argument("--lens-device", default="auto")
+    p.add_argument("--device", default=default_device)
+    p.add_argument("--dtype", choices=["bf16", "fp32"], default="bf16")
+    p.set_defaults(func=cmd_panel_v2)
+
+    p = sub.add_parser("judge-validate", help="v2 Stage 5: judge-validation panel")
+    p.add_argument("--out-dir", required=True)
+    p.add_argument("--key", required=True)
+    p.add_argument("--judges", nargs="+", required=True,
+                   help="two explicit OpenRouter model ids from different families")
+    p.add_argument("--identity-panel", default=None,
+                   help="target-layer panel (out-of-window instrument control)")
+    p.add_argument("--n-each", type=int, default=10)
+    p.add_argument("--n-late", type=int, default=5)
+    p.set_defaults(func=cmd_judge_validate)
 
     args = parser.parse_args()
     args.func(args)

@@ -2170,3 +2170,525 @@ def test_freeze_panel_cell_count_scales_with_n_per_set():
     ids = {s: [f"{s}{i}" for i in range(20)] for s in ("a", "b", "c", "d", "e")}
     assert freeze_panel_sample(select_prompts(ids, n_per_set=8), depths)["n_cells"] == 5*8*5
     assert freeze_panel_sample(select_prompts(ids, n_per_set=4), depths)["n_cells"] == 5*4*5
+
+
+# ---------------------------------------------------------------------------
+# Coherence v2 — Stage 4/5: blinded panel and autoraters
+# ---------------------------------------------------------------------------
+
+from rlens.autorate import (
+    CONTEXTUAL_MAX,
+    RUBRIC,
+    SECONDARY_MAX,
+    SchemaError,
+    combine,
+    needs_adjudication,
+    parse_scores,
+    render_cell,
+    rubric_hash,
+)
+from rlens.panel_v2 import (
+    ARM_LABELS,
+    LENS_ARMS,
+    PanelCell,
+    arm_permutation,
+    escape_for_display,
+    highlight_prompt,
+    panel_hash,
+    validate_panel,
+)
+
+
+def _cell(cell_id="c0", arms=None):
+    arms = arms or {l: [{"rank": r, "token": f"«t{r}»"} for r in range(1, 11)]
+                    for l in ARM_LABELS}
+    return PanelCell(cell_id=cell_id, prompt_display="the [[>>cat<<]] sat",
+                     readout_position=1, readout_token="«cat»", arms=arms)
+
+
+def test_escaping_makes_whitespace_and_control_chars_visible():
+    """A rater cannot judge 'inappropriate whitespace' if it renders as blank."""
+    assert escape_for_display("\n") == "«\\n»"
+    assert escape_for_display("\t") == "«\\t»"
+    assert escape_for_display("") == "<empty>"
+    assert escape_for_display("\x00") == "«\\u0000»"
+    assert escape_for_display(" Japan") == "« Japan»"
+
+
+def test_prompt_highlights_exactly_one_evaluation_position():
+    out = highlight_prompt(["the", " cat", " sat"], 1)
+    assert out == "the[[>> cat<<]] sat"
+    assert out.count("[[>>") == 1
+
+
+def test_arm_order_is_randomized_per_rater_not_once_per_cell():
+    """§8: independent randomization per rater assignment, so an
+    order-invariance control can detect position bias."""
+    a = arm_permutation("cell-1", "judge-a")
+    b = arm_permutation("cell-1", "judge-b")
+    assert sorted(a) == sorted(b) == [0, 1, 2]
+    assert a == arm_permutation("cell-1", "judge-a"), "deterministic"
+    perms = {tuple(arm_permutation(f"cell-{i}", "judge-a")) for i in range(60)}
+    assert len(perms) > 1, "must not be a fixed order across cells"
+
+
+def test_public_cell_carries_no_identifying_field():
+    public = _cell().public()
+    assert set(public) == {"cell_id", "prompt", "readout_position",
+                           "readout_token", "note", "candidates"}
+    blob = json.dumps(public).lower()
+    for term in ("released-r", "released-j", "logit", "qwen", "gemma",
+                 "multihop", "layer", "depth"):
+        assert term not in blob, f"{term!r} leaked into the blinded cell"
+
+
+def test_validate_panel_catches_every_structural_defect(tmp_path):
+    sample = {"sample_sha256": "deadbeef" * 8}
+    key = [{"cell_id": "c0", "model_key": m, "set": "multihop", "item_id": "i1",
+            "layer": 6, "arms": dict(zip(ARM_LABELS, LENS_ARMS))}
+           for m in ("qwen3.5-27b", "gemma-3-27b-it")]
+    public = [_cell("c0"), _cell("c1")]
+    key_path = tmp_path / "outside" / "key.jsonl"
+    key_path.parent.mkdir()
+    key_path.write_text("{}")
+
+    checks = dict((n, s) for n, s, _ in validate_panel(
+        public, key, sample, expected_cells=2, expected_prompts=1,
+        key_path=key_path, repo_root=tmp_path / "repo"))
+    assert checks["cell_count"] == "PASS"
+    assert checks["three_arms_per_cell"] == "PASS"
+    assert checks["ten_ranks_per_arm"] == "PASS"
+    assert checks["every_cell_has_all_three_lenses"] == "PASS"
+    assert checks["both_models_share_every_prompt"] == "PASS"
+    assert checks["no_identity_leakage"] == "PASS"
+    assert checks["prompt_visible"] == "PASS"
+    assert checks["position_highlighted"] == "PASS"
+    assert checks["key_outside_repository"] == "PASS"
+
+    # wrong cell count fails
+    bad = dict((n, s) for n, s, _ in validate_panel(
+        public, key, sample, expected_cells=200, expected_prompts=1,
+        key_path=key_path, repo_root=tmp_path / "repo"))
+    assert bad["cell_count"] == "FAIL"
+
+
+def test_validate_panel_fails_when_the_key_is_inside_the_repository(tmp_path):
+    repo = tmp_path / "repo"
+    inside = repo / "results" / "key.jsonl"
+    inside.parent.mkdir(parents=True)
+    inside.write_text("{}")
+    checks = dict((n, s) for n, s, _ in validate_panel(
+        [_cell()], [{"cell_id": "c0", "model_key": "m", "set": "s", "item_id": "i",
+                     "layer": 0, "arms": dict(zip(ARM_LABELS, LENS_ARMS))}],
+        {"sample_sha256": "x"}, expected_cells=1, expected_prompts=1,
+        key_path=inside, repo_root=repo))
+    assert checks["key_outside_repository"] == "FAIL"
+
+
+def test_leakage_check_ignores_content_that_coincides_with_a_condition_name():
+    """R-lens genuinely surfaces the token " poetry" on the poetry set, and a
+    prompt may contain "association". Neither is leakage."""
+    innocent = _cell(arms={l: [{"rank": 1, "token": "« poetry»"}] for l in ARM_LABELS})
+    innocent.prompt_display = "an [[>>association<<]] of ideas"
+    key = [{"cell_id": "c0", "model_key": "m", "set": "s", "item_id": "i",
+            "layer": 0, "arms": dict(zip(ARM_LABELS, LENS_ARMS))}]
+    checks = dict((n, s) for n, s, _ in validate_panel(
+        [innocent], key, {"sample_sha256": "x"}, expected_cells=1, expected_prompts=1,
+        key_path=Path("/tmp/k.jsonl"), repo_root=Path("/repo")))
+    assert checks["no_identity_leakage"] == "PASS"
+
+
+def test_leakage_check_catches_an_identifying_field_in_the_structure():
+    """Metadata leakage IS caught, and case-insensitively."""
+    from rlens.panel_v2 import ALLOWED_CELL_KEYS
+
+    leaky = _cell()
+    original = leaky.public
+    leaky.public = lambda: {**original(), "model_key": "Qwen/Qwen3.5-27B"}
+    key = [{"cell_id": "c0", "model_key": "m", "set": "s", "item_id": "i",
+            "layer": 0, "arms": dict(zip(ARM_LABELS, LENS_ARMS))}]
+    checks = dict((n, s) for n, s, _ in validate_panel(
+        [leaky], key, {"sample_sha256": "x"}, expected_cells=1, expected_prompts=1,
+        key_path=Path("/tmp/k.jsonl"), repo_root=Path("/repo")))
+    assert checks["no_identifying_fields"] == "FAIL"
+    assert checks["no_identity_leakage"] == "FAIL", "must match regardless of case"
+    assert "model_key" not in ALLOWED_CELL_KEYS
+
+
+def test_judge_input_contains_the_prompt_and_the_highlighted_position():
+    """v1's judge was given a rubric referencing 'the prompt' but never the prompt."""
+    text = render_cell(_cell().public())
+    assert "[[>>cat<<]]" in text
+    assert "Evaluation position: index 1" in text
+    assert "Candidate A:" in text and "Candidate C:" in text
+    assert "SAME model state" in text
+
+
+def test_rubric_uses_the_amended_score_ranges():
+    assert CONTEXTUAL_MAX == 4 and SECONDARY_MAX == 2
+    assert "CONTEXTUAL COHERENCE (0-4)" in RUBRIC
+    assert "LEXICAL INTEGRITY (0-2)" in RUBRIC and "PROMPT ECHO (0-2)" in RUBRIC
+    assert "not automatically earn a high score" in RUBRIC
+    assert len(rubric_hash()) == 16
+
+
+def _valid(a=4, b=1, c=2, winner="A"):
+    return json.dumps({
+        "A": {"contextual_coherence": a, "lexical_integrity": 2, "prompt_echo": 0, "evidence": "x"},
+        "B": {"contextual_coherence": b, "lexical_integrity": 1, "prompt_echo": 1, "evidence": "y"},
+        "C": {"contextual_coherence": c, "lexical_integrity": 0, "prompt_echo": 2, "evidence": "z"},
+        "contextual_winner": winner})
+
+
+def test_parse_scores_accepts_the_exact_schema():
+    parsed = parse_scores("here you go ```json\n" + _valid() + "\n```")
+    assert parsed["A"]["contextual_coherence"] == 4
+    assert parsed["contextual_winner"] == "A"
+
+
+@pytest.mark.parametrize("bad,reason", [
+    ("no json here", "no JSON"),
+    ('{"A": 1}', "keys"),
+    (_valid(a=5), "out of range"),
+    (_valid(winner="D"), "bad winner"),
+    (json.dumps({"A": {"contextual_coherence": 1, "lexical_integrity": 1,
+                       "prompt_echo": 1, "evidence": "w " * 30},
+                 "B": {"contextual_coherence": 1, "lexical_integrity": 1,
+                       "prompt_echo": 1, "evidence": ""},
+                 "C": {"contextual_coherence": 1, "lexical_integrity": 1,
+                       "prompt_echo": 1, "evidence": ""},
+                 "contextual_winner": "A"}), "evidence too long"),
+])
+def test_parse_scores_rejects_malformed_output(bad, reason):
+    """Never recover scores from free-form text (§4 of the amendment)."""
+    with pytest.raises(SchemaError):
+        parse_scores(bad)
+
+
+def test_parse_scores_rejects_booleans_masquerading_as_ints():
+    payload = json.loads(_valid())
+    payload["A"]["contextual_coherence"] = True
+    with pytest.raises(SchemaError):
+        parse_scores(json.dumps(payload))
+
+
+def test_adjudication_triggers_on_two_point_gap_or_winner_disagreement():
+    a, b = json.loads(_valid(a=4, winner="A")), json.loads(_valid(a=4, winner="A"))
+    assert not needs_adjudication(a, b)
+
+    b2 = json.loads(_valid(a=2, winner="A"))
+    assert needs_adjudication(a, b2), "2-point contextual gap"
+
+    b3 = json.loads(_valid(a=4, winner="C"))
+    assert needs_adjudication(a, b3), "different winner"
+
+    b4 = json.loads(_valid(a=3, winner="A"))
+    assert not needs_adjudication(a, b4), "1-point gap is not enough"
+
+
+def test_combine_uses_mean_of_two_and_median_of_three():
+    s1, s2 = json.loads(_valid(a=4)), json.loads(_valid(a=2))
+    assert combine([s1, s2])["A"]["contextual_coherence"] == 3.0
+    s3 = json.loads(_valid(a=0))
+    assert combine([s1, s2, s3])["A"]["contextual_coherence"] == 2, "median, not mean"
+
+
+def test_combine_returns_tie_without_a_majority_winner():
+    votes = [json.loads(_valid(winner=w)) for w in ("A", "B", "C")]
+    assert combine(votes)["contextual_winner"] == "tie"
+    assert combine([json.loads(_valid(winner="A"))] * 2)["contextual_winner"] == "A"
+
+
+def test_panel_hash_is_stable_and_content_sensitive():
+    assert panel_hash([_cell()]) == panel_hash([_cell()])
+    assert panel_hash([_cell()]) != panel_hash([_cell("other-id")])
+
+
+# --- v2 judge-validation controls -------------------------------------------
+
+from rlens.autorate import THRESHOLDS, incomplete_ratings, judge_validation_report
+from rlens.panel_v2 import (
+    CONTROL_KINDS,
+    audit_outgoing_payload,
+    build_validation_panel,
+    corrupt_arm,
+)
+
+
+def _cells(n, prefix="c", identical=False):
+    """`identical=True` mirrors a target-layer cell, where ||J - I|| = 0 makes
+    all three lenses provably equal."""
+    out = []
+    for i in range(n):
+        if identical:
+            shared = [{"rank": r, "token": f"«same{r}»"} for r in range(1, 11)]
+            arms = {l: list(shared) for l in ARM_LABELS}
+        else:
+            arms = {l: [{"rank": r, "token": f"«{l}{r}»"} for r in range(1, 11)]
+                    for l in ARM_LABELS}
+        out.append(PanelCell(cell_id=f"{prefix}{i:02d}", prompt_display="a [[>>b<<]] c",
+                             readout_position=1, readout_token="«b»", arms=arms))
+    return out
+
+
+def _score(a, b, c, winner):
+    return {"A": {"contextual_coherence": a, "lexical_integrity": 1, "prompt_echo": 0, "evidence": ""},
+            "B": {"contextual_coherence": b, "lexical_integrity": 1, "prompt_echo": 0, "evidence": ""},
+            "C": {"contextual_coherence": c, "lexical_integrity": 1, "prompt_echo": 0, "evidence": ""},
+            "contextual_winner": winner}
+
+
+def test_validation_panel_builds_all_five_control_categories():
+    cells = _cells(30)
+    late, ident = _cells(5, "late"), _cells(5, "id", identical=True)
+    controls, meta = build_validation_panel(cells, [], n_each=10,
+                                            late_cells=late, identity_cells=ident)
+    kinds = {m["kind"] for m in meta}
+    assert kinds == set(CONTROL_KINDS)
+    assert len(controls) == 10 + 10 + 10 + 5 + 5 == 40
+    assert all(len(c.arms) == 3 for c in controls)
+    # identity-layer cells are flagged as genuinely equal-armed
+    assert all(m["arms_identical"] for m in meta if m["kind"] == "identity_layer_equal")
+
+
+def test_corrupted_arm_is_deterministic_and_unambiguously_garbage():
+    arm = [{"rank": r, "token": f"«word{r}»"} for r in range(1, 11)]
+    a, b = corrupt_arm(arm, "seed"), corrupt_arm(arm, "seed")
+    assert a == b, "deterministic"
+    assert corrupt_arm(arm, "other") != a
+    assert all(e["token"] not in {x["token"] for x in arm} for e in a)
+
+
+def test_judge_fails_when_it_prefers_corrupted_readouts():
+    controls, meta = build_validation_panel(_cells(30), [], n_each=10)
+    corrupt = [m for m in meta if m["kind"] == "coherent_vs_corrupted"]
+    # judge always picks the planted garbage
+    results = {m["cell_id"]: _score(4, 0, 0, m["corrupted_arm"]) if m["corrupted_arm"] == "A"
+               else _score(0, 4, 0, m["corrupted_arm"]) if m["corrupted_arm"] == "B"
+               else _score(0, 0, 4, m["corrupted_arm"]) for m in corrupt}
+    report = judge_validation_report(results, meta, judge_id="bad-judge")
+    check = next(c for c in report["checks"] if c["name"] == "prefers_coherent_over_corrupted")
+    assert check["status"] == "FAIL" and check["measured"] == 1.0
+    assert report["passed"] is False
+
+
+def test_judge_fails_when_identical_candidates_score_differently():
+    controls, meta = build_validation_panel(_cells(30), [], n_each=10)
+    dups = [m for m in meta if m["kind"] == "duplicate_arms"]
+    results = {m["cell_id"]: _score(4, 0, 2, "A") for m in dups}   # A vs B gap of 4
+    report = judge_validation_report(results, meta, judge_id="j")
+    check = next(c for c in report["checks"] if c["name"] == "identical_candidates_score_alike")
+    assert check["status"] == "FAIL"
+    assert check["measured"] > THRESHOLDS["duplicate_score_gap"]
+
+
+def test_judge_passes_duplicate_control_within_one_point():
+    _, meta = build_validation_panel(_cells(30), [], n_each=10)
+    dups = [m for m in meta if m["kind"] == "duplicate_arms"]
+    results = {}
+    for m in dups:
+        a, b = m["identical_arms"]
+        base = {"A": 2, "B": 2, "C": 1}
+        base[b] = base[a] + 1                      # one point apart: allowed
+        results[m["cell_id"]] = _score(base["A"], base["B"], base["C"], "A")
+    check = next(c for c in judge_validation_report(results, meta, judge_id="j")["checks"]
+                 if c["name"] == "identical_candidates_score_alike")
+    assert check["status"] == "PASS"
+
+
+def test_order_invariance_uses_the_rotation_to_define_the_expected_winner():
+    cells = _cells(30)
+    _, meta = build_validation_panel(cells, [], n_each=10)
+    order = [m for m in meta if m["kind"] == "order_invariance"]
+    assert order, "order-invariance controls must exist"
+
+    consistent, flipped = {}, {}
+    for m in order:
+        twin = m["twin_of"]
+        consistent[twin] = _score(4, 1, 0, "A")
+        consistent[m["cell_id"]] = _score(1, 4, 0, m["rotation"]["A"])   # content moved with it
+        flipped[twin] = _score(4, 1, 0, "A")
+        flipped[m["cell_id"]] = _score(4, 1, 0, "A")                     # stuck on position A
+    good = next(c for c in judge_validation_report(consistent, meta, judge_id="j")["checks"]
+                if c["name"] == "winner_survives_permutation")
+    bad = next(c for c in judge_validation_report(flipped, meta, judge_id="j")["checks"]
+               if c["name"] == "winner_survives_permutation")
+    assert good["status"] == "PASS" and good["measured"] == 0.0
+    assert bad["status"] == "FAIL" and bad["measured"] == 1.0
+
+
+def test_position_bias_is_detected_by_a_chi_square_on_winners():
+    _, meta = build_validation_panel(_cells(30), [], n_each=10)
+    biased = {f"x{i}": _score(4, 0, 0, "A") for i in range(30)}
+    balanced = {f"x{i}": _score(4, 0, 0, "ABC"[i % 3]) for i in range(30)}
+    assert next(c for c in judge_validation_report(biased, meta, judge_id="j")["checks"]
+                if c["name"] == "no_position_bias")["status"] == "FAIL"
+    assert next(c for c in judge_validation_report(balanced, meta, judge_id="j")["checks"]
+                if c["name"] == "no_position_bias")["status"] == "PASS"
+
+
+def test_judge_fails_if_it_speculates_about_lens_identity():
+    _, meta = build_validation_panel(_cells(30), [], n_each=10)
+    leaky = {"x0": {**_score(4, 1, 0, "A")}}
+    leaky["x0"]["A"]["evidence"] = "this looks like the R-lens output"
+    check = next(c for c in judge_validation_report(leaky, meta, judge_id="j")["checks"]
+                 if c["name"] == "no_identity_speculation")
+    assert check["status"] == "FAIL"
+
+
+def test_identity_layer_cells_must_receive_equal_scores():
+    _, meta = build_validation_panel(_cells(30), [], n_each=10,
+                                     identity_cells=_cells(5, "id", identical=True))
+    ident = [m for m in meta if m["kind"] == "identity_layer_equal"]
+    equal = {m["cell_id"]: _score(3, 3, 3, "tie") for m in ident}
+    unequal = {m["cell_id"]: _score(4, 1, 0, "A") for m in ident}
+    assert next(c for c in judge_validation_report(equal, meta, judge_id="j")["checks"]
+                if c["name"] == "identity_layer_arms_score_alike")["status"] == "PASS"
+    assert next(c for c in judge_validation_report(unequal, meta, judge_id="j")["checks"]
+                if c["name"] == "identity_layer_arms_score_alike")["status"] == "FAIL"
+
+
+def test_outgoing_payload_audit_flags_metadata_not_content():
+    """The audit runs on the exact string sent to the API, where prompt and
+    candidate text are legitimate but metadata is not."""
+    clean = render_cell(_cell().public())
+    assert audit_outgoing_payload(clean) == []
+
+    assert "layer <n>" in audit_outgoing_payload(clean + "\nlayer 12")
+    assert "released-r" in audit_outgoing_payload(clean + "\nreleased-R")
+    assert "qwen" in audit_outgoing_payload(clean + "\nmodel: Qwen/Qwen3.5-27B")
+    # a prompt that legitimately says "poetry" is not metadata leakage
+    assert audit_outgoing_payload(clean + "\nCandidate A: 1. «poetry»") == []
+
+
+def test_incomplete_ratings_block_analysis_until_every_cell_is_accounted_for():
+    """§10: refuse analysis while any expected score is neither ok nor FAILED."""
+    expected = ["c0", "c1", "c2"]
+    partial = {"judge-a": {"c0": {"status": "ok"}, "c1": {"status": "FAILED"}}}
+    report = incomplete_ratings(expected, partial)
+    assert report["judge-a"]["missing"] == ["c2"]
+    assert report["complete"] is False
+
+    full = {"judge-a": {c: {"status": "ok"} for c in expected}}
+    assert incomplete_ratings(expected, full)["complete"] is True
+
+    # AMENDED: an explicitly FAILED cell is accounted for but still BLOCKS —
+    # a cell with no rating cannot silently leave the frozen panel.
+    marked = {"judge-a": {"c0": {"status": "ok"}, "c1": {"status": "FAILED"},
+                          "c2": {"status": "FAILED"}}}
+    blocked = incomplete_ratings(expected, marked)
+    assert blocked["complete"] is False
+    assert blocked["judge-a"]["n_failed"] == 2 and blocked["judge-a"]["missing"] == []
+
+
+def test_a_broken_identity_control_fails_rather_than_vanishing():
+    """Identity-layer cells whose arms are NOT equal test nothing; the report
+    must say so instead of silently omitting the check."""
+    _, meta = build_validation_panel(_cells(30), [], n_each=10,
+                                     identity_cells=_cells(3, "id", identical=False))
+    report = judge_validation_report({}, meta, judge_id="j")
+    check = next(c for c in report["checks"] if c["name"] == "identity_layer_arms_score_alike")
+    assert check["status"] == "FAIL"
+    assert "none have identical arms" in check["detail"]
+
+
+# --- v2 amendments: consistency, blocking, stratification, criteria ---------
+
+from rlens.panel_v2 import stratified_sample
+
+
+def test_parser_rejects_a_winner_its_own_scores_do_not_support():
+    """Winner/score consistency enforced in the strict parser."""
+    payload = json.loads(_valid(a=4, b=1, c=2, winner="A"))
+    assert parse_scores(json.dumps(payload))["contextual_winner"] == "A"
+
+    payload["contextual_winner"] = "B"          # B scores 1, A leads with 4
+    with pytest.raises(SchemaError, match="winner B scores 1"):
+        parse_scores(json.dumps(payload))
+
+
+def test_parser_rejects_tie_when_one_arm_uniquely_leads():
+    payload = json.loads(_valid(a=4, b=1, c=2, winner="tie"))
+    with pytest.raises(SchemaError, match="uniquely leads"):
+        parse_scores(json.dumps(payload))
+
+
+def test_parser_accepts_tie_when_the_maximum_is_shared():
+    payload = json.loads(_valid(a=3, b=3, c=1, winner="tie"))
+    assert parse_scores(json.dumps(payload))["contextual_winner"] == "tie"
+    # naming either co-leader is also consistent
+    payload["contextual_winner"] = "B"
+    assert parse_scores(json.dumps(payload))["contextual_winner"] == "B"
+
+
+def test_a_terminal_failed_rating_blocks_analysis():
+    """Amended: FAILED is not an acceptable outcome — omitting the cell would
+    change the estimand from 'the frozen panel' to 'the cells that parsed'."""
+    expected = ["c0", "c1", "c2"]
+    marked = {"judge-a": {"c0": {"status": "ok"}, "c1": {"status": "ok"},
+                          "c2": {"status": "FAILED"}}}
+    report = incomplete_ratings(expected, marked)
+    assert report["complete"] is False
+    assert report["judge-a"]["failed"] == ["c2"]
+    assert report["judge-a"]["blocks_analysis"] is True
+    assert "1 FAILED" in report["blocking_reason"]
+
+    clean = {"judge-a": {c: {"status": "ok"} for c in expected}}
+    assert incomplete_ratings(expected, clean)["complete"] is True
+
+
+def test_control_sources_are_stratified_across_models_and_sets():
+    """Duplicate-arm and order-invariance controls must span both models and
+    multiple evaluation sets, not whichever ids sort first."""
+    cells, key = [], []
+    for model in ("qwen3.5-27b", "gemma-3-27b-it"):
+        for set_name in ("multihop", "multilingual", "association", "typo", "poetry"):
+            for i in range(6):
+                cid = f"{model}-{set_name}-{i}"   # full names: 'mult' collides
+                cells.append(_cells(1, cid)[0])
+                cells[-1].cell_id = cid
+                key.append({"cell_id": cid, "model_key": model, "set": set_name,
+                            "item_id": f"i{i}", "layer": 6,
+                            "arms": dict(zip(ARM_LABELS, LENS_ARMS))})
+
+    picked = stratified_sample(cells, key, 30)
+    index = {r["cell_id"]: r for r in key}
+    models = {index[c]["model_key"] for c in picked}
+    sets = {index[c]["set"] for c in picked}
+    assert models == {"qwen3.5-27b", "gemma-3-27b-it"}, "both models represented"
+    assert len(sets) == 5, f"only {sets} covered"
+    assert len(picked) == 30 and len(set(picked)) == 30
+
+
+def test_late_positive_control_fails_when_the_scale_has_no_dynamic_range():
+    cells = _cells(30)
+    late = _cells(5, "late")
+    _, meta = build_validation_panel(cells, [], n_each=10, late_cells=late)
+    corrupt = [m for m in meta if m["kind"] == "coherent_vs_corrupted"]
+    late_ids = [m["cell_id"] for m in meta if m["kind"] == "late_layer_positive"]
+
+    floored = {m["cell_id"]: _score(1, 1, 1, "tie") for m in corrupt}
+    floored.update({cid: _score(1, 1, 1, "tie") for cid in late_ids})
+    check = next(c for c in judge_validation_report(floored, meta, judge_id="j")["checks"]
+                 if c["name"] == "late_positive_has_dynamic_range")
+    assert check["status"] == "FAIL"
+
+    ranged = {m["cell_id"]: _score(0, 0, 0, "tie") for m in corrupt}
+    ranged.update({cid: _score(4, 4, 4, "tie") for cid in late_ids})
+    check = next(c for c in judge_validation_report(ranged, meta, judge_id="j")["checks"]
+                 if c["name"] == "late_positive_has_dynamic_range")
+    assert check["status"] == "PASS"
+
+
+def test_identity_layer_control_requires_ties():
+    _, meta = build_validation_panel(_cells(30), [], n_each=10,
+                                     identity_cells=_cells(6, "id", identical=True))
+    ident = [m["cell_id"] for m in meta if m["kind"] == "identity_layer_equal"]
+    ties = {cid: _score(3, 3, 3, "tie") for cid in ident}
+    assert next(c for c in judge_validation_report(ties, meta, judge_id="j")["checks"]
+                if c["name"] == "identity_layer_returns_tie")["status"] == "PASS"
+
+    # equal scores but the judge always names A: byte-identical arms, no tie
+    picks = {cid: _score(3, 3, 3, "A") for cid in ident}
+    assert next(c for c in judge_validation_report(picks, meta, judge_id="j")["checks"]
+                if c["name"] == "identity_layer_returns_tie")["status"] == "FAIL"
