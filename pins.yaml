@@ -42,7 +42,7 @@ experiment_models:           # R>J effect phase: post reports an R-lens advantag
       - qwen3.5-27b/r-lens/lens.pt
   gemma-3-27b-it:            # only Gemma in the released set; (1+w) RMSNorm in a different codebase.
     hf_id: google/gemma-3-27b-it   # GATED on HF: accept Google's license + set HF_TOKEN before downloading (~54 GB)
-    revision: null
+    revision: 005ad3404e59d6023443cb575daa05336842228a   # pinned 2026-08-26 (coherence v2)
     n_layers: 62
     d_model: 5376
     target_layer: 60
