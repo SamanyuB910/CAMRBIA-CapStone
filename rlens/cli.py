@@ -862,6 +862,60 @@ def cmd_onset(args) -> None:
 
 
 # ---------------------------------------------------------------------------
+# preflight  (Coherence v2, Stage 1)
+# ---------------------------------------------------------------------------
+
+
+def cmd_preflight(args) -> None:
+    """Fail-closed provenance + compatibility gate for Coherence v2.
+
+    Writes provenance.json and validation_report.md per model and exits non-zero
+    when any fatal check fails, so a full run cannot start on an unvalidated
+    model/lens pairing (docs/coherence_v2.md §4, §5, §14).
+    """
+    import json
+    import sys
+
+    import jlens
+
+    from rlens.provenance import preflight, render_validation_report
+
+    pin = _model_pin(args.model)
+    out_dir = Path(args.out_dir).expanduser() / args.model
+    if out_dir.exists() and any(out_dir.iterdir()) and not args.force:
+        raise SystemExit(
+            f"{out_dir} already exists and is not empty. §14 forbids silent overwrites; "
+            "pass an explicit versioned --out-dir, or --force to replace."
+        )
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    hf, tok = _load_model(args.dtype, args.device, args.model)
+    model = jlens.from_hf(hf, tok)
+
+    lens_paths = {arm: _lens_path("released", arm, args.model) for arm in ("j-lens", "r-lens")}
+    manifest = preflight(
+        args.model, pin, hf, tok, model, lens_paths,
+        command=" ".join(sys.argv), seeds={"protocol_salt_seed": args.seed},
+    )
+
+    (out_dir / "provenance.json").write_text(
+        json.dumps(manifest.to_dict(), indent=2, default=str), encoding="utf-8")
+    (out_dir / "validation_report.md").write_text(
+        render_validation_report(manifest), encoding="utf-8")
+
+    for c in manifest.checks:
+        print(f"  [{c.status:7s}] {c.name}: {c.detail}")
+    print(f"\nprovenance -> {out_dir / 'provenance.json'}")
+    print(f"validation -> {out_dir / 'validation_report.md'}")
+
+    if manifest.blocking:
+        print(f"\n{len(manifest.blocking)} BLOCKING failure(s); inference must not proceed.")
+        raise SystemExit(2)
+    print("\nAll fatal checks passed.")
+
+
+
+# ---------------------------------------------------------------------------
 # entry point
 # ---------------------------------------------------------------------------
 
@@ -1008,6 +1062,15 @@ def main() -> None:
     p.add_argument("--device", default=default_device)
     p.add_argument("--dtype", choices=["bf16", "fp32"], default="bf16")
     p.set_defaults(func=cmd_onset)
+
+    p = sub.add_parser("preflight", help="Coherence v2 Stage 1: provenance + fail-closed validation")
+    p.add_argument("--model", required=True, help="pins.yaml key, e.g. qwen3.5-27b")
+    p.add_argument("--out-dir", default="/workspace/results/coherence_v2")
+    p.add_argument("--force", action="store_true", help="allow overwriting a non-empty output dir")
+    p.add_argument("--seed", type=int, default=20260826)
+    p.add_argument("--device", default=default_device)
+    p.add_argument("--dtype", choices=["bf16", "fp32"], default="bf16")
+    p.set_defaults(func=cmd_preflight)
 
     args = parser.parse_args()
     args.func(args)

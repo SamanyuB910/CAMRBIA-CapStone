@@ -1588,3 +1588,419 @@ def test_rank_inflation_is_detected_even_when_nothing_ever_surfaces():
     assert contrasts.loc["random", "d_log_rank"] == pytest.approx(1.0)
     message = verdict(contrasts)
     assert message.startswith("CONFOUNDED") and "RANK INFLATION" in message
+
+
+def test_an_outlier_driven_control_is_a_note_not_a_blocker():
+    """The 27B run's `answer` control had a positive mean (+3.9, p=0.005) but a
+    35.5% win rate: carried by a few items, not the population. A handful of
+    outliers must not veto a consistent primary effect."""
+    from rlens.onset import onset_contrasts, verdict
+
+    rows = []
+    for item in range(40):
+        rows += [
+            {"set": "s", "item": item, "lens": "released-R", "condition": "true",
+             "onset": 5.0, "mean_log_rank": 1.0, "n_layers": 64},
+            {"set": "s", "item": item, "lens": "released-J", "condition": "true",
+             "onset": 15.0, "mean_log_rank": 1.0, "n_layers": 64},
+        ]
+        # answer: R loses narrowly on most items, wins hugely on a few
+        r, j = (2.0, 60.0) if item < 12 else (20.0, 18.0)
+        rows += [
+            {"set": "s", "item": item, "lens": "released-R", "condition": "answer",
+             "onset": r, "mean_log_rank": 1.0, "n_layers": 64},
+            {"set": "s", "item": item, "lens": "released-J", "condition": "answer",
+             "onset": j, "mean_log_rank": 1.0, "n_layers": 64},
+        ]
+    contrasts = onset_contrasts(_onset_frame(rows), reference="released-R",
+                                other="released-J", n_boot=1000)
+    assert contrasts.loc["answer", "delta_layers"] > 0
+    assert contrasts.loc["answer", "win_rate"] < 0.5
+    message = verdict(contrasts)
+    assert not message.startswith("CONFOUNDED"), "outliers must not veto the primary effect"
+    assert "outlier-driven" in message and "suggestive rather than established" in message
+
+
+# ---------------------------------------------------------------------------
+# Coherence v2 — Stage 1: provenance and fail-closed validation
+# ---------------------------------------------------------------------------
+
+from rlens.provenance import (
+    FAIL,
+    PASS,
+    PROTOCOL_SALT,
+    RELATIVE_DEPTHS,
+    WARN,
+    Check,
+    Manifest,
+    check_layer_reconciliation,
+    check_lens_provenance,
+    check_lenses_differ,
+    check_target_layer_identity,
+    check_transport_orientation,
+    render_validation_report,
+    select_depth_layers,
+)
+
+
+class _FakeJacobianLens:
+    """Minimal stand-in with jlens's transport semantics: residual @ J.T."""
+
+    def __init__(self, jacobians):
+        self.jacobians = jacobians
+
+    def transport(self, residual, layer):
+        return residual @ self.jacobians[layer].T
+
+
+def test_pins_carry_explicit_revisions_for_both_v2_models():
+    """§14: an unpinned revision must block the run."""
+    import yaml
+
+    pins = yaml.safe_load((REPO_ROOT / "pins.yaml").read_text(encoding="utf-8"))
+    for key in ("qwen3.5-27b", "gemma-3-27b-it"):
+        rev = pins["experiment_models"][key]["revision"]
+        assert rev is not None, f"{key} is unpinned"
+        assert len(rev) == 40 and all(c in "0123456789abcdef" for c in rev), rev
+
+
+def test_relative_depth_selection_is_unique_early_and_deterministic():
+    """§5: five unique layers, strictly first-half, same rule for both models."""
+    qwen = select_depth_layers(list(range(63)), target_layer=62, block_count=64)
+    gemma = select_depth_layers(list(range(61)), target_layer=60, block_count=62)
+
+    for chosen, target, blocks in ((qwen, 62, 64), (gemma, 60, 62)):
+        layers = [c["layer"] for c in chosen]
+        assert len(layers) == len(RELATIVE_DEPTHS) == 5
+        assert len(set(layers)) == len(layers), f"duplicate layers: {layers}"
+        assert all(l < blocks // 2 for l in layers), f"outside first half: {layers}"
+        for c in chosen:
+            assert c["actual_depth"] == pytest.approx(c["layer"] / target)
+    # deterministic
+    assert select_depth_layers(list(range(63)), 62, 64) == qwen
+    # z=0.0 must land on layer 0 for both
+    assert qwen[0]["layer"] == 0 and gemma[0]["layer"] == 0
+
+
+def test_relative_depth_never_returns_a_layer_outside_the_available_set():
+    chosen = select_depth_layers([0, 5, 9], target_layer=62, block_count=64)
+    assert {c["layer"] for c in chosen} <= {0, 5, 9}
+
+
+def test_target_layer_identity_passes_on_identity_and_fails_otherwise():
+    d = 16
+    ident = _FakeJacobianLens({5: torch.eye(d)})
+    assert check_target_layer_identity(ident, 5).status == PASS
+
+    torch.manual_seed(0)
+    bogus = _FakeJacobianLens({5: torch.randn(d, d)})
+    assert check_target_layer_identity(bogus, 5).status == FAIL
+
+    assert check_target_layer_identity(ident, 99).status == FAIL, "missing target layer"
+    assert check_target_layer_identity(_FakeJacobianLens({5: torch.zeros(4, 8)}), 5).status == FAIL
+
+
+def test_transport_orientation_detects_a_transposed_jacobian():
+    """The identity layer is the only place the right answer is known a priori,
+    which is what makes it able to pin orientation."""
+    d = 12
+    ok = _FakeJacobianLens({7: torch.eye(d)})
+    assert check_transport_orientation(ok, 7, d).status == PASS
+
+    torch.manual_seed(1)
+    asym = torch.randn(d, d)
+    asym[0, 1] += 5.0                       # ensure J != J.T
+    wrong = _FakeJacobianLens({7: asym})
+    assert check_transport_orientation(wrong, 7, d).status == FAIL
+
+
+def test_lens_provenance_mismatch_is_fatal_and_absence_is_a_warning():
+    assert check_lens_provenance({"provenance": {"model_id": "Qwen/Qwen3.5-27B"}},
+                                 "Qwen/Qwen3.5-27B").status == PASS
+    bad = check_lens_provenance({"provenance": {"model_id": "Qwen/Qwen3.5-4B"}},
+                                "Qwen/Qwen3.5-27B")
+    assert bad.status == FAIL and bad.fatal
+    missing = check_lens_provenance({"provenance": None}, "Qwen/Qwen3.5-27B")
+    assert missing.status == WARN and not missing.fatal
+
+
+def test_identical_j_and_r_artifacts_are_fatal():
+    """If the two arms are the same file the contrast is vacuous."""
+    same = {"sha256": "abc", "source_layers": [0, 1]}
+    assert check_lenses_differ(same, dict(same)).status == FAIL
+    ok = check_lenses_differ(same, {"sha256": "def", "source_layers": [0, 1]})
+    assert ok.status == PASS
+    assert check_lenses_differ({"sha256": "a", "source_layers": [0]},
+                               {"sha256": "b", "source_layers": [9]}).status == FAIL
+
+
+def test_layer_reconciliation_documents_the_64_block_63_readout_mapping():
+    """§5: the report must explain, not silently mix, block count vs readouts."""
+    qwen = check_layer_reconciliation(list(range(63)), block_count=64, target_layer=62)
+    assert qwen.status == PASS
+    assert "64 configured blocks" in qwen.detail and "63 readout locations" in qwen.detail
+
+    gemma = check_layer_reconciliation(list(range(61)), block_count=62, target_layer=60)
+    assert gemma.status == PASS
+
+    off = check_layer_reconciliation(list(range(62)), block_count=64, target_layer=62)
+    assert off.status == FAIL and "MISMATCH" in off.detail
+
+
+def test_manifest_status_is_fail_when_any_fatal_check_fails():
+    m = Manifest(model_key="x")
+    m.add(Check("a", PASS, "fine"))
+    assert m.to_dict()["status"] == PASS
+    m.add(Check("b", WARN, "meh", fatal=False))
+    assert m.to_dict()["status"] == WARN
+    m.add(Check("c", FAIL, "broken", fatal=False))
+    assert m.to_dict()["status"] == WARN, "non-fatal FAIL must not block"
+    m.add(Check("d", FAIL, "fatal", fatal=True))
+    assert m.to_dict()["status"] == FAIL
+    assert [c.name for c in m.blocking] == ["d"]
+
+
+def test_validation_report_renders_and_carries_the_incompleteness_notice():
+    """§16: the mandated sentence must appear until human ratings exist."""
+    m = Manifest(model_key="qwen3.5-27b")
+    m.add(Check("ok", PASS, "all good"))
+    m.add(Check("bad", FAIL, "pipe | in detail"))
+    m.entries["relative_depth_layers"] = [
+        {"requested_depth": 0.0, "layer": 0, "actual_depth": 0.0}
+    ]
+    text = render_validation_report(m)
+    assert "The semantic coherence experiment is incomplete" in text
+    assert "**Overall status: FAIL**" in text
+    assert PROTOCOL_SALT in text
+    assert "BLOCKING FAILURES" in text
+    assert "pipe \\| in detail" in text, "table cells must escape pipes"
+
+
+def test_protocol_document_is_present_and_frozen():
+    doc = REPO_ROOT / "docs" / "coherence_v2.md"
+    assert doc.exists(), "the protocol must be committed alongside the code"
+    body = doc.read_text(encoding="utf-8")
+    for required in (PROTOCOL_SALT, "0.0, 0.1, 0.2, 0.3, 0.4",
+                     "must permit a null or reversed result",
+                     "The semantic coherence experiment is incomplete"):
+        assert required in body, f"protocol is missing: {required!r}"
+
+
+# ---------------------------------------------------------------------------
+# Coherence v2 — Stage 2: model isolation and secondary-only diagnostics
+# ---------------------------------------------------------------------------
+
+from rlens.coherence_v2 import (
+    CATEGORIES_V2,
+    HARD_INVALID,
+    LEXICAL,
+    STRUCTURAL,
+    ReferenceCorpus,
+    TokenizerProfile,
+    build_reference_corpus,
+    build_tokenizer_profile,
+    classify_v2,
+    is_hard_invalid,
+    is_structural,
+    normalize_piece,
+    prompt_echo_flags,
+    prompt_piece_set,
+    refuse_overwrite,
+    safe_output_dir,
+    tokenizer_fingerprint,
+)
+
+
+class _V2Tok:
+    """Char-level tokenizer: id == ord(char). Two instances with different
+    vocab sizes stand in for two different models."""
+
+    all_special_ids: list = []
+    added_tokens_decoder: dict = {}
+
+    def __init__(self, size=128, shift=0):
+        self._size, self._shift = size, shift
+
+    def __len__(self):
+        return self._size
+
+    def encode(self, text, add_special_tokens=False):
+        return [(ord(c) + self._shift) % self._size for c in text]
+
+    def decode(self, ids):
+        return "".join(chr((i - self._shift) % self._size) for i in ids)
+
+
+def test_v2_taxonomy_groups_are_disjoint_and_complete():
+    assert set(HARD_INVALID) | set(STRUCTURAL) | set(LEXICAL) == set(CATEGORIES_V2)
+    assert not (set(HARD_INVALID) & set(STRUCTURAL))
+    assert not (set(STRUCTURAL) & set(LEXICAL))
+    assert not (set(HARD_INVALID) & set(LEXICAL))
+
+
+@pytest.mark.parametrize(
+    "text,expected",
+    [
+        ("", "empty"),
+        ("<|im_start|>", "special"),
+        ("�", "undecodable"),
+        ("\n", "newline"),
+        ("\n\n", "newline"),
+        ("   ", "whitespace"),
+        ("\t", "whitespace"),
+        (".", "punct_single"),
+        ("......", "punct_run"),
+        (" ...\n\n", "punct_run"),      # strips to "..." -> a run, per the post
+        ("42", "numeric"),
+        ("锁定", "cjk_multi"),
+        ("尷", "cjk_single"),
+    ],
+)
+def test_classify_v2_categories(text, expected):
+    assert classify_v2(text) == expected
+
+
+def test_structural_tokens_are_never_hard_invalid():
+    """§13: whitespace and punctuation must not be invalid by definition —
+    poetry's readout position IS a newline."""
+    for text in ("\n", "   ", ".", "......", "42"):
+        cat = classify_v2(text)
+        assert is_structural(cat), text
+        assert not is_hard_invalid(cat), f"{text!r} classified as hard-invalid"
+    for text in ("", "�"):
+        assert is_hard_invalid(classify_v2(text)), text
+
+
+def test_newline_is_reported_separately_from_whitespace():
+    assert classify_v2("\n") == "newline"
+    assert classify_v2(" ") == "whitespace"
+    assert classify_v2("\n") != classify_v2(" ")
+
+
+def test_tokenizer_fingerprints_differ_across_models():
+    """§14: a cross-model cache must carry model and tokenizer identity."""
+    a = tokenizer_fingerprint(_V2Tok(128), "qwen3.5-27b", "rev-a")
+    b = tokenizer_fingerprint(_V2Tok(128), "gemma-3-27b-it", "rev-a")
+    c = tokenizer_fingerprint(_V2Tok(96, shift=3), "qwen3.5-27b", "rev-a")
+    d = tokenizer_fingerprint(_V2Tok(128), "qwen3.5-27b", "rev-b")
+    assert len({a, b, c, d}) == 4, "model, vocabulary, and revision must all matter"
+    assert tokenizer_fingerprint(_V2Tok(128), "qwen3.5-27b", "rev-a") == a
+
+
+def test_uniform_baselines_are_computed_per_tokenizer_not_shared(tmp_path):
+    """§13: never reuse one model's vocabulary constant for another."""
+    qwen = build_tokenizer_profile(_V2Tok(128), "qwen3.5-27b", "r1", cache_dir=tmp_path)
+    gemma = build_tokenizer_profile(_V2Tok(96, shift=3), "gemma-3-27b-it", "r1",
+                                    cache_dir=tmp_path)
+
+    assert qwen.vocab_size == 128 and gemma.vocab_size == 96
+    assert sum(qwen.category_counts.values()) == 128
+    assert qwen.tokenizer_fingerprint != gemma.tokenizer_fingerprint
+    assert qwen.baseline(HARD_INVALID) != gemma.baseline(HARD_INVALID) or \
+        qwen.category_counts != gemma.category_counts
+    for p in (qwen, gemma):
+        assert 0.0 <= p.baseline(HARD_INVALID) <= 1.0
+        assert p.to_dict()["structural_baseline"] == p.baseline(STRUCTURAL)
+
+
+def test_tokenizer_profile_cache_is_keyed_and_cannot_serve_another_model(tmp_path):
+    build_tokenizer_profile(_V2Tok(128), "qwen3.5-27b", "r1", cache_dir=tmp_path)
+    files = list(tmp_path.glob("tokprofile_*.json"))
+    assert len(files) == 1 and "qwen3.5-27b" in files[0].name
+
+    build_tokenizer_profile(_V2Tok(96, shift=3), "gemma-3-27b-it", "r1", cache_dir=tmp_path)
+    assert len(list(tmp_path.glob("tokprofile_*.json"))) == 2, "no cross-model reuse"
+
+    again = build_tokenizer_profile(_V2Tok(128), "qwen3.5-27b", "r1", cache_dir=tmp_path)
+    assert again.vocab_size == 128
+
+
+def test_reference_corpus_records_its_own_size_and_is_untruncated():
+    """§13: record documents, characters, tokens; absence != untrained row."""
+    tok = _V2Tok(128)
+    docs = ["hello world", "a" * 50_000]
+    corpus = build_reference_corpus(tok, docs, "qwen3.5-27b", "fp", "pile-10k[all]")
+
+    assert corpus.n_documents == 2
+    assert corpus.n_characters == len(docs[0]) + len(docs[1]), "no silent truncation"
+    assert corpus.n_tokens == corpus.n_characters
+    assert not corpus.unseen(ord("h"))
+    assert corpus.unseen(ord("~"))
+    assert "n_characters" in corpus.to_dict()
+
+    truncated = build_reference_corpus(tok, docs, "m", "fp", "s", max_chars=100)
+    assert truncated.n_characters < corpus.n_characters
+
+
+def test_prompt_echo_is_exact_and_rejects_the_v1_substring_false_positive():
+    """v1 flagged 'the' as echoed because it is a SUBSTRING of 'there'."""
+    tok = _V2Tok()
+    prompt_ids = set(tok.encode("there"))
+    pieces = prompt_piece_set(tok, prompt_ids)
+
+    # a whole word that only appears as a substring of the prompt
+    flags = prompt_echo_flags(9999, "the", prompt_ids, pieces)
+    assert flags["echo_piece"] is False, "substring must not count as an echo"
+
+    # an actual prompt character does count, by ID and by piece
+    tid = tok.encode("t")[0]
+    hit = prompt_echo_flags(tid, "t", prompt_ids, pieces)
+    assert hit["echo_id"] is True and hit["echo_piece"] is True
+
+
+def test_prompt_echo_piece_matches_across_ids_but_not_across_surfaces():
+    tok = _V2Tok()
+    prompt_ids = set(tok.encode("Cat"))
+    pieces = prompt_piece_set(tok, prompt_ids)
+    # same normalized surface reached by a different id
+    assert prompt_echo_flags(9999, " C ", prompt_ids, pieces)["echo_piece"] is True
+    assert prompt_echo_flags(9999, "z", prompt_ids, pieces)["echo_piece"] is False
+    assert prompt_echo_flags(9999, "", prompt_ids, pieces)["echo_piece"] is False
+
+
+def test_normalize_piece_folds_case_and_whitespace_only():
+    assert normalize_piece("  Japan ") == "japan"
+    assert normalize_piece("\n") == ""
+    assert normalize_piece("Ａ") == "a", "NFKC folds fullwidth"
+
+
+def test_output_dirs_are_model_scoped_and_refuse_silent_overwrite(tmp_path):
+    """§14: Qwen and Gemma output directories must not collide."""
+    q = safe_output_dir(tmp_path, "qwen3.5-27b")
+    g = safe_output_dir(tmp_path, "gemma-3-27b-it")
+    assert q != g and q.name == "qwen3.5-27b" and g.name == "gemma-3-27b-it"
+
+    (q / "readouts.parquet").write_text("x")
+    with pytest.raises(FileExistsError, match="forbids silent overwrites"):
+        safe_output_dir(tmp_path, "qwen3.5-27b")
+    assert safe_output_dir(tmp_path, "qwen3.5-27b", force=True) == q
+
+
+def test_refuse_overwrite_guards_panel_key_and_score_files(tmp_path):
+    p = tmp_path / "panel_public.jsonl"
+    assert refuse_overwrite(p) == p
+    p.write_text("{}")
+    with pytest.raises(FileExistsError, match="panel, key, or score file"):
+        refuse_overwrite(p)
+
+
+def test_v2_module_does_not_expose_a_trash_metric():
+    """The semantic-sounding headline is retired (§13)."""
+    import rlens.coherence_v2 as v2
+
+    assert not hasattr(v2, "TRASH_SETS")
+    assert not hasattr(v2, "trash")
+    assert not hasattr(v2, "zero_freq")
+    # renamed from zero_freq, and explicitly disclaims the training-data reading
+    assert hasattr(ReferenceCorpus, "unseen") and not hasattr(ReferenceCorpus, "zero_freq")
+    assert "not about tokenizer training" in ReferenceCorpus.unseen.__doc__.lower()
+    assert "SECONDARY" in v2.SECONDARY_NOTICE
+    assert "incomplete" in v2.INCOMPLETE_NOTICE
+
+
+def test_v1_coherence_module_is_untouched_by_v2():
+    """onset.py imports from v1; v2 must not have altered it."""
+    from rlens import coherence as v1
+
+    assert hasattr(v1, "pin_lenses") and hasattr(v1, "model_device")
+    assert hasattr(v1, "TRASH_SETS"), "v1 left intact for onset.py"
