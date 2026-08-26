@@ -535,10 +535,15 @@ def cmd_onset(args) -> None:
                                    REPO_ROOT / "results" / f"patch_records_{args.model}.parquet") if p.exists()), None)
     if patch_path is not None:
         pres = onset.analyze_patching(pd.read_parquet(patch_path), rho=args.rho)
-        lines.append("\n## Lens-free ceiling: cross-prompt activation patching at the cue\n")
-        lines.append("No lens is involved: the receiver's cue activation is replaced wholesale by a")
-        lines.append("donor prompt's. l* is the earliest layer at which the cue's residual is causally")
-        lines.append("sufficient, so NO direction-based onset may legitimately precede it.\n")
+        site = pres["patch_at"]
+        lines.append(f"\n## Lens-free landmarks: cross-prompt activation patching at the {site} token\n")
+        lines.append("No lens is involved: the receiver's activation at that position is replaced wholesale")
+        lines.append("by a donor prompt's (template-matched pairs, so only the cue differs).\n")
+        lines.append("Read these as landmarks, NOT as a strict ceiling on the lens onsets: the onset rule is")
+        lines.append("threshold-RELATIVE (20% of each curve's own peak), so curves of very different scale")
+        lines.append("are not directly comparable. On the absolute metric, whole-vector patching flips the")
+        lines.append("answer 100% of the time while lens-direction swaps peak near 11%, i.e. lens directions")
+        lines.append("are far weaker write vectors than the activation difference they stand in for.\n")
         lines.append(f"- **l\\* = {pres['l_star']}**, bootstrap 95% CI {pres['l_star_ci']} "
                      f"({pres['n_pairs']} pairs, defined in {pres['defined_frac']:.0%} of resamples)")
         lines.append(f"- top-1 flip rate to the donor's answer: {pres['top1_flip_rate']:.1%}")
@@ -548,12 +553,20 @@ def cmd_onset(args) -> None:
         if pres["patch_at"] == "cue":
             lines.append("  NB at the cue, l* is trivially ~0: the early-layer residual IS the cue token, so "
                          "patching transplants token identity and downstream simply recomputes. Use the OFFSET.")
+        if site == "final":
+            lines.append(f"- l\\* = {pres['l_star']} is a FINAL-position landmark: before it, replacing the final")
+            lines.append("  token's residual does not redirect the answer (earlier layers re-gather from the")
+            lines.append("  intact prompt), so the answer is not settled there until then.")
+        else:
+            lines.append(f"- offset = {pres['l_offset']} is the layer by which the CUE stops being decisive,")
+            lines.append("  i.e. the intermediate has been transferred out of that position.")
         for lens in ("R", "J"):
             lr = result["onsets"][lens].get("L_R_cue")
-            if lr is not None and pres["l_star"] is not None:
-                verdict = ("reads BEFORE the information is demonstrably usable (anticipatory)"
-                           if lr < pres["l_star"] else "reads at or after the lens-free ceiling")
-                lines.append(f"- {lens}: L_R_cue = {lr:.0f} vs l* = {pres['l_star']:.0f} -> {verdict}")
+            if lr is not None:
+                lines.append(f"- {lens} reads the intermediate at cue layer {lr:.0f} — long before the transfer "
+                             f"completes, wherever exactly it is placed in the 47–49 window.")
+        lines.append("  (Position note: readouts above are at the CUE; l* is at the FINAL token. They bracket "
+                     "the transfer rather than bounding each other.)")
 
     # 2c. threshold sensitivity (pre-registered rho sweep) and per-category split
     lines.append("\n## Sensitivities\n")
