@@ -529,8 +529,11 @@ def cmd_onset(args) -> None:
                      "(cue readout vs t_i causality) - use the `gap*` columns here.")
 
     # 2b. lens-free ceiling from cross-prompt patching, if it has been run
-    patch_path = REPO_ROOT / "results" / f"patch_records_{args.model}.parquet"
-    if patch_path.exists():
+    # prefer the final-token patch (a real onset); the cue variant is kept for its offset
+    patch_path = next((p for p in (REPO_ROOT / "results" / f"patch_records_{args.model}_final.parquet",
+                                   REPO_ROOT / "results" / f"patch_records_{args.model}_cue.parquet",
+                                   REPO_ROOT / "results" / f"patch_records_{args.model}.parquet") if p.exists()), None)
+    if patch_path is not None:
         pres = onset.analyze_patching(pd.read_parquet(patch_path), rho=args.rho)
         lines.append("\n## Lens-free ceiling: cross-prompt activation patching at the cue\n")
         lines.append("No lens is involved: the receiver's cue activation is replaced wholesale by a")
@@ -539,7 +542,12 @@ def cmd_onset(args) -> None:
         lines.append(f"- **l\\* = {pres['l_star']}**, bootstrap 95% CI {pres['l_star_ci']} "
                      f"({pres['n_pairs']} pairs, defined in {pres['defined_frac']:.0%} of resamples)")
         lines.append(f"- top-1 flip rate to the donor's answer: {pres['top1_flip_rate']:.1%}")
-        lines.append(f"- self-patch drift (must be ~0): {pres['selfpatch_max_drift']:.2e}")
+        lines.append(f"- self-patch drift (must be ~0): mean {pres['selfpatch_mean_drift']:.3f}, "
+                     f"worst layer {pres['selfpatch_max_layer_drift']:.3f}")
+        lines.append(f"- patch site: {pres['patch_at']}; offset (last layer still flipping): {pres['l_offset']}")
+        if pres["patch_at"] == "cue":
+            lines.append("  NB at the cue, l* is trivially ~0: the early-layer residual IS the cue token, so "
+                         "patching transplants token identity and downstream simply recomputes. Use the OFFSET.")
         for lens in ("R", "J"):
             lr = result["onsets"][lens].get("L_R_cue")
             if lr is not None and pres["l_star"] is not None:
