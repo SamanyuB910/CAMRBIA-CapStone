@@ -3068,3 +3068,149 @@ def test_autorate_requires_a_third_family_adjudicator():
     assert "exactly two model ids" in source
     assert "forbids overwriting score files" in source
     assert "_to_panel_labels" in source, "comparison must happen on panel labels"
+
+
+# --- v2 Stage 6: unblinding and the primary estimate -------------------------
+
+from rlens.analysis_v2 import (
+    DIMENSIONS,
+    _paired_cells,
+    equal_weight_delta,
+    holm,
+    judge_agreement,
+    prompt_cluster_bootstrap,
+    signflip_permutation_p,
+    unblind_panel,
+    win_rates,
+)
+
+
+def _long(delta_by_set=None, n_prompts=4, depths=(0.0, 0.1, 0.2, 0.3, 0.4),
+          models=("qwen3.5-27b", "gemma-3-27b-it")):
+    """R scores J's score + delta for that set, at every prompt and depth."""
+    delta_by_set = delta_by_set or {"a": 1.0, "b": 1.0, "c": 1.0, "d": 1.0, "e": 1.0}
+    rows = []
+    for model in models:
+        for set_name, delta in delta_by_set.items():
+            for item in range(n_prompts):
+                for z in depths:
+                    base = 2.0
+                    for lens, value in (("released-J", base),
+                                        ("released-R", base + delta),
+                                        ("logit", base - 1.0)):
+                        rows.append({"cell_id": f"{model}-{set_name}-{item}-{z}",
+                                     "model_key": model, "set": set_name,
+                                     "item_id": f"i{item}", "layer": int(z * 60),
+                                     "requested_depth": z, "actual_depth": z,
+                                     "lens": lens, "contextual_coherence": value,
+                                     "lexical_integrity": 1.0, "prompt_echo": 0.0,
+                                     "won": lens == "released-R"})
+    return pd.DataFrame(rows)
+
+
+def test_unblinding_joins_scores_to_lenses_only_via_the_key():
+    combined = {"c0": {"A": {d: 3.0 for d in DIMENSIONS},
+                       "B": {d: 1.0 for d in DIMENSIONS},
+                       "C": {d: 0.0 for d in DIMENSIONS},
+                       "contextual_winner": "A"}}
+    key = [{"cell_id": "c0", "model_key": "qwen3.5-27b", "set": "multihop",
+            "item_id": "i1", "layer": 6,
+            "arms": {"A": "released-R", "B": "released-J", "C": "logit"}}]
+    sample = {"depths_by_model": {"qwen3.5-27b": [
+        {"requested_depth": 0.1, "layer": 6, "actual_depth": 0.0968}]}}
+
+    df = unblind_panel(combined, key, sample)
+    assert set(df["lens"]) == {"released-R", "released-J", "logit"}
+    r = df[df["lens"] == "released-R"].iloc[0]
+    assert r["contextual_coherence"] == 3.0 and r["won"]
+    assert r["requested_depth"] == 0.1 and r["actual_depth"] == pytest.approx(0.0968)
+    assert (df[df["lens"] == "logit"]["won"] == False).all()
+
+
+def test_equal_weight_estimator_ignores_unequal_prompt_counts():
+    """§11: a set with more prompts must not dominate."""
+    big = _long({"a": 0.0}, n_prompts=40)
+    small = _long({"b": 4.0}, n_prompts=4)
+    combined = pd.concat([big, small], ignore_index=True)
+    paired = _paired_cells(combined, "released-R", "released-J", "contextual_coherence")
+    # equal weight per SET -> (0 + 4) / 2 = 2.0, not dragged toward 0 by the big set
+    assert equal_weight_delta(paired) == pytest.approx(2.0)
+
+
+def test_bootstrap_resamples_whole_prompts_not_individual_readouts():
+    """Five depths of one prompt are not five independent observations."""
+    df = _long({"a": 1.0, "b": 1.0}, n_prompts=4)
+    paired = _paired_cells(df, "released-R", "released-J", "contextual_coherence")
+    out = prompt_cluster_bootstrap(paired, n_boot=500)
+    assert out["delta"] == pytest.approx(1.0)
+    assert out["n_prompts"] == 8, "2 sets x 4 prompts"
+    assert out["n_cells"] == 8 * 5 * 2, "prompts x depths x models"
+    # a constant effect has no between-prompt variance, so the CI collapses
+    assert out["ci_lo"] == pytest.approx(1.0) and out["ci_hi"] == pytest.approx(1.0)
+
+
+def test_bootstrap_ci_widens_with_between_prompt_variance():
+    steady = _paired_cells(_long({"a": 1.0}), "released-R", "released-J",
+                           "contextual_coherence")
+    noisy = steady.copy()
+    noisy.loc[noisy["item_id"] == "i0", "diff"] = 4.0
+    noisy.loc[noisy["item_id"] == "i1", "diff"] = -2.0
+    wide = prompt_cluster_bootstrap(noisy, n_boot=800)
+    tight = prompt_cluster_bootstrap(steady, n_boot=800)
+    assert (wide["ci_hi"] - wide["ci_lo"]) > (tight["ci_hi"] - tight["ci_lo"])
+
+
+def test_permutation_p_is_never_zero_and_reports_its_lower_bound():
+    """§12: report p >= 1/(B+1), never p = 0.0000."""
+    paired = _paired_cells(_long({"a": 3.0, "b": 3.0, "c": 3.0, "d": 3.0, "e": 3.0}),
+                           "released-R", "released-J", "contextual_coherence")
+    out = signflip_permutation_p(paired, n_perm=500)
+    assert out["p_value"] > 0.0
+    assert out["p_value"] >= 1 / 501
+    assert out["p_display"].startswith("<")
+
+
+def test_permutation_p_is_large_when_there_is_no_effect():
+    df = _long({"a": 0.0, "b": 0.0, "c": 0.0, "d": 0.0, "e": 0.0})
+    paired = _paired_cells(df, "released-R", "released-J", "contextual_coherence")
+    assert signflip_permutation_p(paired, n_perm=400)["p_value"] > 0.5
+
+
+def test_win_rates_report_ties_separately():
+    df = _long({"a": 0.0})
+    rates = win_rates(df, "released-R", "released-J")
+    assert rates["tie"] == 1.0 and rates["win"] == 0.0
+    assert rates["win_adjusted"] == 0.5, "ties count half"
+
+    rates = win_rates(_long({"a": 1.0}), "released-R", "released-J")
+    assert rates["win"] == 1.0 and rates["win_adjusted"] == 1.0
+
+
+def test_holm_is_monotone_and_never_below_the_raw_p():
+    raw = {"a": 0.001, "b": 0.02, "c": 0.04, "d": 0.5}
+    adjusted = holm(raw)
+    assert all(adjusted[k] >= raw[k] for k in raw)
+    ordered = sorted(raw, key=raw.get)
+    values = [adjusted[k] for k in ordered]
+    assert values == sorted(values), "must be non-decreasing"
+    assert adjusted["a"] == pytest.approx(0.004)
+
+
+def test_judge_agreement_reports_weighted_kappa():
+    rows = []
+    for i in range(40):
+        for arm in ("A", "B", "C"):
+            value = (i + ord(arm)) % 5
+            rows.append({"cell_id": f"c{i}", "panel_arm": arm, "judge_id": "j1",
+                         "contextual_coherence": value})
+            rows.append({"cell_id": f"c{i}", "panel_arm": arm, "judge_id": "j2",
+                         "contextual_coherence": value})
+    perfect = judge_agreement(pd.DataFrame(rows), ["j1", "j2"])
+    assert perfect["quadratic_weighted_kappa"] == pytest.approx(1.0)
+    assert perfect["exact_agreement"] == 1.0 and perfect["mean_abs_difference"] == 0.0
+
+    noisy = pd.DataFrame(rows).copy()
+    mask = (noisy["judge_id"] == "j2")
+    noisy.loc[mask, "contextual_coherence"] = (4 - noisy.loc[mask, "contextual_coherence"])
+    inverted = judge_agreement(noisy, ["j1", "j2"])
+    assert inverted["quadratic_weighted_kappa"] < 0
