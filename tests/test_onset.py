@@ -11,6 +11,7 @@ import torch
 from rlens.onset import (
     EditRunner,
     final_norm_gain,
+    find_cue,
     lens_vectors,
     make_ablation,
     make_pinv_swap,
@@ -18,6 +19,17 @@ from rlens.onset import (
     make_reflection_swap,
     swap_diagnostics,
 )
+
+
+def test_find_cue_rule():
+    # last capitalized token wins (proper noun in the descriptor)
+    toks = "Fact :  The  language  spoken  in  the  country  where  the  Amazon  River  ends  is".split("  ")
+    assert toks[find_cue(toks)] == "River"
+    # no capitals -> last alphabetic non-stopword
+    toks = "Fact :  The  currency  used  in  the  country  shaped  like  a  boot  is".split("  ")
+    assert toks[find_cue(toks)] == "boot"
+    # override word pins the cue exactly
+    assert toks[find_cue(toks, override_word="shaped")] == "shaped"
 
 D = 32
 

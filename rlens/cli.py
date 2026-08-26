@@ -47,8 +47,8 @@ def _load_model(dtype: str, device: str):
     return hf, tok
 
 
-def _lens_path(kind: str, name: str) -> Path:
-    return REPO_ROOT / "lenses" / kind / "qwen3.5-4b" / name / "lens.pt"
+def _lens_path(kind: str, name: str, model: str = "qwen3.5-4b") -> Path:
+    return REPO_ROOT / "lenses" / kind / model / name / "lens.pt"
 
 
 # ---------------------------------------------------------------------------
@@ -348,7 +348,7 @@ def cmd_eval(args) -> None:
 
     from rlens.evals import EVAL_SETS, run_passk, summarize_passk
 
-    hf, tok = _load_model(args.dtype, args.device)
+    hf, tok = _onset_model(args.model, args.dtype, args.device)
     model = jlens.from_hf(hf, tok)
 
     lenses = {"logit": None}
@@ -358,9 +358,9 @@ def cmd_eval(args) -> None:
         "ours-J": ("ours", "j-lens"),
         "ours-R": ("ours", "r-lens"),
     }.items():
-        if _lens_path(kind, file).exists():
-            lenses[name] = JacobianLens.load(str(_lens_path(kind, file)))
-    print(f"lenses: {list(lenses)}   sets: {args.sets}")
+        if _lens_path(kind, file, args.model).exists():
+            lenses[name] = JacobianLens.load(str(_lens_path(kind, file, args.model)))
+    print(f"model: {args.model}   lenses: {list(lenses)}   sets: {args.sets}")
 
     df = run_passk(
         model, lenses,
@@ -370,17 +370,16 @@ def cmd_eval(args) -> None:
     summary = summarize_passk(df)
 
     out_dir = REPO_ROOT / "results"
-    df.to_csv(out_dir / "passk_per_layer_qwen3.5-4b.csv")
+    df.to_csv(out_dir / f"passk_per_layer_{args.model}.csv")
     lines = [
-        "# pass@%d — qwen3.5-4b\n" % args.k,
-        f"Sets: {args.sets}. Items kept after correctness filter: {df.attrs['n_kept']}.",
-        "Expected on 4b: J ≈ R (the post's null); both well above the logit lens.\n",
-        "## Summary (mean pass@%d over layers)\n" % args.k,
+        f"# pass@{args.k} — {args.model}\n",
+        f"Sets: {args.sets}. Items kept after correctness filter: {df.attrs['n_kept']}.\n",
+        f"## Summary (mean pass@{args.k} over layers)\n",
         summary.to_markdown(floatfmt=".3f"),
         "\n## Per-layer (mean over sets)\n",
         df.T.groupby(level="lens").mean().T.to_markdown(floatfmt=".3f"),
     ]
-    report = out_dir / "passk_qwen3.5-4b.md"
+    report = out_dir / f"passk_{args.model}.md"
     report.write_text("\n".join(lines), encoding="utf-8")
     print(f"\n{summary.to_string(float_format='%.3f')}\nreport -> {report}")
 
@@ -461,17 +460,54 @@ def cmd_onset(args) -> None:
     # analyze
     df = pd.read_parquet(records_path)
     result = onset.analyze(df, rho=args.rho)
+    n_items, n_layers = df["item"].nunique(), df["layer"].nunique()
     lines = [f"# Causal concept onset — {args.model}\n"]
-    lines.append(f"Items: {df['item'].nunique()}; layers: {df['layer'].nunique()}; rho={args.rho}, w=2.")
-    lines.append("Curves are EXCESS over matched controls (shuffled labels / norm-matched random).\n")
-    lines.append("## Onsets (layer index; None = never exceeded threshold)\n")
-    onset_rows = {lens: result["onsets"][lens] for lens in onset.LENSES}
-    lines.append(pd.DataFrame(onset_rows).T.to_markdown())
-    lines.append("")
-    lines.append(f"**Gap Δ = L_causal − L_R:  Δ_R = {result['gap_R']}, Δ_J = {result['gap_J']}**")
-    lines.append(f"**Principal comparison Δ_R − Δ_J = {result['delta_R_minus_delta_J']}**")
+    lines.append(f"Items: {n_items}; layers: {n_layers}; rho={args.rho}, w=2. Curves are EXCESS over matched controls.\n")
+
+    # 1. self-repair (the most robust finding) with collateral-damage controls
+    lines.append("## Self-repair (single-layer vs persistent ablation) + collateral-damage controls\n")
+    lines.append("Mean necessity effect by starting-layer band. If wrong-concept / answer persist curves")
+    lines.append("match the concept's, late-band suppression is generic damage, not concept-specific.\n")
+    bands = [(0, n_layers // 3), (n_layers // 3 + 1, 2 * n_layers // 3), (2 * n_layers // 3 + 1, n_layers)]
+    rows = {}
+    for lens in ("R", "J"):
+        for key in ("N", "N_persist", "N_band", "N_wrong_persist", "N_answer_persist"):
+            cv = result["curves"][lens][key]
+            rows[(lens, key)] = {f"L{lo}-{hi}": cv[(cv.index >= lo) & (cv.index <= hi)].mean() for lo, hi in bands}
+    lines.append(pd.DataFrame(rows).T.to_markdown(floatfmt=".3f"))
+
+    # 2. onsets with bootstrap CIs (incl. cue-position readout = the H1 re-test)
+    lines.append("\n## Onsets (bootstrap 95% CIs; None = never exceeded threshold)\n")
+    table = {}
+    for lens in onset.LENSES:
+        row = {}
+        for k, v in result["onsets"][lens].items():
+            ci = result["onset_cis"][lens].get(k)
+            row[k] = f"{v} [{ci[0]:.0f},{ci[1]:.0f}]" if (v is not None and ci) else str(v)
+        table[lens] = row
+    lines.append(pd.DataFrame(table).T.to_markdown())
+    lines.append("\nH1 check: L_R_cue (cue-token readout onset) is where the post's early-readout claim lives.")
+    lines.append(f"\n**Δ = L_causal − L_R: Δ_R = {result['gap_R']}, Δ_J = {result['gap_J']}; Δ_R − Δ_J = {result['delta_R_minus_delta_J']}**")
     if result["boot_ci"]:
-        lines.append(f"Paired bootstrap 95% CI: {result['boot_ci']} (defined in {result['boot_defined_frac']:.0%} of resamples)")
+        lines.append(f"Paired bootstrap 95% CI: {result['boot_ci']} (defined in {result['boot_defined_frac']:.0%} of resamples).")
+    lines.append("\nPhrasing: on this item set, at these positions, on this model, this is a *no detectable")
+    lines.append("difference* result; the CI does not rule out moderate differences in either direction.\n")
+
+    # 3. lens geometry + magnitude confound
+    geo = df[df.condition == "lens_cos"]
+    if len(geo):
+        lines.append("## Lens geometry: cos(v_R, v_J) of the concept direction by layer band\n")
+        lines.append("Near-parallel vectors force identical intervention results by construction.\n")
+        g = geo.groupby("layer")[["cos_RJ", "cos_Rlogit"]].mean()
+        lines.append(pd.DataFrame({f"L{lo}-{hi}": g[(g.index >= lo) & (g.index <= hi)].mean() for lo, hi in bands}).T.to_markdown(floatfmt=".3f"))
+    real = df[df.condition.isin(["ablate", "swap"]) & (df.alpha == 1.0)]
+    if "delta_norm" in df and len(real):
+        lines.append("\n## Push sizes ‖δh‖ by layer band (cross-lens matching was NOT applied to primary conditions)\n")
+        piv = real.pivot_table(index="layer", columns=["condition", "lens"], values="delta_norm")
+        lines.append(pd.DataFrame({f"L{lo}-{hi}": piv[(piv.index >= lo) & (piv.index <= hi)].mean() for lo, hi in bands}).T.to_markdown(floatfmt=".2f"))
+        lines.append("\nNorm-equalized (eqnorm) curves below control this directly.")
+
+    # 4. full curves per lens
     for lens in onset.LENSES:
         lines.append(f"\n## Excess curves — {lens}\n")
         lines.append(pd.DataFrame(result["curves"][lens]).to_markdown(floatfmt=".3f"))
@@ -479,15 +515,13 @@ def cmd_onset(args) -> None:
     if len(diag):
         lines.append("\n## Swap-pair conditioning (mid layer)\n")
         lines.append(diag.groupby("lens")[["cos", "kappa"]].describe().to_markdown(floatfmt=".2f"))
-    if "delta_norm" in df:
-        real = df[df.condition.isin(["ablate", "swap"]) & (df.alpha == 1.0)]
-        if len(real):
-            lines.append("\n## Intervention displacement norms (magnitude-confound check)\n")
-            lines.append("Per-lens push sizes; effects are baselined against norm-matched random pushes,")
-            lines.append("but if R >> J here at early layers, run the norm-equalized sensitivity.\n")
-            lines.append(
-                real.groupby(["lens", "condition"])["delta_norm"].agg(["mean", "std", "max"]).to_markdown(floatfmt=".2f")
-            )
+
+    # sanity: band at last layer == persist from first layer (both suppress everywhere)
+    for lens in ("R", "J"):
+        b = result["curves"][lens]["N_band"].iloc[-1] if len(result["curves"][lens]["N_band"]) else float("nan")
+        p = result["curves"][lens]["N_persist"].iloc[0] if len(result["curves"][lens]["N_persist"]) else float("nan")
+        lines.append(f"\nsanity {lens}: N_band(last)={b:.3f} vs N_persist(first)={p:.3f} (must agree within noise)")
+
     out = REPO_ROOT / "results" / f"onset_{args.model}.md"
     out.write_text("\n".join(lines), encoding="utf-8")
     print(f"report -> {out}")
@@ -536,6 +570,7 @@ def main() -> None:
     from rlens.evals import EVAL_SETS
 
     p = sub.add_parser("eval", help="pass@10 battery: R vs J vs logit lens -> results/")
+    p.add_argument("--model", choices=["qwen3.5-4b", "qwen3.5-27b"], default="qwen3.5-4b")
     p.add_argument("--sets", nargs="+", default=EVAL_SETS, choices=EVAL_SETS)
     p.add_argument("--k", type=int, default=10)
     p.add_argument("--limit", type=int, default=None, help="max items per set (quick checks)")

@@ -213,6 +213,39 @@ class OnsetItem:
     y_id: int              # chosen by clean-logit argmax over surface forms
     y_prime_id: int
     t_i: int               # absolute intervention/readout position
+    cue_i: int             # cue-token position (the post's flagship readouts live here)
+
+
+#: pre-registered stopword list for the cue auto-rule
+_CUE_STOPWORDS = {
+    "the", "a", "an", "of", "in", "on", "at", "to", "for", "by", "with", "is",
+    "was", "are", "were", "that", "which", "where", "who", "whose", "its", "it",
+    "and", "or", "most", "from", "into", "s", "called", "fact", "used", "when",
+}
+
+
+def find_cue(token_strs: list[str], override_word: str | None = None) -> int:
+    """Cue position: the descriptor's content token (e.g. 'sushi', 'boot').
+
+    Rule (pre-registered): the override word's last token if given; else the
+    last mid-sentence Capitalized token (proper nouns like 'Amazon'); else the
+    last alphabetic non-stopword token. Audit the choice via the data stage's
+    printout and hand-fix misses in data/onset_cues.json.
+    """
+    stripped = [t.strip() for t in token_strs]
+    if override_word is not None:
+        for i in range(len(stripped) - 1, -1, -1):
+            if override_word.lower() in stripped[i].lower():
+                return i
+    for i in range(len(stripped) - 1, 0, -1):
+        t = stripped[i]
+        if t.isalpha() and t[0].isupper() and t.lower() not in _CUE_STOPWORDS:
+            return i
+    for i in range(len(stripped) - 1, -1, -1):
+        t = stripped[i].lower()
+        if t.isalpha() and t not in _CUE_STOPWORDS:
+            return i
+    return len(stripped) - 1
 
 
 def _direction_id(tok, word: str) -> int | None:
@@ -251,6 +284,8 @@ def build_dataset(hf_model, tok, *, position: int = -1, min_p_answer: float = 1e
     )["items"][:limit]
     overrides_path = REPO_ROOT / "data" / "onset_controls.json"
     overrides = json.loads(overrides_path.read_text(encoding="utf-8")) if overrides_path.exists() else {}
+    cues_path = REPO_ROOT / "data" / "onset_cues.json"
+    cue_overrides = json.loads(cues_path.read_text(encoding="utf-8")) if cues_path.exists() else {}
 
     device = hf_model.model.embed_tokens.weight.device
 
@@ -308,7 +343,10 @@ def build_dataset(hf_model, tok, *, position: int = -1, min_p_answer: float = 1e
         if c_wrong is None:
             drop(item, "no wrong-concept candidate"); continue
 
-        seq_len = tok(prompt, return_tensors="pt").input_ids.shape[1]
+        token_ids = tok(prompt, return_tensors="pt").input_ids[0].tolist()
+        seq_len = len(token_ids)
+        token_strs = [tok.decode([t]) for t in token_ids]
+        cue_i = find_cue(token_strs, cue_overrides.get(prompt))
         y_id = y_set[int(logp[y_set].argmax())]
         yp_id = yp_set[int(logp[yp_set].argmax())]
         kept.append(
@@ -319,9 +357,10 @@ def build_dataset(hf_model, tok, *, position: int = -1, min_p_answer: float = 1e
                 c_id=ids["c"], c_prime_id=ids["c'"], c_wrong_id=_direction_id(tok, c_wrong),
                 y_id=y_id, y_prime_id=yp_id,
                 t_i=seq_len + position if position < 0 else position,
+                cue_i=cue_i,
             )
         )
-        log.append({"name": item["name"], "kept": True})
+        log.append({"name": item["name"], "kept": True, "cue": token_strs[cue_i]})
     return kept, log
 
 
@@ -337,31 +376,40 @@ def _layer_jacobians(lenses: dict, layer: int) -> dict[str, torch.Tensor | None]
 
 def _edit_battery(
     hf_model, jacobians: dict[str, torch.Tensor | None], item: OnsetItem, *,
-    layer: int, c_dirs: dict[str, dict[int, torch.Tensor]], all_layers: list[int],
+    layer: int, dirs: dict[str, dict[str, dict[int, torch.Tensor]]], all_layers: list[int],
     ridge: float, center_mu: torch.Tensor | None,
 ):
     """All (lens, condition, alpha) edits for one (item, layer) as
-    ``{layer: edit_fn}`` dicts. ``c_dirs[lens][l]`` are per-layer concept
-    directions for the persistent (anti-self-repair) ablation."""
+    ``{layer: edit_fn}`` dicts. ``dirs[token][lens][l]`` are per-layer
+    directions (token in {"c", "wrong", "y"}) for the multi-layer conditions."""
     labels, edits = [], []
 
     def add(lens, condition, alpha, edit_dict):
         labels.append({"lens": lens, "condition": condition, "alpha": alpha})
         edits.append(edit_dict)
 
+    def multi(token, lens, layer_set):
+        return {l2: make_ablation(dirs[token][lens][l2], 1.0, mu=center_mu) for l2 in layer_set}
+
     add("-", "identity", 0.0, {layer: lambda h: h})  # alpha=0 numerics check
+    later = [l2 for l2 in all_layers if l2 >= layer]
+    upto = [l2 for l2 in all_layers if l2 <= layer]
     for lens in LENSES:
         J = jacobians[lens]
         v_c, v_cp, v_wrong, v_y, v_yp = lens_vectors(
             hf_model, J, [item.c_id, item.c_prime_id, item.c_wrong_id, item.y_id, item.y_prime_id]
         )
         add(lens, "ablate", 1.0, {layer: make_ablation(v_c, 1.0, mu=center_mu)})
-        # persistent ablation: suppress the concept direction at EVERY layer
-        # >= l (each layer's own direction). N_persist - N_single measures
-        # self-repair (later layers recomputing the concept from the prompt).
-        add(lens, "ablate_persist", 1.0, {
-            l2: make_ablation(c_dirs[lens][l2], 1.0, mu=center_mu) for l2 in all_layers if l2 >= layer
-        })
+        # persistent ablation (anti-self-repair): suppress the concept at every
+        # layer >= l. band ablation: the complement, layers 0..l — the pair
+        # isolates the early-band causal contribution.
+        add(lens, "ablate_persist", 1.0, multi("c", lens, later))
+        add(lens, "ablate_band", 1.0, multi("c", lens, upto))
+        # collateral-damage controls for the persist curve: if suppressing an
+        # unrelated concept / the answer direction from the same starting layer
+        # matches, late-band suppression is generic answer-space damage.
+        add(lens, "ablate_wrong_persist", 1.0, multi("wrong", lens, later))
+        add(lens, "ablate_answer_persist", 1.0, multi("y", lens, later))
         add(lens, "ablate_wrong", 1.0, {layer: make_ablation(v_wrong, 1.0, mu=center_mu)})
         add(lens, "ablate_answer", 1.0, {layer: make_ablation(v_y, 1.0, mu=center_mu)})
         for alpha in ALPHAS:
@@ -423,27 +471,59 @@ def run_measurements(
         # shuffled-label baseline concept for the readout (fixed derangement)
         shuf = items[(item_idx + 1) % len(items)]
 
-        # per-layer concept directions (for the persistent ablation), once per item
-        c_dirs = {
-            lens: {l: lens_vectors(hf_model, _layer_jacobians(lenses, l)[lens], [item.c_id])[0] for l in layers}
-            for lens in LENSES
-        }
+        # per-layer directions for c / wrong-concept / answer (multi-layer
+        # conditions), once per item
+        token_ids_by_key = {"c": item.c_id, "wrong": item.c_wrong_id, "y": item.y_id}
+        dirs = {key: {lens: {} for lens in LENSES} for key in token_ids_by_key}
+        for l in layers:
+            per_layer_J = _layer_jacobians(lenses, l)
+            for lens in LENSES:
+                vs = lens_vectors(hf_model, per_layer_J[lens], list(token_ids_by_key.values()))
+                for key, v in zip(token_ids_by_key, vs):
+                    dirs[key][lens][l] = v
+
+        # lens-geometry diagnostics: if R's and J's concept directions are
+        # near-parallel, identical results are forced by construction
+        for l in layers:
+            vR, vJ, vL = (dirs["c"][lens][l] for lens in ("R", "J", "logit"))
+            records.append({
+                **base, "layer": l, "lens": "-", "condition": "lens_cos", "alpha": 0.0,
+                "cos_RJ": float((vR @ vJ) / (vR.norm() * vJ.norm())),
+                "cos_Rlogit": float((vR @ vL) / (vR.norm() * vL.norm())),
+            })
 
         for layer in layers:
             h_t = acts[layer][item.t_i].float().cpu()
+            h_cue = acts[layer][item.cue_i].float().cpu()
             jacobians = _layer_jacobians(lenses, layer)
             for lens in LENSES:
                 J = jacobians[lens]
-                read = h_t if J is None else h_t @ J.float().T
-                logits_l = unembed(read)
-                for concept, cond in ((item.c, "readout"), (shuf.c, "readout_shuffled")):
-                    ids = token_ids_of(tok, concept)
-                    records.append({**base, "layer": layer, "lens": lens, "condition": cond, "alpha": 0.0, "rank_c": rank_of(logits_l, ids)})
+                for h_pos, suffix in ((h_t, ""), (h_cue, "_cue")):
+                    read = h_pos if J is None else h_pos @ J.float().T
+                    logits_l = unembed(read)
+                    for concept, cond in ((item.c, f"readout{suffix}"), (shuf.c, f"readout_shuffled{suffix}")):
+                        ids = token_ids_of(tok, concept)
+                        records.append({**base, "layer": layer, "lens": lens, "condition": cond, "alpha": 0.0, "rank_c": rank_of(logits_l, ids)})
 
             labels, edits = _edit_battery(
-                hf_model, jacobians, item, layer=layer, c_dirs=c_dirs, all_layers=layers,
+                hf_model, jacobians, item, layer=layer, dirs=dirs, all_layers=layers,
                 ridge=ridge, center_mu=mu_by_layer.get(layer),
             )
+            # cross-lens norm-equalized variants (magnitude confound: early-band
+            # ||dh_R||/||dh_J|| measured at 3-4x): same directions, displacement
+            # rescaled to the R/J geometric-mean norm at this (item, layer)
+            for cond in ("ablate", "swap"):
+                base_edits = {
+                    lab["lens"]: ed[layer] for lab, ed in zip(labels, edits)
+                    if lab["condition"] == cond and lab["alpha"] == 1.0 and lab["lens"] in ("R", "J")
+                }
+                delta = {lens: ed(h_t.clone()) - h_t for lens, ed in base_edits.items()}
+                target = float((delta["R"].norm() * delta["J"].norm()).sqrt())
+                for lens in ("R", "J"):
+                    norm = float(delta[lens].norm())
+                    vec = delta[lens] * (target / norm) if norm > 1e-8 else delta[lens]
+                    labels.append({"lens": lens, "condition": f"{cond}_eqnorm", "alpha": 1.0, "delta_norm": target})
+                    edits.append({layer: (lambda h, v=vec: h + v.to(h.device))})
             # displacement norms at this layer (magnitude-confound reporting:
             # per-lens intervention sizes differ, and effects must be judged
             # against equally-sized random pushes)
@@ -523,48 +603,68 @@ def analyze(df: pd.DataFrame, *, rho: float = 0.2, w: int = 2, n_boot: int = 100
                     m &= d.alpha == alpha
                 return d[m].groupby("layer")[col].mean()
 
+            rand_abl = by_layer("random_ablate", "necessity")
             out[lens] = {
                 "R": by_layer("readout", "hit10") - by_layer("readout_shuffled", "hit10"),
-                "N": by_layer("ablate", "necessity", 1.0) - by_layer("random_ablate", "necessity"),
+                "R_cue": by_layer("readout_cue", "hit10") - by_layer("readout_shuffled_cue", "hit10"),
+                "N": by_layer("ablate", "necessity", 1.0) - rand_abl,
                 "S": by_layer("swap", "swap_effect", 1.0) - by_layer("random_swap", "swap_effect"),
-                # persistent (all layers >= l) ablation: N_persist - N flags
-                # self-repair; informational, not used for the primary onsets
-                "N_persist": by_layer("ablate_persist", "necessity", 1.0) - by_layer("random_ablate", "necessity"),
+                # multi-layer curves (informational; primary onsets use N and S):
+                "N_persist": by_layer("ablate_persist", "necessity", 1.0) - rand_abl,
+                "N_band": by_layer("ablate_band", "necessity", 1.0) - rand_abl,
+                "N_wrong_persist": by_layer("ablate_wrong_persist", "necessity", 1.0) - rand_abl,
+                "N_answer_persist": by_layer("ablate_answer_persist", "necessity", 1.0) - rand_abl,
+                "N_eqnorm": by_layer("ablate_eqnorm", "necessity", 1.0) - rand_abl,
+                "S_eqnorm": by_layer("swap_eqnorm", "swap_effect", 1.0) - by_layer("random_swap", "swap_effect"),
             }
         return out
+
+    ONSET_KEYS = ("R", "R_cue", "N", "S")
 
     def onsets(cv: dict) -> dict:
         res = {}
         for lens in LENSES:
-            L_R = _onset(cv[lens]["R"], rho, w)
-            L_N = _onset(cv[lens]["N"], rho, w)
-            L_S = _onset(cv[lens]["S"], rho, w)
+            r = {f"L_{k}": _onset(cv[lens][k], rho, w) for k in ONSET_KEYS}
             joint = None
-            if L_N is not None and L_S is not None:
+            if r["L_N"] is not None and r["L_S"] is not None:
                 nn = cv[lens]["N"] / (cv[lens]["N"].max() + 1e-9)
                 ss = cv[lens]["S"] / (cv[lens]["S"].max() + 1e-9)
                 both = pd.Series(((nn >= rho) & (ss >= rho)).to_numpy().astype(float), index=nn.index)
                 for i in range(len(both) - w + 1):
                     if both.iloc[i : i + w].all():
                         joint = float(both.index[i]); break
-            res[lens] = {"L_R": L_R, "L_N": L_N, "L_S": L_S, "L_causal": joint,
-                         "gap": (joint - L_R) if (joint is not None and L_R is not None) else None}
+            r["L_causal"] = joint
+            r["gap"] = (joint - r["L_R"]) if (joint is not None and r["L_R"] is not None) else None
+            r["gap_cue"] = (joint - r["L_R_cue"]) if (joint is not None and r["L_R_cue"] is not None) else None
+            res[lens] = r
         return res
 
     full_curves = curves(df)
     full_onsets = onsets(full_curves)
 
-    boot_gaps = []
+    boot_gaps, boot_onsets = [], {lens: {k: [] for k in (*[f"L_{x}" for x in ONSET_KEYS], "L_causal", "gap")} for lens in LENSES}
     for _ in range(n_boot):
         pick = torch.randint(len(items), (len(items),), generator=rng).tolist()
         chosen = [items[i] for i in pick]
         sub = pd.concat([df[df.item == it] for it in chosen])
         o = onsets(curves(sub))
+        for lens in LENSES:
+            for k, dist in boot_onsets[lens].items():
+                if o[lens][k] is not None:
+                    dist.append(o[lens][k])
         gR, gJ = o["R"]["gap"], o["J"]["gap"]
         if gR is not None and gJ is not None:
             boot_gaps.append(gR - gJ)
+
+    def ci_of(vals):
+        s = pd.Series(vals)
+        return (float(s.quantile(0.025)), float(s.quantile(0.975)), len(vals) / n_boot) if len(vals) else None
+
     gap_diff = full_onsets["R"]["gap"], full_onsets["J"]["gap"]
-    ci = (float(pd.Series(boot_gaps).quantile(0.025)), float(pd.Series(boot_gaps).quantile(0.975))) if boot_gaps else None
-    return {"curves": full_curves, "onsets": full_onsets, "gap_R": gap_diff[0], "gap_J": gap_diff[1],
-            "delta_R_minus_delta_J": (gap_diff[0] - gap_diff[1]) if None not in gap_diff else None,
-            "boot_ci": ci, "boot_defined_frac": len(boot_gaps) / n_boot}
+    return {
+        "curves": full_curves, "onsets": full_onsets,
+        "onset_cis": {lens: {k: ci_of(v) for k, v in dists.items()} for lens, dists in boot_onsets.items()},
+        "gap_R": gap_diff[0], "gap_J": gap_diff[1],
+        "delta_R_minus_delta_J": (gap_diff[0] - gap_diff[1]) if None not in gap_diff else None,
+        "boot_ci": ci_of(boot_gaps)[:2] if boot_gaps else None, "boot_defined_frac": len(boot_gaps) / n_boot,
+    }
