@@ -10,6 +10,7 @@
     uv run rlens unblind <scores.csv> --key ...   join hand ratings to lens names
     uv run rlens rate-local <panel.jsonl>         second rater, local model, no API
     uv run rlens anchors [--model ...]            validate vs the post's own claims
+    uv run rlens onset [--model ...]              controlled test of 'earlier readout'
 """
 
 from __future__ import annotations
@@ -768,6 +769,99 @@ def cmd_anchors(args) -> None:
 
 
 # ---------------------------------------------------------------------------
+# onset
+# ---------------------------------------------------------------------------
+
+
+def cmd_onset(args) -> None:
+    """Controlled, full-dataset test of 'R-lens surfaces concepts earlier'."""
+    import jlens
+    from jlens.lens import JacobianLens
+
+    from rlens.onset import onset_contrasts, onset_summary, run_onsets, verdict
+
+    hf, tok = _load_model(args.dtype, args.device, args.model)
+    model = jlens.from_hf(hf, tok)
+
+    lenses = {"logit": None}
+    for name, (kind, file) in {
+        "released-J": ("released", "j-lens"),
+        "released-R": ("released", "r-lens"),
+    }.items():
+        path = _lens_path(kind, file, args.model)
+        if path.exists():
+            lenses[name] = JacobianLens.load(str(path))
+    if set(lenses) == {"logit"}:
+        raise SystemExit(f"no J/R lens artifacts for {args.model!r}; run rlens download first")
+
+    from rlens.coherence import model_device, pin_lenses
+
+    restore = pin_lenses(lenses, None if args.lens_device == "cpu" else model_device(model))
+    try:
+        df = run_onsets(
+            model, lenses, sets=tuple(args.sets), k=args.k, limit=args.limit,
+            filter_correct=not args.no_filter_correct, max_positions=args.max_positions,
+            seed=args.seed,
+        )
+    finally:
+        restore()
+
+    out_dir = Path(args.out_dir).expanduser() if args.out_dir else REPO_ROOT / "results"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    df.to_csv(out_dir / f"onset_{args.model}.csv", index=False)
+
+    summary = onset_summary(df)
+    contrasts = onset_contrasts(df, reference="released-R", other="released-J", seed=args.seed)
+    vs_logit = onset_contrasts(df, reference="released-R", other="logit", seed=args.seed)
+    conclusion = verdict(contrasts)
+
+    n_layers = int(df["n_layers"].iloc[0]) if len(df) else 0
+    lines = [
+        f"# Readout onset with controls — {args.model}\n",
+        "`rlens anchors` checks five examples **the post chose to showcase its own**",
+        "**method**. This runs the same measurement over every eval item, with controls",
+        "designed to fail.\n",
+        f"Onset = first layer where the probe token enters the top-{args.k} at **any** of the",
+        f"last {args.max_positions} prompt positions. Position-agnostic on purpose: choosing a",
+        "position after seeing the result is the freedom that makes hand-picked examples",
+        "untrustworthy.\n",
+        f"Sets: {list(args.sets)}. Layers: {n_layers}. Seed: {args.seed}.\n",
+        "## Conditions\n",
+        "| condition | probe | what a positive gap would mean |",
+        "|---|---|---|",
+        "| `true` | the item's own intermediate | the effect under test |",
+        "| `wrong` | another item's intermediate, same eval set (seeded derangement) | "
+        "R ranks *mismatched* concepts early too — not concept-specific |",
+        "| `random` | a uniformly sampled vocabulary token | plain rank inflation |",
+        "| `answer` | the item's final answer, where the eval provides one | "
+        "answer smuggling: the lens is not tracking a multi-step computation |",
+        "",
+        "## Verdict\n",
+        f"**{conclusion}**\n",
+        "## Onset by condition and lens\n",
+        "`surfaced` is the fraction of items where the probe ever entered the top-k; a low",
+        "value makes the median unrepresentative.\n",
+        summary.to_markdown(floatfmt=".2f"),
+        "",
+        "## R-lens vs J-lens (paired per item, 10k bootstrap)\n",
+        "Positive `delta_layers` = R surfaces earlier. Items where one lens never surfaces",
+        "are counted separately rather than imputed — dropping them silently biases the gap",
+        "toward whichever lens fails more often.\n",
+        contrasts.to_markdown(floatfmt=".3f"),
+        "",
+        "## R-lens vs logit lens\n",
+        vs_logit.to_markdown(floatfmt=".3f"),
+        "",
+    ]
+    report = out_dir / f"onset_{args.model}.md"
+    report.write_text("\n".join(lines), encoding="utf-8")
+    print(f"\n{summary.to_string(float_format='%.2f')}\n")
+    print(contrasts.to_string(float_format='%.3f'))
+    print(f"\n{conclusion}\n\nreport -> {report}")
+
+
+
+# ---------------------------------------------------------------------------
 # entry point
 # ---------------------------------------------------------------------------
 
@@ -899,6 +993,21 @@ def main() -> None:
     p.add_argument("--device", default=default_device)
     p.add_argument("--dtype", choices=["bf16", "fp32"], default="bf16")
     p.set_defaults(func=cmd_anchors)
+
+    p = sub.add_parser("onset", help="controlled full-dataset test of the 'earlier readout' claim")
+    p.add_argument("--model", default="qwen3.5-27b")
+    p.add_argument("--sets", nargs="+", default=EVAL_SETS, choices=EVAL_SETS)
+    p.add_argument("--k", type=int, default=10)
+    p.add_argument("--limit", type=int, default=None, help="max items per set")
+    p.add_argument("--max-positions", type=int, default=24,
+                   help="how many trailing prompt positions to scan (cost scales linearly)")
+    p.add_argument("--no-filter-correct", action="store_true")
+    p.add_argument("--lens-device", default="auto")
+    p.add_argument("--out-dir", default=None)
+    p.add_argument("--seed", type=int, default=20260825)
+    p.add_argument("--device", default=default_device)
+    p.add_argument("--dtype", choices=["bf16", "fp32"], default="bf16")
+    p.set_defaults(func=cmd_onset)
 
     args = parser.parse_args()
     args.func(args)

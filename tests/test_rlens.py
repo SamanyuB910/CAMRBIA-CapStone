@@ -1385,3 +1385,134 @@ def test_a_strict_top1_criterion_can_hide_a_real_ordering():
     assert v.loc["verona", "verdict"].startswith("MATCH")
     assert v.loc["verona", "R_top10"] == 23 and v.loc["verona", "J_top10"] == 37
     assert pd.isna(v.loc["verona", "R_top1"]) or v.loc["verona", "R_top1"] is None
+
+
+# --- controlled onset test ---------------------------------------------------
+
+
+def test_derangement_never_gives_an_item_its_own_concept():
+    """The `wrong` control is worthless if any item draws itself."""
+    import numpy as np
+
+    from rlens.onset import derange
+
+    rng = np.random.default_rng(0)
+    for n in (2, 3, 5, 20, 100):
+        perm = derange(n, rng)
+        assert sorted(perm) == list(range(n)), "must be a permutation"
+        assert all(perm[i] != i for i in range(n)), f"fixed point at n={n}"
+
+
+def _onset_frame(rows):
+    df = pd.DataFrame(rows)
+    df.attrs["k"] = 10
+    return df
+
+
+def test_onset_verdict_supported_only_when_controls_stay_flat():
+    """A real effect must beat its own controls, not merely be positive."""
+    from rlens.onset import onset_contrasts, verdict
+
+    rows = []
+    for item in range(30):
+        rows += [
+            {"set": "multihop", "item": item, "lens": "released-R", "condition": "true",
+             "onset": 5.0, "n_layers": 64},
+            {"set": "multihop", "item": item, "lens": "released-J", "condition": "true",
+             "onset": 15.0, "n_layers": 64},
+            # controls: both lenses identical -> zero gap
+            {"set": "multihop", "item": item, "lens": "released-R", "condition": "wrong",
+             "onset": 20.0, "n_layers": 64},
+            {"set": "multihop", "item": item, "lens": "released-J", "condition": "wrong",
+             "onset": 20.0, "n_layers": 64},
+        ]
+    contrasts = onset_contrasts(_onset_frame(rows), reference="released-R",
+                                other="released-J", n_boot=500)
+    assert contrasts.loc["true", "delta_layers"] == pytest.approx(10.0)
+    assert contrasts.loc["true", "win_rate"] == 1.0
+    assert verdict(contrasts).startswith("SUPPORTED")
+
+
+def test_onset_verdict_flags_rank_inflation_as_confounded():
+    """If R also ranks unrelated tokens earlier, earliness is not concept-specific."""
+    from rlens.onset import onset_contrasts, verdict
+
+    rows = []
+    for item in range(30):
+        for condition, r, j in (("true", 5.0, 15.0), ("random", 8.0, 16.0)):
+            rows += [
+                {"set": "s", "item": item, "lens": "released-R", "condition": condition,
+                 "onset": r, "n_layers": 64},
+                {"set": "s", "item": item, "lens": "released-J", "condition": condition,
+                 "onset": j, "n_layers": 64},
+            ]
+    contrasts = onset_contrasts(_onset_frame(rows), reference="released-R",
+                                other="released-J", n_boot=500)
+    message = verdict(contrasts)
+    assert message.startswith("CONFOUNDED")
+    assert "random" in message and "80%" in message   # 8 of 10 layers explained by the control
+
+
+def test_onset_verdict_not_supported_when_the_gap_is_null():
+    from rlens.onset import onset_contrasts, verdict
+
+    rows = []
+    for item in range(30):
+        rows += [
+            {"set": "s", "item": item, "lens": "released-R", "condition": "true",
+             "onset": 10.0 + (item % 3), "n_layers": 64},
+            {"set": "s", "item": item, "lens": "released-J", "condition": "true",
+             "onset": 10.0 + ((item + 1) % 3), "n_layers": 64},
+        ]
+    contrasts = onset_contrasts(_onset_frame(rows), reference="released-R",
+                                other="released-J", n_boot=500)
+    assert verdict(contrasts).startswith("NOT SUPPORTED")
+
+
+def test_never_surfaced_items_are_counted_not_imputed():
+    """Dropping them silently biases the gap toward whichever lens fails more."""
+    from rlens.onset import onset_contrasts
+
+    rows = [
+        {"set": "s", "item": 0, "lens": "released-R", "condition": "true", "onset": 5.0, "n_layers": 64},
+        {"set": "s", "item": 0, "lens": "released-J", "condition": "true", "onset": float("nan"), "n_layers": 64},
+        {"set": "s", "item": 1, "lens": "released-R", "condition": "true", "onset": float("nan"), "n_layers": 64},
+        {"set": "s", "item": 1, "lens": "released-J", "condition": "true", "onset": float("nan"), "n_layers": 64},
+        {"set": "s", "item": 2, "lens": "released-R", "condition": "true", "onset": 4.0, "n_layers": 64},
+        {"set": "s", "item": 2, "lens": "released-J", "condition": "true", "onset": 9.0, "n_layers": 64},
+    ]
+    c = onset_contrasts(_onset_frame(rows), reference="released-R", other="released-J", n_boot=200)
+    assert c.loc["true", "n_both_surfaced"] == 1
+    assert c.loc["true", "only_released-R"] == 1
+    assert c.loc["true", "neither"] == 1
+
+
+def test_min_rank_is_taken_over_positions():
+    """Onset is position-agnostic: the concept counts as surfaced if it reaches
+    the top-k anywhere in the prompt."""
+    from rlens.onset import _min_rank_over_positions
+
+    torch.manual_seed(0)
+    logits = torch.rand(3, 50)       # non-degenerate: no ties
+    logits[:, 7] = -1.0              # concept last everywhere
+    assert _min_rank_over_positions(logits, [7]) == 50
+
+    logits[2, 7] = 10.0              # ...except at the third position
+    assert _min_rank_over_positions(logits, [7]) == 1, "min is taken over positions"
+
+    # a second surface form counts too: best over ids, then min over positions
+    logits[1, 9] = 10.0
+    assert _min_rank_over_positions(logits, [7, 9]) == 1
+
+
+def test_onset_summary_reports_surfacing_rate():
+    """A lens that surfaces in 30% of items has an unrepresentative median."""
+    from rlens.onset import onset_summary
+
+    rows = [
+        {"set": "s", "item": 0, "lens": "R", "condition": "true", "onset": 5.0, "n_layers": 64},
+        {"set": "s", "item": 1, "lens": "R", "condition": "true", "onset": float("nan"), "n_layers": 64},
+    ]
+    table = onset_summary(_onset_frame(rows))
+    assert table.loc[("true", "R"), "surfaced"] == 0.5
+    assert table.loc[("true", "R"), "median_onset"] == 5.0
