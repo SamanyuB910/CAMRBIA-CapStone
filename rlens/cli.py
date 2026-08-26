@@ -9,6 +9,7 @@
     uv run rlens rescore <readouts.parquet>       re-score saved readouts, no GPU
     uv run rlens unblind <scores.csv> --key ...   join hand ratings to lens names
     uv run rlens rate-local <panel.jsonl>         second rater, local model, no API
+    uv run rlens anchors [--model ...]            validate vs the post's own claims
 """
 
 from __future__ import annotations
@@ -697,6 +698,76 @@ def cmd_rate_local(args) -> None:
 
 
 # ---------------------------------------------------------------------------
+# anchors
+# ---------------------------------------------------------------------------
+
+
+def cmd_anchors(args) -> None:
+    """Check the pipeline against the post's own published qualitative claims."""
+    import jlens
+    from jlens.lens import JacobianLens
+
+    from rlens.anchors import ANCHORS, run_anchors, verdicts
+
+    hf, tok = _load_model(args.dtype, args.device, args.model)
+    model = jlens.from_hf(hf, tok)
+
+    lenses = {"logit": None}
+    for name, (kind, file) in {
+        "released-J": ("released", "j-lens"),
+        "released-R": ("released", "r-lens"),
+    }.items():
+        path = _lens_path(kind, file, args.model)
+        if path.exists():
+            lenses[name] = JacobianLens.load(str(path))
+    if set(lenses) == {"logit"}:
+        raise SystemExit(
+            f"no J/R lens artifacts for {args.model!r}; "
+            f"run: rlens download --experiment-models --only {args.model}"
+        )
+    print(f"lenses: {list(lenses)}")
+
+    ranks = run_anchors(model, lenses)
+    table = verdicts(ranks, {"R": "released-R", "J": "released-J"})
+
+    out_dir = Path(args.out_dir).expanduser() if args.out_dir else REPO_ROOT / "results"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    ranks.to_csv(out_dir / f"anchor_ranks_{args.model}.csv", index=False)
+
+    lines = [
+        f"# Harness validation against published anchors — {args.model}\n",
+        "Each row is a claim the R-lens post states exactly, re-run through this",
+        "pipeline. Unlike the pass@10 / coherence protocols, these read at the **token",
+        "position the post names** (e.g. \"on the token 'sushi'\"), which is where its",
+        "qualitative claims live.\n",
+        "**The verdict is directional.** The post's examples are on its headline model",
+        "(Qwen3.6-27B) or an unspecified one, so exact layer numbers need not transfer to",
+        f"{args.model}. What must transfer is the ordering — R surfacing the concept",
+        "earlier than J. MATCH validates the harness; INVERTED indicates a pipeline",
+        "fault and blocks any null result from this repo.\n",
+        "`reconstructed = True` means the post did not print the prompt and we wrote one;",
+        "a miss there is weak evidence of anything.\n",
+        table.to_markdown(),
+        "",
+        "## Source claims\n",
+    ]
+    for anchor in ANCHORS:
+        mark = " *(prompt reconstructed)*" if anchor.reconstructed else ""
+        lines.append(f"- **{anchor.name}**{mark}: “{anchor.quote}”")
+        lines.append(f"  - prompt: `{anchor.prompt}`  → read at `{anchor.position_token}`, "
+                     f"concept `{anchor.concept}`")
+    lines.append("")
+    lines.append("## Full rank trajectories\n")
+    pivot = ranks.pivot_table(index=["anchor", "layer"], columns="lens", values="rank")
+    lines.append(pivot.to_markdown())
+
+    report = out_dir / f"anchors_{args.model}.md"
+    report.write_text("\n".join(lines), encoding="utf-8")
+    print(f"\n{table.to_string()}\n\nreport -> {report}")
+
+
+
+# ---------------------------------------------------------------------------
 # entry point
 # ---------------------------------------------------------------------------
 
@@ -821,6 +892,13 @@ def main() -> None:
     p.add_argument("--device", default=default_device)
     p.add_argument("--dtype", choices=["bf16", "fp32"], default="bf16")
     p.set_defaults(func=cmd_rate_local)
+
+    p = sub.add_parser("anchors", help="validate the pipeline against the post's published claims")
+    p.add_argument("--model", default="qwen3.5-27b")
+    p.add_argument("--out-dir", default=None)
+    p.add_argument("--device", default=default_device)
+    p.add_argument("--dtype", choices=["bf16", "fp32"], default="bf16")
+    p.set_defaults(func=cmd_anchors)
 
     args = parser.parse_args()
     args.func(args)

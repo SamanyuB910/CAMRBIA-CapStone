@@ -1297,3 +1297,73 @@ def test_parser_rejects_a_reasoning_preamble_with_no_scores():
 
     preamble = "Thinking Process:\n\n1.  **Analyze the Request:**\n    *   Task"
     assert _parse_arm_scores(preamble, ["arm_A", "arm_B", "arm_C"]) is None
+
+
+# --- harness validation against published anchors ----------------------------
+
+
+def test_anchor_position_finding_handles_multi_piece_words():
+    """The post names a token ('on the token "sushi"'); if the tokenizer splits
+    that word, the LAST piece carries the assembled representation."""
+    from rlens.anchors import find_position
+
+    tok = _StubTokenizer()          # char-level: every char is its own token
+    ids = tok.encode("a sushi b")
+    # "sushi" spans 5 char-tokens; the fallback must land on the final one
+    assert find_position(tok, ids, " sushi") == ids.index(ord("i"))
+    assert find_position(tok, ids, "b") == len(ids) - 1
+    with pytest.raises(ValueError, match="not found"):
+        find_position(tok, ids, "zebra")
+
+
+def test_anchor_onset_respects_top1_vs_top10_criterion():
+    from rlens.anchors import ANCHORS, Anchor, onset
+
+    ranks = pd.DataFrame([
+        {"anchor": "x", "lens": "released-R", "layer": 2, "rank": 7},
+        {"anchor": "x", "lens": "released-R", "layer": 5, "rank": 1},
+    ])
+    top10 = Anchor(name="x", prompt="", position_token="", concept="", quote="", criterion="top10")
+    top1 = Anchor(name="x", prompt="", position_token="", concept="", quote="", criterion="top1")
+    assert onset(ranks, top10, "released-R") == 2      # rank 7 qualifies
+    assert onset(ranks, top1, "released-R") == 5       # only rank 1 qualifies
+    assert onset(ranks, top1, "released-J") is None    # lens absent -> never
+
+
+def test_anchor_verdicts_are_directional_not_exact_layer_match():
+    """The post's examples are on its own headline model, so what must transfer
+    is the ordering, not the layer number."""
+    from rlens.anchors import Anchor, verdicts
+
+    anchor = Anchor(name="sushi", prompt="", position_token="", concept="", quote="",
+                    criterion="top10", reported={"R": 2, "J": 14})
+    def ranks_for(r_layer, j_layer):
+        rows = []
+        for lens, layer in (("released-R", r_layer), ("released-J", j_layer)):
+            if layer is not None:
+                rows.append({"anchor": "sushi", "lens": lens, "layer": layer, "rank": 1})
+        return pd.DataFrame(rows)
+
+    lens_map = {"R": "released-R", "J": "released-J"}
+    # measured layers differ from reported (7 vs 2, 30 vs 14) but ordering holds
+    v = verdicts(ranks_for(7, 30), lens_map, [anchor])
+    assert v.loc["sushi", "verdict"].startswith("MATCH")
+    assert v.loc["sushi", "reported_R"] == 2 and v.loc["sushi", "measured_R"] == 7
+
+    assert verdicts(ranks_for(30, 7), lens_map, [anchor]).loc["sushi", "verdict"].startswith("INVERTED")
+    assert verdicts(ranks_for(5, None), lens_map, [anchor]).loc["sushi", "verdict"].startswith("MATCH")
+    assert verdicts(ranks_for(None, 5), lens_map, [anchor]).loc["sushi", "verdict"].startswith("INVERTED")
+    assert verdicts(ranks_for(None, None), lens_map, [anchor]).loc["sushi", "verdict"].startswith("NEITHER")
+
+
+def test_printed_anchors_are_marked_and_quoted():
+    """Anchors whose prompt the post did not print are ours, and a miss on them
+    is weak evidence — so they must be flagged."""
+    from rlens.anchors import ANCHORS
+
+    printed = [a for a in ANCHORS if not a.reconstructed]
+    assert {a.name for a in printed} == {"multihop-sushi", "assoc-jordan"}, \
+        "only these two prompts appear verbatim in the post"
+    for anchor in ANCHORS:
+        assert anchor.quote, f"{anchor.name} must carry its source quote"
+        assert anchor.reported.get("R") is not None, "every anchor reports an R-lens layer"
