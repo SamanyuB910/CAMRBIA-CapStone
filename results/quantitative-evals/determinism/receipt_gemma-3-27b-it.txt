@@ -1,0 +1,14 @@
+model gemma-3-27b-it
+repeat rows 1952  matched 1952  unmatched 0
+identical ranks: 1.000000   differing: 0
+pass@10 flips:   0
+lens
+control       1.0
+logit         1.0
+released-J    1.0
+released-R    1.0
+dtype: float64
+kept: True
+readout_pos: True
+readout_token: True
+n_intermediates_single_token: True

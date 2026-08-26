@@ -1,0 +1,10 @@
+all five sets    R vs released-J  +0.0617 [+0.0516, +0.0725] p=0.0000
+all five sets    R vs logit       +0.0514 [+0.0405, +0.0627] p=0.0000
+excluding typo   R vs released-J  +0.0151 [+0.0092, +0.0220] p=0.0000
+excluding typo   R vs logit       +0.0131 [+0.0070, +0.0199] p=0.0000
+
+association   R-J +0.0118 p=0.0000   R-logit +0.0056 p=0.0810
+multihop      R-J +0.0171 p=0.0290   R-logit +0.0128 p=0.0130
+multilingual  R-J +0.0317 p=0.0000   R-logit +0.0342 p=0.0000
+poetry        R-J +0.0000 p=1.0000   R-logit -0.0003 p=1.0000
+typo          R-J +0.2479 p=0.0000   R-logit +0.2045 p=0.0000

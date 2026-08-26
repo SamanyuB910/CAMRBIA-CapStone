@@ -1,0 +1,1247 @@
+model,set,item_id,intermediate,lens,layer,top10
+qwen3.5-27b,multihop,mars-color,Mars,released-R,0, 부터 | ….. |  …. | 做为 |  whilst | …. | /is | 更加的 |  going |  amongst
+qwen3.5-27b,multihop,mars-color,Mars,released-R,1,….. |  부터 |  …. | …… | ………… | …. | .… |  […] | …………………… |  whilst
+qwen3.5-27b,multihop,mars-color,Mars,released-R,2,".… | …… | ….. | ………… |  […] | …"" |  [… |  covid |  ……………………… |  부터"
+qwen3.5-27b,multihop,mars-color,Mars,released-R,3," and | , |  the |  more |  in |  a |  to |  not |  that |  because"
+qwen3.5-27b,multihop,mars-color,Mars,released-R,4," the |  and | , |  more |  a |  in |  to |  not |  because |  that"
+qwen3.5-27b,multihop,mars-color,Mars,released-R,5,", |  the |  more |  and |  not |  a |  because |  to |  in |  actually"
+qwen3.5-27b,multihop,mars-color,Mars,released-R,6," because |  color | , |  not |  actually |  more |  a |  the |  colors |  very"
+qwen3.5-27b,multihop,mars-color,Mars,released-R,7,", |  and |  not |  the |  more |  a |  because |  in |  to | 
+"
+qwen3.5-27b,multihop,mars-color,Mars,released-R,8,", |  color |  because |  the |  not |  a |  more |  and | 
+ |  to"
+qwen3.5-27b,multihop,mars-color,Mars,released-R,9," color |  because |  colors | , |  the |  not |  more |  and |  a |  very"
+qwen3.5-27b,multihop,mars-color,Mars,released-R,10," color |  colors |  because | , |  not |  the |  a |  more |  very |  to"
+qwen3.5-27b,multihop,mars-color,Mars,released-R,11,", |  color |  the |  a |  not |  and |  colors |   |  more |  because"
+qwen3.5-27b,multihop,mars-color,Mars,released-R,12,", |  because |  probably |  not |  color |  a |  the |  very |  colors |  actually"
+qwen3.5-27b,multihop,mars-color,Mars,released-R,13,", |  very |  probably |  not |  almost |  because |  the |  a |  actually |  even"
+qwen3.5-27b,multihop,mars-color,Mars,released-R,14," probably | , |  not |  color |  because |  colors |  actually |  very |  almost |  most"
+qwen3.5-27b,multihop,mars-color,Mars,released-R,15,", |  not |  the |  actually |  because |  color |  what |  a |  even |  very"
+qwen3.5-27b,multihop,mars-color,Mars,released-R,16,", |  ... |  not |  actually |  sometimes |  a |  probably |  even |  just |  because"
+qwen3.5-27b,multihop,mars-color,Mars,released-R,17,", |  colors |  color |  ... |  not |  sometimes |  probably |  … |  perhaps |  because"
+qwen3.5-27b,multihop,mars-color,Mars,released-R,18," colors |  color |  — |  indeed |  … |  hue | color |  perhaps |  because | ,"
+qwen3.5-27b,multihop,mars-color,Mars,released-R,19," color |  colors | , |  ... |  sometimes |  — |  so |  indeed |  almost |  not"
+qwen3.5-27b,multihop,mars-color,Mars,released-R,20," color |  colors | -color |  planet | , |  sometimes |  almost | color |  mostly |  so"
+qwen3.5-27b,multihop,mars-color,Mars,released-R,21," planet |  colors |  color | , |  sometimes |  probably |  ... |  almost |  mostly |  Earth"
+qwen3.5-27b,multihop,mars-color,Mars,released-R,22," planet |  color |  colors |  sometimes | , |  Earth |  ... | -color |  not |  rainbow"
+qwen3.5-27b,multihop,mars-color,Mars,released-R,23," planet |  sometimes | , |  colors |  color |  ... |  Earth |  not |  almost |  also"
+qwen3.5-27b,multihop,mars-color,Mars,released-R,24," planet |  Earth |  sometimes |  color |  colors | , |  ... |  earth |  not |  because"
+qwen3.5-27b,multihop,mars-color,Mars,released-R,25," planet |  Earth |  color |  colors |  ... |  earth |  sometimes |  rainbow |  planets | ,"
+qwen3.5-27b,multihop,mars-color,Mars,released-R,26," planet |  Earth |  color |  earth |  colors |  sometimes | , |  planets |  ... |  hue"
+qwen3.5-27b,multihop,mars-color,Mars,released-R,27," planet |  Earth | , |  color |  ... |  sometimes |  earth |  colors |  among | ..."
+qwen3.5-27b,multihop,mars-color,Mars,released-R,28," Earth |  planet |  sometimes |  color |  ... |  colors | , | ... |  earth |  often"
+qwen3.5-27b,multihop,mars-color,Mars,released-R,29," sometimes |  color |  Earth |  ... |  planet |  colors | , | ... |  ( |  often"
+qwen3.5-27b,multihop,mars-color,Mars,released-R,30, color |  sometimes |  Earth |  ... |  planet | ____ |  colors |  known |  ____ | ...
+qwen3.5-27b,multihop,mars-color,Mars,released-R,31, color |  ... | ... |  Earth | ____ |  known |  planet |  hue |  ____ |  (
+qwen3.5-27b,multihop,mars-color,Mars,released-R,32, Earth |  color |  planet | color |  known |  colors |  named |  scientists |  name | ____
+qwen3.5-27b,multihop,mars-color,Mars,released-R,33, color |  colors |  Earth | color | 的颜色 |  planet |  known | [color |  colored | /color
+qwen3.5-27b,multihop,mars-color,Mars,released-R,34, planet |  Earth | color |  colors |  color |  planets |  hue | 地球 | 的颜色 | 颜色
+qwen3.5-27b,multihop,mars-color,Mars,released-R,35, colors |  color | color |  planet | 的颜色 | 颜色 | /color |  Earth |  colored | colors
+qwen3.5-27b,multihop,mars-color,Mars,released-R,36, planet |  planets |  planetary | 行星 | planet |  Earth |  asteroids |  orbit |  Planet | 地球
+qwen3.5-27b,multihop,mars-color,Mars,released-R,37, planet |  planets |  planetary |  Earth |  orbit | 行星 |  Planet | 地球 | planet |  color
+qwen3.5-27b,multihop,mars-color,Mars,released-R,38, planet |  color |  planets |  colors |  Earth |  planetary | color |  orbit | 行星 | 的颜色
+qwen3.5-27b,multihop,mars-color,Mars,released-R,39, planet |  Earth |  color |  planetary |  planets |  Planet | planet |  colors | 地球 |  earth
+qwen3.5-27b,multihop,mars-color,Mars,released-R,40, planet |  color |  Earth |  planetary |  planets | color | planet |  colors | 地球 |  earth
+qwen3.5-27b,multihop,mars-color,Mars,released-R,41, planet |  color |  Earth |  planetary | color |  Martian | 火星 |  planets |  colors | 地球
+qwen3.5-27b,multihop,mars-color,Mars,released-R,42, planet |  color |  Earth |  earth | color | 地球 |  Martian |  colors | 火星 |  redd
+qwen3.5-27b,multihop,mars-color,Mars,released-R,43, planet |  color |  Earth | color |  colors |  earth |  redd | 的颜色 | 地球 |  colour
+qwen3.5-27b,multihop,mars-color,Mars,released-R,44, planet |  color | color |  colors |  Earth |  earth |  colour | 的颜色 |  redd | 颜色
+qwen3.5-27b,multihop,mars-color,Mars,released-R,45, color |  planet |  colors | color | 的颜色 |  Earth | 颜色 |  colour |  colored |  redd
+qwen3.5-27b,multihop,mars-color,Mars,released-R,46, color |  planet | color |  colors | 的颜色 | 颜色 |  Earth |  redd |  colour |  earth
+qwen3.5-27b,multihop,mars-color,Mars,released-R,47, color |  planet |  colors | color | 的颜色 |  earth |  colored | 颜色 |  redd |  Earth
+qwen3.5-27b,multihop,mars-color,Mars,released-R,48, color |  planet | color |  colors | 的颜色 |  Earth |  earth | 火星 | 地球 |  redd
+qwen3.5-27b,multihop,mars-color,Mars,released-R,49, color |  colors | 的颜色 |  planet | color | 颜色 |  redd |  colored |  Earth |  orange
+qwen3.5-27b,multihop,mars-color,Mars,released-R,50, color | 的颜色 |  colors | color |  redd |  planet | 颜色 |  orange |  known |  due
+qwen3.5-27b,multihop,mars-color,Mars,released-R,51, color |  redd | 的颜色 |  colors |  orange |  red | color | 红色 | 颜色 |  Earth
+qwen3.5-27b,multihop,mars-color,Mars,released-R,52, redd |  planet |  Earth |  color | 的颜色 |  orange | 地球 |  red | 红色 |  colors
+qwen3.5-27b,multihop,mars-color,Mars,released-R,53, Earth |  planet | 地球 |  redd |  earth |  named |  red |  color |  known | 红色
+qwen3.5-27b,multihop,mars-color,Mars,released-R,54, redd | 红色 |  yellow |  orange |  red |  named |  blue |  color | 黄色 |  planet
+qwen3.5-27b,multihop,mars-color,Mars,released-R,55, redd |  yellow |  planet |  Earth |  red |  due | 红色 |  Mars |  orange | 火星
+qwen3.5-27b,multihop,mars-color,Mars,released-R,56, Earth |  planet |  redd |  yellow | 地球 |  blue |  earth | 红色 |  orange |  called
+qwen3.5-27b,multihop,mars-color,Mars,released-R,57, redd |  red |  called |  known | 红色 |  due |  determined |  named |  often |  yellow
+qwen3.5-27b,multihop,mars-color,Mars,released-R,58, red |  redd | 红色 |  caused |  called |  known |  yellow |  determined |  often |  blue
+qwen3.5-27b,multihop,mars-color,Mars,released-R,59, red |  redd |  blue |  orange | 红色 |  called |  known |  yellow |  caused |  Red
+qwen3.5-27b,multihop,mars-color,Mars,released-R,60, red |  redd |  Red | 红色 | -red | _red |  orange | red |  RED |  blue
+qwen3.5-27b,multihop,mars-color,Mars,released-R,61, red |  redd |  called |  blue |  caused |  orange |  known |  Red |  determined |  often
+qwen3.5-27b,multihop,mars-color,Mars,released-R,62, red |  called |  often |  blue |  known |  redd |  determined |  orange |  due |  described
+qwen3.5-27b,multihop,mars-color,Mars,released-J,0,� | ….. | …the | …I |  …. | …it | اً | …but | achter |  […]
+qwen3.5-27b,multihop,mars-color,Mars,released-J,1,  | اً | ….. |      |  …. | 托 |    | � | 触摸 | moil
+qwen3.5-27b,multihop,mars-color,Mars,released-J,2, Sw | 鸿 |  sw |  SW |  swing | otope |  Sv |  perchè | (sw | 鴻
+qwen3.5-27b,multihop,mars-color,Mars,released-J,3,Har |  Sv |  HAR |  har | .har |  Har |  SV | har |  Sw |  SW
+qwen3.5-27b,multihop,mars-color,Mars,released-J,4,..... | ...... | � | /is | ........... |  .... | ....... | ultan |  ... | .........
+qwen3.5-27b,multihop,mars-color,Mars,released-J,5,اً | ........... | ・・・・ | ưởi |  마찬 | vre | ..... | bamos |  hú | panic
+qwen3.5-27b,multihop,mars-color,Mars,released-J,6,"OnError |  ""... | 鸿 | 谐波 | .ValidationError | cai | .onError | ող | panic |  hú"
+qwen3.5-27b,multihop,mars-color,Mars,released-J,7," ...\ | OnError | har | 报业 | Inflater | nist |  --- | 로우 | 像一个 |  ""..."
+qwen3.5-27b,multihop,mars-color,Mars,released-J,8,"color |  colors | nist |  color | Colors | ・・・・ | -color |  Colors | 像一个 |  ""..."
+qwen3.5-27b,multihop,mars-color,Mars,released-J,9,color |  color |  colors |  Kab | nist | -color | /color |  Colors | rock | Colors
+qwen3.5-27b,multihop,mars-color,Mars,released-J,10, colors |  color | color | colors | Colors |  colored | nist |  Colors | dia |  basically
+qwen3.5-27b,multihop,mars-color,Mars,released-J,11, colors | colors |  color | color | Colors |  Colors | 公司董事长 | 踊 |  basically | nist
+qwen3.5-27b,multihop,mars-color,Mars,released-J,12, colors | colors | 公司董事长 | oto |  basically |  color | color | Colors | witch |  Nowadays
+qwen3.5-27b,multihop,mars-color,Mars,released-J,13, nowadays |  colors |  probably |  basically | ´t |  everybody |  indeed | zis |  Nowadays |  surely
+qwen3.5-27b,multihop,mars-color,Mars,released-J,14, basically |  colors |  probably |  definitely |  nowadays |  indeed |  pais |  beautiful |  patriotism |  surely
+qwen3.5-27b,multihop,mars-color,Mars,released-J,15, pais |  basically |  indeed |  anyways |  nowadays |  wonder |  freaking |  colors |  cal |  surely
+qwen3.5-27b,multihop,mars-color,Mars,released-J,16,– |  indeed | –and |  pais |  — | otope | — |  logos | ADVERTISEMENT |  palette
+qwen3.5-27b,multihop,mars-color,Mars,released-J,17, — |  indeed | otope |  pais | favicon | wis |  patriotism | odoxy | –and | anis
+qwen3.5-27b,multihop,mars-color,Mars,released-J,18, — | — | —— | —in | —or |  indeed |  colors | –and | —the | –
+qwen3.5-27b,multihop,mars-color,Mars,released-J,19," — | — | —or | —— | —and | —"" | —in | —which | —even | —the"
+qwen3.5-27b,multihop,mars-color,Mars,released-J,20, colors | -color |  — | color | —or | [color |  color | colors | —and |  sometimes
+qwen3.5-27b,multihop,mars-color,Mars,released-J,21,[color | —or |  planet | ADVERTISEMENT |  colors | — |  — | -color | colors | Planet
+qwen3.5-27b,multihop,mars-color,Mars,released-J,22,—or |  colors |  planet | [color | planet | Planet | colors |  — | -color | —and
+qwen3.5-27b,multihop,mars-color,Mars,released-J,23, planet | planet | Planet |  Planet | [color | colors | 揭晓 |  colors |  nevertheless |  Yoshi
+qwen3.5-27b,multihop,mars-color,Mars,released-J,24, planet | planet | Planet | colors | 地球 |  colors |  Earth | 揭晓 |  Planet | 名叫
+qwen3.5-27b,multihop,mars-color,Mars,released-J,25, planet |  Earth | planet | 地球 |  colors | colors | —or | 揭晓 | Planet | color
+qwen3.5-27b,multihop,mars-color,Mars,released-J,26, planet |  Earth | —or | 揭晓 |  humanity | planet |  colors | 地球 | colors |  spaceship
+qwen3.5-27b,multihop,mars-color,Mars,released-J,27, planet |  Earth | —or |  colors | 地球 | 该国 | planet | 揭晓 | /color | 地球上
+qwen3.5-27b,multihop,mars-color,Mars,released-J,28, planet |  colors |  Earth | —or | colors | planet |  spaceship | color |  humanity | /color
+qwen3.5-27b,multihop,mars-color,Mars,released-J,29," colors |  planet | colors | color |  Earth |  color |  spaceship | —or |  \"" |  ____"
+qwen3.5-27b,multihop,mars-color,Mars,released-J,30, colors | color |  planet | ____ | colors |  humans |  color |  ____ |  humanity | —or
+qwen3.5-27b,multihop,mars-color,Mars,released-J,31,____ | color |  ____ |  colors |  humans |  humanity |  planet | 又称 |  ______ |  color
+qwen3.5-27b,multihop,mars-color,Mars,released-J,32,____ | color |  ____ | 又称 |  humans |  planet |  colors |  ______ | colors |  ___
+qwen3.5-27b,multihop,mars-color,Mars,released-J,33, colors | colors | ____ | color |  ____ |  planet | 又称 |  humans |  ___ |  color
+qwen3.5-27b,multihop,mars-color,Mars,released-J,34, planet | colors |  colors | color | ____ |  planets | planet | 地球 |  ____ | 颜色
+qwen3.5-27b,multihop,mars-color,Mars,released-J,35, colors |  planet | color | colors | 颜色 |  color |  planets | 的颜色 | -color | Colors
+qwen3.5-27b,multihop,mars-color,Mars,released-J,36, planet |  planets | planet | 行星 |  planetary |  asteroids | Planet |  Planet |  NASA | 地球
+qwen3.5-27b,multihop,mars-color,Mars,released-J,37, planet |  planets |  planetary | planet | 行星 |  Planet | 地球 | Planet |  Earth | 星球
+qwen3.5-27b,multihop,mars-color,Mars,released-J,38, planet |  planets |  colors |  color |  planetary | planet | color | 行星 | 颜色 | 的颜色
+qwen3.5-27b,multihop,mars-color,Mars,released-J,39, planet |  planets |  planetary | planet | 地球 | Planet |  Planet | 行星 |  colors |  Earth
+qwen3.5-27b,multihop,mars-color,Mars,released-J,40, planet |  planets |  planetary | planet |  colors |  color | color | Planet |  Planet |  Martian
+qwen3.5-27b,multihop,mars-color,Mars,released-J,41, planet |  color |  colors |  planets | 火星 | color |  planetary | 颜色 |  Martian | planet
+qwen3.5-27b,multihop,mars-color,Mars,released-J,42, planet |  color |  colors | 颜色 | 火星 | color | 的颜色 |  colour |  Martian |  planets
+qwen3.5-27b,multihop,mars-color,Mars,released-J,43, planet |  color |  colors | 颜色 | color | 的颜色 |  colour |  colours | colors |  Color
+qwen3.5-27b,multihop,mars-color,Mars,released-J,44, planet |  color | 颜色 |  colors | color | 的颜色 |  colour |  colours | 火星 | colors
+qwen3.5-27b,multihop,mars-color,Mars,released-J,45, color |  colors |  planet | 颜色 | color | 的颜色 |  colour |  Color | colors |  colours
+qwen3.5-27b,multihop,mars-color,Mars,released-J,46, color |  planet |  colors | color | 的颜色 | 颜色 |  colour |  Color |  colours | colors
+qwen3.5-27b,multihop,mars-color,Mars,released-J,47, color |  colors |  planet | color | 的颜色 | 颜色 |  colour |  Color | colors |  colours
+qwen3.5-27b,multihop,mars-color,Mars,released-J,48, color |  planet | color |  colors | 的颜色 | 颜色 |  colour | 火星 |  Color |  redd
+qwen3.5-27b,multihop,mars-color,Mars,released-J,49, color |  colors | 的颜色 | 颜色 | color |  planet |  colour | colors |  redd |  colours
+qwen3.5-27b,multihop,mars-color,Mars,released-J,50, color | 的颜色 |  colors | color | 颜色 |  redd |  planet | 红色 |  colour | 因其
+qwen3.5-27b,multihop,mars-color,Mars,released-J,51, color | 的颜色 |  colors |  redd | 颜色 | 红色 | color |  orange |  planet |  colour
+qwen3.5-27b,multihop,mars-color,Mars,released-J,52, planet |  redd | 的颜色 |  color | 红色 |  Earth |  colors | 地球 | color |  orange
+qwen3.5-27b,multihop,mars-color,Mars,released-J,53, planet |  Earth | 地球 |  named |  redd | 红色 |  earth | 的颜色 | 行星 | 火星
+qwen3.5-27b,multihop,mars-color,Mars,released-J,54,红色 |  redd |  orange |  red |  named |  yellow | 黄色 | 蓝色 | 橙色 |  planet
+qwen3.5-27b,multihop,mars-color,Mars,released-J,55, redd | 红色 |  planet |  Mars |  red |  yellow | 火星 |  orange | 地球 |  due
+qwen3.5-27b,multihop,mars-color,Mars,released-J,56, planet |  redd | 红色 |  Earth | 地球 |  yellow |  blue |  orange |  red |  Mars
+qwen3.5-27b,multihop,mars-color,Mars,released-J,57, redd | 红色 |  red |  called |  known |  due |  named |  determined |  often |  blue
+qwen3.5-27b,multihop,mars-color,Mars,released-J,58, red |  redd | 红色 |  caused |  called |  known |  blue |  yellow |  orange |  named
+qwen3.5-27b,multihop,mars-color,Mars,released-J,59, red |  redd | 红色 |  orange |  blue |  called | -red |  caused |  yellow | _red
+qwen3.5-27b,multihop,mars-color,Mars,released-J,60, red |  redd | 红色 |  Red | _red | -red | red | 红 |  orange |  RED
+qwen3.5-27b,multihop,mars-color,Mars,released-J,61, red |  redd |  called |  blue |  orange |  caused |  known |  Red | _red | 红色
+qwen3.5-27b,multihop,mars-color,Mars,released-J,62, red |  called |  often |  blue |  known |  redd |  determined |  orange |  due |  described
+qwen3.5-27b,multihop,mars-color,Mars,logit,0,"  | - | / | , | ... | . | ( |  ( | _ | ?"
+qwen3.5-27b,multihop,mars-color,Mars,logit,1,"  | ... | , | - | ( | / | . |  ( | ? | :"
+qwen3.5-27b,multihop,mars-color,Mars,logit,2,"  | ... | , | . | ( | 
+ | … |  a | : |  ("
+qwen3.5-27b,multihop,mars-color,Mars,logit,3,"  | ... | , | . | ( | 
+ | / | : | … | -"
+qwen3.5-27b,multihop,mars-color,Mars,logit,4,"  | , | ... | . | : | ( | / | 
+ |  ( | -"
+qwen3.5-27b,multihop,mars-color,Mars,logit,5,"  | , | ... | . | ( | : |  ( | - | / | 
+"
+qwen3.5-27b,multihop,mars-color,Mars,logit,6,"  | , | 
+ | : | ... | - |  ( |  a | ( | ."
+qwen3.5-27b,multihop,mars-color,Mars,logit,7,"  | , | 
+ | : | ... |  ( | . | - |  a | …"
+qwen3.5-27b,multihop,mars-color,Mars,logit,8,"  | , | 
+ | ... | . | - | … | ( | : |  ("
+qwen3.5-27b,multihop,mars-color,Mars,logit,9,"  | , | ... | 
+ | ( | … | - | . | : | /"
+qwen3.5-27b,multihop,mars-color,Mars,logit,10,"... |   | , | ( | … | _ | . |  s | - | ?"
+qwen3.5-27b,multihop,mars-color,Mars,logit,11,"  | ... | , | ( | … | 
+ | : | . | - | _"
+qwen3.5-27b,multihop,mars-color,Mars,logit,12,"  | ... | , | 
+ | ( | . |  ( | : | … | -"
+qwen3.5-27b,multihop,mars-color,Mars,logit,13,"  | ... | , | … | . | ( | — | 
+ |  ( | _"
+qwen3.5-27b,multihop,mars-color,Mars,logit,14,"... |   | … | — | , | ( | _ |  ( | . | M"
+qwen3.5-27b,multihop,mars-color,Mars,logit,15,"... | … |   | — | , | ( | . |  b | _ |  ("
+qwen3.5-27b,multihop,mars-color,Mars,logit,16,"... | … |   | ( | — | , | . |  ( | B | M"
+qwen3.5-27b,multihop,mars-color,Mars,logit,17,"... | … |   | ( |  b | M | , | “ | . | —"
+qwen3.5-27b,multihop,mars-color,Mars,logit,18,"... |  b | … |   | “ | , |  ( |  s |   | M"
+qwen3.5-27b,multihop,mars-color,Mars,logit,19,"... | “ |  color |  b | … |   | , | ( | M |  ("
+qwen3.5-27b,multihop,mars-color,Mars,logit,20, b |  color | “ |  colors | ly | ... |  planet | ' |   |  Earth
+qwen3.5-27b,multihop,mars-color,Mars,logit,21,"“ | ( | ... | ’ |  b | ' | , |  Earth | M | …"
+qwen3.5-27b,multihop,mars-color,Mars,logit,22,"( | ' | ... | “ | ’ |  b | , | ly |  ( | M"
+qwen3.5-27b,multihop,mars-color,Mars,logit,23,"... | ( | ' | “ | , | _ |  b | ’ | ? |  ("
+qwen3.5-27b,multihop,mars-color,Mars,logit,24,"( | ... | ' | _ | , |  ( | 
+ | : | ; | ?"
+qwen3.5-27b,multihop,mars-color,Mars,logit,25,"... | ( | ' | 统 | , |  ( | _ | : | — | ;"
+qwen3.5-27b,multihop,mars-color,Mars,logit,26,"( | ... | , |  ( | ' | _ |   | : | . | —"
+qwen3.5-27b,multihop,mars-color,Mars,logit,27,"( | ... | ' | _ | , |  ( |   | — | * | --"
+qwen3.5-27b,multihop,mars-color,Mars,logit,28,"( | ... |  ( | , | ' |   | * | _ | — | 
+"
+qwen3.5-27b,multihop,mars-color,Mars,logit,29,"( | ... |  ( | , | _ | ' |   | [ | ____ | *"
+qwen3.5-27b,multihop,mars-color,Mars,logit,30,"( |  ( | ... | ' | , | * | _ | ____ |   | ["
+qwen3.5-27b,multihop,mars-color,Mars,logit,31,"... |  ( | ( | * | ' | , |   | [ | _ | ____"
+qwen3.5-27b,multihop,mars-color,Mars,logit,32," ( | ( | ... | , |   | un | U | ano |   | $"
+qwen3.5-27b,multihop,mars-color,Mars,logit,33,"... |  ( | ano | ( | un | , | * | U | $ | _"
+qwen3.5-27b,multihop,mars-color,Mars,logit,34,... | un | (s | ____ | aug | * | ( | unge | H | umd
+qwen3.5-27b,multihop,mars-color,Mars,logit,35,HD | 寡 | lob | ixo | asma |  HD | oplan | nam | ... | gos
+qwen3.5-27b,multihop,mars-color,Mars,logit,36, planets | 轨道 |  orbit | 寡 | ixo | oplan |  planet | 天王 | HD |  orbits
+qwen3.5-27b,multihop,mars-color,Mars,logit,37,ixo | 轨道 |  orbit |  orbits | 橘 | oplan |  planets | � | úa | orb
+qwen3.5-27b,multihop,mars-color,Mars,logit,38,ixo | 轨道 |  orbits | 橘 | oplan | orb | ystems | 这颗 | 炒饭 |  orbit
+qwen3.5-27b,multihop,mars-color,Mars,logit,39,ixo | 橘 | VIS |  redd | jep | orb | otence | 轨道 | deos | ystems
+qwen3.5-27b,multihop,mars-color,Mars,logit,40,ystems | colon | สื่อ | inis | 橘 |  sáp | -green |  facts | facts |  redd
+qwen3.5-27b,multihop,mars-color,Mars,logit,41,橘 | ystems |  facts | inis | utan |  redd | facts | otence | uves | orb
+qwen3.5-27b,multihop,mars-color,Mars,logit,42,橘 | orb |  orange | ystems |  redd | 橙色 | uves | ... | 橙 |  facts
+qwen3.5-27b,multihop,mars-color,Mars,logit,43,橘 |  redd | ... |  orange | 橙色 | uves | 橙 | 和其 | 惭 | 地球
+qwen3.5-27b,multihop,mars-color,Mars,logit,44,... | 橘 |  called | nam |  redd | _ | 被称为 | unge |  known | 府
+qwen3.5-27b,multihop,mars-color,Mars,logit,45," called | ... |  known | 被称为 |  redd | ____ | \"" | _ | 橘 |  color"
+qwen3.5-27b,multihop,mars-color,Mars,logit,46,"... |  called | <u | nam | 被称为 | \"" |  known | 橘 |  color | ---"
+qwen3.5-27b,multihop,mars-color,Mars,logit,47,"... | <u | nam |  known |  called | \"" | ____ |  color | unge | 被称为"
+qwen3.5-27b,multihop,mars-color,Mars,logit,48, known | 彤 | unge | <u | nam | color | uves |  called | 因其 |  often
+qwen3.5-27b,multihop,mars-color,Mars,logit,49,因其 |  often |  known | unge | 的颜色 |  hues |  colors |  redd |  color |  due
+qwen3.5-27b,multihop,mars-color,Mars,logit,50,因其 |  often |  due | 红色 |  redd |  known | ... |  predominantly | 取决于 |  orange
+qwen3.5-27b,multihop,mars-color,Mars,logit,51, redd | 红色 |  orange |  predominantly |  red | 的颜色 | 因其 |  known |  often |  earth
+qwen3.5-27b,multihop,mars-color,Mars,logit,52, redd | 红色 |  Earth | 地球 | 火星 |  orange |  often |  predominantly |  earth | 橘
+qwen3.5-27b,multihop,mars-color,Mars,logit,53, often |  Earth |  named | 红色 | 地球 |  redd |  predominantly |  earth |  determined | 得名
+qwen3.5-27b,multihop,mars-color,Mars,logit,54,红色 |  predominantly |  primarily |  redd |  orange |  often | 蓝色 |  mainly |  named |  mostly
+qwen3.5-27b,multihop,mars-color,Mars,logit,55, often | 红色 | 火星 |  redd |  predominantly |  due |  determined |  primarily | 地球 |  mainly
+qwen3.5-27b,multihop,mars-color,Mars,logit,56, Earth | 红色 |  redd | 地球 |  often |  called |  due |  planet |  determined | 蓝色
+qwen3.5-27b,multihop,mars-color,Mars,logit,57, redd |  called |  often |  due | 红色 |  determined |  predominantly | 因其 |  red |  known
+qwen3.5-27b,multihop,mars-color,Mars,logit,58, caused |  red |  redd |  called | 红色 |  often |  determined |  known |  due |  predominantly
+qwen3.5-27b,multihop,mars-color,Mars,logit,59, red |  redd |  caused | 红色 |  called |  orange |  determined | 橘 |  known |  blue
+qwen3.5-27b,multihop,mars-color,Mars,logit,60, red |  redd | 红色 |  Red | 红 | _red | -red |  orange |  called |  caused
+qwen3.5-27b,multihop,mars-color,Mars,logit,61, red |  redd |  called |  caused |  blue |  often |  orange |  determined |  Red | _red
+qwen3.5-27b,multihop,mars-color,Mars,logit,62, red |  called |  often |  blue |  known |  redd |  determined |  orange |  due |  described
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,0," "" | ..."" |  ""... | !"" | -"" | ."" | s |  **"" | "" |  ""."
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,1," "" | "" | -"" | ."" | !"" | ?"" | ness | /"" | ;"" |  ("""
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,2,"ness | "" | !"" |  "" | ..."" | ."" | ?"" | ："" |  +"" | "":"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,3," "" | s |  and | , |  -- |  ( |  really | t | n |  more"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,4," "" | s |  really | "" | n | t |  and | , |  -- |  pretty"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,5," "" |  really | s | "" |  stuff |  obviously | t | n |  REALLY |  things"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,6," "" |  really | "" | s |  ("" |  REALLY |  stuff |  things |  thing | ness"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,7," "" |  really | "" |  things |  stuff |  thing | s |  pretty |  people |  ("
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,8," "" | "" |  really |  things |  stuff |  ("" |  thing | -- | ..."" | s"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,9," "" | "" |  stuff |  really |  thing |  things | -- |  getting |  pretty | ."""
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,10," "" | "" |  really |  stuff |  thing |  things |  basically |  probably |  anyway | ness"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,11," "" |  really | "" |  things |  stuff |  thing | s |  actually | ... |  pretty"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,12," "" | "" |  really |  stuff |  things |  thing | s |  getting |  people | n"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,13," "" |  really |  stuff | "" |  thing |  freaking | s |  REALLY |  things |  people"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,14," "" |  really | "" |  REALLY |  actually |  thing |  stuff | s |  things |  freaking"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,15," really |  "" |  actually |  stuff |  thing |  weird |  freaking |  anyway |  things |  REALLY"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,16," really |  "" | s |  thing |  because | ... | "" |  actually | … |  things"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,17," "" |  really | … | ... |  because | "" |  thing | s |  something |  things"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,18," "" | "" |  really | “ | ness |  because | ... |  anyway | ."" | ”"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,19," "" | "" |  really | ."" |  because | ... | ness |  anyway |  something | \"""
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,20," "" | "" |  really | ."" | ... |  because |  something | "", | “ | ness"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,21," "" | "" | ... | ."" |  really |  because | ness | ..."" | “ | "","
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,22," "" | "" | ... | ."" |  really | ..."" | ness |  because | "", | “"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,23," "" | "" | ... | ."" |  really | ness | "", |  because | ..."" |  words"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,24," "" | "" | ... |  words | ."" | ness | “ | "", |  people |  because"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,25,"... | "" |  "" |  words | \"" |   | ."" | ..."" | “ | ness"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,26,"... | "" |  words |   |  "" | \"" | “ |  grammar |  gramm |  oppos"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,27,"... |   |  "" | "" | … |  words | “ | \"" | 
+ | �"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,28,"... |   | \"" | … | "" |  \"" | “ |  words |  "" |  grammar"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,29,"  | ... | \"" |  \"" | � | … | “ |  grammar | "" |  words"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,30,"  | ... | \"" |  \"" | � |  gramm |  grammar |  ______ | “ |  words"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,31,"  | � | ... |  fucking | \"" |  grammar |  gramm |  ______ |  \"" |  ____"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,32,"\"" |   | ____ |  \"" |  ____ |  ______ |  ___ |  _____ | ... | �"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,33,"____ | \"" |  ____ |  ___ |  ______ |   |  _____ | � | ... |  \"""
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,34,"____ | \"" |  ____ |  ______ |  ___ |  _____ | ___ | ” | ________ |  "
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,35,"____ | \"" |  ____ |  ______ |  ___ | ___ |  _____ |  oppos | _____ | “"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,36,"____ | \"" |  ____ |  ______ |  ___ |   | ___ |  _____ |  oppos | 相反"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,37,"____ |  oppos | \"" | 反义词 | 相反 |  ___ |  ____ |   |  ______ |  opposite"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,38,"____ | 反义词 |  oppos | \"" | 相反 |  ____ |  ___ |  ______ | ___ |  opposite"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,39,"____ | 反义词 |  oppos | \"" | 相反 |  ____ |  ___ |   |  ______ | ..."
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,40,"反义词 | ____ | \"" |  oppos |  synonyms | 相反 | 这个词 | 单词 |  ______ |  ___"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,41,"反义词 | ____ | \"" |  oppos |  synonyms |  ___ | ___ |  ______ |  ____ | 相反"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,42,"反义词 |  oppos | ____ | \"" | 相反 |  ___ |  opposite |  ______ | ___ |  ____"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,43,"反义词 | ____ |  oppos |  ___ | \"" | 相反 | ___ |  opposite |  ____ |  ______"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,44,"____ | 反义词 |  ___ | \"" | ___ |  ____ |  oppos |  ______ |  _____ | ________"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,45,"____ |  ___ | 反义词 |  ____ | ___ | \"" |  ______ |  oppos |  _____ | ________"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,46,"____ | 反义词 |  ___ |  ____ | ___ |  ______ | ________ | \"" |  oppos | _____"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,47,____ |  ___ | ___ |  ____ |  ______ | ________ | __ |  __ | 反义词 | _____
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,48,____ | 反义词 |  ____ | ___ |  ___ |  ______ | __ | ________ |   |  __
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,49,____ | 反义词 | ________ |  ____ | ___ |  ______ |  ___ |  size | __ | 缩小
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,50,"____ | "" | "". | ."" | "", |  size | Size |  ____ | ________ | ___"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,51, size | small |  small | Size |  smaller | 渺小 | size | ____ | 大小 |  Size
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,52,small | ____ |  small |  size |  smaller | 渺小 | ___ | Size |  ___ | size
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,53,small |  small | 渺小 |  smaller | ____ | 小的 |  size | ___ | -small | 小了
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,54, small | small |  smaller | 小的 | -small | 渺小 |  smallest | 小了 | 小巧 | Small
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,55, small | small |  smaller | 小的 | -small |  large |  smallest |  nhỏ | 较小 | 小了
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,56, small | small | 小的 | -small |  smaller | Small |  kecil |  nhỏ | _small |  Small
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,57, small | small | 小的 | -small |  nhỏ | Small |  kecil |  pequeño |  Small |  smaller
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,58, small | small | 小的 | Small | -small |  nhỏ |  pequeño |  Small |  kecil |  SMALL
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,59, small | small | Small | 小的 | -small |  Small |  pequeño |  kecil |  nhỏ | _small
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,60, small | small |  pequeño | 小的 |  pequeños | Small |  Small |  nhỏ | -small |  pequeña
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,61,pe |  Pe |  pequeño |  small | Pe | small | -pe | _pe |  pe |  pequeno
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-R,62,pe |  Pe | Pe |  pequeño | _pe | -pe | PE |  pe |  PE | .pe
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,0,ness | ação | tures | ses | ами | ization | 来得及 | ties | iest | ificates
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,1,ness | iest | ity | ses | eer | ами | ties | ization | ة | tol
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,2,ness | iest | ity | ами | sw | 鸿 | nis | eer | aire |  sw
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,3,ness | eer | ity | iest | ами | sel | s | ties | ت | aire
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,4,ness | ами | ity | iest | ties | sel | aire | eer | nya | est
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,5,ness | ами | eer | aire | iest | ity | een | ة | ation | lings
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,6,ness | ами | ity | eer | een | eenth | ation | ization | iance | iest
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,7,ness | ity | ation | ization | lings | stuff | iance | uum | eer | izable
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,8,"ness | ization | ity |  "" | eer | iance |  freaking | ""-- | lings | ation"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,9,ness | ity | ization | nya | -- | stuff | ation | lings |  stuff |  freaking
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,10,ness | ization | ity | nya | eer |  stuff |  freaking | ation | iance | iest
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,11,ness | ization |  freaking | ity | eer | iance | nya |  stuff | ation | て
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,12,ness |  freaking | ization | ation | ity | iance | nya | eer |  stuff | ology
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,13,ness |  freaking | ity |  stuff | ation |  REALLY |  weird | stuff | ization | ology
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,14,ness | ity |  REALLY | ation |  freaking | ly | ology | m | ization | stuff
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,15,ness |  freaking |  weird | stuff |  stuff |  kinda |  everybody |  fucking |  REALLY |  gonna
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,16,ness |  freaking |  weird | stuff |  kinda |  crazy |  vibe | ity |  REALLY |  thing
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,17,ness |  freaking |  vibe |  weird |  thing |  kinda | stuff |  stuff |  crazy |  yeah
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,18,ness |  freaking |  weird | stuff |  stuff | magic |  anyway |  thing |  yeah |  fucking
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,19,ness |  freaking |  anyway |  everybody |  weird |  Anyway |  really |  somebody |  fucking | nya
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,20,ness |  everybody |  somebody |  freaking |  anyway |  stuff |  really | stuff | cito | really
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,21,ness |  everybody |  freaking |  somebody | ity | stuff |  really |  Anyway | izer |  anyway
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,22,"ness |  everybody | 怎么了 | ity |  freaking | \"" | cito |  somebody |  anything | izer"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,23,"ness |  everybody | \"" | 怎么了 |  somebody |  words | ity |  fucking | arium | eness"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,24,"ness |  words |  fucking | 怎么了 | -language | \"" |  grammar | arium | lings | -speaking"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,25,"ness | \"" |  words |  fucking |  grammar | 单词 |  \"" | rä |  gramm | «"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,26,"ness |  words |   |  fucking |  grammar | \"" | 单词 |  gramm |  slang |  lingu"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,27,"ness | \"" |  words |  fucking |  \"" |   |  gramm |  grammar |  _____ | 单词"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,28,"ness |   | \"" |  \"" |  words |  grammar |  gramm |  _____ |  slang | 怎么了"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,29,"  | ness | \"" |  \"" |  words |  grammar |  gramm | � |  _____ |  ____"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,30,"  | � |  fucking | ness |  \"" | \"" | ____ |  ____ |  _____ |  ______"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,31,  |  fucking | � | ____ |  ____ |  ___ |  slang |  _____ |  � |  grammar
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,32,"____ |   |  ____ |  ___ |  _____ | \"" |  ______ |  fucking | � |  \"""
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,33,"____ |  ____ |  ___ |  _____ |  ______ | \"" |   |  fucking | � | _____"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,34,"____ |  ____ |  ___ |  _____ |  ______ | \"" | _____ | ________ | ___ |  __"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,35,"____ |  ____ |  ___ |  _____ |  ______ | _____ | \"" | ________ | ___ |  __"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,36,"____ |  ____ |  ______ |  ___ |  _____ | \"" | _____ | ________ | ___ |  __"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,37,"____ |  ____ |  ___ |  ______ |  _____ | 反义词 |  oppos | \"" | ________ | 单词"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,38,"____ | 反义词 |  ____ |  ______ |  ___ |  _____ |  oppos | ________ | \"" | _____"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,39,____ | 反义词 |  ____ |  ______ |  oppos |  _____ |  ___ | 这个词 |  synonyms | ________
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,40,反义词 | ____ |  synonyms | 这个词 | 单词 |  oppos |  synonym |  adjective |  words |  noun
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,41,反义词 | ____ | 尺寸 |  synonyms |  oppos | Size | 缩小 |  size | 这个词 | 缩
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,42,反义词 |  oppos | ____ | 缩小 | Size |  size | 尺寸 |  synonyms | 相反 | 越小
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,43,反义词 |  oppos | ____ | 缩小 | Size |  size | 尺寸 | 越小 |  synonyms |  ___
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,44,反义词 | ____ |  oppos |  ___ |  synonyms | 缩小 | ________ | ___ | Size |  ____
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,45,____ | 反义词 |  ____ |  ___ |  oppos | ________ |  ______ | ___ |  _____ |  synonyms
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,46,____ | 反义词 | ________ |  ______ |  ____ |  ___ | ___ |  oppos |  _____ | _____
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,47,____ |  ____ | ________ |  ______ |  ___ | ___ | _____ |  _____ |  __ | 反义词
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,48,____ | 反义词 |  ____ | ________ |  ______ |  ___ | ___ | 缩小 | _____ |  _____
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,49,____ | ________ | 反义词 |  ______ |  ____ | 缩小 | _____ |  ___ |  _____ | Size
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,50,____ | ________ |  ____ |  ______ | 越小 |  smaller | Size |  size | 变小 |  ___
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,51,small |  smaller |  size | Size | 渺小 |  small | 变小 | 小的 |  smallest |  Size
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,52,small |  smaller | ____ |  small | 渺小 |  size | 变小 | Size | 小的 |  smallest
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,53,small |  small | 渺小 |  smaller | 小的 | -small | ____ | 变小 | 小了 | 小巧
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,54,small |  small |  smaller | 小的 | -small | 渺小 |  smallest | 小了 | 较小 | Small
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,55, small | small |  smaller | 小的 | -small | 较小 |  kecil |  smallest |  nhỏ | 很小
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,56, small | small | 小的 | -small |  smaller |  kecil |  nhỏ | Small | _small |  کوچک
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,57, small | small | 小的 | -small |  nhỏ |  kecil | Small |  pequeño | _small |  Small
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,58, small | small | 小的 | Small | -small |  nhỏ |  pequeño |  Small |  kecil |  SMALL
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,59, small | small | Small | 小的 |  pequeño | -small |  Small |  kecil |  nhỏ | _small
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,60, small | small |  pequeño | 小的 |  pequeños | Small |  Small |  nhỏ | -small |  pequeña
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,61,pe |  pequeño |  Pe |  small | Pe | small | _pe | -pe |  pequeno | .pe
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,released-J,62,pe |  Pe | Pe |  pequeño | _pe | -pe | PE |  pe |  PE | .pe
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,0,"  | - | / | , | ... |  ( | . | 
+ | ? | '"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,1,"  | / | ... |  ( | 
+ | , | . | - | "" | '"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,2,"/ |   | ... | , | … | . | "" | 
+ | S | “"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,3,"  | / | ... | , | . | … |  ( |  "" | "" | '"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,4,"  | / | ... | . | , | ' | "" | … |  "" |  ("
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,5,"/ | ... |   | . | ' | , | "" | … | [ | s"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,6,"... | / |   | , | . | ' | s |  ( | … | -"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,7,"... | / |   | . | ' | s | - | , | … | """
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,8,"... |   | . | / |  "" | ' | "" | … |  ( | ,"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,9,"... |   | . |  "" | … | / | "" | ' | 
+ | -"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,10,"... |   |  "" | … | "" | 
+ | . | / | ' |  V"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,11,"... |   |  "" | "" | 
+ | … | . | ' | “ | /"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,12,"  | "" | ... | … |  "" | ' | “ | 
+ | . |  ("
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,13,""" | ... |   | … | ' |  "" |  s | s | B |  a"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,14,"... | … | "" |   | s | ' | B |  l |  "" |  s"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,15,"... | … |   | "" | s | ' | B | 
+ | l | A"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,16,"... | … |   | B | "" | ' | s | L | ____ | ……"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,17,"... | … |   | "" | …… |  I | s | B | I | l"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,18,"... | … |   | "" | 吗 | 
+ | 付 | ____ | .. | s"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,19,"... | … | ____ | "" |   | 副 | 吗 | 付 | ' | .."
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,20,"... | 什么呢 | … | 付 | "" | ____ | 吗 | 副 | …… | ug"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,21,"... | … | "" | 副 | ' | ____ |  "" |  ' |   | 吗"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,22,"... | … |  "" |  ' |   | ' | "" | 
+ |  * | ____"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,23,"... | 
+ | ____ | … |  "" |   |  ' | � |  * | B"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,24,"... | ____ | 
+ | � | 义词 | L | … | 副 |  ' |  L"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,25,"... | … | � | ____ | L |  ' |   | 
+ |  * |  L"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,26,"... | … | ____ | � | 吗 |  * | L |  L | � | 
+"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,27,... | ____ | … | � | L |  L | 吗 |  ___ |  en | �
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,28,... | ____ | … | L | � |  ' |  ______ | 什么呢 |  L |  *
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,29,"... | ____ | � | L | 吗 | "" |  ' | ' | … |  ______"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,30,"... | ____ | � | 什么呢 | … | 吗 |  ______ |  "" | "" |  ___"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,31,"... | ____ | … | � |  ______ | \"" | "" | 什么呢 | 吗 | ___"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,32,"____ | � | ... | \"" | ___ |  ______ |  ___ | … | __ | '"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,33,"____ | ... | __ | ___ | � | … |  ___ | \"" |  ______ |  ____"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,34,"____ | ... | ___ | � | \"" | … | __ |  ______ |  ___ | '"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,35,"____ | ... | ___ | � | ' | 相反 | … | \"" | __ |  ______"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,36,"____ | ... | ___ | __ | 相反 | … | \"" |  ______ | ' | �"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,37,"____ | ... | ___ | 相反 | … | __ | � | \"" | 反义词 | '"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,38,"____ | ... | ___ | … | __ | 相反 | ' | � | \"" |  ___"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,39,____ | ... | ___ | … | __ | ' |  ___ |  ______ | � | 相反
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,40,"____ | ... | … | ___ | ' |  ______ | L | \"" | __ |  ___"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,41,"____ | ... | … | ___ | ' | L | \"" |  ______ |  ___ |  "
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,42,"____ | ... | … | ___ |  ___ | \"" |   | � |  ______ | L"
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,43,... | ____ | … | ___ |  ___ | __ |  ______ | L | 相反 | '
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,44,____ | ... | … |  ___ | ___ |  ______ | L |  ____ | ug | __
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,45,____ | ... | … |  ___ | ___ |  ______ |  ____ | L | D | __
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,46,____ | ... | … | ___ |  ___ |  ______ |  ____ | B | L | D
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,47,____ | ... | ___ |  ______ |  ____ |  ___ | … | _____ | __ | ________
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,48,____ | ___ |  ____ | ... |  ______ | … |  ___ | 反义词 | __ |  __
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,49,____ | ... | … | ug | 反义词 |  ______ |  ____ | ___ | ________ | 什么呢
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,50,____ | ... | ___ |  ____ | … |  ___ |  ______ | ug | 毛泽东 | 反义词
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,51,渺小 |  size | small | 大小 | Size |  smaller | 矮 |  small | ____ | 小的
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,52,渺小 | ____ | small | 矮 | ___ | ug | 大小 |  size |  dimin |  small
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,53,渺小 | small | 矮 | ____ |  small | ug | 小的 | … | ___ |  dimin
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,54,small |  small | 小的 |  smaller | 渺小 | -small | 小 | … | 矮 | ...
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,55, small | small |  smaller | 小的 |  nhỏ | -small | 小 |  kecil |  کوچک | 较小
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,56, small | small | 小的 |  kecil |  nhỏ | -small | Small | 小 |  smaller |  کوچک
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,57, small | small | 小的 |  kecil |  nhỏ | -small | Small | 小 |  کوچک |  pequeño
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,58, small | small | 小的 | 小 |  nhỏ | Small |  kecil | -small |  pequeño |  Small
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,59, small | small | 小的 | Small |  nhỏ | 小 |  kecil |  pequeño | -small |  Small
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,60, small | small | 小的 |  pequeño |  pequeños |  nhỏ | 小 | Small |  kecil |  pequeñas
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,61, pequeño | pe |  small | small |  Pe |  pequeno |  pequeños |  pequeña | Pe | _pe
+qwen3.5-27b,multilingual,spanish-opposite-big,Spanish,logit,62,pe |  Pe | Pe |  pequeño | _pe | -pe | PE |  pe |  PE | .pe
+qwen3.5-27b,typo,typo-language,language,released-R,0,Whilst |  Whilst |  whilst | 但不限于 |  amongst | ً |  entirety |  seperate |  preventative | -esque
+qwen3.5-27b,typo,typo-language,language,released-R,1,Whilst |  Whilst |  whilst |  seperate | ً | 但不限于 |  amongst |  kì |  recieved |  preventative
+qwen3.5-27b,typo,typo-language,language,released-R,2, seperate | Whilst |  whilst |  Whilst |  recieved |  alot |  amongst |  seper |  preventative | ً
+qwen3.5-27b,typo,typo-language,language,released-R,3," seperate |  amongst | e |  and | -- |  whilst | , |  recieved |  Whilst |  --"
+qwen3.5-27b,typo,typo-language,language,released-R,4," seperate |  whilst | e |  amongst |  and | , |  Whilst |  recieved |  in | y"
+qwen3.5-27b,typo,typo-language,language,released-R,5," seperate |  whilst | e |  Whilst |  amongst |  and | , | Whilst |  in | es"
+qwen3.5-27b,typo,typo-language,language,released-R,6, seperate | e |  whilst | es |  Whilst |  recieved | y |  alot | on |  amongst
+qwen3.5-27b,typo,typo-language,language,released-R,7,"e |  and |  seperate | , | - | y |   |  whilst |  in | on"
+qwen3.5-27b,typo,typo-language,language,released-R,8,"e |  seperate | y |  and | - |   | , |  , |  in | g"
+qwen3.5-27b,typo,typo-language,language,released-R,9," seperate | e | - |   |  whilst |  , |  alot | ( |  and | /"
+qwen3.5-27b,typo,typo-language,language,released-R,10,"e |  seperate | - |  whilst |   | / | ( |  and |  , |  Whilst"
+qwen3.5-27b,typo,typo-language,language,released-R,11," seperate | e | - | -- |  , |  "" | ( |   | y |  alot"
+qwen3.5-27b,typo,typo-language,language,released-R,12," seperate | e |  , | -- |  alot | - |   | ( |  seper |  isnt"
+qwen3.5-27b,typo,typo-language,language,released-R,13," seperate | e |  alot |  , |  seper |  atleast |  isnt | - |   |  recieved"
+qwen3.5-27b,typo,typo-language,language,released-R,14," seperate | e |  alot |  , |  isnt |  seper |  atleast |  recieved |   | i"
+qwen3.5-27b,typo,typo-language,language,released-R,15," seperate |  alot | e |  seper |  atleast |  isnt |  , |  recieved | 做为 |  thats"
+qwen3.5-27b,typo,typo-language,language,released-R,16,"e |  seperate |  alot |  , | .. | -- |   |  isnt | ( | -"
+qwen3.5-27b,typo,typo-language,language,released-R,17,"e |  , | .. | -- |  seperate |  alot |   | 
+ | i | -"
+qwen3.5-27b,typo,typo-language,language,released-R,18,"e |  , |  alot |  seperate | .. | -- | 
+ | i |  isnt |  "
+qwen3.5-27b,typo,typo-language,language,released-R,19,"e |  , | -- | .. | i | - | 
+ |   | a | ."
+qwen3.5-27b,typo,typo-language,language,released-R,20,"e | -- |  , | .. | - | i | 
+ |   |  alot |  seperate"
+qwen3.5-27b,typo,typo-language,language,released-R,21,"e | -- |  , | - | i | 
+ | .. | . |   | ("
+qwen3.5-27b,typo,typo-language,language,released-R,22,"e | -- |  , | - | 
+ | i | .. | ( | / |  """
+qwen3.5-27b,typo,typo-language,language,released-R,23,"-- | e |  "" |  , | - | 
+ |   | / |  and | i"
+qwen3.5-27b,typo,typo-language,language,released-R,24,"-- | e |  "" |  , | - | 
+ |   | / |  and |  language"
+qwen3.5-27b,typo,typo-language,language,released-R,25," , | e | -- | - |  "" | 
+ |   |   | i |  language"
+qwen3.5-27b,typo,typo-language,language,released-R,26," , | -- | e |  language |  languages | - | 
+ |   |   |  """
+qwen3.5-27b,typo,typo-language,language,released-R,27," , | e | 
+ | - | -- |   |   |  language | / | ("
+qwen3.5-27b,typo,typo-language,language,released-R,28," , | e | 
+ | -- |   | - |   |  language | / | i"
+qwen3.5-27b,typo,typo-language,language,released-R,29,"
+ | e |   |  , | -- | - |   | / |  ( |  """
+qwen3.5-27b,typo,typo-language,language,released-R,30,"
+ |   | e |  , |   | -- | - | / |  language | i"
+qwen3.5-27b,typo,typo-language,language,released-R,31,"
+ | e |   |   | - | / |  , | -- |  ( | i"
+qwen3.5-27b,typo,typo-language,language,released-R,32,"
+ | e |   |   | - | -- |  language |  languages | ... |  ,"
+qwen3.5-27b,typo,typo-language,language,released-R,33,"
+ |  language | e | ... |  languages | -- | - |   |  ( | /"
+qwen3.5-27b,typo,typo-language,language,released-R,34," language |  languages | 
+ | e | ... | -- |  Language | - | / |  "
+qwen3.5-27b,typo,typo-language,language,released-R,35," languages |  language | 
+ | ... | -- | e |  Language | - | / |  "
+qwen3.5-27b,typo,typo-language,language,released-R,36," language |  languages | 
+ |  Language | ... | e | -- |   | - | ."
+qwen3.5-27b,typo,typo-language,language,released-R,37," language |  languages | 
+ |  Language | ... | -- |   | e | - |  Languages"
+qwen3.5-27b,typo,typo-language,language,released-R,38," language |  languages |  Language | 
+ |  Languages | Language | ... | 语言 |  lingu | language"
+qwen3.5-27b,typo,typo-language,language,released-R,39,"
+ |  language |  languages | ... |   |  Language |  learning | - | -- |  -"
+qwen3.5-27b,typo,typo-language,language,released-R,40," languages |  language |  Language |  Languages | Language | 
+ |  learning | ... | 语言 |  lingu"
+qwen3.5-27b,typo,typo-language,language,released-R,41," languages |  language |  Language |  Languages | 
+ |  learning | ... | Language |   | 语言"
+qwen3.5-27b,typo,typo-language,language,released-R,42," languages |  language |  Language |  learning |  Languages | 
+ | ... |   | Language | --"
+qwen3.5-27b,typo,typo-language,language,released-R,43," languages |  language |   | 
+ |  learning | ... | -- |  - |   |  Language"
+qwen3.5-27b,typo,typo-language,language,released-R,44," languages | 
+ |  language |   |  learning | ... |  - | -- | - |  "
+qwen3.5-27b,typo,typo-language,language,released-R,45,"
+ |   |  languages |  - | ... |  , | - |  language | ( | e"
+qwen3.5-27b,typo,typo-language,language,released-R,46," , |  languages |   | -- | e | 
+ |  - | ( | - | i"
+qwen3.5-27b,typo,typo-language,language,released-R,47,"  | e |  languages |  - |  , | -- | . | ( | 
+ |  language"
+qwen3.5-27b,typo,typo-language,language,released-R,48," languages |  language | ... | . |  foreign |  - | -- |  ( | 
+ |  Language"
+qwen3.5-27b,typo,typo-language,language,released-R,49," languages |  language | . | ... | 
+ |  foreign | -- |  - |  chosen |  ("
+qwen3.5-27b,typo,typo-language,language,released-R,50," languages | ... |  language | . | -- |  Languages |  Language | 
+ |  foreign |  lingu"
+qwen3.5-27b,typo,typo-language,language,released-R,51,". | ... | -- | 
+ |  - |  ( |  languages | ( |  language | !"
+qwen3.5-27b,typo,typo-language,language,released-R,52,"-- | . |  besides | ... |  languages |  alongside |  language |  chosen |  - | 
+"
+qwen3.5-27b,typo,typo-language,language,released-R,53, languages |  alongside |  besides |  language | -- | . |  chosen |  foreign |  spoken |  Language
+qwen3.5-27b,typo,typo-language,language,released-R,54, besides | 除了 |  alongside |  languages |  aside |  chosen |  during |  apart | -- |  spoken
+qwen3.5-27b,typo,typo-language,language,released-R,55, besides | 除了 |  alongside |  during |  aside |  apart |  languages |  beyond | -- | .
+qwen3.5-27b,typo,typo-language,language,released-R,56, besides | 除了 |  during |  languages |  alongside |  chosen |  apart |  aside | -- |  language
+qwen3.5-27b,typo,typo-language,language,released-R,57, besides | 除了 |  during |  languages |  chosen |  alongside |  aside | -- |  beyond | .
+qwen3.5-27b,typo,typo-language,language,released-R,58, besides | 除了 |  during |  other |  chosen |  foreign |  alongside |  aside |  beyond |  apart
+qwen3.5-27b,typo,typo-language,language,released-R,59, besides |  during |  other | . | 除了 |  chosen |  foreign |  beyond |  alongside |  aside
+qwen3.5-27b,typo,typo-language,language,released-R,60, besides | . |  during |  other |  apart | -- |  chosen |  alongside |  aside |  Spanish
+qwen3.5-27b,typo,typo-language,language,released-R,61, other |  besides | other | . |  Other |  during |  OTHER | Other |  apart |  which
+qwen3.5-27b,typo,typo-language,language,released-R,62," other | . |  besides |  during | , |  and |  in |  as |  so |  ("
+qwen3.5-27b,typo,typo-language,language,released-J,0,但不限于 | Whilst |  Whilst |  whilst |  amongst | en |  kì | enje | 众所周知 |  kỉ
+qwen3.5-27b,typo,typo-language,language,released-J,1,但不限于 | Whilst |  Whilst |  whilst | en | enje |  amongst | 众所周知 |  kỉ |  kì
+qwen3.5-27b,typo,typo-language,language,released-J,2,Whilst | 但不限于 |  whilst |  Whilst | en |  seperate |  amongst |  recieved | ً | enje
+qwen3.5-27b,typo,typo-language,language,released-J,3,en | 但不限于 | Whilst | े | ً |  Whilst |  whilst | es | enje | 众所周知
+qwen3.5-27b,typo,typo-language,language,released-J,4,en |  Whilst | Whilst |  whilst | 但不限于 | ً | es |  amongst | े | ه
+qwen3.5-27b,typo,typo-language,language,released-J,5,en | Whilst |  Whilst |  whilst | 但不限于 | ً | es |  seperate | enje | े
+qwen3.5-27b,typo,typo-language,language,released-J,6,en |  Whilst | Whilst | es |  whilst | 但不限于 |  seperate | ه | ة | े
+qwen3.5-27b,typo,typo-language,language,released-J,7,en |  Whilst |  seperate | es | Whilst |  whilst | ه | 但不限于 | irlines |  alot
+qwen3.5-27b,typo,typo-language,language,released-J,8,en | es |  seperate |  fran | e |  Whilst |  alot | ه | ة | oque
+qwen3.5-27b,typo,typo-language,language,released-J,9, seperate |  Whilst |  alot |  whilst |  seper | es | en | Whilst | e | ة
+qwen3.5-27b,typo,typo-language,language,released-J,10, seperate |  whilst |  Whilst |  alot |  seper | en | e | es |  atleast | Whilst
+qwen3.5-27b,typo,typo-language,language,released-J,11, seperate |  alot | es | -- | en |  seper | e | ة |  teh |  isnt
+qwen3.5-27b,typo,typo-language,language,released-J,12, seperate | es | e |  alot | en |  seper | ة |  isnt | -- |  doesnt
+qwen3.5-27b,typo,typo-language,language,released-J,13, seperate |  alot | e |  seper | es |  isnt |  atleast |  recieved | en |  upto
+qwen3.5-27b,typo,typo-language,language,released-J,14, seperate |  alot | e |  isnt | es |  seper |  recieved |  doesnt | en |  atleast
+qwen3.5-27b,typo,typo-language,language,released-J,15, alot |  seperate |  atleast |  seper |  isnt |  thats |  recieved |  doesnt | e |  occured
+qwen3.5-27b,typo,typo-language,language,released-J,16, alot |  seperate | e |  isnt |  seper |  recieved |  atleast | es |  thats |  insure
+qwen3.5-27b,typo,typo-language,language,released-J,17, alot |  seperate | e |  isnt | es |  seper |  recieved |  thats |  atleast | en
+qwen3.5-27b,typo,typo-language,language,released-J,18," alot |  seperate | e |  isnt |  seper |  recieved | es |  atleast |  , |  thats"
+qwen3.5-27b,typo,typo-language,language,released-J,19, alot |  seperate | e |  isnt | es |  seper |  teh |  thats |  atleast |  recieved
+qwen3.5-27b,typo,typo-language,language,released-J,20, alot |  seperate | e |  isnt |  seper | es |  thats |  recieved |  teh |  occured
+qwen3.5-27b,typo,typo-language,language,released-J,21, alot |  seperate | e |  isnt | es |  seper |  insure | i |  occured | --
+qwen3.5-27b,typo,typo-language,language,released-J,22, alot |  seperate | e |  insure |  isnt |  seper |  atleast |  occured | es |  teh
+qwen3.5-27b,typo,typo-language,language,released-J,23, alot |  seperate | e |  insure | -- |  isnt |  seper |  teh |  occured |  poss
+qwen3.5-27b,typo,typo-language,language,released-J,24, alot |  seperate | e |  insure | -- |  isnt |  occured |  seper |  teh | es
+qwen3.5-27b,typo,typo-language,language,released-J,25," seperate |  alot | e |  insure |  occured |  isnt |  teh |  , |  english |  recieved"
+qwen3.5-27b,typo,typo-language,language,released-J,26,"e |  seperate |  alot |  languages |  , |  insure |  english |  isnt |  language |  lengu"
+qwen3.5-27b,typo,typo-language,language,released-J,27,"e |  seperate |  alot |  languages |  , |  isnt |  insure |  english |  teh |  recieved"
+qwen3.5-27b,typo,typo-language,language,released-J,28,"e |  languages |  seperate |  , |  alot |  teh |  language | -- |  insure |  isnt"
+qwen3.5-27b,typo,typo-language,language,released-J,29,"e |  languages |  teh |  alot |  language |  seperate |  Language |  , |  english | --"
+qwen3.5-27b,typo,typo-language,language,released-J,30,"e |  languages |  language |  alot |  teh |  , |  Language | -- |  seperate |  english"
+qwen3.5-27b,typo,typo-language,language,released-J,31,"e |  languages |  teh |  alot |  language | 
+ |  Language | i | ..... |  ,"
+qwen3.5-27b,typo,typo-language,language,released-J,32,"e |  languages |  language |  Language | 
+ |  teh | -- | i | .... |  isnt"
+qwen3.5-27b,typo,typo-language,language,released-J,33," languages | e |  language |  Language | -- | 
+ |  Languages | Language | ... |  english"
+qwen3.5-27b,typo,typo-language,language,released-J,34, languages |  language |  Language | e |  Languages | Language | -- | ... | language |  english
+qwen3.5-27b,typo,typo-language,language,released-J,35, languages |  language |  Language |  Languages | e | Language | language |  lengu |  lingu | 语言
+qwen3.5-27b,typo,typo-language,language,released-J,36, languages |  language |  Language |  Languages | Language | language |  lingu | 语言 |  lingua |  english
+qwen3.5-27b,typo,typo-language,language,released-J,37, languages |  language |  Language |  Languages | Language | 语言 | language |  lingu |  lingua |  english
+qwen3.5-27b,typo,typo-language,language,released-J,38, languages |  language |  Language |  Languages | Language | 语言 | language |  lingu |  lingua | /language
+qwen3.5-27b,typo,typo-language,language,released-J,39, languages |  language |  Language |  Languages | Language | 语言 | language |  lingua |  lingu |  learning
+qwen3.5-27b,typo,typo-language,language,released-J,40, languages |  language |  Language |  Languages | Language | 语言 | language |  lingu | Languages |  lingua
+qwen3.5-27b,typo,typo-language,language,released-J,41, languages |  language |  Language |  Languages | Language | language | 语言 | Languages | languages | /language
+qwen3.5-27b,typo,typo-language,language,released-J,42, languages |  language |  Language |  Languages | Language | 语言 | language |  learning | Languages | languages
+qwen3.5-27b,typo,typo-language,language,released-J,43, languages |  language |  Languages |  Language | Language |  learning | language | 语言 | languages | Languages
+qwen3.5-27b,typo,typo-language,language,released-J,44, languages |  language |  Languages |  Language |  learning | Language | language | 语言 | Languages | languages
+qwen3.5-27b,typo,typo-language,language,released-J,45, languages |  language |  Languages |  Language |  learning | Language | language | 语言 |  linguistic | languages
+qwen3.5-27b,typo,typo-language,language,released-J,46," languages |  Languages |  Language |  language |  learning | Language |  , | language | e | 语言"
+qwen3.5-27b,typo,typo-language,language,released-J,47, languages |  language |  Languages |  Language |  chose | Language | e |  learning | language |  choose
+qwen3.5-27b,typo,typo-language,language,released-J,48, languages |  language |  Languages |  Language | Language | 语言 |  lingu | language |  linguistic | Languages
+qwen3.5-27b,typo,typo-language,language,released-J,49, languages |  language |  Languages |  Language | Language | 语言 |  lingu | language |  chosen |  learning
+qwen3.5-27b,typo,typo-language,language,released-J,50, languages |  language |  Languages |  Language | Language |  lingu | 语言 | language |  lingua | /language
+qwen3.5-27b,typo,typo-language,language,released-J,51, languages |  language | . |  Language | -- |  Languages | ... |  besides | ? |  either
+qwen3.5-27b,typo,typo-language,language,released-J,52, besides |  languages |  language | 除了 | -- |  Languages |  chosen |  alongside |  Language | ...
+qwen3.5-27b,typo,typo-language,language,released-J,53, languages |  besides |  language |  alongside |  Languages |  Language |  lingua | 外语 |  chosen | /language
+qwen3.5-27b,typo,typo-language,language,released-J,54, besides | 除了 |  alongside |  languages |  aside |  apart |  chosen |  Besides |  Languages |  choose
+qwen3.5-27b,typo,typo-language,language,released-J,55, besides | 除了 |  alongside |  aside |  apart |  Besides |  during |  languages | Besides | 除
+qwen3.5-27b,typo,typo-language,language,released-J,56, besides | 除了 |  languages |  apart |  aside |  during |  chosen |  Besides |  alongside |  language
+qwen3.5-27b,typo,typo-language,language,released-J,57, besides | 除了 |  languages |  aside |  during |  chosen |  Languages |  Besides |  language |  alongside
+qwen3.5-27b,typo,typo-language,language,released-J,58, besides | 除了 |  other |  chosen |  during |  Besides |  foreign |  aside |  languages |  spoken
+qwen3.5-27b,typo,typo-language,language,released-J,59, besides | 除了 |  during |  other |  Besides |  foreign |  aside |  chosen |  alongside |  Spanish
+qwen3.5-27b,typo,typo-language,language,released-J,60, besides |  other |  during | 除了 |  apart | . |  aside |  chosen | -- |  foreign
+qwen3.5-27b,typo,typo-language,language,released-J,61, other |  besides | other |  OTHER |  Other | Other |  during | . |  apart |  aside
+qwen3.5-27b,typo,typo-language,language,released-J,62," other | . |  besides |  during | , |  and |  in |  as |  so |  ("
+qwen3.5-27b,typo,typo-language,language,logit,0,"  | . | , | - | / | : | ' | 
+ |  ( | ["
+qwen3.5-27b,typo,typo-language,language,logit,1,". | , | ' | ( |   | [ | - | / |  ( | :"
+qwen3.5-27b,typo,typo-language,language,logit,2,[ | 语言 | an | ( | � | bar | p | ew | 语言的 | �
+qwen3.5-27b,typo,typo-language,language,logit,3,". |  ( | , | p | ( | 在 | - | w | C | an"
+qwen3.5-27b,typo,typo-language,language,logit,4," ( |   | ( | . | [ | , | 在 | g | an | p"
+qwen3.5-27b,typo,typo-language,language,logit,5," ( | ( |   | - | g | . | w | , | [ | 在"
+qwen3.5-27b,typo,typo-language,language,logit,6,y | 并 | w | _ |  ( | - |  language | g | e | 语言
+qwen3.5-27b,typo,typo-language,language,logit,7,w | g | _ | y |  ( | . | 并 | - | p | �
+qwen3.5-27b,typo,typo-language,language,logit,8,g | dev | 语言 | asing |  language |  ( | w | language | ( | ed
+qwen3.5-27b,typo,typo-language,language,logit,9,g |  ( | ( | dev | w | . |  foreign | ique | gment | asing
+qwen3.5-27b,typo,typo-language,language,logit,10,dev | g |  ( |  foreign |  dev | ( | asing | ed | gment | Y
+qwen3.5-27b,typo,typo-language,language,logit,11,g |  ( | dev | � | Y | ( | y | 临 | 语言 | w
+qwen3.5-27b,typo,typo-language,language,logit,12,� | dev | g | Y | Id |  ( | 临 | asing | or | �
+qwen3.5-27b,typo,typo-language,language,logit,13,� | or | Y | asing | dev | g | � | Id | 甚 | 至少
+qwen3.5-27b,typo,typo-language,language,logit,14,� | or | g | Id | Y | 至少 | 如 | 甚 | � |  (
+qwen3.5-27b,typo,typo-language,language,logit,15,置 | � | 肯定 | or | 甚 | � | 至少 | 如 | g |  (
+qwen3.5-27b,typo,typo-language,language,logit,16,置 | 肯定 | � | � | 至少 | asing | 如 | ச்ச | � | or
+qwen3.5-27b,typo,typo-language,language,logit,17,or | � | 置 | 肯定 | ச்ச | 如 | quisition | YG | � | 性质的
+qwen3.5-27b,typo,typo-language,language,logit,18,or | quisition | 甚 | 如 | � | 操 | b |  ( | 盟 | 耳
+qwen3.5-27b,typo,typo-language,language,logit,19,quisition | 甚 | 操 | � | or |  languages | yman | 沟通 | atory | keit
+qwen3.5-27b,typo,typo-language,language,logit,20,quisition | 甚 | bling | atory | CEL | 操 | anding | 沟通 | � |  lingu
+qwen3.5-27b,typo,typo-language,language,logit,21,quisition | or | 甚 | YW | bling | 操 |  lingua | opard |  adipiscing |  languages
+qwen3.5-27b,typo,typo-language,language,logit,22,quisition | 未果 | 甚 | anding |  languages | or |  lingua | 操 |  lingu |  -
+qwen3.5-27b,typo,typo-language,language,logit,23,quisition | anding | 甚 | 操 |  lingu | /- |  lingua | 舌 | � |  languages
+qwen3.5-27b,typo,typo-language,language,logit,24, lingu |  languages |  lingua | 文言文 | � | quisition | 舌 | or | thern | 这门
+qwen3.5-27b,typo,typo-language,language,logit,25,语 | quisition |  lingu | or | 程 | 这门 | itzer | bling | tp |  (
+qwen3.5-27b,typo,typo-language,language,logit,26,"tp |  ( | or | quisition | 语 |  program | 
+ | b | 程 | ouse"
+qwen3.5-27b,typo,typo-language,language,logit,27,"tp |  ( | 
+ |  dest | or |  ab |  program | b | 语 | quisition"
+qwen3.5-27b,typo,typo-language,language,logit,28," ( | tp | HS | 
+ | b | or |   | 甚 | 小编 |  "
+qwen3.5-27b,typo,typo-language,language,logit,29," ( | 
+ | ... | HS | b | ( |   | or | (s |  "
+qwen3.5-27b,typo,typo-language,language,logit,30," ( | 
+ | b | HS | or | ( | ... |   | d | (s"
+qwen3.5-27b,typo,typo-language,language,logit,31,"
+ |  ( | or | ( | HS | b | 哥 | 小编 | ... | c"
+qwen3.5-27b,typo,typo-language,language,logit,32," ( | 
+ | ... | ( | ____ | or | 哥 | HS | b | L"
+qwen3.5-27b,typo,typo-language,language,logit,33," ( | 
+ | ... | or | ____ | 哥 | ( | ula | 语 | ¿"
+qwen3.5-27b,typo,typo-language,language,logit,34,"... | 
+ |  ( | ( | or | c | ¿ | HS | ____ | r"
+qwen3.5-27b,typo,typo-language,language,logit,35,"... | ula | 正宗 |  languages | 
+ | lectic |  flu | 这门 | HS |  ("
+qwen3.5-27b,typo,typo-language,language,logit,36,"这门 | ... |  languages |  foreign | 正宗 | 
+ | lectic | L | c | HS"
+qwen3.5-27b,typo,typo-language,language,logit,37,"这门 | L | ... |  languages | 
+ | c |  foreign |  flu | or |  mand"
+qwen3.5-27b,typo,typo-language,language,logit,38,"... | 
+ |  languages | or | L |  ( | c | and | ( |  mand"
+qwen3.5-27b,typo,typo-language,language,logit,39,"
+ | 这门 | ... | (s | or | L |  learning | � |  - |  ("
+qwen3.5-27b,typo,typo-language,language,logit,40,"这门 | ... | 
+ | or |  languages |  learning | 哥 |  proficiency |  lingu | (s"
+qwen3.5-27b,typo,typo-language,language,logit,41,"
+ | 这门 | ... | or | (s |  either | c |  learning | lm | L"
+qwen3.5-27b,typo,typo-language,language,logit,42,"... | 
+ | (s | 这门 | ____ | or | ​ |  - | 至少 |  mand"
+qwen3.5-27b,typo,typo-language,language,logit,43,"... | 
+ | (s | 选择 | w | 这门 |  - | or | L |  mand"
+qwen3.5-27b,typo,typo-language,language,logit,44,"
+ | ... | (s |  either |  mand | 选择 | 这门 | or |  - |  ("
+qwen3.5-27b,typo,typo-language,language,logit,45,"
+ | ... | or | (s | 选择 |  - |  either | c |  ( | w"
+qwen3.5-27b,typo,typo-language,language,logit,46,"选择 | 
+ |  either | 要么是 | 选择一个 | __ | (s | 要么 | � | ..."
+qwen3.5-27b,typo,typo-language,language,logit,47,"选择 | __ | 
+ | ____ | (s |  foreign | 选择一个 |  either | S | кала"
+qwen3.5-27b,typo,typo-language,language,logit,48,选择 |  foreign | __ | ____ | 选择一个 | ... | (s |  either |  mand |  chosen
+qwen3.5-27b,typo,typo-language,language,logit,49,选择 |  chosen |  flu | 除了 | ... |  either |  compulsory | (s |  mand |  foreign
+qwen3.5-27b,typo,typo-language,language,logit,50,除了 |  besides | ... |  flu |  mand |  either | (s |  chosen | 选择一个 | �
+qwen3.5-27b,typo,typo-language,language,logit,51, flu |  proficiency |  besides | 这门 |  either | � | 和第二 | 除了 |  mand |  spoken
+qwen3.5-27b,typo,typo-language,language,logit,52, besides | 除了 |  flu |  proficiency |  alongside | 这门 |  beyond |  spoken | 额外的 | 选择
+qwen3.5-27b,typo,typo-language,language,logit,53, besides |  alongside |  flu | 除了 |  mand |  chosen |  spoken | 这门 |  proficiency |  either
+qwen3.5-27b,typo,typo-language,language,logit,54, besides | 除了 |  selain | 除 |  aside |  Besides |  кроме |  alongside | 除了要 |  apart
+qwen3.5-27b,typo,typo-language,language,logit,55, besides | 除了 |  selain |  Besides |  alongside |  кроме |  aside | 除 | 除了要 |  apart
+qwen3.5-27b,typo,typo-language,language,logit,56, besides | 除了 |  selain |  Besides |  aside |  apart | 除 |  during |  alongside |  beyond
+qwen3.5-27b,typo,typo-language,language,logit,57, besides | 除了 |  selain |  Besides |  during |  aside |  beyond |  alongside |  кроме | 除
+qwen3.5-27b,typo,typo-language,language,logit,58, besides | 除了 |  Besides |  selain |  during |  beyond |  aside |  chosen |  apart |  other
+qwen3.5-27b,typo,typo-language,language,logit,59, besides | 除了 |  Besides |  during |  aside |  selain |  beyond |  alongside |  chosen | 选择
+qwen3.5-27b,typo,typo-language,language,logit,60, besides | 除了 | . |  during | -- |  apart |  other |  chosen |  alongside | ...
+qwen3.5-27b,typo,typo-language,language,logit,61, other |  besides | other | . |  during |  OTHER |  Other | Other | 除了 | 其他
+qwen3.5-27b,typo,typo-language,language,logit,62," other | . |  besides |  during | , |  and |  in |  as |  so |  ("
+qwen3.5-27b,association,grief,grief,released-R,0, though |  seperate |  they |  there | ….. | (er | 礎 | …… |  … | ….
+qwen3.5-27b,association,grief,grief,released-R,1,"…… |  […] | ….. |  … | .… | …. | …"" | ………… |  [… |  …."
+qwen3.5-27b,association,grief,grief,released-R,2, anyway | —— | —they |  whatever |  … | <unk | …… | .… |  nobody | �
+qwen3.5-27b,association,grief,grief,released-R,3,", |  and |  the |  that |  in |  just |  more |  not |  ... |  a"
+qwen3.5-27b,association,grief,grief,released-R,4,", |  and |  the |  that | 
+ |  ... |  only |  just |  not |  it"
+qwen3.5-27b,association,grief,grief,released-R,5,", |  really |  because |  just |  it |  that |  probably |  actually |  only |  though"
+qwen3.5-27b,association,grief,grief,released-R,6, because |  probably |  really |  though |   |  actually |  nearly |  just |  not |  sometimes
+qwen3.5-27b,association,grief,grief,released-R,7,", |   |  just |  that |  because | 
+ |  it |  not |  the |  really"
+qwen3.5-27b,association,grief,grief,released-R,8," because |  just |  that | , |   |  really |  probably |  it |  even | 
+"
+qwen3.5-27b,association,grief,grief,released-R,9, because |  nearly |  just |  almost |  only |  it |  mostly |  even |  probably |  
+qwen3.5-27b,association,grief,grief,released-R,10, because |  only |  almost |  probably |  nearly |  it |  people |  mostly |  just |  even
+qwen3.5-27b,association,grief,grief,released-R,11," nearly |  only |  because |  just |  that | , |  even |  it |  almost |  "
+qwen3.5-27b,association,grief,grief,released-R,12, almost |  just |  only |  nearly |  because |  it |   |  even |  mostly |  probably
+qwen3.5-27b,association,grief,grief,released-R,13, almost |  because |  even |  just |  only |  nearly |  that |  mostly |  never |  really
+qwen3.5-27b,association,grief,grief,released-R,14, never |  even |  almost |  just |  nearly |  only |  because |  really |  somehow |  still
+qwen3.5-27b,association,grief,grief,released-R,15, even |  only |  never |  almost |  just |  nearly |  the |  every |  simply |  because
+qwen3.5-27b,association,grief,grief,released-R,16, even |  almost |  nearly |  just |  never |  still |  because |  only |  nothing |  every
+qwen3.5-27b,association,grief,grief,released-R,17, even |  nearly |  just |  never |  almost |  because |  only |  every |   |  it
+qwen3.5-27b,association,grief,grief,released-R,18, even |  never |  nearly |   |  because |  just |  — |  almost |  nothing |  still
+qwen3.5-27b,association,grief,grief,released-R,19, even |  never |  just |  nearly |  barely |  because |  almost |  — |  somehow | —and
+qwen3.5-27b,association,grief,grief,released-R,20, even |  never |  nearly |  just |  almost |  barely | —and |  because |  — | ...
+qwen3.5-27b,association,grief,grief,released-R,21, even |  never | ... |  nearly |  ... |  just |   |  almost |  barely |  —
+qwen3.5-27b,association,grief,grief,released-R,22, even |  never |  nearly |  — |  barely | —and |  just |   |  almost |  still
+qwen3.5-27b,association,grief,grief,released-R,23, even |  nearly |  never |  — |   |  just |  almost |  barely | —and |  ...
+qwen3.5-27b,association,grief,grief,released-R,24, even |  nearly |   |  never | ... |  ... | —and |  — |  barely |  every
+qwen3.5-27b,association,grief,grief,released-R,25, even |   | ... |  ... |  still |  never |  — |  decades |  years |  nearly
+qwen3.5-27b,association,grief,grief,released-R,26,  |  grief |  mourn |  still |  forever |  ... |  even |  grieving | ... |  lingering
+qwen3.5-27b,association,grief,grief,released-R,27,... |   |  ... |  even |  still |  grief |  mourn |  forever |  every |  never
+qwen3.5-27b,association,grief,grief,released-R,28,  | ... |  ... |  mourn |  every | … |  even |  grief |  forever |  still
+qwen3.5-27b,association,grief,grief,released-R,29,  | ... | � | … |  — |  ... | —and |  mourn |  grief |  even
+qwen3.5-27b,association,grief,grief,released-R,30,  | � | ... | … |  ... |  — |  even | —and |  lingering |  emotional
+qwen3.5-27b,association,grief,grief,released-R,31,"  | … | � | ... |  even | 
+ |  ... |  emotional |  just |  waiting"
+qwen3.5-27b,association,grief,grief,released-R,32,  | … | ... | � |  waiting |  even |  ... |  — |  … |  just
+qwen3.5-27b,association,grief,grief,released-R,33,  | … | � | ... |  slowly |  waiting |  decades |  invisible |  still |  —
+qwen3.5-27b,association,grief,grief,released-R,34,  | � | … |  invisible |  stubborn |  quietly | ... |  despite |  memories |  decades
+qwen3.5-27b,association,grief,grief,released-R,35,  | � | … |  invisible |  stubborn |  decades | ... |  quietly |  — |  memories
+qwen3.5-27b,association,grief,grief,released-R,36,  | � | … |  memories |  stubborn |  invisible |  memory | ... |  sentimental |  still
+qwen3.5-27b,association,grief,grief,released-R,37,  | � | … |  memories | ... |  memory |  sentimental |  stubborn |  every |  emotional
+qwen3.5-27b,association,grief,grief,released-R,38,  | � | … |  memories |  memory |  sentimental | ... |  emotional |  stubborn |  still
+qwen3.5-27b,association,grief,grief,released-R,39,  | … | � | ... |  memories |  memory |  every |  still |  sentimental |  stubborn
+qwen3.5-27b,association,grief,grief,released-R,40,  | � | … |  memories |  sentimental | ... |  memory |  quietly |  emotional |  still
+qwen3.5-27b,association,grief,grief,released-R,41, her |   | � |  sentimental |  herself |  emotional |  memories |  she |  quietly |  memory
+qwen3.5-27b,association,grief,grief,released-R,42,  | � |  herself |  her |  emotional |  memories |  sentimental |  quietly |  habit | …
+qwen3.5-27b,association,grief,grief,released-R,43,  | � |  her |  memories |  herself |  she | … |  emotional |  sentimental |  memory
+qwen3.5-27b,association,grief,grief,released-R,44,  | � |  herself | ____ |  sentimental |  memories |  her |  she |  every |  emotional
+qwen3.5-27b,association,grief,grief,released-R,45,� |   |  memories |  her |  every |  herself |  she |  sentimental |  lingering |  emotional
+qwen3.5-27b,association,grief,grief,released-R,46,� |   |  herself |  she |  her | 每周 |  sentimental |    | 每月 | 她的
+qwen3.5-27b,association,grief,grief,released-R,47,� |   | ____ |  her |  she |  herself | ___ |  memories |  every | —
+qwen3.5-27b,association,grief,grief,released-R,48,� |   | ____ |  she |  memories |  her | 每周 | ___ |  every |  herself
+qwen3.5-27b,association,grief,grief,released-R,49,� |   |  she | 每周 |    |  memories | 每月 |  her | ____ |  sentimental
+qwen3.5-27b,association,grief,grief,released-R,50,"� |    | ____ |  she |  
+ |   | 每月 | 每周 |  | why"
+qwen3.5-27b,association,grief,grief,released-R,51," 
+ | 什么意思 | � |    | 
+ |   |   
+ | 每周 | 是什么意思 | <|im_end|>"
+qwen3.5-27b,association,grief,grief,released-R,52," 
+ | � | 什么意思 |   | 
+ | 这句话 |    | ____ |   
+ | ()"
+qwen3.5-27b,association,grief,grief,released-R,53,"这句话 | 什么意思 |  
+ |    |   
+ | 改成 | � | 是什么意思 | 
+ |   
+
+"
+qwen3.5-27b,association,grief,grief,released-R,54,"什么意思 |  
+ | 改成 | 这句话 |    |   | 改写 | 
+ | 	 |   
+"
+qwen3.5-27b,association,grief,grief,released-R,55,"什么意思 |  
+ |    | 改成 |   | 
+ | 这句话 | 	 | 改写 | �"
+qwen3.5-27b,association,grief,grief,released-R,56,"什么意思 |  
+ | 改成 | 
+ | 这句话 |   
+ |    |   
+
+ | 改写 |  rewrite"
+qwen3.5-27b,association,grief,grief,released-R,57," 
+ | 什么意思 |   
+ | 
+ |    |   
+
+ | 改成 | 这句话 | 改写 |  
+
+"
+qwen3.5-27b,association,grief,grief,released-R,58," 
+ | 
+ | 什么意思 |    |   
+ | 改写 | 改成 | 这句话 |  she |   
+
+"
+qwen3.5-27b,association,grief,grief,released-R,59,"什么意思 |  
+ | 这句话 |  she |  her | 改成 |   
+
+ |   
+ | 
+ |  "
+qwen3.5-27b,association,grief,grief,released-R,60,"什么意思 |   
+
+ |   
+ |  
+ | 
+ |    |  It |  She |   | 这句话"
+qwen3.5-27b,association,grief,grief,released-R,61," He |   
+
+ | 什么意思 |  She |  His |  It |  That |   
+ |  Every | 
+"
+qwen3.5-27b,association,grief,grief,released-R,62,"
+ |  Her |  She |  It |  He |  That |   
+ |  When |   
+
+ |  His"
+qwen3.5-27b,association,grief,grief,released-J,0,–and | – | **– | izon |  tossed | � | .hm | � | 籲 | renz
+qwen3.5-27b,association,grief,grief,released-J,1,–and | – | ” |  – |  “ |  “[ | ’Brien | –– | ”— |  
+qwen3.5-27b,association,grief,grief,released-J,2,–and |  — | —and | tom |  Swe | —I |  Tom | ３ | – | slot
+qwen3.5-27b,association,grief,grief,released-J,3,欠 | .plist |  harvest | okal |  Seahawks | 穌 |  Harvest | 漿 | 厲 |  quiet
+qwen3.5-27b,association,grief,grief,released-J,4,okal |  cal | (cal |  Cal |  ... | cal | ... |  calibration | —I | .cal
+qwen3.5-27b,association,grief,grief,released-J,5,—we | –and | 一个叫 | —I | ... |  — | —but | – | —you |  everyone
+qwen3.5-27b,association,grief,grief,released-J,6," — | —even | —but | –and | —and | —we | —I | —not | —they | —"""
+qwen3.5-27b,association,grief,grief,released-J,7,—even | —I |  — | —but | —the | —they | —not | —and | –and | —it
+qwen3.5-27b,association,grief,grief,released-J,8,—even |  someday | —but | -- | —they | —I | —that | —it |  — |  sometimes
+qwen3.5-27b,association,grief,grief,released-J,9,-- |  people |  probably |  somehow |  things |  maybe |  anyway |  everybody |  someday |  --
+qwen3.5-27b,association,grief,grief,released-J,10, probably | -- |  people |  somehow |  someone |  anyway |  -- |  maybe |  Anyway |  ...
+qwen3.5-27b,association,grief,grief,released-J,11, maybe |  probably |  mostly |  somehow |  people | Maybe | -- |  anyway |  Maybe |  sometimes
+qwen3.5-27b,association,grief,grief,released-J,12, somehow |  maybe |  probably |  mostly |  even |  someone | Maybe |  like |  nobody |  really
+qwen3.5-27b,association,grief,grief,released-J,13, somehow |  things |  nobody |  maybe |  thing |  people | because |  because |  just |  tiny
+qwen3.5-27b,association,grief,grief,released-J,14, even |  somehow |  just |  because |  nobody |  really |  nothing |  everyone |  things |  actually
+qwen3.5-27b,association,grief,grief,released-J,15, anyways |  freaking | _logger |  even |  damn |  everyone |  countless |  someday |  nothing |  everything
+qwen3.5-27b,association,grief,grief,released-J,16,—even | � |  nothing |  someday |  nobody |  dozens |  things |  even |  everything |  just
+qwen3.5-27b,association,grief,grief,released-J,17,—even | —or | —not |  — | —but |  someday | —that |  nothing |  nobody |  dozens
+qwen3.5-27b,association,grief,grief,released-J,18,—even | —or | —and | —not | —but |  — | —that | —they | —you | —
+qwen3.5-27b,association,grief,grief,released-J,19,"—even | —or | —and | —but | —not |  — | —that | —"" | —they | —you"
+qwen3.5-27b,association,grief,grief,released-J,20,"—even | —and | —or | —but | —not | —"" |  — | —that | —they | ּ"
+qwen3.5-27b,association,grief,grief,released-J,21,"—and | —even | —or | —but | —not |  — | —that | ּ |  nobody | —"""
+qwen3.5-27b,association,grief,grief,released-J,22,"—and | —or | —even | —but | —not |  — | ּ | —that | —"" |  longtime"
+qwen3.5-27b,association,grief,grief,released-J,23,—and | —or | —even | —but | ּ |  — | —not |  someday | —that |  longtime
+qwen3.5-27b,association,grief,grief,released-J,24,—and | —or | —but | —even | ּ |  — | —that | —not |  dozens |  longtime
+qwen3.5-27b,association,grief,grief,released-J,25,—and | —or | —even | —but |  longtime |  — |  someday | � |  neighborhoods | —not
+qwen3.5-27b,association,grief,grief,released-J,26,—and | —or | —but | —even |  mourn |  lingering |  forever |  grieving |  longtime |  —
+qwen3.5-27b,association,grief,grief,released-J,27,—and | —or | —but | —even |  forever |  mourn |  — |  grieving |  grief | —a
+qwen3.5-27b,association,grief,grief,released-J,28,—and | —or | —but | —even |  mourn | —a |  grieving |  — |  forever |  lingering
+qwen3.5-27b,association,grief,grief,released-J,29,—and | —or | —but | —a | —even |  — |   | � | —the | —
+qwen3.5-27b,association,grief,grief,released-J,30,—or | —and | —but | —a | —even |   |  — | � | — | —the
+qwen3.5-27b,association,grief,grief,released-J,31,  | —but | —or | —and | � | —even | —a | … | — | —not
+qwen3.5-27b,association,grief,grief,released-J,32,  | —but | � | —and | —or | … | —even | —a | — |  —
+qwen3.5-27b,association,grief,grief,released-J,33,—and | —but | … | � |  stubborn | —even | —or | —a |   |  invisible
+qwen3.5-27b,association,grief,grief,released-J,34,� |  stubborn | —but | … |   | —even | —and |  invisible |  quietly | —a
+qwen3.5-27b,association,grief,grief,released-J,35,� | … | —but |   | —or |  stubborn | —even | —and | —a |  quietly
+qwen3.5-27b,association,grief,grief,released-J,36, stubborn | � | —but | … |  memories | —and | —or | —even |  quietly | ____
+qwen3.5-27b,association,grief,grief,released-J,37, stubborn | � |  memories | … |  memory |  quietly | ____ |  mourn | —but | 记忆
+qwen3.5-27b,association,grief,grief,released-J,38, stubborn |  memories |  memory | … | � | 记忆 |  quietly |  sentimental | ____ |  mourn
+qwen3.5-27b,association,grief,grief,released-J,39, stubborn |  memory |  memories | 记忆 | … |  sentimental |  invisible |  quietly |  mourn | Memory
+qwen3.5-27b,association,grief,grief,released-J,40, memories |  memory |  sentimental |  stubborn | 记忆 |  quietly |  mourn |  invisible |  memorial | Memory
+qwen3.5-27b,association,grief,grief,released-J,41, sentimental |  memories |  grieving |  memory |  mourn |  emotionally |  obsessive |  herself |  grief |  stubborn
+qwen3.5-27b,association,grief,grief,released-J,42, sentimental |  memories |  grieving |  memory |  emotionally |  quietly |  stubborn |  grief |  obsessive |  lingering
+qwen3.5-27b,association,grief,grief,released-J,43, memories |  sentimental |  memory |  grieving |  symbolic |  stubborn |  mourn |  emotionally |  quietly |  grief
+qwen3.5-27b,association,grief,grief,released-J,44, stubborn |  sentimental |  memories |  quietly |  lingering |  silently |  invisible |  mourn |  grieving |  grief
+qwen3.5-27b,association,grief,grief,released-J,45, memories |  sentimental |  stubborn |  quietly |  lingering |  memory | 每周 |  silently |  invisible |  symbolic
+qwen3.5-27b,association,grief,grief,released-J,46, herself |  sentimental |  stubborn |  lingering |  she | 每周 |  quietly | � |  memories |  her
+qwen3.5-27b,association,grief,grief,released-J,47,____ | � | ___ |  stubborn |  sentimental |  memories |  she |  herself |  lingering | 每周
+qwen3.5-27b,association,grief,grief,released-J,48, memories | � | ____ | 每周 |  stubborn |  every |  she |  sentimental | ___ | 每月
+qwen3.5-27b,association,grief,grief,released-J,49, memories | 每周 | � |  she | 每月 |  every | ____ |  sentimental |  memory | Every
+qwen3.5-27b,association,grief,grief,released-J,50,____ | � | why |    |  she |  why | 每月 | 为什么 | 每周 | Why
+qwen3.5-27b,association,grief,grief,released-J,51,"什么意思 |  
+ | ____ | 是什么意思 |    | � | why | 每周 |   | 为什么"
+qwen3.5-27b,association,grief,grief,released-J,52,"什么意思 |  
+ | 这句话 | ____ | � |   |   | 是什么意思 | why | ___"
+qwen3.5-27b,association,grief,grief,released-J,53,"这句话 | 什么意思 |  
+ | 改成 |   |    | 是什么意思 |  |   
+ | ____"
+qwen3.5-27b,association,grief,grief,released-J,54,什么意思 | 改成 | 这句话 | 换成 | 改写 |   |  rewrite | 是什么意思 | 	 |   
+qwen3.5-27b,association,grief,grief,released-J,55,什么意思 | 改成 | 换成 | 这句话 | 改写 | 是什么意思 | 	 |   |    |  rewrite
+qwen3.5-27b,association,grief,grief,released-J,56,"什么意思 | 改成 | 这句话 | 改写 | 换成 |  rewrite |   |  
+ | 是什么意思 | 改为"
+qwen3.5-27b,association,grief,grief,released-J,57,"什么意思 | 改成 | 改写 | 这句话 |  
+ | 换成 |  rewrite |   |    |  she"
+qwen3.5-27b,association,grief,grief,released-J,58,"什么意思 | 改写 | 改成 | 这句话 |  she |  rewrite |  
+ |    | rewrite | 解释"
+qwen3.5-27b,association,grief,grief,released-J,59," she | 什么意思 | 这句话 |  her | 改成 |  
+ |  rewrite |  eleven | 解释 |   
+"
+qwen3.5-27b,association,grief,grief,released-J,60,"什么意思 |   
+
+ |   
+ |  She |  she |  
+ | 这句话 |    |  her | 改成"
+qwen3.5-27b,association,grief,grief,released-J,61," He | 什么意思 |   
+
+ |  She |  His |  That |   
+ |  she |  It |  Every"
+qwen3.5-27b,association,grief,grief,released-J,62,"
+ |  Her |  She |  It |  He |  That |   
+ |  When |   
+
+ |  His"
+qwen3.5-27b,association,grief,grief,logit,0,"  | , |  ( | - | . | 
+ | ... | / | : | ?"
+qwen3.5-27b,association,grief,grief,logit,1,"  | 
+ | ... | , | . |  ( | - | / | : | ?"
+qwen3.5-27b,association,grief,grief,logit,2,"... |   | 
+ | , | … | . | : | / |  A |  ("
+qwen3.5-27b,association,grief,grief,logit,3,"  | 
+ | ... |   | , | / | … |  ( | . | ?"
+qwen3.5-27b,association,grief,grief,logit,4,"  | 
+ | ... |   | … | . | , | ? |  ( | /"
+qwen3.5-27b,association,grief,grief,logit,5,"  | 
+ | ... |   | . |  ( | … | ? | , | :"
+qwen3.5-27b,association,grief,grief,logit,6,"  | ... | 
+ |   | . | : | … |  ( | ? | ,"
+qwen3.5-27b,association,grief,grief,logit,7,"  | ... | 
+ |   | . | … | , | ? | : |  ("
+qwen3.5-27b,association,grief,grief,logit,8,"... |   | 
+ |   | . | … | ? | , |  ( | :"
+qwen3.5-27b,association,grief,grief,logit,9,"
+ |   |   | ... | . | ? | , | : | … |  ("
+qwen3.5-27b,association,grief,grief,logit,10,"
+ |   | ... |   | … |  ... | . |  ( |  I | 	"
+qwen3.5-27b,association,grief,grief,logit,11,"  | 
+ |   | ... | . | … |  ( |  ... |  
+ | ?"
+qwen3.5-27b,association,grief,grief,logit,12,"  | 
+ |   | ... | . |  ... |  
+ | … |  ( | ?"
+qwen3.5-27b,association,grief,grief,logit,13,"  | 
+ |   | ... | . |  A | … |  ... |  ( |  
+"
+qwen3.5-27b,association,grief,grief,logit,14,"  |   | ... | 
+ | � |  ... |  A | … | . |  s"
+qwen3.5-27b,association,grief,grief,logit,15,"  |   | ... | 
+ | . | … |  A |  ( |  [ | ["
+qwen3.5-27b,association,grief,grief,logit,16,"... |   |   | 
+ | … | . |  A |  ( | / | ("
+qwen3.5-27b,association,grief,grief,logit,17,"  |   | ... | … | . | 
+ |  A | // |  ( | 。"
+qwen3.5-27b,association,grief,grief,logit,18,"  | ... |   | … | 
+ | . |  ... | …… |  s | ____"
+qwen3.5-27b,association,grief,grief,logit,19,"  | ... | 
+ | … |  ... | ____ | 泛 |  et | 蛛 |  "
+qwen3.5-27b,association,grief,grief,logit,20,"  | ... | 
+ |  ... | ta | 代 | … | ____ | …… |   "
+qwen3.5-27b,association,grief,grief,logit,21,"... |   | 
+ |  ... | 代 | … |   | ta | [] |  i"
+qwen3.5-27b,association,grief,grief,logit,22,"  | ... | 
+ | ta |   | … | [] |  ... | . |  ."
+qwen3.5-27b,association,grief,grief,logit,23,"  | ... | [] | ta | 
+ |  ... |   | . | ____ | T"
+qwen3.5-27b,association,grief,grief,logit,24,"[] |   | ... | 
+ | ta | . |   |  ... | … | 蛛"
+qwen3.5-27b,association,grief,grief,logit,25,"  | ... | 
+ | ta | [] | . | ; |  ... |    |  L"
+qwen3.5-27b,association,grief,grief,logit,26,"... | 
+ | em |   | ta | � | ____ | … |  p | rem"
+qwen3.5-27b,association,grief,grief,logit,27,"... | 
+ | ta |   | agi | 寡 | � |  l | � | ____"
+qwen3.5-27b,association,grief,grief,logit,28,"ta | 寡 | � | � | ____ | agi | ... | 
+ | � |  ost"
+qwen3.5-27b,association,grief,grief,logit,29,寡 | � | ____ | [] | � | � | ___ | ... | � |  
+qwen3.5-27b,association,grief,grief,logit,30,� | ____ | � | 寡 | [] |  [...] |   | ___ |  { | ve
+qwen3.5-27b,association,grief,grief,logit,31,[] | ____ | � | � | ve | ___ | ... |   |  { | �
+qwen3.5-27b,association,grief,grief,logit,32,____ | ve | [] | � | � | ___ | ... |   |  ... | �
+qwen3.5-27b,association,grief,grief,logit,33,寡 | ____ | ve | � | 显得格外 | igio | � | ‑ |  [...] | 痴
+qwen3.5-27b,association,grief,grief,logit,34,寡 | � | ____ | � |  [...] | stub | 可见 | ve | impl | �
+qwen3.5-27b,association,grief,grief,logit,35,obi |  [...] | � | 寡 | 安置 | � |  routine | 习惯 | 对一个 | 出入
+qwen3.5-27b,association,grief,grief,logit,36,obi | 出入 | ty | � |  her | 老兵 | stub | 对一个 | 习惯 | 的习惯
+qwen3.5-27b,association,grief,grief,logit,37,� | obi | 老兵 | 安置 | ty | 出入 |  her |  [...] | Why | usty
+qwen3.5-27b,association,grief,grief,logit,38,usty | obi | � | 老兵 |  [...] | 安置 | 习惯 | impan | 对一个 |  
+qwen3.5-27b,association,grief,grief,logit,39,usty | � |  [...] | [] | 矛盾的 | obi | osso | 可见 | 习惯 | 安置
+qwen3.5-27b,association,grief,grief,logit,40,� | usty |  [...] | obi | 作为一个 | 可见 | tems | yla | osl | abus
+qwen3.5-27b,association,grief,grief,logit,41,tems | � | obi | 作为一个 | 可见 | yla |  her | usty |  [...] | impan
+qwen3.5-27b,association,grief,grief,logit,42,� | 作为一个 |   |  [...] | tems | 可见 | obi | 作为 | ____ | 抚
+qwen3.5-27b,association,grief,grief,logit,43,� | tems | 作为一个 |  [...] | obi | 出入 | 可见 | coes | posito |  
+qwen3.5-27b,association,grief,grief,logit,44,� |   |  [...] | 作为一个 | tems | idd | obi | osso | 出入 |   
+qwen3.5-27b,association,grief,grief,logit,45,� | 作为一个 |   | obi | 三百 | tems | 抚 | impan |    |  [...]
+qwen3.5-27b,association,grief,grief,logit,46,� |   | 每一次 |    | emb | obi | ember | 三百 | 璃 | 作为一个
+qwen3.5-27b,association,grief,grief,logit,47,"� | 每一次 | ____ |  
+ |   
+ | 三百 | 害 | 作为一个 | emb | 安置"
+qwen3.5-27b,association,grief,grief,logit,48,� | 每一次 | 害 | ____ | emb | osso | 来访 | 维系 | 什么意思 | 擦拭
+qwen3.5-27b,association,grief,grief,logit,49,🙂 | � | 多少次 |   | 蕊 | 每一次 | yla | 挝 | 擦拭 | ¹
+qwen3.5-27b,association,grief,grief,logit,50,"yla | 多少次 | 🙂 | 每一次 |   |   
+
+ | 什么意思 | 多少个 | 来访 | 蕊"
+qwen3.5-27b,association,grief,grief,logit,51,"什么意思 | 🙂 |   | \""\ | 每一次 | yla | 蕊 |   
+
+ | 😉 | 每次"
+qwen3.5-27b,association,grief,grief,logit,52,"什么意思 | 这句话 |   |   
+
+ | \""\ | 多少次 | 解释 | 🙂 | 帮我 | ouns"
+qwen3.5-27b,association,grief,grief,logit,53,"这句话 | 什么意思 |   
+
+ |   |   
+ | 下列说法 | 换成 | estin | 是什么意思 | 解释"
+qwen3.5-27b,association,grief,grief,logit,54,"
+ |   |   |    |   
+ | � | — | in | 	 | 
+
+"
+qwen3.5-27b,association,grief,grief,logit,55,"什么意思 |   
+
+ | 换成 |   
+ | yla | 这句话 | 改写 |    | 对 | 下列说法"
+qwen3.5-27b,association,grief,grief,logit,56,"  
+
+ | 什么意思 | 这句话 |   
+ | 换成 | yla | 改写 |  
+
+ | 以上内容 |   "
+qwen3.5-27b,association,grief,grief,logit,57,"  
+
+ |   
+ | 什么意思 |  
+
+ | 换成 |    | 这句话 |  
+ | yla | 改写"
+qwen3.5-27b,association,grief,grief,logit,58,"
+ |   | - |  ( | _ | 
+
+ | . |   |  
+ | /"
+qwen3.5-27b,association,grief,grief,logit,59,"  
+
+ | 什么意思 | 这句话 |   
+ |  
+ |  
+
+ |  rewrite | 解释 | 润 | 改成"
+qwen3.5-27b,association,grief,grief,logit,60,"什么意思 |   
+
+ | 这句话 |   
+ |  rewrite | 改成 | 十一 |  eleven |  
+
+ |  Its"
+qwen3.5-27b,association,grief,grief,logit,61,"什么意思 |   
+
+ | 这句话 |  He |  That |  eleven |  rewrite |  Every |   
+ | 十一"
+qwen3.5-27b,association,grief,grief,logit,62,"
+ |  Her |  She |  It |  He |  That |   
+ |  When |   
+
+ |  His"
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,0,"ly | ""-- | jenigen | (er |  
+
+
+ | an |  
+
+
+
+
+ | -but | -and |  ..."""
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,1,ly | ся | raries | jenigen | efois | imately | 不可思议 | zeitig | riors | self
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,2,riors | 若 | ly | ondrous | efois | raries | resent |  лишь | 如同一 | 仅
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,3,", | 
+ |  and | ly | -- | â |  ( |  though |  the |  nearly"
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,4,"ly | 
+ | ... | â |  
+ | , | ~ |  seper |  â |  huh"
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,5,"ly | Though | ~ |  though |  
+ |  Though | ... | -esque | -ish |  nearly"
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,6,ly | beau | 加拿大 |  ës | edal |  замо | ся | alak | imately | 勇往直前
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,7,"ly | 
+ | , | ... | â |  
+ |   |  though |  thought |  nearly"
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,8,"ly | 
+ | ... | , |  pretty | Though | â |  though |  nearly |  thought"
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,9,"ly | 
+ | Though | ~ | ... |  
+ |  though |  gotta | That | semble"
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,10,"ly | 
+ | ... |  
+ | Though | lets | alak | ~ | edal |  gotta"
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,11,"... | 
+ | ly |  ... |  
+ | ~ | … |   | .. | ,"
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,12,"... | ly | 
+ |  ... | ..., | ~ | alak |  
+ |   |  poetic"
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,13,"... | ly | 
+ |  ... |  
+ | lets | ..., | ~ | alak | ...."
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,14,"... | ly |  ... | 加拿大 | ,... |  poetic | ..., | 
+ | haps | almas"
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,15,"... |  ... | 
+ | ,... | … | ly | .... |  
+ | ..., |  "
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,16,"... |  ... | … |   |  … | ,... | .... | 
+ | ly |  indeed"
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,17,"... |   | … |  ... | .... | ,... | 
+ | ly |  
+ |  indeed"
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,18,"... |   | ly |  poetic | … | —but |  poetry |  indeed | .... | ...,"
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,19,... |   | ly | … |  yet |  indeed |  poetic |  beneath |  perhaps | ....
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,20,... |   | … | ly |  yet |  indeed |  poetic | .... |  perhaps |  poetry
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,21,"... |   | … | ly |  poetic |  poetry |  indeed | ..., |  yet |  ..."
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,22,"... |  poetry |  poetic |   | … |  Poetry | ly |  poem | 诗歌 | ...,"
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,23,... |  poetic |  poetry |   |  Poetry | … |  poem | ly | 诗句 |  poets
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,24, poetic |  poetry |  Poetry |  poem |  poets |  rhyme |  poems |  poet |  verse | ...
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,25, poetic |  poetry |  poem |  Poetry |  poets |  poems |  poet |  rhyme | 诗歌 | 诗
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,26, poetic |  poetry |  poem |  Poetry |  poets |  poems |  rhyme |  poet | 诗歌 | 诗句
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,27, poetic |  poetry |  poem |  Poetry |  poets |  rhyme |  poems |  poet | 诗歌 | 诗
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,28, poetic |  poetry |  poem |  Poetry |  poets |  rhyme |  poems |  poet | 诗歌 | 诗句
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,29, poetic |  poetry |  poem |  Poetry |  poets |  rhyme |  poems | 诗歌 |  poet | 诗句
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,30, poetic |  poetry |  poem |  Poetry |  poets |  rhyme | 诗句 |  poet |  poems | 诗歌
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,31, poetry |  poetic |  poem |  Poetry |  poets | 诗歌 |  poems | 诗句 |  rhyme |  poet
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,32, poetry |  poetic |  poem |  Poetry |  poets | 诗句 | 诗歌 |  poems |  rhyme |  poet
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,33, poetry |  poetic |  poem |  Poetry |  poets | 诗歌 | 诗句 |  poems |  poet | 诗
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,34, poetry |  poetic |  poem |  Poetry |  poets | 诗歌 | 诗句 |  poems | 诗 |  rhyme
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,35, poetry |  poetic |  poem |  poets |  Poetry | 诗歌 |  rhyme | 诗句 |  poems | 诗
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,36, poetry |  poetic |  poem |  poets |  Poetry |  rhyme | 诗歌 | ____ |  poems | 诗
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,37, poetry |  poetic |  poem |  Poetry | ____ |  rhyme |  poets | 诗歌 |   |  poems
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,38, poetry |  poetic |  poem |  Poetry | ... | ____ | … |   |  rhyme |  poets
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,39, poetry |   |  poetic | ____ |  poem | ... | … |  Poetry | � | 这句
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,40, poetry |  poetic |  poem |  rhyme |  Poetry |   | ... | ____ |  poets | …
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,41, poetic |  poetry |  poem |  rhyme | ... | ____ |   | ___ | … |  poets
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,42,____ | ... |  poetic |   |  rhyme | ___ | … |  poem |  poetry | 句
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,43,  | ... | ____ | ___ | … |  poetic |  poetry | � |  rhyme |  poem
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,44,____ | ___ |   | ... |  poetic | … |  rhyme |  poetry | __ |  poem
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,45,____ | ... | ___ | … |   |  ______ |  poetic | __ |  ____ | ....
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,46,____ | ... | ___ |  poetic |  poem |  poetry | … |   |  rhyme |  poets
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,47,____ | ___ |  ______ | ... |  ____ | ________ | _____ | ________________ | __ |  ___
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,48,____ | ... | ___ |  ______ |  ____ | ________ | ________________ | … | .... | _____
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,49,____ | ___ | ... |  ______ | ________________ | __ | � |  ____ | ________ | _____
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,50,____ | ... | ___ | .... | __ | ________________ | ________ | … |      |        
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,51,____ | ... | ___ | __ |      |          | .... |    |       |    
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,52,____ | ___ | __ | ________________ | ... |  ______ | ________ | _____ |      |   
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,53,____ | ___ |  while | __ | ________________ |  beneath |  goodbye |  ______ | And |     
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,54,____ | ___ |  his |  beneath |  before |  goodbye |  death |  while |  until |  His
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,55, his |  His | His |  goodbye |  while | his | ____ |  farewell | ___ | And
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,56, his |  His |  while | His | his | And |  now |  death |  goodbye |  farewell
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,57, his |  His | his | His | And | 他的 |  farewell |  goodbye |  as |  And
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,58, his |  His | His | his | And | 他的 |  farewell |  as |  goodbye |  And
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,59, his |  His | His | his |  as | And | 他的 |  while |  And |  farewell
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,60, His | His |  his | And | his |  And |  then | Then |  while |  Then
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,61,His |  His | And |  his |  And | his | As | Then | Before | With
+qwen3.5-27b,poetry,couplet-breath-death,death,released-R,62,And | His | As |  His | A |  And | The | Then | With | While
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,0,ly | raries | ся | –and |  Weiner | 倡廉 | igor | aldo | ounsel | an
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,1,ly | raries | ся | ward |   | an |  “ | но | ” | ’s
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,2,ly | raries | ся | 써 | но | LY | an | UMENT | /sw | hips
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,3,ly | ся | ROID | a | -- | ... |  -- | ا | ayaran | LY
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,4,ly | ся | istic | raries | ... | 써 | 琥 | ا | okal | a
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,5,ly | ся | 써 | 中行 | zeitig | но | ا | ... | ward | almas
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,6,ly | ся | zeitig | 써 | но | imately | ward | jenigen | 中行 | raries
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,7,ly | ся | но | raries | zeitig | 써 | ônio | ward |  McCart | lich
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,8,ly | ся | но | zeitig | jenigen | ward | ჯ | ... | raries | 中通
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,9,ly | ся | но | ... | ays | zeitig | -- | 琥 | ward | ships
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,10,ly | ся | ... | ו | iful | ays | -- | но | hips | bat
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,11,ly | ... | ו | ays | iful | ся | но | a | 데요 | an
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,12,ly | ... | quit | но | ays | alak | ו | ся | ward | mente
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,13,ly | istic | ward | ся | ו | alak | но | ... | quit | a
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,14,ly | ... | но | ся | LY | alak | hev | lich | istic | quit
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,15,"ly | ... |  kal | ...” | ..."" | ..., | 3 |  ... |  Cali | alak"
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,16,ly | ... | … | ...” | fully | …… |  ... | alak | ्स | ...\
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,17,ly | ... | fully | alak | a | ्स | … | istic | en | 데요
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,18,ly | haps | ... | 데요 |  poetic |   | alak | iful | ्स | —
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,19,ly | haps |   |  poetic | Though | ... | 데요 | ्स |  nestled | iful
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,20,ly | ... | haps |  perhaps |   |  poetic | Though |  nestled | ्स | Perhaps
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,21,ly | ... |   | haps |  ought | ्स |  poetic | iful |  swiftly | …
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,22,ly | ... |  poetic | iful | haps |   | icles |  poetry | —but | …
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,23,ly |  poetic |   | ... | iful |  poetry | haps |  swiftly | icles |  Poetry
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,24,ly |  poetic |  poetry |  Poetry |   |  poets | ... |  lyric | haps |  whispers
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,25, poetic | ly |  poetry |  Poetry |  poets |  poem |   |  poet |  poems | ...
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,26, poetic |  poetry |  Poetry | ly |  poets |  poem |  poems |  poet |  rhyme | 诗句
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,27, poetic |  poetry |  Poetry | ly |  poets |  poem |  poet |  poems |  rhyme |  lyric
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,28, poetic |  poetry |  Poetry |  poem |  poets | ly |  poems | … |  rhyme | ...
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,29, poetic |  poetry |  Poetry |  poem |  poets | ly | … | ... |  poems |  poet
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,30, poetic |  poetry |  Poetry |  poem |  poets |  poems | 诗句 |  poet | … | ly
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,31, poetry |  poetic |  Poetry | … |  poem | � | ... |  � |   |  poets
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,32, poetry |  poetic |  Poetry | … |  poem | …… |  poets | ... |   | �
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,33, poetry |  poetic |  Poetry |  poem |  poets | ... |  poems | … | 诗句 | ……
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,34, poetry |  poetic |  Poetry |  poem | ____ | … |  poets | …… | ... |  poems
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,35, poetry |  poetic | ____ | … | …… |  poets |  Poetry |  poem | ... |  poems
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,36, poetry |  poetic | ____ |  poets |  Poetry |  poem | … | ... | …… |  poems
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,37, poetry |  poetic | ____ |  Poetry |  poets |  poem | … | ... | …… |  poems
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,38, poetry |  poetic | ____ |  Poetry | … | ... | …… |  poem |  poets |  poems
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,39, poetry | ____ |  poetic |  Poetry | … |  poem |  poets | ... | …… | ___
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,40, poetic |  poetry |  Poetry | ____ |  poem |  poets | … |  rhyme | 诗句 |  poems
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,41, poetic |  poetry | ____ |  poem |  rhyme |  poets |  Poetry | … | ... | 诗句
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,42,____ |  poetic |  poetry | ... |  rhyme | … |  poem | ___ |  poets | 诗句
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,43,____ |  poetic | ___ |  poetry | ... |  poem |  rhyme |  poets | … |  
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,44,____ | ___ |  poetic |  poetry |  rhyme |  poets |  poem |  ______ |  ____ |  ___
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,45,____ | ___ | ... |  poetic |  ______ |  poetry |  ____ | … |  poets |  rhyme
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,46,____ | ___ |  poetic | ... |  poetry |  ______ |  poem |  poets | ________ |  ____
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,47,____ | ___ |  ______ | ________ |  ____ | _____ |  ___ |  _____ | ____________ | ________________
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,48,____ | ___ |  ______ | ... |  ____ | ________ | _____ |  ___ |  _____ | ________________
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,49,____ | ___ |  ______ |  ____ | ________ | ________________ | _____ |  _____ |  ___ | ...
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,50,____ | ___ | ... | .... |  ______ | ________________ | ________ | …… |  ____ | __
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,51,____ | ___ | ... | .... |  ______ | ________________ |  death | ________ | __ |         
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,52,____ | ___ | ________________ |  ______ | ________ | _____ | _________ | __ |  ____ |  ___
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,53,____ | ___ | ________________ |  ______ |  goodbye | ________ |  while |  death | _____ |  beneath
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,54,____ | ___ |  his |  death |  goodbye |  until |  His |  farewell |  beneath |  before
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,55, his |  His | His |  farewell |  goodbye | his | ____ | ___ |  while | And
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,56, his |  His | His | his |  while |  death |  farewell |  now |  goodbye | And
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,57, his |  His | His | his |  farewell | 他的 | And |  goodbye |  as |  And
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,58, his |  His | His | his | 他的 |  farewell | And |  goodbye |  And |  as
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,59, his |  His | His | his | 他的 |  as |  while | And |  And |  его
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,60, His | His |  his | his | And |  And | 他的 |  Его |  while |  then
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,61, His | His | And |  his | his |  And | Then | As | Before | While
+qwen3.5-27b,poetry,couplet-breath-death,death,released-J,62,And | His | As |  His | A |  And | The | Then | With | While
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,0,"  | , | . | ... | - |  ( | / | 
+ | ' | :"
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,1,"  | ... | . | , |  ( | - | ( | 
+ | / | :"
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,2,"... |   | . | - | / | ( | , |  I | ' | …"
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,3,"... |   | / | - | . | ' | ( | , |  
+ | …"
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,4,"... |   | / | - | . | ( | , |  ( | ly | _"
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,5,  | ... | - | . | / |  ( | ly | ( | _ |  
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,6,  | ... | . | - | / |  ( | ( |   | ! | ly
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,7,"  | ... | . | - | / | ly | ! | ( | ' |  
+"
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,8,"  | . | ... | - | / | ( | ! |  
+ | , | ly"
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,9,"  | ... | . | - | / | ( | s |  
+ | ! |  "
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,10,"  | ... | / | s | . | - | ( |  
+ |   | “"
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,11,"  | ... | s | / | . | - |  
+ | ( |   | !"
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,12,"  | ... | s |  
+ | � | 
+ | . | / | - | �"
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,13,"  | ... | s | 初 | . |  
+ | C | � | 
+ | 	"
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,14,"  | 初 | � | 沥 | s | � |  
+ |     | 灶 | ..."
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,15,� | 初 | s |   | ... |     | ** | � | 偶 | 不
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,16,  | ... | / | … | s | � |     | 初 | // | ()
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,17,"  | ... | < | .. | __ | … |     | s | 灶 | 
+"
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,18,... |     |    | � | ly |   | .. | __ |   | …
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,19,"... |     | .. | __ | 
+ | ly | // |   | < |   "
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,20,... | ly |     | // | � | __ | .. | … | ad |  
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,21,... |     |   | ta | ad | ly | < |    | // | �
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,22,"... | ta |     |   | ly | // |         | 
+ |  
+ | a"
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,23,... | ta |     | — |   | 首 | .. |         | 两句 | …
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,24,... |   | ta | // | … |    | 两句 | — | 一句 | ..
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,25,... |   | 一句 | ____ |    | — | 两句 |     | … | ta
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,26,"... |   | ta |    | ____ | ly |     | . | 
+ |  rhyme"
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,27,... | ta |   |     |  rhyme | ‑ |    | oes | — | ____
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,28,... | ta |  rhyme | oon | — |     | oes | .. | … |   
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,29,... | ta |  rhyme | oon | ad | 诗 | https | a | … | un
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,30,"... | ta | 诗 |  prose | https | oon |     | a | ____ | 
+"
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,31,oon | oom | ... |     | po | https | � | ____ |  prose | �
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,32,oon | oom |     | ... | po | 缀 |    | � | 请问 | ta
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,33,oom | oon |     | umn | ... | ____ | � | 请问 | utton | 缀
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,34,____ | oom |   | 请问 | utton |     | ... | https | 尾 | �
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,35,oom | illion |  rhyme | 诗 | ____ | plet |  XXX | 尾 | umn | �
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,36,____ | 诗 | 有何 | illion | oom |  rhyme |  XXX | 尾 | auses | 缀
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,37,____ | � | 诗 | 尾 | 有何 |  rhyme | auses | illion | ta | �
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,38,� | ____ | 尾 | 有何 | ... | auses | illion | ta | 诗 | 缀
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,39,____ | � | illion | __ | 与其 | auses | oom | � | 有何 | ...
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,40,____ | ... | � | 句 | � | auses | ta | __ | — |  rhyme
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,41,____ | ... | ta | __ | � | � | auses | un | — | ....
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,42,____ | ... | ta | � |   | un | ___ | � | � | �
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,43,____ | ... | ___ | 粉 | ta | � | un | utton | � | __
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,44,____ | ... | ___ | � | un | � | ta | a | _____ | oom
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,45,____ | ... | un | � | ___ | � | a | ta | � | —
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,46,____ | ... | � | � | ta | un | 当 | 用 | unal | a
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,47,____ | _____ | ___ | ... | ________________ |  ____ | ＿＿ |  ______ | .... | ________
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,48,____ | ＿＿ | _____ | ... | � | .... | adan | ___ | ________________ | emsp
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,49,____ | ＿＿ | � | _____ | ___ | ... | 而在 | ________________ | emsp | so
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,50,... | ____ | .... | ＿＿ | ___ | 终 | so | 　　 |         |        
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,51,＿＿ | 　　 | ____ | 功 | 这句 | ... | ___ |  beneath | 终 | ....
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,52,____ | ___ | 然后 | ________________ |  beneath | ＿＿ | ETER | 功 | 　　 | _____
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,53,____ |  beneath | 然后 | ___ |  whilst | ________________ | 而 | 功 | The | ETER
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,54,然后 |  beneath | The | ... | Then | ____ |  whilst | ___ | And |  Its
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,55, his |  His | 他的 | His | 然后 | And |  whilst | The | Then |  farewell
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,56, his |  His |  yet | His |  whilst |  while | Then | 然后 | 他的 | And
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,57, his |  His | 他的 | His | And | his |  And |  farewell |  as | Then
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,58, his |  His | His | And | 他的 | his |  as |  And | Then | The
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,59, his | His |  His | his | 他的 | And | Then |  as |  его | The
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,60, His | His |  his | And |  And | Then | his | 他的 | The |  Его
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,61,His |  His | And |  his | As | Then |  And | his | The | Before
+qwen3.5-27b,poetry,couplet-breath-death,death,logit,62,And | His | As |  His | A |  And | The | Then | With | While

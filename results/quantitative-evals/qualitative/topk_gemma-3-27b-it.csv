@@ -1,0 +1,1123 @@
+model,set,item_id,intermediate,lens,layer,top10
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,0," to |  the | , |  a |  in |  not |  that |  also |  on |  being"
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,1,", |  to |  the |  a |  in |  not |  that |  and |  for |  also"
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,2,", |  to |  the |  a |  in |  not |  on |  and |  for |  also"
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,3,", |  to |  the |  a |  in |  and |  for |  on |  not |  that"
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,4,", |  to |  the |  a |  in |  and |  for |  on |   |  that"
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,5,", |  to |  the |  a |  in |  and |   |  for |  on |  as"
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,6,", |  to |  the |  a |  in |  and |   |  for |  on |  ("
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,7,", |  to |  the |  a |  and |  in |   |  for |  that |  ("
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,8,", |  to |  the |  a |  and |  in |   |  that |    |  for"
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,9,", |  to |  the |  a |  and |  in |   |  that | . |  for"
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,10,", |  to |  the |  a |  and |  in |   | 
+ |  that |  not"
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,11,", |  to |  the |  a |  and |  in |   | 
+ |  that |  for"
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,12,", |  to |  the |  a |  and |  in |  that |   |  for | 
+"
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,13,", |  to |  the |  a |  and |  in |  that |   |  not |  for"
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,14,", |  to |  the |  a |  and |  in |   |  that |  not | 
+"
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,15,", |  to |  the |  a |  and |  in |  that | � |  only |  not"
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,16,", |  color |  to |  the |  a |  and |   |  in |  only | �"
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,17," color | , |  the |  to |  a |  colors |  and |   | 
+ |  in"
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,18,", |  color |  the |  to |  a |  and |  that |   |  in |  colors"
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,19," color |  the | , |  a |  colors |  to |   |  and |  in | �"
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,20," color |  colors | , |  the |  a |  to |  that |  only |  colored |  in"
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,21," color |  colors | , |  the |  that |  a |  to |  only |  being | �"
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,22," color |  colors |  colored |  the |  that |  Earth |  science | , |  not |  a"
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,23," color |  colors | , |  Earth |  the |  colored |  that |  "" |  a |  science"
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,24," color |  colors |  colored |  science |  Earth | , |  the |  a |  coloring |  that"
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,25," color |  colors |  colored |  known |  science |  "" |  coloring |  that |  Earth |  the"
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,26," color |  "" |  colors |  not |  colored |  Earth | � |  a | , |  known"
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,27," color |  colors |  Earth |  "" |  colored |  science | � |  known |  a |  commonly"
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,28," color |  colors |  colored |  Earth |  coloration |  colorful |  colorless |  multicolored |  coloring |  """
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,29," color |  colors |  commonly |  Earth |  colored |  often |  known |  most |  usually |  """
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,30, color |  colors |  Earth |  colored |  commonly |  coloration |  often |  known |  colour |  coloring
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,31, color |  colors |  colored |  coloration |  coloring |  Color |  colour |  Earth |  reddish |  multicolored
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,32, color |  colors |  colored |  colour |  Color |  coloration |  reddish |  coloring |  multicolored |  Earth
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,33, color |  colors |  colored |  colour |  Color |  coloration |  reddish |  coloring |  multicolored |  colorful
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,34, color |  colors |  reddish |  colour |  colored |  coloration |  Color |  coloring |  orange |  purple
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,35, color |  colors |  reddish |  colour |  colored |  Color |  coloration |  orange |  yellowish |  coloring
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,36, color |  colors |  reddish |  colour |  colored |  coloration |  orange |  Color |  yellowish |  purple
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,37, color |  reddish |  colors |  colour |  colored |  Martian |  orange |  yellowish |  planet |  purple
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,38, color |  reddish |  Mars |  Martian |  planet |  planetary |  colors |  known |  red |  commonly
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,39, reddish |  color |  Mars |  planet |  Martian |  known |  planetary |  colors |  mostly |  red
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,40, reddish |  color |  known |  mostly |  named |  Mars |  largely |  called |  commonly |  primarily
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,41, Mars |  Martian |  reddish |  planet |  mars |  planetary | Mars |  red |  color |  orange
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,42, Mars |  Martian |  reddish |  mars |  red |  planet |  planetary |  orange | Mars |  named
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,43, reddish |  Mars |  Martian |  red |  orange |  named |  color |  mostly |  called |  yellowish
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,44, reddish |  Mars |  Martian |  red |  orange |  color |  known |  named |  yellowish |  called
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,45, reddish |  red |  orange |  known |  Mars |  Red |  Martian |  yellowish |  named |  crimson
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,46, reddish |  red |  Red |  orange |  красный |  redness | 红色 |  reds |  крас |  crimson
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,47, reddish |  red |  Red |  orange |  redness |  красный |  reds | 红色 | 紅色 |  крас
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,48, reddish |  red |  orange |  Red |  reds |  красный | 红色 | 紅色 |  crimson |  redness
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,49, reddish |  red |  Red |  красный |  orange |  reds | 红色 |  kırmızı |  crimson |  redness
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,50, reddish |  red |  Red |  красный |  orange |  reds |  crimson | 红色 |  крас |  kırmızı
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,51, red |  reddish |  Red |  orange |  красный |  reds |  crimson |  redness |  крас | 红色
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,52, red |  reddish |  Red | Red |  reds | 红 |  красный | red |  RED |  redness
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,53, red |  reddish |  Red | Red |  reds | red |  красный | 红 |  RED |  крас
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,54, red |  reddish |  Red | red | Red |  RED |  reds | 红 |  красный |  крас
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,55, red |  reddish |  Red | red | Red |  RED |  reds | 红 |  красный |  orange
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,56, red |  reddish |  Red | red |  orange |  RED |  commonly | Red | 红 |  often
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,57, red |  reddish |  Red |  orange |  RED |  commonly | red | Red |  often | 红
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,58, red |  Red |  reddish |  commonly |  often |  RED |  orange |  primarily |  known |  called
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,59, red |  Red |  reddish |  often |  known |  called |  commonly |  famously |  largely |  orange
+gemma-3-27b-it,multihop,mars-color,Mars,released-R,60, red |  Red |  often |  reddish |  commonly |  a |  known |  called |  most |  predominantly
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,0,ness | ity | </b> |  입니다 |  부터 |  ok |  jalap |  Wifi | shire | y
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,1,ness | ity | shire |  입니다 |  부터 | </b> |  jalap | y |  সাধারন |  Jimenez
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,2,ness | ity | shire |  jalap |  입니다 |  부터 |  Rodriguez | ly |  Jimenez | ment
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,3,ness | ity | shire | ly |  أيضا |  Rodriguez | ся | </b> |  Jimenez |  입니다
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,4,ity | ness |  bowiem |  입니다 | </b> | ся | shire |  까지 | ly |  pues
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,5,ity | ness |  bowiem | ся | </b> | shire | ment |  입니다 | ly |  indeed
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,6,ity | ness |  bowiem | ся | shire | ment | </b> |  입니다 | ly |  indeed
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,7,"</b> | ness | ity |  indeed | ment |  , |  bowiem | shire | ся |  ‘’"
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,8,</b> | ness | ity |  indeed |  Histogram | ся |  . |  therefore | ment |  bowiem
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,9,</b> | ness | ity |  indeed | ся |    |  bowiem |  . |  therefore |  Histogram
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,10,</b> | ity | ness |  indeed |  Oak | ся |  ` |  أيضا |  Magnesium |  .
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,11,</b> | ity | ness |  ` |  indeed |  Oak |  `` |  '' |  أيضا |  ¨
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,12,ity | </b> | ness |  indeed |  ?. |  ! |  Oak | сть |  أيضا |  color
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,13,ity | ness | </b> |  indeed |  indoor |  color | сть |  Jimenez |  to |  allowed
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,14,ity | ness | </b> |  color |  . |  colors |  indeed |  always |  Jimenez |  ?.
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,15,</b> | ness | ity | � |  because |  colors |  ?. |  Pokemon |  color |  !
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,16,</b> | ity |  color | ness | � |  colors |  ! |  ¨ | . |  to
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,17,"</b> | ness |  because | ity |  ! |  ¨ |  colors |  Pokemon |    |  ,"
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,18,"</b> |  colors |    |  , | � |  color |  ! | . |  : | ness"
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,19,"</b> |  colors |  color | � |  ! | 
+ |  : |  , | ity |  Pokemon"
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,20,"</b> |  colors |  color |  Pokemon |  ! |    | ity | 
+ |  : | ness"
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,21,</b> |  according | � |  colors |  because |  Pokemon |  : |  ! |  ¨ | </strong>
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,22,</b> |  ! |  colors |  '' |  ?. |  according |  because |  ¨ |  color |  ?
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,23,</b> |  colors |  color | </strong> |  Colors |  Pokemon |  ` |  because |  ! | ness
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,24,</b> |  colors |  color |  Colors |  scientifically |  vegetable |  과학 | </strong> |  multicolored | Colors
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,25, colors | </b> |  color |  scientifically |  vegetable |  Vegetable |  Colors |  multicolored |  scientific |  vegetables
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,26,</b> |  neither |  presently |  peculiar |  purportedly |  commonly |  colors |  indeed |  color |  multicolored
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,27, commonly | </b> |  colors |  known |  color |  scientifically |  multicolored |  popularly |  scientific |  peculiar
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,28, commonly |  colors |  color |  known |  scientifically |  popularly |  multicolored |  ______ |  peculiar |  nicknamed
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,29, commonly |  usually |  sometimes |  often |  known |  colors |  oftentimes |  popularly |  color |  scientifically
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,30, commonly |  colors |  usually |  nicknamed |  color |  sometimes |  known |  popularly |  often |  named
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,31, colors |  color |  commonly |  nicknamed |  multicolored |  popularly |  scientifically |  coloring |  usually |  coloration
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,32, colors |  color |  multicolored | 颜色 |  Colors |  Color |  coloration |  colored | 顏色 | colors
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,33, color |  colors |  multicolored | 颜色 |  रंग |  Color | 顏色 |  coloration |  Colors | colors
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,34, colors |  color | 颜色 | 顏色 |  coloration |  цвета |  रंग | colors |  colores |  Colors
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,35, colors |  color | 颜色 |  reddish |  रंग |  색 | 顏色 |  nicknamed |  цвета |  রঙের
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,36, colors |  color |  reddish |  রঙের |  nicknamed | 颜色 |  रंग |  COLOR |  색 |  цвета
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,37, reddish |  colors |  color |  রঙের |  nicknamed | 紅色 |  색 | 颜色 |  цвета |  yellowish
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,38, Martian |  reddish |  Mars |  nicknamed | 紅色 |  color | Mars |  colors |  yellowish | 红色
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,39, reddish |  Martian |  Mars |  nicknamed | 紅色 |  color | Mars |  planetary |  planet |  colors
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,40, reddish |  nicknamed |  Martian |  yellowish | 紅色 |  Mars |  multicolored |  colors |  named |  color
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,41, Martian |  Mars | Mars |  reddish |  mars |  planetary |  planet | mars | 紅色 | 红色
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,42, Mars |  Martian | Mars |  reddish |  mars |  planetary | 紅色 |  yellowish |  planet | 红色
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,43, reddish |  Martian |  Mars | Mars |  yellowish | 紅色 |  nicknamed |  grayish | 红色 |  mars
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,44, reddish |  Martian |  Mars | Mars |  yellowish | 紅色 | 红色 |  grayish |  nicknamed |  rougeâtre
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,45, reddish |  orange | 红色 | 紅色 |  yellowish |  சிவப்பு |  красный |  Martian |  Mars |  rougeâtre
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,46, reddish |  red | 红色 |  красный | 紅色 |  சிவப்பு |  крас |  kırmızı |  reds |  redness
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,47, reddish |  red | 红色 |  красный | 紅色 |  крас |  சிவப்பு |  kırmızı |  redness |  reds
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,48, reddish |  red |  orange | 红色 |  красный | 紅色 |  kırmızı |  சிவப்பு |  reds |  крас
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,49, reddish |  red |  красный | 红色 | 紅色 |  kırmızı |  крас |  சிவப்பு |  reds |  قرمز
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,50, reddish |  red |  красный | 红色 | 紅色 |  kırmızı |  крас |  reds |  சிவப்பு |  قرمز
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,51, reddish |  red |  красный | 红色 | 紅色 |  kırmızı |  крас |  reds |  قرمز |  சிவப்பு
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,52, red |  reddish |  Red |  красный |  reds | Red | 红 | 红色 |  крас | 紅色
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,53, red |  reddish |  Red |  красный |  крас | 红 | 红色 |  reds | Red | 紅色
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,54, red |  reddish |  Red | Red | 红 |  reds |  красный |  крас |  RED | red
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,55, red |  reddish |  Red | red | Red |  RED | 红 |  красный |  reds |  крас
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,56, red |  reddish |  Red | red | Red |  RED | 红 |  красный |  orange |  крас
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,57, red |  reddish |  Red |  RED | Red | 红 | red |  orange |  красный |  commonly
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,58, red |  reddish |  Red |  commonly |  often |  RED |  orange | Red |  primarily |  predominantly
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,59, red |  Red |  reddish |  often |  known |  called |  famously |  commonly |  orange |  predominantly
+gemma-3-27b-it,multihop,mars-color,Mars,released-J,60, red |  Red |  often |  reddish |  commonly |  a |  known |  called |  most |  predominantly
+gemma-3-27b-it,multihop,mars-color,Mars,logit,0, is |  are |  has | y | s |  heeft | した | する | と | d
+gemma-3-27b-it,multihop,mars-color,Mars,logit,1, is |  are | した | y |  has | する |  heeft | と | して | もの
+gemma-3-27b-it,multihop,mars-color,Mars,logit,2, is | y | した |  are |  has | する |  heeft | して | と |  does
+gemma-3-27b-it,multihop,mars-color,Mars,logit,3, is | y |  has | した |  heeft | する | と | して | もの | ון
+gemma-3-27b-it,multihop,mars-color,Mars,logit,4, is | y |  has | ון | もの | d | する | と |  OBJECT | ים
+gemma-3-27b-it,multihop,mars-color,Mars,logit,5,y |  is |  has | ון | d | s | もの | ים |  OBJECT | g
+gemma-3-27b-it,multihop,mars-color,Mars,logit,6,y |  is |  has | ון | d | g | s | ים | もの |  OBJECT
+gemma-3-27b-it,multihop,mars-color,Mars,logit,7,y | g | d | u | ון |  has |  MAP | m | on | k
+gemma-3-27b-it,multihop,mars-color,Mars,logit,8,y | u | d | g | on | m |  MAP |  has | k | ים
+gemma-3-27b-it,multihop,mars-color,Mars,logit,9,u | y | g | d | k | on |  MAP | m |  has |  HAS
+gemma-3-27b-it,multihop,mars-color,Mars,logit,10,u | y | on |  MAP | g | d | k |  HAS | et |  has
+gemma-3-27b-it,multihop,mars-color,Mars,logit,11,u | y |  has | on |  HAS |  MAP | ಾ | et |  SMK | g
+gemma-3-27b-it,multihop,mars-color,Mars,logit,12,u | on | ಾ | et | y |  has |  HAS | g |  MAP | d
+gemma-3-27b-it,multihop,mars-color,Mars,logit,13,u | et | y | on | ಾ |  has |  HAS |  А |  MAP | g
+gemma-3-27b-it,multihop,mars-color,Mars,logit,14,u | et | ಾ | y | on | g |  А | b |  HAS |  EYE
+gemma-3-27b-it,multihop,mars-color,Mars,logit,15,u | et | ಾ | y | on | g | b |  А |  EYE |  HAS
+gemma-3-27b-it,multihop,mars-color,Mars,logit,16,u | y | et | ಾ | g | b | on | t |  А | k
+gemma-3-27b-it,multihop,mars-color,Mars,logit,17,u | y | et | g | t | on | ಾ | b |  А | k
+gemma-3-27b-it,multihop,mars-color,Mars,logit,18,u | y | et | g |  А | t |  О |  HAS |  EYE | on
+gemma-3-27b-it,multihop,mars-color,Mars,logit,19,u | y | t | et |  А | g |  О | on |  З | hiy
+gemma-3-27b-it,multihop,mars-color,Mars,logit,20,y | u |  А |  О | t | g | hiy | et | ！) |  Y
+gemma-3-27b-it,multihop,mars-color,Mars,logit,21,y |  А | u |  О |  Я | t | g | hiy | et | ！)
+gemma-3-27b-it,multihop,mars-color,Mars,logit,22, А | y |  О | u |  Я |  Y | hiy |  Α | ！) |  Н
+gemma-3-27b-it,multihop,mars-color,Mars,logit,23, А |  О | y |  Я |  Α |  Y | u |  З |  Н |  скорее
+gemma-3-27b-it,multihop,mars-color,Mars,logit,24, А |  О | y |  Я |  что |  Α |  скорее |  NIKE |  не |  AMERICA
+gemma-3-27b-it,multihop,mars-color,Mars,logit,25, А |  не |  О |  AMERICA |  скорее |  is |  Я |  что |  a | y
+gemma-3-27b-it,multihop,mars-color,Mars,logit,26, a |  А |  не |  is |  что |  CAN | oncé |  has |  на |  COLOR
+gemma-3-27b-it,multihop,mars-color,Mars,logit,27, a |  не |  has |  is |  А |  color |  COLOR |  sunlight |  AMERICA |  much
+gemma-3-27b-it,multihop,mars-color,Mars,logit,28, не |  a |  color |  А |  is |  more |  COLOR |  much |  что |  sunlight
+gemma-3-27b-it,multihop,mars-color,Mars,logit,29, a |  more |  color |  is |  не |  not |  what |  known |  much |  something
+gemma-3-27b-it,multihop,mars-color,Mars,logit,30, color |  more |  a |  is |  colors | 色 | color |  colour |  not |  billions
+gemma-3-27b-it,multihop,mars-color,Mars,logit,31, color |  colors | color |  colour | 色 |  more |  reddish |  a |  COLOR |  not
+gemma-3-27b-it,multihop,mars-color,Mars,logit,32, color |  colors |  colour | color | 色 |  reddish |  a |  more | colour |  colours
+gemma-3-27b-it,multihop,mars-color,Mars,logit,33, color |  colors |  colour | color | 色 |  reddish |  COLOR |  Color | colour |  цвет
+gemma-3-27b-it,multihop,mars-color,Mars,logit,34, color |  reddish | color |  colors |  colour | 紅色 | 色 |  more |  red |  a
+gemma-3-27b-it,multihop,mars-color,Mars,logit,35, reddish |  color |  more | color |  red |  blue |  colour |  colors |  primarily |  a
+gemma-3-27b-it,multihop,mars-color,Mars,logit,36, reddish |  color |  red |  primarily |  more |  blue |  called | color |  very |  colors
+gemma-3-27b-it,multihop,mars-color,Mars,logit,37, reddish |  red |  color |  planetary |  primarily |  blue |  Martian |  called |  Mars |  planet
+gemma-3-27b-it,multihop,mars-color,Mars,logit,38, reddish |  Mars |  Martian |  planetary |  red |  planet |  mars | 紅色 |  called |  красный
+gemma-3-27b-it,multihop,mars-color,Mars,logit,39, reddish |  planet |  Mars |  planetary |  red |  known |  Martian |  primarily | 紅色 |  debated
+gemma-3-27b-it,multihop,mars-color,Mars,logit,40, reddish |  primarily |  Mars |  red |  known |  named |  called |  mostly |  planetary |  predominantly
+gemma-3-27b-it,multihop,mars-color,Mars,logit,41, Mars |  Martian | Mars |  reddish |  mars |  planetary |  planet |  red |  named |  primarily
+gemma-3-27b-it,multihop,mars-color,Mars,logit,42, Mars |  Martian |  reddish | Mars |  red |  planetary |  mars |  planet |  crimson |  orange
+gemma-3-27b-it,multihop,mars-color,Mars,logit,43, reddish |  Mars |  red |  Martian | Mars |  rusty |  named |  orange |  predominantly |  called
+gemma-3-27b-it,multihop,mars-color,Mars,logit,44, reddish |  Mars |  Martian |  red |  orange | Mars |  rusty |  named |  planetary |  crimson
+gemma-3-27b-it,multihop,mars-color,Mars,logit,45, reddish |  red |  orange |  Mars |  known |  Martian |  красный | 红色 |  rusty |  Red
+gemma-3-27b-it,multihop,mars-color,Mars,logit,46, red |  reddish | 红 |  красный |  orange | 红色 |  Red |  крас | red | 紅色
+gemma-3-27b-it,multihop,mars-color,Mars,logit,47, red |  reddish | 红 |  orange | 红色 |  красный |  крас |  Red | red |  kırmızı
+gemma-3-27b-it,multihop,mars-color,Mars,logit,48, red |  reddish |  orange |  красный | 红色 | 红 |  reds | 紅色 | red |  kırmızı
+gemma-3-27b-it,multihop,mars-color,Mars,logit,49, red |  reddish | 红 |  красный |  orange | 红色 |  kırmızı |  reds |  крас |  Red
+gemma-3-27b-it,multihop,mars-color,Mars,logit,50, red |  reddish | 红 |  orange |  красный | 红色 |  Red |  крас |  reds |  kırmızı
+gemma-3-27b-it,multihop,mars-color,Mars,logit,51, red |  reddish | 红 |  красный |  orange |  Red |  reds |  крас | 红色 |  kırmızı
+gemma-3-27b-it,multihop,mars-color,Mars,logit,52, red |  reddish |  Red | 红 | Red | red |  красный |  reds |  RED |  крас
+gemma-3-27b-it,multihop,mars-color,Mars,logit,53, red |  reddish |  Red | 红 | red | Red |  красный |  RED |  reds |  крас
+gemma-3-27b-it,multihop,mars-color,Mars,logit,54, red |  reddish |  Red | 红 | red | Red |  RED |  reds |  красный |  крас
+gemma-3-27b-it,multihop,mars-color,Mars,logit,55, red |  reddish |  Red | red |  orange | 红 |  RED | Red |  красный |  reds
+gemma-3-27b-it,multihop,mars-color,Mars,logit,56, red |  reddish |  Red |  orange |  commonly | red |  predominantly | Red |  RED |  often
+gemma-3-27b-it,multihop,mars-color,Mars,logit,57, red |  reddish |  Red |  orange |  commonly | red |  predominantly |  often |  RED |  primarily
+gemma-3-27b-it,multihop,mars-color,Mars,logit,58, red |  Red |  reddish |  commonly |  often |  orange |  RED | Red |  primarily | red
+gemma-3-27b-it,multihop,mars-color,Mars,logit,59, red |  Red |  reddish |  often |  orange |  famously |  known |  called |  predominantly |  commonly
+gemma-3-27b-it,multihop,mars-color,Mars,logit,60, red |  Red |  often |  reddish |  commonly |  a |  known |  called |  most |  predominantly
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,0," ..."" | ."" |  ."" |  "") | ,"" | ..."" | !"" |  ?"" | "") |  !"""
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,1," ..."" | ..."" | ."" |  ."" | ,"" | !"" | "") |  "") | )"" |  !"""
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,2," ..."" | ..."" | ."" | ,"" | !"" |  ."" | "") | "" |  "") | )"""
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,3," ..."" | ..."" | ."" | ,"" | "" | !"" |  ."" | "") | "", |  "")"
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,4," ..."" | ..."" | ."" | ,"" | "" | !"" |  ."" | "", |  "". |  "","
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,5," ..."" | ..."" | ."" | "" | ,"" |  "" | !"" | "", | "". |  ""."
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,6," ..."" | ..."" | ."" | "" | ,"" | !"" | "", | "". |  "" |  ."""
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,7,""" | ..."" | ."" | ,"" |  ..."" |  "" | !"" | "", | "". |  ""."
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,8,"..."" |  ..."" | ."" | "" | ,"" | !"" | "", | "". | ?"" |  """
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,9," ..."" | ..."" | "" | ."" | ,"" | !"" | "", | "". |  ."" | ?"""
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,10," ..."" | ."" | ..."" | "" | ,"" | !"" | "", |  ."" | "". | ?"""
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,11,"..."" |  ..."" | ."" | "" | ,"" | !"" | "", | "". | ?"" |  ."""
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,12,"."" | "" |  ..."" | ..."" | ,"" | !"" | "", | "". |  ."" | ?"""
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,13,"."" |  ..."" | "" | ..."" | ,"" | "", | !"" | "". |  ."" |  ""."
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,14,"."" | "" |  ..."" | ..."" | ,"" | "", | !"" | "". |  "", |  """
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,15," ..."" | ."" | ..."" | "" | ,"" | "", | !"" | "". |  "", |  ""."
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,16,"."" | "" |  ..."" | ..."" | ,"" | "", | !"" | "". | ?"" |  "","
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,17," ..."" | ..."" | ."" | "" | ,"" | "", | !"" | "". | ?"" |  "","
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,18," ..."" | ."" | ..."" | "" | ,"" | "", | !"" | "". | ?"" |  "","
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,19," ..."" | ..."" | ."" | "" | ,"" | "", | "". |  "", | ?"" | !"""
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,20," ..."" | ..."" | ."" | "" | ,"" | "", | "". | !"" |  "", | ?"""
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,21,"..."" |  ..."" | "" | ."" | ,"" | "", | "". | !"" |  "", | ?"""
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,22," ..."" | ..."" | "" | ."" | "", | "". |  "", | ,"" |  "". | ?"""
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,23," ..."" | ..."" | ."" | "" | "", | "". | ,"" | ?"" |  "", |  ""."
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,24," ..."" | ..."" | ."" | "". |  "". | "", | "" |  "", | ,"" | ?"""
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,25," ..."" | ..."" | ."" | "". | "", |  "". |  "", | ,"" | "" | ?"""
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,26," ..."" | ..."" | ."" | "". | "", | ,"" |  ... |  "". |  "", | ?"""
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,27," ..."" | ..."" | ."" | "". | "", | ?"" | ,"" |  ."" | ..."", | !"""
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,28,"."" |  opposites | ..."" |  ..."" | "". |  ____ | "", |  _____ |  opposite |  ________"
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,29,"."" | "". | ..."" | "", |  ____ |  ..."" |  _____ | � |  ... | ,"""
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,30," ____ |  ________ |  _____ |  ______ | ..."" |  _______ | ."" |  anton |  __________ |  opposites"
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,31," ____ |  _____ |  ________ |  _______ |  ______ |  opposites |  opposite | ..."" | ."" | "","
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,32, ____ |  _____ |  _______ |  ________ |  ______ |  __________ |  ___ |  anton |  ____________ |  **
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,33, opposites |  ____ |  anton |  opposite |  ________ |  _______ |  _____ |  ______ |  __________ | opposite
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,34, opposite |  opposites |  anton |  ____ | opposite |  Opposite |  противополо |  ________ |  _______ |  _____
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,35, ____ |  ________ |  _______ |  _____ |  opposite |  opposites |  ______ |  __________ |  anton |  pequeño
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,36," ____ |  ________ |  _______ |  _____ |  ______ |  __________ | ____ |  ____________ |  pequeño | ..."""
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,37," ____ |  ________ |  _____ |  _______ |  ______ |  __________ | ____ | ..."" |  pequeño |  ___"
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,38, pequeño |  ____ |  _____ |  ________ |  _______ |  ______ | small |  __________ |  pequeña |  small
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,39, pequeño |  pequeña |  pequeños |  ____ |  pequeno |  pequeñas |  _____ |  peque |  ________ |  débil
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,40, pequeño |  pequeña |  pequeños |  pequeñas |  pequeno | small |  small |  ____ |  tamaño |  peque
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,41, pequeño |  pequeña |  pequeños |  pequeñas |  pequeno | small |  petite |  peque |  tamaño |  small
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,42, pequeño |  pequeña |  pequeños |  pequeñas | small |  pequeno |  small |  малень |  petite | Small
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,43, pequeño |  pequeña | small |  pequeños |  small |  pequeno |  pequeñas | Small |  peque |  малень
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,44, pequeño |  pequeña |  pequeños |  pequeñas |  pequeno | small |  small |  peque |  малень | Small
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,45, pequeño |  pequeños |  pequeña |  pequeñas |  pequeno |  small | small |  peque |  малень |  pequena
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,46, pequeño |  pequeños |  pequeña |  small |  pequeñas |  pequeno | small | Small |  малень |  маленький
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,47, pequeño |  pequeña |  pequeños |  small |  pequeñas |  pequeno | small | Small |  малень |  pequena
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,48, pequeño |  pequeña |  pequeños |  pequeñas |  small |  pequeno | small | Small |  малень |  pequena
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,49, pequeño | Small |  small |  pequeños |  pequeña |  pequeñas |  Small | small |  pequeno |  SMALL
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,50, pequeño |  pequeños |  pequeña | Small |  pequeñas |  small |  pequeno | small |  Small |  pequena
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,51, pequeño |  pequeños |  pequeña | Small |  small |  pequeno |  pequeñas | small |  Small |  pequena
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,52, pequeño |  pequeños |  pequeña |  pequeno |  small |  pequeñas | Small | small |  Small |  peque
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,53, pequeño |  pequeños |  pequeña |  pequeno |  small |  pequeñas | small | Small |  peque |  Small
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,54, pequeño |  pequeña |  pequeños |  pequeno |  small |  peque |  pequeñas | Small | small |  Small
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,55, pequeño |  pequeno |  pequeña |  pequeños |  peque |  chico |  pequeñas |  small | Pe | small
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,56, pequeño |  pequeña |  pequeno |  pequeños |  small |  pequeñas | small |  peque | Small |  Small
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,57, pequeño |  pequeña |  pequeno |  pequeños |  small |  peque | small |  pequeñas | Pe |  Pe
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,58, pequeño |  pequeno |  pequeña |  pequeños |  peque | small |  pequeñas |  small | pe | Pe
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,59, pequeño | pe | Pe |  Pe |  pe | ch |  chico |  pequeno |  peque |  pequeña
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-R,60,"pe | ch |  pequeño | Pe |  Pe | 
+
+ | small | 小 |   |  pe"
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,0," ..."" |  ."" | ...."" |  ?"" |  !"" | !!!"" | )"" | ।"" | ..."" |  }"""
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,1," ..."" |  ."" | ...."" | !!!"" |  !"" | ।"" |  ?"" | )"" | !"" | ..."""
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,2," ..."" |  ."" | ...."" | !!!"" | ।"" |  !"" | ..."" |  ?"" | !"" | ]"""
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,3," ..."" |  ."" | ।"" | ...."" | ..."" | !!!"" |  ?"" | ]"" | ;"" |  !"""
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,4," ..."" |  ."" |  ,"" | ।"" | ...."" |  ?"" |  !"" | ;"" |  }}"" | ..."""
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,5," ..."" |  ."" |  ,"" |  !"" | ..."" |  ],"" | ...."" | ।"" | ""— | ;"""
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,6," ..."" |  ."" |  ,"" |  !"" | ।"" | ..."" | ...."" | ;"" |  ],"" | ."""
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,7," ..."" |  ."" |  ,"" |  !"" | ..."" | ."" |  ?"" | ...."" | ;"" |  "";"
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,8," ..."" |  ."" | ..."" |  ,"" | ."" |  !"" | ...."" |  ?"" | ,"" | ;"""
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,9," ..."" |  ."" | ..."" |  ,"" | ."" |  !"" | ,"" |  ?"" | ...."" |  "";"
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,10," ..."" |  ."" |  ,"" | ..."" |  !"" | ."" | ,"" |  ?"" | 。"" | !"""
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,11," ..."" |  ."" | ..."" |  ,"" | ."" |  !"" |  ?"" | ,"" | !"" | ...."""
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,12," ..."" |  ,"" |  ."" |  !"" | ..."" | ."" | ,"" |  "", |  ?"" |  "")"
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,13," ..."" |  ."" |  ,"" | ..."" | ."" |  !"" | ,"" |  "", |  ?"" |  ""."
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,14," ..."" |  ."" |  ,"" | ..."" | ."" |  !"" | ,"" |  "", |  "". |  "")"
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,15," ..."" |  ."" |  ,"" | ..."" |  !"" |  "", | ."" |  "". | ,"" |  "")"
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,16," ..."" |  ."" |  ,"" | ..."" |  !"" | ."" |  "", |  ?"" |  "". | ,"""
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,17," ..."" |  ."" | ..."" |  ,"" |  !"" | ."" |  ?"" |  "". |  "", |  "";"
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,18," ..."" | ..."" |  ."" |  ,"" |  !"" | ."" |  ?"" | ,"" |  "". |  "","
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,19," ..."" | ..."" |  ."" |  ?"" |  ,"" |  !"" | ...."" | ."" |  "", |  ""."
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,20," ..."" | ..."" |  ."" |  !"" |  ?"" |  ,"" | ."" |  "", | ...."" |  ""."
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,21," ..."" | ..."" |  ."" |  !"" |  ?"" | ."" |  "", |  "". |  ,"" | ,"""
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,22," ..."" |  !"" | ..."" |  ?"" |  "". |  ."" |  "", | "". | ."" |  ..."");"
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,23," ..."" |  ."" | ..."" |  ?"" |  !"" |  "". | ."" |  "", |  ,"" | ,"""
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,24," ..."" | ..."" |  ."" |  !"" |  ?"" |  "". | ."" | ""... | 。"" | ।"""
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,25," ..."" | ..."" |  ...""); |  ."" | ..."", |  "". | ""。 | ...."" | ."" | 。"""
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,26," ..."" | ..."" | ..."", |  …” |  ...""); |  \... | .\"" | ...” | ,\"" | ...."""
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,27," ..."" | ""。 |  ...""); | ।"" | ?"". | 。"", | ""， |  ।” | ”। | .\"""
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,28," __________ |  ..."" |  ______ |  ***"", |  _____ |  ।” | ""。 |  _______ |  ________ |  ..."");"
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,29," __________ |  _____ |  ______ | または |  ________ |  _______ | ”。 |  ***"", |  ..."" |  ಅಥವಾ"
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,30," __________ |  _______ |  ______ |  _____ |  ________ |  ***"", |  ____________ |  _____________ |  ____ | ______"
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,31," __________ |  _______ |  _____ |  ***"", |  ______ |  ________ |  ____ |  _____________ |  ____________ | ______"
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,32," __________ |  _______ |  ***"", |  ______ |  _____ |  ________ |  _____________ |  ____ |  ____________ | ______"
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,33," ***"", | 🫠 |  __________ |  _______ |  ........ |  противополо |  ...""); | ***"", | 🫤 |  наоборот"
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,34," противополо |  ***"", |  наоборот | 🫠 | 🫤 |  বিপরীত |  ……………………………….. |  इनवर्स |  ........ |  disminución"
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,35," ***"", |  противополо | sadquotes |  ……………………………….. |  disminución |  наоборот |  ........ |  médioc |  rétréci |  _______"
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,36," ***"", |  __________ |  _______ |  ……………………………….. |  débil | ______ |  rétréci |  médioc |  sonidos | sadquotes"
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,37," ***"", |  rétréci |  __________ |  _______ |  débil | ______ |  ……………………………….. |  _____ |  ______ |  médioc"
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,38," pequeño |  pequeñas |  малень |  ***"", |  சிறிய | 小さい |  rétréci | Smaller |  маленький |  작은"
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,39, pequeño |  pequeñas |  pequeños |  малень |  pequeña |  débil | 小さい |  சிறிய |  маленький |  pequeno
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,40, pequeño |  pequeñas |  pequeña |  pequeños | 小さい |  малень |  சிறிய | Smaller |  작은 |  маленький
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,41, pequeño |  pequeñas |  pequeños |  pequeña |  малень | 小さい |  சிறிய |  pequeno |  작은 |  маленький
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,42, pequeño |  pequeñas |  pequeños |  pequeña |  малень | Smaller |  சிறிய |  작은 |  pequeno | 小さい
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,43, pequeño |  pequeñas |  pequeños |  pequeña |  малень |  pequeno |  சிறிய |  작은 |  صغير | 小さい
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,44, pequeño |  pequeñas |  pequeños |  pequeña |  pequeno |  малень |  சிறிய |  작은 |  صغير |  pequena
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,45, pequeño |  pequeños |  pequeñas |  pequeña |  pequeno |  малень |  작은 |  pequena |  маленький |  சிறிய
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,46, pequeño |  pequeños |  pequeña |  pequeñas |  малень |  pequeno |  маленький |  작은 |  pequena | Small
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,47, pequeño |  pequeña |  pequeños |  pequeñas |  pequeno |  малень | Small | small |  pequena |  маленький
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,48, pequeño |  pequeña |  pequeños |  pequeñas |  pequeno | Small |  малень | small |  small |  pequena
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,49, pequeño | Small |  pequeños |  pequeña |  pequeñas |  pequeno |  small |  Small | small |  SMALL
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,50, pequeño |  pequeños |  pequeña | Small |  pequeñas |  pequeno |  Small | small |  small |  pequena
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,51, pequeño |  pequeños |  pequeno |  pequeña | Small |  pequeñas |  small | small |  Small |  pequena
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,52, pequeño |  pequeños |  pequeña |  pequeno |  pequeñas | Small |  small |  Small | small |  peque
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,53, pequeño |  pequeños |  pequeno |  pequeña |  pequeñas |  small | Small |  peque |  Small | small
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,54, pequeño |  pequeña |  pequeno |  pequeños |  pequeñas |  small |  peque | Small |  Small | small
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,55, pequeño |  pequeno |  pequeña |  pequeños |  peque |  pequeñas |  chico |  small |  Chico |  pequena
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,56, pequeño |  pequeno |  pequeña |  pequeños |  pequeñas |  small |  peque | Small |  Small | small
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,57, pequeño |  pequeno |  pequeña |  pequeños |  peque |  pequeñas |  small |  chico |  Pe | Small
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,58, pequeño |  pequeno |  pequeña |  pequeños |  peque |  pequeñas |  small | small |  chico | pe
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,59, pequeño | pe | Pe |  Pe |  pe |  chico |  pequeno |  peque |  pequeña | ch
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,released-J,60,"pe | ch |  pequeño | Pe |  Pe | 
+
+ | small | 小 |   |  pe"
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,0," "" | 
+ |  ""; | 9 |  "". | 						 |  ""' | ти | ong | 8"
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,1,"ти |  "" | 
+ |  ""; | 						 | 9 |  ""' |  "". | 8 |  "")"
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,2,"ти | 
+ | 						 | 9 |  ""; | 8 |  "" |  ""' |  |  ""."
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,3,"ти | 						 | 
+ |  ""; |  ""' | RxDocument | йдет |  "" |  "". |  "")"
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,4,"
+ |  I | ти | 						 | on |  "" |  ""; |  Tope |  "") | 
+
+"
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,5,"
+ |  I | on | anlı | ות |  "" | 스로 |  Tope |  "") |  "";"
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,6,"
+ |  I | on | anlı | ות | ა | 嶆 | 스로 |  Queste | ალი"
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,7,"
+ | on | em |  I | anlı | ות | ა | il | 嶆 |  Queste"
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,8,"
+ | on | em | anlı | ა | 嶆 | an | el |  Tshirt |  Система"
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,9,"
+ | on | em | an | anlı | 嶆 | il | aný | ა |  Tecnología"
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,10,"
+ | on | em | an | il | anlı |  Você | 嶆 |  Максим |  Tshirt"
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,11,"
+ | on | em | an | anlı |  Você |  Tshirt | il | ა | aný"
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,12,"on | 
+ | em | an | anlı | ა | el | il | ות | at"
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,13,"on | 
+ | em | an | anlı | il | ა | at | aný | el"
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,14,"on | em | an | 
+ | anlı | il |  Você | ა | aný |  Tecnología"
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,15,on | an | em | il |  Según | anlı | ა | aný |  Tshirt |  Você
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,16,on | em | an | il | aný | Destroy |  Você |  Política |  Según | ა
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,17,em | il | لای | on | an | Destroy | aný |  Política |  Tshirt |  Química
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,18,em | Destroy | لای |  Química | on |  Neces |  Tshirt |  Política | ução |  Según
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,19, Neces |  Cómo | لای |  Según |  Química | aný | acją |  Когда | Destroy | on
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,20,لای |  Neces |  Tshirt | ução |  Cómo | aniti |  Когда | Mutable | fähig |  Álvarez
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,21, Tshirt |  Neces | ução | aniti | 兕 |  होता |  Wochschr |  Люди | ítez | acją
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,22,ução |  Tshirt | ués | fähig |  değil | ástica |  Bá | لای |  Wochschr |  Neces
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,23,ução | 吗 |  değil |  Más | ástica | fähig | ítez |  Tshirt |  ανθρώ |  விரும்ப
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,24,CCCc | 吗 |  ανθρώ | fähig |  Más | észet |  దాని |  άνθρω | Selectors |  más
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,25, ≠ |  که |  దాని | 的时候 |  не | 吗 |  ανθρώ | CCCc |  可以 |  לא
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,26, { |  a |  Bá |  ≠ |  coś | Checker |  ____ |  Dí |  κάτι |  Sí
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,27, a |  de |  opposites |  în |  Sí |  ____ |  más |  aversion |  Más |  hacer
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,28, de |  opposite |  opposites |  a |  ≠ |  Yin |  no |  De |  anton |  противополо
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,29, a |  de |  opposites |  opposite |  very |  ____ |  ¿ |  one |  anton |  más
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,30, opposite |  ____ |  opposites |  ¿ |  adjectives |  a |  de |  one |  anton |  ceea
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,31, opposite |  ____ |  opposites |  ¿ |  de | opposite | ( |  a |  Opposite | 反対
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,32, ____ |  opposite |  de |  word |  anton |  _______ | ( |  ____________ |   |  a
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,33, opposite |  Opposite |  anton | opposite |  opposites |  বিপরীত | 反対 |  contrasting |  ____ |  de
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,34, opposite |  Opposite |  opposites | opposite | 反対 |  anton |  বিপরীত |  Small |  small |  contraire
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,35, opposite |  small |  Small | opposite |  opposites |  Opposite |  inferior |  Yin |  size |  ¿
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,36, small |  Small |  ____ | Small |  smaller |  size |  opposite |  de |  Yin |  a
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,37, small |  Small |  size |  smaller | Small |  pequeño | small |  opposite |  Size | size
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,38, small |  pequeño |  Small | Small | small |  smaller | smaller |  маленький | 小さい |  Smaller
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,39, pequeño |  small |  pequeña |  Small | small | Small |  pequeños |  маленький |  petite |  piccolo
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,40, pequeño |  small | small |  smaller |  pequeña | Small |  Small | smaller | 小さい |  petite
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,41, pequeño |  small | small | Small |  pequeña |  petite | 小さい |  Small | smaller |  smaller
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,42, pequeño |  small | small |  smaller | Small | smaller |  pequeña | 小さい |  Small |  nhỏ
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,43, pequeño |  small | small | Small |  smaller |  pequeña | smaller |  Small | 小さい |  pequeños
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,44, pequeño |  small |  pequeña | small |  pequeños |  smaller | 小さい |  pequeñas | Small |  Small
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,45, pequeño |  small |  pequeña | small |  pequeños |  pequeno |  kecil |  pequeñas | Small |  Small
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,46, pequeño |  small | small |  pequeña |  pequeños | Small |  малень |  Small |  pequeno |  pequeñas
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,47, small |  pequeño | small | Small |  pequeña |  pequeños |  Small |  малень |  pequeno |  pequeñas
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,48, pequeño |  small |  pequeña |  pequeños | small |  pequeñas | Small |  pequeno |  Small |  малень
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,49, pequeño |  small | Small | small |  Small |  pequeña |  pequeños |  pequeñas |  pequeno | 小
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,50, pequeño |  small | small | Small |  pequeña |  pequeños |  Small |  pequeñas |  pequeno | 小
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,51, pequeño |  small | small | Small |  pequeña |  pequeños |  Small |  pequeñas |  pequeno | 小
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,52, pequeño | small |  small |  pequeña |  pequeños | Small |  pequeñas |  Small |  pequeno | 小
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,53, pequeño | small |  pequeños |  pequeña |  small |  pequeñas | Small |  pequeno |  Small |  peque
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,54, pequeño |  pequeña |  pequeños |  small | small |  pequeñas |  pequeno | Small |  Small |  peque
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,55, pequeño |  pequeña |  pequeños |  pequeno |  pequeñas |  peque |  small | small |  chico | Small
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,56, pequeño |  pequeña | small |  pequeños |  small |  pequeno |  pequeñas |  peque | Small |  Small
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,57, pequeño |  pequeña | Pe | pe |  Pe |  pequeños |  pequeno | small |  small |  peque
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,58, pequeño | Pe | pe |  pequeña | small |  pequeno |  Pe |  pequeños |  small | Small
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,59,pe |  pequeño | Pe |  Pe | ch |  pe | small |   |  chico |  pequeno
+gemma-3-27b-it,multilingual,spanish-opposite-big,Spanish,logit,60,"pe | ch |  pequeño | Pe |  Pe | 
+
+ | small | 小 |   |  pe"
+gemma-3-27b-it,typo,typo-language,language,released-R,0,"</blockquote> | e |  thence |  aforementioned |  furthermore | , | -- |  aswell |  nonetheless | ("""
+gemma-3-27b-it,typo,typo-language,language,released-R,1," furthermore | </blockquote> |  aforementioned |  thence | e |  aswell | , |  nonetheless |  thereby |  whilst"
+gemma-3-27b-it,typo,typo-language,language,released-R,2," thence |  furthermore |  aforementioned | </blockquote> |  nonetheless |  thereby |  insofar |  principally |  notwithstanding | ,"
+gemma-3-27b-it,typo,typo-language,language,released-R,3, furthermore |  thence |  aforementioned |  thereby | </blockquote> |  principally |  nonetheless |  notwithstanding |  preexisting | --
+gemma-3-27b-it,typo,typo-language,language,released-R,4,", |  furthermore |  aforementioned |  preexisting |  thereby | -- |  nonetheless |  as |  principally |  subsequently"
+gemma-3-27b-it,typo,typo-language,language,released-R,5,", |  as | -- |  and |  ( |  "" |  in |  specifically |  furthermore | ;"
+gemma-3-27b-it,typo,typo-language,language,released-R,6,", |  and |  as |  ( |  in | -- |  "" |  specifically | ; | ..."
+gemma-3-27b-it,typo,typo-language,language,released-R,7,", |  and |  as |  in |  ( |  "" | -- |  to |   | ;"
+gemma-3-27b-it,typo,typo-language,language,released-R,8,", |  seperate |  and |  as |  in |  to |  isnt |  seper |  for |  """
+gemma-3-27b-it,typo,typo-language,language,released-R,9," seperate |  isnt | , |  seper |  recieve |  and |  doesnt |  english |  as |  accomod"
+gemma-3-27b-it,typo,typo-language,language,released-R,10," seperate |  isnt |  recieve |  english |  seper | , |  and |  language | -- |  doesnt"
+gemma-3-27b-it,typo,typo-language,language,released-R,11," seperate | , |  and |  isnt |  language | -- |  as |  in |  recieve |  english"
+gemma-3-27b-it,typo,typo-language,language,released-R,12,", |  language |  seperate |  and |  english |  as |  in | -- |  to |  recieve"
+gemma-3-27b-it,typo,typo-language,language,released-R,13," language |  english | , |  and |  seperate |  languages |  to |  in |  as |  recieve"
+gemma-3-27b-it,typo,typo-language,language,released-R,14," language | , |  and |  in |  english |  languages |  as |  to |  seperate |  for"
+gemma-3-27b-it,typo,typo-language,language,released-R,15," language | , |  and |  in |  to |  as |  languages |  for |  english |  """
+gemma-3-27b-it,typo,typo-language,language,released-R,16," language |  english |  seperate |  languages |  and | , |  recieve |  seper |  in |  to"
+gemma-3-27b-it,typo,typo-language,language,released-R,17," language |  languages |  and |  english | , |  seperate |  in |  to |  recieve |  Language"
+gemma-3-27b-it,typo,typo-language,language,released-R,18," language |  languages |  english | , |  and |  seperate |  Language |  in |  linguistics |  to"
+gemma-3-27b-it,typo,typo-language,language,released-R,19," language |  languages |  english | , |  and |  learning |  linguistics |  Language |  in |  seperate"
+gemma-3-27b-it,typo,typo-language,language,released-R,20," language |  languages |  english |  learning |  linguistics |  Language |  and | , |  seperate |  bilingual"
+gemma-3-27b-it,typo,typo-language,language,released-R,21, recieve |  language |  seperate |  english |  seper |  languages |  recieved |  accomod |  learning |  sucess
+gemma-3-27b-it,typo,typo-language,language,released-R,22, recieve |  seperate |  seper |  recieved |  alot |  sucess |  occuring |  accomod |  inital |  english
+gemma-3-27b-it,typo,typo-language,language,released-R,23, language |  seperate |  recieve |  seper |  english |  languages |  learning |  recieved |  accomod |  sucess
+gemma-3-27b-it,typo,typo-language,language,released-R,24, recieve |  seperate |  language |  accomod |  seper |  english |  languages |  learning |  recieved |  sucess
+gemma-3-27b-it,typo,typo-language,language,released-R,25, recieve |  seperate |  seper |  accomod |  recieved |  language |  english |  sucess |  occuring |  learning
+gemma-3-27b-it,typo,typo-language,language,released-R,26, seperate |  recieve |  seper |  recieved |  accomod |  alot |  occuring |  sucess |  inital |  english
+gemma-3-27b-it,typo,typo-language,language,released-R,27, seperate |  recieve |  accomod |  english |  seper |  language |  recieved |  student |  languages |  learning
+gemma-3-27b-it,typo,typo-language,language,released-R,28, student |  students |  teaching |  english |  learning |  language |  seperate |  recieve |  languages |  curriculum
+gemma-3-27b-it,typo,typo-language,language,released-R,29, teaching |  learning |  student |  students |  classroom |  language |  curriculum |  english |  teachers |  education
+gemma-3-27b-it,typo,typo-language,language,released-R,30, language |  teaching |  learning |  students |  student |  english |  languages |  classroom |  curriculum |  teachers
+gemma-3-27b-it,typo,typo-language,language,released-R,31, students |  student |  teaching |  learning |  english |  classroom |  language |  recieve |  accomod |  teachers
+gemma-3-27b-it,typo,typo-language,language,released-R,32, learning |  teaching |  english |  students |  language |  languages |  student |  recieve |  classroom |  curriculum
+gemma-3-27b-it,typo,typo-language,language,released-R,33, learning |  english |  students |  teaching |  classroom |  accomod |  student |  wasnt |  languages |  language
+gemma-3-27b-it,typo,typo-language,language,released-R,34, languages |  language |  english |  Language |  learning |  اللغه |  Languages |  bahasa | language |  spanish
+gemma-3-27b-it,typo,typo-language,language,released-R,35, language |  languages |  english |  Language |  اللغه |  bahasa |  Languages | language |  learning | languages
+gemma-3-27b-it,typo,typo-language,language,released-R,36, language |  languages |  Language |  english |  اللغه |  Languages | language |  bahasa |  linguistics | 语言
+gemma-3-27b-it,typo,typo-language,language,released-R,37, english |  languages |  language |  wasnt |  spanish |  اللغه |  atleast | .... |  thats |  Language
+gemma-3-27b-it,typo,typo-language,language,released-R,38, languages |  language |  english |  اللغه |  spanish |  Language |  Languages |  bahasa | language | 言語
+gemma-3-27b-it,typo,typo-language,language,released-R,39, languages |  language |  english |  اللغه |  spanish |  Language |  Languages |  bahasa |  linguistics |  hispanic
+gemma-3-27b-it,typo,typo-language,language,released-R,40, languages |  language |  english |  spanish |  اللغه |  Languages |  Language |  wasnt |  hispanic |  linguistics
+gemma-3-27b-it,typo,typo-language,language,released-R,41, languages |  language |  اللغه |  Languages |  Language |  english | language |  langage | languages |  spanish
+gemma-3-27b-it,typo,typo-language,language,released-R,42, languages |  language |  اللغه |  Language |  Languages |  spanish |  english |  langage | language | languages
+gemma-3-27b-it,typo,typo-language,language,released-R,43, languages |  language |  اللغه |  Languages |  Language |  spanish |  langage | language | languages |  english
+gemma-3-27b-it,typo,typo-language,language,released-R,44, language |  languages |  spanish |  اللغه |  Languages |  Language |  langage |  english | language | languages
+gemma-3-27b-it,typo,typo-language,language,released-R,45, language |  languages |  اللغه |  Language |  langage | language |  Languages |  spanish |  english | languages
+gemma-3-27b-it,typo,typo-language,language,released-R,46, spanish |  language |  languages |  wasnt |  english |  langage |  thats |  اللغه |  isnt |  atleast
+gemma-3-27b-it,typo,typo-language,language,released-R,47, spanish |  seperate |  wasnt |  english |  succesfully |  recieve |  atleast |  sucess |  isnt |  seper
+gemma-3-27b-it,typo,typo-language,language,released-R,48," languages |  spanish |  fluency |  language | . |  proficiency |  through |  foreign |  fluent | 
+"
+gemma-3-27b-it,typo,typo-language,language,released-R,49, spanish |  languages |  fluency |  because |  language | . |  to |  foreign |  fluent |  english
+gemma-3-27b-it,typo,typo-language,language,released-R,50,". |  language |  languages |  because |  to |  spanish |  fluency |  foreign |  through | 
+"
+gemma-3-27b-it,typo,typo-language,language,released-R,51,. |  because |  to |  languages |  language |  through |  fluency |  spanish |  inorder |  foreign
+gemma-3-27b-it,typo,typo-language,language,released-R,52,". |  to |  because |  language |  through |  for |  languages | 
+ | , |  spanish"
+gemma-3-27b-it,typo,typo-language,language,released-R,53,". |  to |  because |  through |  language |  for | , | 
+ | ; |  as"
+gemma-3-27b-it,typo,typo-language,language,released-R,54,". |  to |  because |  through | 
+ | , |  for | ; |  as |  and"
+gemma-3-27b-it,typo,typo-language,language,released-R,55,". |  because |  to |  through |  for |  which | , |  and | 
+ |  as"
+gemma-3-27b-it,typo,typo-language,language,released-R,56,". |  to |  because |  for |  through | , |  which | ; |  and |  as"
+gemma-3-27b-it,typo,typo-language,language,released-R,57,". |  to | , |  for |  because |  and | ; |  through |  as |  which"
+gemma-3-27b-it,typo,typo-language,language,released-R,58,". |  to | , |  because |  and |  for | ; |  as |  through |  during"
+gemma-3-27b-it,typo,typo-language,language,released-R,59,". |  to | , |  and | ; |  for |  as |  in |  because | --"
+gemma-3-27b-it,typo,typo-language,language,released-R,60,". | , |  and |  to |  for |  as |  in | 
+
+ | ; |  so"
+gemma-3-27b-it,typo,typo-language,language,released-J,0,"</blockquote> |  powerplant |  thence |  seperate | ."""" |  succesfully |  filesize | </i> |  thereupon | Tabpage"
+gemma-3-27b-it,typo,typo-language,language,released-J,1,</blockquote> |  powerplant |  seperate |  succesfully | Tabpage |  thence |  whereupon | frontend |  thereupon |  filesize
+gemma-3-27b-it,typo,typo-language,language,released-J,2,"</blockquote> |  thence |  powerplant |  seperate | Tabpage |  thereupon | ."""" |  succesfully |  whereupon |  nonconvex"
+gemma-3-27b-it,typo,typo-language,language,released-J,3,</blockquote> |  thence |  nonconvex |  insofar |  necessitating |  whereupon |  powerplant | Tabpage |  thereupon |  nondegenerate
+gemma-3-27b-it,typo,typo-language,language,released-J,4, thence |  insofar |  nondegenerate |  nonuniform |  nonconvex |  subsum |  precludes |  powerplant |  necessitating |  whereupon
+gemma-3-27b-it,typo,typo-language,language,released-J,5, insofar |  subsum |  thence |  necessitating |  extant |  concomitant |  principally |  nonuniform |  nondegenerate |  ostensibly
+gemma-3-27b-it,typo,typo-language,language,released-J,6, insofar |  thence |  necessitating |  subsum |  extant |  concomitant |  principally |  sociocultural |  necessitates |  powerplant
+gemma-3-27b-it,typo,typo-language,language,released-J,7, insofar |  thence |  necessitating |  necessitates |  contempor |  thereby |  seperate |  powerplant |  nonuniform |  subsum
+gemma-3-27b-it,typo,typo-language,language,released-J,8, seperate |  recieve |  recieved |  seper |  isnt |  succesfully |  occuring |  recc |  accomod |  arent
+gemma-3-27b-it,typo,typo-language,language,released-J,9, seperate |  recieve |  recieved |  succesfully |  isnt |  accomod |  occuring |  seper |  wouldnt |  recc
+gemma-3-27b-it,typo,typo-language,language,released-J,10, seperate |  recieve |  recieved |  isnt |  succesfully |  accomod |  occuring |  seper | recieve |  doesnt
+gemma-3-27b-it,typo,typo-language,language,released-J,11, recieve |  seperate |  succesfully |  recieved |  accomod |  occuring |  isnt |  seper |  occured |  english
+gemma-3-27b-it,typo,typo-language,language,released-J,12, recieve |  seperate |  succesfully |  recieved |  seper |  accomod |  occuring |  english |  isnt |  doesnt
+gemma-3-27b-it,typo,typo-language,language,released-J,13, seperate |  recieve |  recieved |  seper |  english |  isnt |  occuring |  succesfully |  accomod |  اللغه
+gemma-3-27b-it,typo,typo-language,language,released-J,14, seperate |  recieve |  seper |  english |  recieved |  accomod |  succesfully |  isnt |  occuring |  اللغه
+gemma-3-27b-it,typo,typo-language,language,released-J,15, recieve |  seperate |  succesfully |  english |  accomod |  recieved |  seper |  occuring |  isnt |  sucess
+gemma-3-27b-it,typo,typo-language,language,released-J,16, seperate |  recieve |  recieved |  seper |  english |  isnt |  occuring |  accomod |  succesfully |  teh
+gemma-3-27b-it,typo,typo-language,language,released-J,17, seperate |  recieve |  seper |  succesfully |  recieved |  english |  accomod |  isnt |  sucess |  doesnt
+gemma-3-27b-it,typo,typo-language,language,released-J,18, seperate |  recieve |  seper |  recieved |  english |  succesfully |  isnt |  accomod |  sucess |  doesnt
+gemma-3-27b-it,typo,typo-language,language,released-J,19, recieve |  seperate |  succesfully |  seper |  recieved |  english |  isnt |  sucess |  doesnt |  accomod
+gemma-3-27b-it,typo,typo-language,language,released-J,20, recieve |  seperate |  succesfully |  recieved |  seper |  english |  sucess |  doesnt |  isnt |  teh
+gemma-3-27b-it,typo,typo-language,language,released-J,21, recieve |  seperate |  recieved |  succesfully |  sucess |  seper |  doesnt |  teh |  isnt |  thats
+gemma-3-27b-it,typo,typo-language,language,released-J,22, recieve |  seperate |  recieved |  seper |  alot |  inital |  sucess |  occuring |  thats |  isnt
+gemma-3-27b-it,typo,typo-language,language,released-J,23, recieve |  seperate |  recieved |  seper |  sucess |  succesfully |  inital |  thats |  alot |  isnt
+gemma-3-27b-it,typo,typo-language,language,released-J,24, recieve |  recieved |  seperate |  succesfully |  seper |  sucess |  inital | recieve |  occuring |  managable
+gemma-3-27b-it,typo,typo-language,language,released-J,25, recieve |  recieved |  seperate |  seper |  succesfully |  occuring |  inital |  sucess | recieve |  alot
+gemma-3-27b-it,typo,typo-language,language,released-J,26, recieve |  seperate |  recieved |  seper |  alot |  sucess |  occuring |  inital |  succesfully |  accomod
+gemma-3-27b-it,typo,typo-language,language,released-J,27, recieve |  seperate |  recieved |  succesfully |  seper |  alot |  sucess |  doesnt |  accomod |  thats
+gemma-3-27b-it,typo,typo-language,language,released-J,28, recieve |  seperate |  recieved |  succesfully |  doesnt |  alot |  sucess |  seper |  thats |  atleast
+gemma-3-27b-it,typo,typo-language,language,released-J,29, recieve |  seperate |  succesfully |  recieved |  doesnt |  alot |  atleast |  wasnt |  thats |  isnt
+gemma-3-27b-it,typo,typo-language,language,released-J,30, recieve |  seperate |  doesnt |  recieved |  succesfully |  wasnt |  atleast |  isnt |  thats |  alot
+gemma-3-27b-it,typo,typo-language,language,released-J,31, recieve |  doesnt |  seperate |  wasnt |  succesfully |  recieved |  didnt |  thats |  isnt |  atleast
+gemma-3-27b-it,typo,typo-language,language,released-J,32, recieve |  wasnt |  seperate |  doesnt |  succesfully |  didnt |  thats |  isnt |  english |  recieved
+gemma-3-27b-it,typo,typo-language,language,released-J,33, wasnt |  recieve |  doesnt |  didnt |  seperate |  succesfully |  atleast |  isnt |  thats |  couldnt
+gemma-3-27b-it,typo,typo-language,language,released-J,34, اللغه |  english |  spanish |  wasnt |  languages | languages |  doesnt | Languages |  didnt |  japanese
+gemma-3-27b-it,typo,typo-language,language,released-J,35, اللغه |  wasnt |  english |  doesnt |  bahasa | languages |  didnt |  spanish | Languages |  languages
+gemma-3-27b-it,typo,typo-language,language,released-J,36, اللغه | 言語 |  bahasa | 语言 |  languages | Languages |  idiomas | languages |  english | 語言
+gemma-3-27b-it,typo,typo-language,language,released-J,37, اللغه |  wasnt |  english |  atleast | 言語 |  spanish | Languages |  didnt |  recieve |  bahasa
+gemma-3-27b-it,typo,typo-language,language,released-J,38, اللغه | Languages | 言語 |  bahasa |  languages | languages |  idiomas |  english |  Languages |  spanish
+gemma-3-27b-it,typo,typo-language,language,released-J,39, اللغه | Languages | 言語 |  bahasa |  english |  languages |  spanish | languages |  langage |  wasnt
+gemma-3-27b-it,typo,typo-language,language,released-J,40, اللغه | Languages |  spanish |  english | 言語 |  languages | languages |  bahasa |  idiomas |  langage
+gemma-3-27b-it,typo,typo-language,language,released-J,41, اللغه |  languages | languages | Languages |  langage |  idiomas |  Languages | 言語 |  bahasa | language
+gemma-3-27b-it,typo,typo-language,language,released-J,42, اللغه |  languages | Languages | languages |  langage |  idiomas | 言語 |  Languages |  bahasa | language
+gemma-3-27b-it,typo,typo-language,language,released-J,43, اللغه |  languages | languages |  langage | Languages |  idiomas |  Languages | 言語 | language |  language
+gemma-3-27b-it,typo,typo-language,language,released-J,44, اللغه |  languages |  langage | languages | Languages |  idiomas |  Languages | 言語 | language |  bahasa
+gemma-3-27b-it,typo,typo-language,language,released-J,45, اللغه |  languages |  langage | languages |  idiomas |  language | Languages |  Languages | language | 言語
+gemma-3-27b-it,typo,typo-language,language,released-J,46, اللغه |  langage |  spanish |  languages | languages |  wasnt |  idiomas |  Languages | Languages |  language
+gemma-3-27b-it,typo,typo-language,language,released-J,47, spanish |  langage |  wasnt |  succesfully |  recieve |  اللغه |  atleast |  english |  seperate |  languages
+gemma-3-27b-it,typo,typo-language,language,released-J,48, languages |  spanish |  اللغه |  fluency |  Languages |  idiomas | Languages | languages |  bahasa |  fluent
+gemma-3-27b-it,typo,typo-language,language,released-J,49, spanish |  languages |  اللغه |  fluency |  idiomas |  Languages | Languages | languages | spanish |  fluent
+gemma-3-27b-it,typo,typo-language,language,released-J,50, spanish |  languages |  fluency |  اللغه |  Languages |  idiomas | Languages |  foreign | languages |  fluent
+gemma-3-27b-it,typo,typo-language,language,released-J,51, fluency |  spanish |  languages |  اللغه |  Languages |  fluent |  idiomas |  inorder |  foreign | languages
+gemma-3-27b-it,typo,typo-language,language,released-J,52, spanish |  languages |  fluency |  inorder |  Languages |  language |  اللغه |  foreign |  fluent |  english
+gemma-3-27b-it,typo,typo-language,language,released-J,53, languages |  fluency |  spanish |  foreign |  language |  fluent |  Languages |  Spanish |  Mandarin |  because
+gemma-3-27b-it,typo,typo-language,language,released-J,54, fluency |  spanish |  languages |  foreign |  language |  because |  fluent |  Spanish | . |  to
+gemma-3-27b-it,typo,typo-language,language,released-J,55,. |  because |  to |  through |  fluency |  spanish |  Spanish |  which |  foreign |  inorder
+gemma-3-27b-it,typo,typo-language,language,released-J,56, to | . |  because |  for |  fluency |  through | ​. |  which |  beginning | ;
+gemma-3-27b-it,typo,typo-language,language,released-J,57,". |  to |  for |  because | , |  through | ; |  and |  so |  which"
+gemma-3-27b-it,typo,typo-language,language,released-J,58,". |  to |  because | , |  for |  and | ; |  as | ! |  so"
+gemma-3-27b-it,typo,typo-language,language,released-J,59,". |  to |  and | , | ; |  for |  because |  as |  in | !"
+gemma-3-27b-it,typo,typo-language,language,released-J,60,". | , |  and |  to |  for |  as |  in | 
+
+ | ; |  so"
+gemma-3-27b-it,typo,typo-language,language,logit,0,"auge | "" | ли | 
+ | е | : |  | ' | / | '،"
+gemma-3-27b-it,typo,typo-language,language,logit,1,"auge | "" | е | ли | : |  | 
+ | ᆭ | ۸ | iril"
+gemma-3-27b-it,typo,typo-language,language,logit,2,"е | "" | auge |  | ли | : | 
+ | ᱐ | ᆭ | ۸"
+gemma-3-27b-it,typo,typo-language,language,logit,3,"е | auge |  | 
+ | ᱐ | : | iril | ᆭ | ли |  studierte"
+gemma-3-27b-it,typo,typo-language,language,logit,4,"
+ |  | ות | auge | е | , | 끔 | "" | : | </h3>"
+gemma-3-27b-it,typo,typo-language,language,logit,5,"
+ | ות | , | ం | е |  | : | ST | 인 | ع"
+gemma-3-27b-it,typo,typo-language,language,logit,6,"ות | 
+ | , | ం | е | : | ش | 인 | ع | ST"
+gemma-3-27b-it,typo,typo-language,language,logit,7,"
+ | ות | ం | , | е | el | ᱐ | ૦ | ع | ంక"
+gemma-3-27b-it,typo,typo-language,language,logit,8,"
+ | ות | त | il | el | , | ing | ع | us | ش"
+gemma-3-27b-it,typo,typo-language,language,logit,9,"ות | ش | 
+ | il | त | ع | ת | ing | el | т"
+gemma-3-27b-it,typo,typo-language,language,logit,10,"ش | ות | 
+ | il | ع | ת | त | us | т | x"
+gemma-3-27b-it,typo,typo-language,language,logit,11,"ش | 
+ | ות | ת | ع | il | त | т | x | ಾ"
+gemma-3-27b-it,typo,typo-language,language,logit,12,"ش | ות | ת | 
+ | ع | त | ed | т | ون | x"
+gemma-3-27b-it,typo,typo-language,language,logit,13,"ش | ות | ת | 
+ | ع | त |  Severe | т | ಾ | પ"
+gemma-3-27b-it,typo,typo-language,language,logit,14,"ش | ות | 
+ |  Severe | ת | т | त | ع | il | ಾ"
+gemma-3-27b-it,typo,typo-language,language,logit,15,ش | ות | il | ir | an |  Severe | ad | ع | x | त
+gemma-3-27b-it,typo,typo-language,language,logit,16,ش | ות | il | ir | us |  Severe | an | ad |  Teams | auge
+gemma-3-27b-it,typo,typo-language,language,logit,17,ش | il |  Languages |  Language |  Bahasa | ir | an | ות | ad | auge
+gemma-3-27b-it,typo,typo-language,language,logit,18,ش | il |  Languages |  Language |  Bahasa | auge | ॓ | an | ad |  Lernen
+gemma-3-27b-it,typo,typo-language,language,logit,19,ش | il |  Languages |  Bahasa |  Language |  Lernen | auge | ॓ |  Learning | ir
+gemma-3-27b-it,typo,typo-language,language,logit,20, Languages | il |  Learning |  Language |  Inggris |  Lernen |  Bahasa | ॓ | auge | ش
+gemma-3-27b-it,typo,typo-language,language,logit,21, Learning |  sesuai |  Inggris | il |  Lernen | auge |  Language |  Languages | ॓ |  Mandarin
+gemma-3-27b-it,typo,typo-language,language,logit,22, Learning |  lernen |  sesuai |  Languages |  Lernen |  Language |  Bahasa |  Inggris | auge |  Mandarin
+gemma-3-27b-it,typo,typo-language,language,logit,23, Learning |  Inggris |  sesuai | auge |  Language |  Languages |  lernen |  Mandarin |  Bahasa | agamanam
+gemma-3-27b-it,typo,typo-language,language,logit,24, Learning | agamanam |  Language | auge |  Inggris |  sesuai |  Languages |  тепер |  Bahasa |  영어
+gemma-3-27b-it,typo,typo-language,language,logit,25,"agamanam |  Learning | , |  Language |  тепер | auge |  или |  Mandarin | 🎿 |  Gesetz"
+gemma-3-27b-it,typo,typo-language,language,logit,26,"agamanam |  тепер | 🎿 | , |  или |  Learning |  Irland | ॓ |  Inggris |  ឬ"
+gemma-3-27b-it,typo,typo-language,language,logit,27,", |  Unterricht |  coursework |  Learning |  Mandarin |  или |  Classroom |  обучения |  GCSE |  curricular"
+gemma-3-27b-it,typo,typo-language,language,logit,28," Learning | , |  Unterricht |  coursework |  learning |  Teaching |  или |  Teach |  обучения |  bootcamp"
+gemma-3-27b-it,typo,typo-language,language,logit,29, Learning |  learning |  Teaching |  apprend |  coursework |  bootcamp |  training |  Training |  Unterricht |  Languages
+gemma-3-27b-it,typo,typo-language,language,logit,30, Languages |  Language |  Learning |  Teaching |  learning |  coursework |  Unterricht |  Classroom |  تعلم |  Mandarin
+gemma-3-27b-it,typo,typo-language,language,logit,31, Learning |  Classroom |  Languages |  Teaching |  coursework |  learning |  преподава |  Beginning |  classroom |  Courses
+gemma-3-27b-it,typo,typo-language,language,logit,32, Languages |  Learning |  learning | Languages |  Mandarin |  coursework |  courses |  Language |  elective |  تعلم
+gemma-3-27b-it,typo,typo-language,language,logit,33, elective |  Courses |  courses |  Languages |  Learning | 课程 | Languages |  Mandarin |  coursework |  learning
+gemma-3-27b-it,typo,typo-language,language,logit,34, Languages | Languages |  languages |  Language |  اللغة |  language |  ภาษา | Language |  bahasa |  लैंग्वेज
+gemma-3-27b-it,typo,typo-language,language,logit,35, Languages |  languages |  Language |  اللغة |  language |  लैंग्वेज | Languages |  Mandarin |  язык |  elective
+gemma-3-27b-it,typo,typo-language,language,logit,36, Languages |  اللغة |  languages |  Mandarin |  elective |  fluency |  language |  Language | Languages | 语言
+gemma-3-27b-it,typo,typo-language,language,logit,37, elective |  Languages |  Mandarin |  fluency |  Mandatory | を選択 |  mandatory |  languages |  اللغة |  Proficiency
+gemma-3-27b-it,typo,typo-language,language,logit,38, elective |  Mandarin |  Languages |  languages |  اللغة |  fluency | Languages |  mandatory |  Mandatory |  Proficiency
+gemma-3-27b-it,typo,typo-language,language,logit,39, Languages |  elective |  Mandarin |  languages |  اللغة |  fluency |  proficiency |  Proficiency | Languages |  fluent
+gemma-3-27b-it,typo,typo-language,language,logit,40, Mandarin |  elective |  Languages |  proficiency |  languages |  Requirement |  requirement |  Proficiency |  fluency |  اللغة
+gemma-3-27b-it,typo,typo-language,language,logit,41, languages |  Languages |  Mandarin | Languages |  proficiency |  language |  foreign |  اللغة |  langues |  elective
+gemma-3-27b-it,typo,typo-language,language,logit,42, Languages |  languages |  Mandarin |  proficiency | Languages |  language | 语言 |  اللغة |  langues |  fluency
+gemma-3-27b-it,typo,typo-language,language,logit,43, Languages |  languages |  proficiency | Languages |  Mandarin |  language |  elective | 语言 |  Proficiency |  idiomas
+gemma-3-27b-it,typo,typo-language,language,logit,44, Languages |  languages |  Mandarin |  proficiency | Languages |  language |  elective |  idiomas | 语言 |  اللغة
+gemma-3-27b-it,typo,typo-language,language,logit,45, languages |  Languages |  Mandarin | Languages |  language |  اللغة |  proficiency | 语言 |  idiomas |  fluency
+gemma-3-27b-it,typo,typo-language,language,logit,46, Mandarin |  proficiency |  Languages |  languages |  fluency |  elective |  fluent |  Proficiency |  foreign |  proficient
+gemma-3-27b-it,typo,typo-language,language,logit,47, Mandarin |  proficiency |  Languages |  elective |  languages |  fluent |  fluency |  spanish |  upto |  courses
+gemma-3-27b-it,typo,typo-language,language,logit,48, fluency |  proficiency |  fluent |  flu |  Mandarin |  Flu |  elective |  proficient |  Proficiency |  foreign
+gemma-3-27b-it,typo,typo-language,language,logit,49, fluency |  proficiency |  fluent |  flu |  Mandarin |  proficient |  besides |  Proficiency |  Flu |  foreign
+gemma-3-27b-it,typo,typo-language,language,logit,50, fluency |  proficiency |  fluent |  flu |  Mandarin |  proficient |  up |  to |  besides |  foreign
+gemma-3-27b-it,typo,typo-language,language,logit,51, fluency |  fluent |  proficiency |  flu |  to |  up |  proficient |  Mandarin |  because |  besides
+gemma-3-27b-it,typo,typo-language,language,logit,52," to |  fluency |  fluent |  proficiency |  up |  flu | . |  proficient |  because | ,"
+gemma-3-27b-it,typo,typo-language,language,logit,53," to |  fluent | . |  proficient | , |  up |  proficiency |  flu |  fluency |  because"
+gemma-3-27b-it,typo,typo-language,language,logit,54," to |  because | . | , |  up |  for |  fluent |  fluency |  proficient |  flu"
+gemma-3-27b-it,typo,typo-language,language,logit,55," because | . |  to |  for |  through |  Spanish |  besides | , |  fluency |  up"
+gemma-3-27b-it,typo,typo-language,language,logit,56,". |  to | , |  because |  for |  so | ; |  through |  ( |  up"
+gemma-3-27b-it,typo,typo-language,language,logit,57,". | , |  to |  for |  so | ; |  ( |  because |  as |  through"
+gemma-3-27b-it,typo,typo-language,language,logit,58,". | , |  to | ; |  because |  ( |  as |  for |  and |  so"
+gemma-3-27b-it,typo,typo-language,language,logit,59,". |  to | , |  and | ; |  for |  as |  in |  so |  because"
+gemma-3-27b-it,typo,typo-language,language,logit,60,". | , |  and |  to |  for |  as |  in | 
+
+ | ; |  so"
+gemma-3-27b-it,association,grief,grief,released-R,0,", | — | 
+ |  $\ | 
+
+ |  ${ |  — | ... | ly | …"
+gemma-3-27b-it,association,grief,grief,released-R,1,", | — | 
+ | 
+
+ |  $\ | ... |  — |  ${ | … | ly"
+gemma-3-27b-it,association,grief,grief,released-R,2,", | — | 
+ | 
+
+ |  $\ |  — |  ${ | ... | … |  ("
+gemma-3-27b-it,association,grief,grief,released-R,3,", | 
+
+ | 
+ | — | ... |  ( |  and | . |   | …"
+gemma-3-27b-it,association,grief,grief,released-R,4,", | 
+
+ |  ( |  and | 
+ | . |   | � | ... |  in"
+gemma-3-27b-it,association,grief,grief,released-R,5,", |  ( |  and |   | 
+
+ | � | 
+ | . | ... |  """
+gemma-3-27b-it,association,grief,grief,released-R,6,", |  ( |  and | 
+
+ |   | � | . | 
+ |  "" | ..."
+gemma-3-27b-it,association,grief,grief,released-R,7,", |  ( |  and |   | � | 
+
+ | . |  "" | 
+ | ..."
+gemma-3-27b-it,association,grief,grief,released-R,8,", |  ( |  and |  "" | 
+
+ | . |   | � | 
+ |  in"
+gemma-3-27b-it,association,grief,grief,released-R,9,", |  and |  ( | . |   |  "" | 
+
+ | 
+ |  in | ..."
+gemma-3-27b-it,association,grief,grief,released-R,10,", |  ( |  and | . |  "" |   | 
+
+ | 
+ | ... |  in"
+gemma-3-27b-it,association,grief,grief,released-R,11,", |  ( |  and |  "" | . |   | 
+
+ | 
+ |  in | ..."
+gemma-3-27b-it,association,grief,grief,released-R,12,", |  ( |  and |  "" | . |   | 
+ | 
+
+ |  in |  to"
+gemma-3-27b-it,association,grief,grief,released-R,13,", |  "" |  and | . |  ( |   | 
+
+ | 
+ | ... |  in"
+gemma-3-27b-it,association,grief,grief,released-R,14,", |  "" |  and | . |  ( |   | 
+
+ |  in | 
+ |  to"
+gemma-3-27b-it,association,grief,grief,released-R,15,", |  "" | . |  and |   |  ( | 
+
+ | ... |  in | 
+"
+gemma-3-27b-it,association,grief,grief,released-R,16,", |  "" | . |  and |   |  ( | ... | 
+
+ |  a |  the"
+gemma-3-27b-it,association,grief,grief,released-R,17,", |  "" |  and | . |   |  ( |  the |  a | 
+
+ | ..."
+gemma-3-27b-it,association,grief,grief,released-R,18,", |  "" | . |  and |   |  ( |  the |  a | 
+
+ | ..."
+gemma-3-27b-it,association,grief,grief,released-R,19," "" | , | . |  “ |  and |   |  ( |  the |  a |  '"
+gemma-3-27b-it,association,grief,grief,released-R,20," "" | , |  “ |  only |  never |  ' | ... |  almost | . |  not"
+gemma-3-27b-it,association,grief,grief,released-R,21," "" | , |  never |  because |  “ |  only |  almost |  just |  still |  even"
+gemma-3-27b-it,association,grief,grief,released-R,22," inexplic |  quietly |  mysteriously |  "" |  waiting | — |  never |  forever |  seemed |  foolish"
+gemma-3-27b-it,association,grief,grief,released-R,23,— |  inexplic |  quietly |  mysteriously |  because |  never | -- |  — |  seemed |  foolish
+gemma-3-27b-it,association,grief,grief,released-R,24,"— |  quietly |  inexplic |  — | -- | --"" |  mysteriously |  cheerfully |  apparently | —“"
+gemma-3-27b-it,association,grief,grief,released-R,25, inexplic | — |  mysteriously |  apparently |  miraculously |  quietly |  — |  foolish | —“ |  never
+gemma-3-27b-it,association,grief,grief,released-R,26, memorial |  inexplic |  grieving |  mourn |  posthum |  mourning |  sentimental |  commemorating |  mour |  honoring
+gemma-3-27b-it,association,grief,grief,released-R,27, inexplic |  grieving |  memorial |  heartbroken |  mourning |  sentimental |  grief | — |  heartbreaking |  emotionally
+gemma-3-27b-it,association,grief,grief,released-R,28, inexplic |  sentimental |  grieving |  heartbroken |  memorial |  quietly |  heartbreaking |  grief |  emotionally |  lovingly
+gemma-3-27b-it,association,grief,grief,released-R,29, grieving |  sentimental |  grief |  emotionally |  memorial |  inexplic |  because |  heartbroken | — |  mourning
+gemma-3-27b-it,association,grief,grief,released-R,30, grieving |  because |  grief |  sentimental |  heartbroken |  emotionally |  emotional |  mourning |  heartbreaking |  heartbreak
+gemma-3-27b-it,association,grief,grief,released-R,31, grieving |  grief |  heartbroken |  sentimental |  emotionally |  mourning |  heartbreak |  emotional |  sobbing |  memorial
+gemma-3-27b-it,association,grief,grief,released-R,32, grieving |  grief |  heartbroken |  sentimental |  heartbreak |  mourning |  heartbreaking |  emotionally |  sobbing |  mourn
+gemma-3-27b-it,association,grief,grief,released-R,33, grieving |  grief |  heartbroken |  mourning |  heartbreak |  sentimental |  mourn |  heartbreaking |  Grief |  sobbing
+gemma-3-27b-it,association,grief,grief,released-R,34, heartbroken |  grieving |  grief |  heartbreak |  sentimental |  mourning |  heartbreaking |  Grief |  sobbing |  mourn
+gemma-3-27b-it,association,grief,grief,released-R,35, grieving |  grief |  heartbroken |  she |  herself |  mourning |  Grief |  sentimental |  heartbreak |  her
+gemma-3-27b-it,association,grief,grief,released-R,36, she |  grief |  grieving |  heartbroken |  Grief |  sentimental |  Mrs |  her |  mourning |  herself
+gemma-3-27b-it,association,grief,grief,released-R,37, she |  grief |  grieving |  Grief |  Mrs |  heartbroken |  sentimental |  her | 她说 |  herself
+gemma-3-27b-it,association,grief,grief,released-R,38, she |  grief |  Mrs |  Grief |  grieving | 她说 |  herself |  her |  그녀 |  sentimental
+gemma-3-27b-it,association,grief,grief,released-R,39, she |  grief |  그녀 |  her | 她说 |  herself |  Mrs |  Grief |  ఆమె | 她
+gemma-3-27b-it,association,grief,grief,released-R,40, she |  그녀 |  her |  herself | 她说 |  grief |  Mrs | 她 |  ఆమె | she
+gemma-3-27b-it,association,grief,grief,released-R,41, she |  그녀 | 她 |  her |  ఆమె | 她说 | she | 她的 |  herself |  她
+gemma-3-27b-it,association,grief,grief,released-R,42, she |  그녀 | 她 |  her | she |  ఆమె | 她的 |  herself | 她说 |  她
+gemma-3-27b-it,association,grief,grief,released-R,43, she |  그녀 |  her | 她 | she | 她的 |  она |  ఆమె |  她 | 彼女
+gemma-3-27b-it,association,grief,grief,released-R,44, she |  그녀 | she |  her |  она | 她 |  herself | 她的 |  ఆమె | 她说
+gemma-3-27b-it,association,grief,grief,released-R,45, she |  그녀 |  her | she |  grief | 她 |  она |  Grief |  Mrs | 她说
+gemma-3-27b-it,association,grief,grief,released-R,46, she |  그녀 | she |  она | 她 |  her |  她 | 她说 |  вона |  ఆమె
+gemma-3-27b-it,association,grief,grief,released-R,47, she |  그녀 | she | 她 |  она |  her | 她说 |  她 |  ఆమె |  вона
+gemma-3-27b-it,association,grief,grief,released-R,48, she |  그녀 | she |  her | 她 |  она | 她说 |  她 |  ఆమె |  grief
+gemma-3-27b-it,association,grief,grief,released-R,49, she | she |  그녀 |  her | 她 |  она | 她说 |  She |  她 |  ఆమె
+gemma-3-27b-it,association,grief,grief,released-R,50, she | she |  her |  그녀 |  она |  She | 她 |  Mrs | 她说 |  她
+gemma-3-27b-it,association,grief,grief,released-R,51, she | she |  her |  그녀 |  She |  она | 她 |  Mrs | 她说 |  friends
+gemma-3-27b-it,association,grief,grief,released-R,52, she |  her | she |  그녀 |  она | 她 |  She |  herself |  вона |  Mrs
+gemma-3-27b-it,association,grief,grief,released-R,53, she |  her | she |  그녀 | 她 |  она |  She |  herself | 彼女 |  вона
+gemma-3-27b-it,association,grief,grief,released-R,54, she | she |  She |  her |  она | 她 |  그녀 | She |  вона |  她
+gemma-3-27b-it,association,grief,grief,released-R,55, she |  She | she |  her |  It |  она |  Everyone |  People |  Every | She
+gemma-3-27b-it,association,grief,grief,released-R,56, she |  It |  She |  Every |  Eleven |  Everyone |  People |  Eleanor |  Sometimes |  Some
+gemma-3-27b-it,association,grief,grief,released-R,57, It |  she |  She |  Every |  People |  Everyone |  Some |  Sometimes |  The |  After
+gemma-3-27b-it,association,grief,grief,released-R,58, She |  It |  she |  Her | She |  He |  People |  They |  The |  Every
+gemma-3-27b-it,association,grief,grief,released-R,59," She |  It |  Her | 
+
+ |  she |  He |  The |  Eleven |    |  People"
+gemma-3-27b-it,association,grief,grief,released-R,60," She |  It | 
+
+ |   |  The |    |  A |  Her | 
+ |  He"
+gemma-3-27b-it,association,grief,grief,released-J,0,oretically | റേ |  जॉर्ज |  एक्चु | étera |  AGRIC | বঙ্গে | െങ്കിൽ | śmy | ግሎ
+gemma-3-27b-it,association,grief,grief,released-J,1,oretically | റേ | étera |  एक्चु | śmy | 鸰 | theless |  عبدالع | ামুটি | 뢨
+gemma-3-27b-it,association,grief,grief,released-J,2,റേ |  एक्चु | śmy | theless |  عبدالع | étera |  जॉर्ज | oretically | বঙ্গে | 鸰
+gemma-3-27b-it,association,grief,grief,released-J,3,"뢨 | oretically | റേ | étera | 骠 | theless | "",[],"" |  ASSOCIATION | lensFlare |  عبدالع"
+gemma-3-27b-it,association,grief,grief,released-J,4,lensFlare |  llrp |  principally |  প্রভৃতি |  etcétera |  precludes | റേ | 骠 | étera | \|=\
+gemma-3-27b-it,association,grief,grief,released-J,5, principally | lensFlare |  etcétera | റേ |  llrp |  প্রভৃতি | étera |  chiefly |  proportionately | 颶
+gemma-3-27b-it,association,grief,grief,released-J,6, principally | lensFlare |  llrp | étera |  etcétera |  chiefly |  প্রভৃতি | 颶 | റേ |  $\|\
+gemma-3-27b-it,association,grief,grief,released-J,7," etcétera | étera |  principally |  প্রভৃতি | śmy | 颶 | .""[ |  hâ | ുകൊ | শৃঙ্খলা"
+gemma-3-27b-it,association,grief,grief,released-J,8," etcétera |  principally |  mim |  hâ | .""[ |  favourably |  Whilst | śmy |  characterised | étera"
+gemma-3-27b-it,association,grief,grief,released-J,9," […] |  [...] | .""[ | â | […] | --- |  [... | [...] |  â |  mim"
+gemma-3-27b-it,association,grief,grief,released-J,10,".""[ |  '[ |  ... | --- |  [...] | .""' |  â | .] | ,[ | -----"
+gemma-3-27b-it,association,grief,grief,released-J,11," â |  — | --- |  [...] | — |  '[ | .""[ |  --- | â |  ..."
+gemma-3-27b-it,association,grief,grief,released-J,12, â |  [...] |  — |  -- | â |  ... | Â |  '[ | .] |  ---
+gemma-3-27b-it,association,grief,grief,released-J,13," â |  [...] |  — | ,... | .""[ |  '[ |  ... |  -- |  [... | .["
+gemma-3-27b-it,association,grief,grief,released-J,14," â |  — |  [...] |  -- | . | â | , |  '[ | ly |  ..."
+gemma-3-27b-it,association,grief,grief,released-J,15, — |  -- |  [...] |  â | ... | <start_of_image> | . |  --- |  ... | —
+gemma-3-27b-it,association,grief,grief,released-J,16, â |  [...] |  — | Â |  -- | ... | â | ...? | -- |  ...
+gemma-3-27b-it,association,grief,grief,released-J,17, — |  â |  -- | ...? | Â | â | — | ? | <start_of_image> |  [...]
+gemma-3-27b-it,association,grief,grief,released-J,18, — |  -- | <start_of_image> |  â | — | Â | ? | -- | ...? | â
+gemma-3-27b-it,association,grief,grief,released-J,19," -- | <start_of_image> |  â |  "" | ? |  — | Â | ...? |  ? | ."
+gemma-3-27b-it,association,grief,grief,released-J,20," â | ? |  -- | <start_of_image> |  "" |  inexplic | ...? |  seemed |  Merry | ?"""
+gemma-3-27b-it,association,grief,grief,released-J,21," quietly |  inexplic |  mysteriously |  â | ? |  "" |  seemed |  seemingly |  strangely |  ironically"
+gemma-3-27b-it,association,grief,grief,released-J,22," inexplic |  quietly |  mysteriously | --"" | -- |  cheerfully | — |  apparently |  strangely |  silently"
+gemma-3-27b-it,association,grief,grief,released-J,23," inexplic |  mysteriously | --"" | -- |  cheerfully | — |  quietly |  ostensibly |  seemed |  apparently"
+gemma-3-27b-it,association,grief,grief,released-J,24,"--"" | — |  inexplic | -- |  mysteriously | —“ |  cheerfully |  ostensibly | ?— |  quietly"
+gemma-3-27b-it,association,grief,grief,released-J,25," inexplic | --"" | —“ | — |  mysteriously |  ostensibly |  apparently |  BECAUSE | -- | --“"
+gemma-3-27b-it,association,grief,grief,released-J,26," inexplic |  ostensibly | —“ | — | --"" |  mysteriously |  quietly |  apparently |  “… |  improb"
+gemma-3-27b-it,association,grief,grief,released-J,27," inexplic | — | —“ |  — |  quietly |  ostensibly | —— |  because |  BECAUSE | --"""
+gemma-3-27b-it,association,grief,grief,released-J,28, inexplic | — |  quietly | —“ |  — | —— | —” | ——— |  apparently |  inexplicable
+gemma-3-27b-it,association,grief,grief,released-J,29, inexplic |  because | —“ |  BECAUSE | — |  quietly |  — |  apparently | —” |  lovingly
+gemma-3-27b-it,association,grief,grief,released-J,30, because |  BECAUSE |  porque | because |  inexplic |  потому | เพราะ |  perché | Because |  Because
+gemma-3-27b-it,association,grief,grief,released-J,31, because |  BECAUSE |  inexplic | because |  porque | —“ |  fucking | เพราะ |  unconsciously | Because
+gemma-3-27b-it,association,grief,grief,released-J,32, inexplic | —“ | 💔 | 🥹 | 😭😭 |  heartbroken | 😔 |  grieving |  because |  unconsciously
+gemma-3-27b-it,association,grief,grief,released-J,33, heartbroken |  grieving | 💔 |  воспомина | 🥹 | 😭😭 |  lingered | 她说 |  inexplic |  stubbornly
+gemma-3-27b-it,association,grief,grief,released-J,34, heartbroken | 她说 | 💔 | 🥹 |  ఆమె |  grieving | 😭😭 |  stubbornly |  lingered |  그녀
+gemma-3-27b-it,association,grief,grief,released-J,35,她说 |  ఆమె |  그녀 | 彼女 | 她的 |  அவள் | 她在 |  သူမ |  เธอ |  她
+gemma-3-27b-it,association,grief,grief,released-J,36,她说 |  ఆమె |  그녀 | 彼女 | 她的 |  เธอ | 她在 |  她 |  அவள் |  သူမ
+gemma-3-27b-it,association,grief,grief,released-J,37,她说 |  ఆమె |  그녀 |  她 | 彼女 | 她的 | 她在 |  เธอ |  သူမ |  அவள்
+gemma-3-27b-it,association,grief,grief,released-J,38,她说 |  그녀 |  ఆమె | 彼女 | 她的 |  她 |  သူမ | 她在 |  เธอ |  அவள்
+gemma-3-27b-it,association,grief,grief,released-J,39, 그녀 |  ఆమె | 她说 | 彼女 | 她的 |  她 | 她在 |  သူမ |  เธอ |  அவள்
+gemma-3-27b-it,association,grief,grief,released-J,40, 그녀 |  ఆమె | 她说 | 彼女 |  她 | 她的 | 她在 | 她 |  သူမ |  เธอ
+gemma-3-27b-it,association,grief,grief,released-J,41, 그녀 |  ఆమె | 她说 | 彼女 | 她的 |  她 | 她在 | 她 |  вона |  เธอ
+gemma-3-27b-it,association,grief,grief,released-J,42, 그녀 |  ఆమె | 她的 | 彼女 | 她说 |  她 | 她在 | 她 |  вона |  เธอ
+gemma-3-27b-it,association,grief,grief,released-J,43, 그녀 |  ఆమె | 彼女 | 她的 | 她说 |  她 | 她在 | 她 |  she |  вона
+gemma-3-27b-it,association,grief,grief,released-J,44, 그녀 |  ఆమె | 她的 | 彼女 | 她说 |  她 | 她在 |  она |  вона |  she
+gemma-3-27b-it,association,grief,grief,released-J,45, 그녀 |  ఆమె | 她说 | 彼女 | 她的 |  она |  she |  她 |  вона | 她
+gemma-3-27b-it,association,grief,grief,released-J,46, 그녀 |  ఆమె |  she |  она | 她 | 彼女 | 她的 |  вона |  她 | 她说
+gemma-3-27b-it,association,grief,grief,released-J,47, 그녀 |  she |  ఆమె |  она | 彼女 | 她 | 她说 |  她 |  вона | 她的
+gemma-3-27b-it,association,grief,grief,released-J,48, 그녀 |  she |  ఆమె | 她 |  она | 她说 | 彼女 | 她的 |  她 |  вона
+gemma-3-27b-it,association,grief,grief,released-J,49, she |  그녀 | 她 |  она |  ఆమె | 她说 | 彼女 |  вона |  她 | 她的
+gemma-3-27b-it,association,grief,grief,released-J,50, she |  그녀 | 她 |  она | 她说 | 彼女 |  вона |  ఆమె | she |  她
+gemma-3-27b-it,association,grief,grief,released-J,51, she |  그녀 | 她 |  она | 彼女 | 她说 | she |  вона |  ఆమె |  她
+gemma-3-27b-it,association,grief,grief,released-J,52, she |  그녀 | 她 |  она | 彼女 |  her |  вона | she |  ఆమె | 她说
+gemma-3-27b-it,association,grief,grief,released-J,53, she |  그녀 | 她 | 彼女 |  her |  она | she |  ఆమె |  вона | 她说
+gemma-3-27b-it,association,grief,grief,released-J,54, she | she |  그녀 |  она | 她 |  her | 彼女 |  вона |  ఆమె | 她说
+gemma-3-27b-it,association,grief,grief,released-J,55, she | she |  그녀 |  она | 她 |  her |  She |  вона | She | 彼女
+gemma-3-27b-it,association,grief,grief,released-J,56, she |  Eleven |  Eleanor |  She | she |  her |  eleven |  Sarah |  Everyone |  она
+gemma-3-27b-it,association,grief,grief,released-J,57, she |  It |  She |  Eleven |  Everyone |  Every |  People |  Sometimes |  Eleanor |  Some
+gemma-3-27b-it,association,grief,grief,released-J,58, She |  she |  It | She |  Her |  Eleven |  People |  They |  He |  Everyone
+gemma-3-27b-it,association,grief,grief,released-J,59," She |  It |  Her |  she | 
+
+ |  Eleven |  The |  He | She |  People"
+gemma-3-27b-it,association,grief,grief,released-J,60," She |  It | 
+
+ |   |  The |    |  A |  Her | 
+ |  He"
+gemma-3-27b-it,association,grief,grief,logit,0,". |  I |  in | 도 | 
+ | .” | も | ہ | ! | ও"
+gemma-3-27b-it,association,grief,grief,logit,1," I | . | ме | 도 | де | も | .” | ę | ও | 
+"
+gemma-3-27b-it,association,grief,grief,logit,2," I | де | ме | も | 
+ | 도 | .” | . | то | ও"
+gemma-3-27b-it,association,grief,grief,logit,3," I | де | 
+ | то | ти | も | কে | 도 |  불구하고 | .”"
+gemma-3-27b-it,association,grief,grief,logit,4,"
+ |  I |  G |  N |  O |  L |  U | ו |  K |  M"
+gemma-3-27b-it,association,grief,grief,logit,5,"
+ |  I |  G | ו |  N |  L |  K |  M |  O |  X"
+gemma-3-27b-it,association,grief,grief,logit,6,"
+ |  I |  G |  K |  N | ו |  L |  M |  Y |  S"
+gemma-3-27b-it,association,grief,grief,logit,7,"
+ |  I |  K |  G | ו |  L |  MAN |  N |  X |  M"
+gemma-3-27b-it,association,grief,grief,logit,8,"
+ | u |  I | ed | in | il | ו |  K | en |  G"
+gemma-3-27b-it,association,grief,grief,logit,9,"
+ | u | ed | in |  K | il | n |  S |  I |  N"
+gemma-3-27b-it,association,grief,grief,logit,10,"
+ | u | ed | in | il |  K |  S |  I | n |  N"
+gemma-3-27b-it,association,grief,grief,logit,11,"
+ | ed | u | in |  K |  S | il |  N |  I |  Y"
+gemma-3-27b-it,association,grief,grief,logit,12,"
+ | ed |  K | u |  S |  Y | ת |  Set |  L |  G"
+gemma-3-27b-it,association,grief,grief,logit,13,"ed | 
+ |  K | ა |  Set |  Operation | u | il | ת |  Y"
+gemma-3-27b-it,association,grief,grief,logit,14,"ed | 
+ | ა | il |  Maths |  고급 | ת |  Set | et |  K"
+gemma-3-27b-it,association,grief,grief,logit,15,"ed |  Maths | il | 
+ | ა | l |  S | ಿಂತ |  Puedes |  ಯಾವುದೇ"
+gemma-3-27b-it,association,grief,grief,logit,16,"ed | il | l | 
+ |  Maths |  Puedes | et | at | u | el"
+gemma-3-27b-it,association,grief,grief,logit,17,il | ed | et | at | l | ა | elijke | zelfde |  Puedes |  Usted
+gemma-3-27b-it,association,grief,grief,logit,18,et | il | ed | at | l | el | zelfde |  Usted | elijke | ście
+gemma-3-27b-it,association,grief,grief,logit,19,il | et | l | el | ed | ა | at | elijke | ющих | an
+gemma-3-27b-it,association,grief,grief,logit,20,il | l | el | ed |  toată | elijke | et | at | u | an
+gemma-3-27b-it,association,grief,grief,logit,21,el | il | l | elijke |  toată | ed | et |  enemigo |  Çünkü |  Porque
+gemma-3-27b-it,association,grief,grief,logit,22,el |  Porque | et | il | ed | adı |  Çünkü |  Because | ul | at
+gemma-3-27b-it,association,grief,grief,logit,23,el |  почти | et |  Porque |  без |  Because | ed |  майже |  γιατί |  क्योंकि
+gemma-3-27b-it,association,grief,grief,logit,24, почти |  बाथरूम |  майже | et |  Nobody |  без |  फांसी |  Ironically |  তবু |  γιατί
+gemma-3-27b-it,association,grief,grief,logit,25, Because | เพราะ |  Nobody |  Madonna |  Porque |  Children | ul | il | el | ed
+gemma-3-27b-it,association,grief,grief,logit,26, Poems |  Because |  Dreams |  Things |  Ironically |  Çünkü |  Emily | 尽管 | eer |  Hoffnung
+gemma-3-27b-it,association,grief,grief,logit,27, Because |  Things |  Retirement | eer |  Emily | เพราะ |  because |  Nobody |  Poems | urile
+gemma-3-27b-it,association,grief,grief,logit,28, Because |  Things |  because |  เพราะ |  Insurance | เพราะ |  That |  Significant |  Hearing |  Television
+gemma-3-27b-it,association,grief,grief,logit,29, Because |  because | because | เพราะ |  Things |  เพราะ | porque |  That |  Dreams |  Television
+gemma-3-27b-it,association,grief,grief,logit,30, Because |  because | because |  porque | เพราะ |  เพราะ |  Things |  защото | 因为 |  क्योंकि
+gemma-3-27b-it,association,grief,grief,logit,31, Because | because |  Things |  because |  Nobody |  เพราะ |  porque |  Knowing |  Thinking | เพราะ
+gemma-3-27b-it,association,grief,grief,logit,32, Because |  Things |  Sometimes |  Nobody |  Obviously |  After |  because |  Knowing |  Eventually |  Maybe
+gemma-3-27b-it,association,grief,grief,logit,33, Things |  Because |  Memories |  Nobody |  Maybe |  Knowing |  Significant |  Perhaps |  After |  Sometimes
+gemma-3-27b-it,association,grief,grief,logit,34, Things |  Slowly |  Knowing |  Somewhere |  Because |  Haunted |  Tears |  Grief |  Nobody |  Every
+gemma-3-27b-it,association,grief,grief,logit,35, Things |  After |  Somewhere |  Grief |  Almost |  Something |  Nobody |  Someone |  Tears |  Every
+gemma-3-27b-it,association,grief,grief,logit,36, Things |  Maybe |  After |  она |  Like |  Nobody |  Nothing |  Because |  Someone |  Something
+gemma-3-27b-it,association,grief,grief,logit,37, Things |  After |  Grief |  Maybe |  она |  Nothing |  Like |  Somewhere |  Everything |  Why
+gemma-3-27b-it,association,grief,grief,logit,38, After |  Grief |  Widow |  Things |  Maybe |  Slowly |  Mrs |  Memories |  Mama |  она
+gemma-3-27b-it,association,grief,grief,logit,39, Grief |  Maybe |  she |  Things |  она |  Every |  Neighbors |  After |  Widow | she
+gemma-3-27b-it,association,grief,grief,logit,40, she |  After |  она |  Grief |  Maybe | she |  Mrs |  Things |  Every |  Neighbors
+gemma-3-27b-it,association,grief,grief,logit,41, she |  она | she |  вона |  Она | 她 | 她说 |  그녀 |  After |  Maybe
+gemma-3-27b-it,association,grief,grief,logit,42, she |  она | she |  вона |  Она | 她 |  After |  Grief |  People |  Things
+gemma-3-27b-it,association,grief,grief,logit,43, she |  она | she |  вона | 她 |  Она |  Every |  People |  After |  그녀
+gemma-3-27b-it,association,grief,grief,logit,44, she |  она | she |  вона |  Она |  그녀 | 她 | 她说 |  Every |  People
+gemma-3-27b-it,association,grief,grief,logit,45, she |  она | she |  вона |  Она | 她 |  그녀 |  Mrs |  Habits |  Widow
+gemma-3-27b-it,association,grief,grief,logit,46, she |  она | she |  вона | 她 |  Ritual |  Она |  그녀 |  Widow |  Mrs
+gemma-3-27b-it,association,grief,grief,logit,47, she | she |  она |  вона |  Ritual | 她 |  Она |  그녀 |  Habits |  Widow
+gemma-3-27b-it,association,grief,grief,logit,48, she | she |  она |  Habits |  Ritual | 习惯 | 她 |  Habit |  вона |  Mrs
+gemma-3-27b-it,association,grief,grief,logit,49, she | she |  она | 她 |  вона | 习惯 |  Habits |  그녀 |  Ritual |  Она
+gemma-3-27b-it,association,grief,grief,logit,50, she | she |  People |  она |  It |  Every |  She |  Everyone |  After |  Ritual
+gemma-3-27b-it,association,grief,grief,logit,51, she | she |  она |  People |  It |  Everyone |  She |  After |  Every |  Mrs
+gemma-3-27b-it,association,grief,grief,logit,52, she | she |  она |  People |  вона | 她 |  It |  She |  Она |  Every
+gemma-3-27b-it,association,grief,grief,logit,53, she | she |  она |  People |  She | 她 |  вона |  It |  Every |  그녀
+gemma-3-27b-it,association,grief,grief,logit,54, she | she |  She |  People |  она |  It |  Every |  After | She |  Just
+gemma-3-27b-it,association,grief,grief,logit,55, she |  People |  It |  Everyone |  Every |  Eleven |  She |  After |  Some |  Sometimes
+gemma-3-27b-it,association,grief,grief,logit,56, It |  People |  she |  Every |  Eleven |  Everyone |  After |  She |  Some |  Sometimes
+gemma-3-27b-it,association,grief,grief,logit,57, It |  People |  After |  Every |  Some |  she |  Everyone |  She |  Eleven |  Even
+gemma-3-27b-it,association,grief,grief,logit,58, She |  It |  Her | She |  He |  People |  she |  They |  The |  After
+gemma-3-27b-it,association,grief,grief,logit,59," She |  It |  Her | 
+
+ |  she |  He |  Eleven |  People | She |  The"
+gemma-3-27b-it,association,grief,grief,logit,60," She |  It | 
+
+ |   |  The |    |  A |  Her | 
+ |  He"
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,0,     | s |          |     |    |        |  – |       |         |           
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,1,     | s |          |     |        |    |         |       |  – |           
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,2,     | s |          |     |        |    |         |  – |       | (
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,3,"   |      | s |     |          | , |        |  ( |  – |  as"
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,4,"   | , |  ( |      |     | 
+ |  and |  as |  in |  "
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,5,", |    |  ( |   |  and | 
+ |  in |  as |  a |    "
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,6,", |  ( |    | 
+ |   |  in |  and |  as |  a |  to"
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,7,", |    |  ( | 
+ |   |  and |  as |  in | � |  a"
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,8,", | 
+ |    |  ( |   |  and |  in | ... |  a |  as"
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,9,"
+ | , |  ( |    | … | ... |   |  and | ! | *"
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,10,"
+ |    | , | — | … |  ( | ... | � |   |     "
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,11,"
+ | , |    | … |  ( | — | ... |   |  and | !"
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,12,"
+ | , |    |  ( | — |   | ... | … | ! |  and"
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,13,"
+ | — | … | , |    |  ( | ! | ... | ( |  "
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,14,"
+ | … | ! | — | ... |      |    | ( |     | ,"
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,15,"
+ | … | — |    | ! |      | ... | , | ( |    "
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,16,"
+ | ! |    |      | … | — |     | , |          |       "
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,17,"
+ | — | … |      | ! |    |          | � |     |       "
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,18,"
+ | — |      | ! | … |          |  poems |        |  words |   "
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,19," sorrow |  words |  poems |      | — |  poem |  Wordsworth | 
+ | ! |      "
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,20, sorrow |  poems |  words |  poem |  Wordsworth | — |  стихо |  poets | Words | 诗
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,21, sorrow |  poems | — |  poem |  poetry |  poets |  words |  cheerful |  marvellous |  Wordsworth
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,22, poems | — |  sorrow |  poem |  poetry |  poets |      |  words | … |  Wordsworth
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,23, poems |  poem |  poetry |  sorrow |  words |  poets |  poet |  poetic |  sweetly |  singing
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,24, poems |  sorrow |  poem |  sweetly |  poetry |  poets |  poet |  joyful |  poetic |  cheerful
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,25, poems |  sorrow |  poem |  poets |  poetry |  poetic |  poet |  sweetly |  joyous |  hymns
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,26, sorrow |  poetic |  wondrous |  poems |  poet |  joyful |  poem |  joyous |  lovely |  beautiful
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,27, poetic |  sorrow |  poems |  poem |  poet |  poets |  poetry |  sweetly |  weeping |  joyous
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,28, sorrow |  never |  poems |  poetic |  poem |  darkness |  sweetly |  dark |  poet |  poetry
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,29, never |  sorrow |  to |  God |  was |  that |  so |  no |  gentle |  poems
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,30, never |  sorrow |  death |  life |  God |  calmly |  gentle |  that |  gently |  calm
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,31, death |  Death | Death | death |  dying |  DEATH |  deaths |  died |  sorrow |  смерть
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,32, death |  Death | Death | death |  dying |  DEATH |  deaths |  died |  смерть |  muerte
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,33, death |  Death | Death | death |  DEATH |  dying |  deaths |  ölüm |  смерть |  muerte
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,34, death |  Death | Death | death |  DEATH |  ölüm |  muerte |  смерть |  śmierci | 死亡
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,35, death |  Death | Death | death |  DEATH |  ölüm |  смерть |  muerte |  śmierci |  morte
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,36, death |  Death | Death | death |  DEATH |  смерть |  ölüm |  मृत्यु |  muerte |  deaths
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,37, death |  Death | Death | death |  смерть |  DEATH |  deaths |  ölüm |  смерти |  morte
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,38, death | death | Death |  Death |  смерть |  DEATH |  ölüm |  deaths |  śmierci |  muerte
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,39, death | death | Death |  Death |  смерть |  DEATH |  ölüm |  muerte |  śmierci |  मौत
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,40, death |  Death | Death | death |  смерть |  DEATH |  ölüm |  मौत |  śmierci |  مرگ
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,41, death | Death |  Death | death |  смерть |  DEATH |  ölüm |  muerte |  śmierci |  morte
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,42, death | Death | death |  Death |  DEATH |  смерть |  muerte |  śmierci |  смерти |  मौत
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,43, death | Death | death |  Death |  смерть |  DEATH |  śmierci |  muerte |  смерти |  मौत
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,44, death | death | Death |  Death |  смерть |  DEATH |  śmierci |  смерти |  muerte |  मौत
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,45, death | Death | death |  Death |  смерть |  śmierci |  embraced |  DEATH |  смерти |  मौत
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,46, embraced |  surrounded |  death |  Surrounded | Death |  vanqu | death |  embracing |  Death |  overtaken
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,47, surrounded |  embraced |  Surrounded |  death |  vanqu |  embracing |  overtaken | Death | death |  encircled
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,48, surrounded |  embraced |  Surrounded |  embracing |  confronted |  facing |  vanqu |  death |  defeated |  overtaken
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,49, embraced |  surrounded |  embracing |  facing |  Surrounded |  confronted |  death |  faced |  defeated |  confronting
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,50, surrounded |  embraced |  embracing |  facing |  Surrounded |  confronted |  faced |  defeated |  vanqu |  death
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,51, surrounded |  embraced |  facing |  embracing |  Surrounded |  confronted |  faced |  defeated |  vanqu |  confronting
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,52, surrounded |  embraced |  embracing |  facing |  Surrounded |  confronted |  faced |  defeated |  vanqu |  confronting
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,53, surrounded |  embraced |  facing |  embracing |  confronted |  Surrounded |  faced |  defeated |  confronting |  vanqu
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,54, surrounded |  facing |  embraced |  embracing |  Surrounded |  faced |  confronted |  surrendered |  defeated |  confronting
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,55, surrounded |  embraced |  facing |  embracing |  surrendered |  faced |  sur |  confronted | Sur |  defeated
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,56, embracing |  embraced |  facing |  surrounded |  faced | Facing |  surrendered |  Surrounded |  Embr |  Facing
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,57, embraced |  embracing |  facing |  surrounded |  faced | Facing |  Embr |  Surrounded |  surrendered | Sur
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,58, embraced | Sur | Facing | Em | And |  Embr | His |  embracing |  faced | Consumed
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,59,And | Sur | Em | His | Lost | A | Consumed | Facing | Con | Def
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-R,60,And | A | Sur | Em | His | As | Lost | While | Con | Then
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,0,ের | ς | s | ों | ی | ים | samb | silk | ˁ |  Elektrokh
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,1,ς | ের | ों | ים | s | autoarima | 蜞 | samb | ی | 󰡕
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,2,ের | ों | autoarima | 󰡕 | 蜞 | ς | 粆 | 麋 |  Maugin | ˁ
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,3,ों | autoarima | 󰡕 | ের | ים | ς | ی | 麋 | 粆 | 쯜
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,4,󰡕 |  adjudged | ╿ | నకు | 𒉈 | ﺛ | 蜞 | ⸨ | 粆 | ों
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,5,󰡕 | ≳ |  adjudged | AudioAsset | ╿ |  fudai | ों |  fulfils |  whereupon | ⸨
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,6,󰡕 |  fulfils | ≳ | AudioAsset | 𒉈 |  adjudged | ≔ | Metering |  किंतु |  हेतु
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,7, fulfils | 󰡕 |  fulfilment |  fulfil |  utilises |  soddisf |  utilised | ​— |  हेतु | 
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,8,󰡕 | </i> |  utilised | 하였 |  utilises | ​— | ―――― | AudioAsset | newdata | 曏
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,9,</i> | 󰡕 | ​— | ―――― |  endeavoured | Whilst |  |  summarised | ⩽ | AudioAsset
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,10,</i> | ​— | 󰡕 | ― | ―――― | ⎯ | ⟺ | </blockquote> | ∕ | ‘‘
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,11,</i> | ​— | ― | 󰡕 | ⎯ |  阅读全文 |  | ⟺ |  | Willow
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,12,"</i> | ​— |  阅读全文 | ,! | 󰡕 | Computation | ...! |  | ― | "
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,13,"</i> |  阅读全文 | ​— | ,! |  | ,… | ― | ⎯ | 󰡕 | ...!"
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,14,"​— |  阅读全文 | </i> |  […] | ,… |  |  |  | 󰡕 | ...!"
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,15," 阅读全文 | </i> | ​— |  […] | ,… |  |  |  | 󰡕 | ―"
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,16,"​— |  阅读全文 | </i> |  | 󰡕 |  |  آ | coloured | ,… | ―"
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,17,​— | 󰡕 |  | </i> |  |  آ |  阅读全文 | ⌞ | 􀂃 | 
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,18,​— | 󰡕 |  阅读全文 |  |  | ⌞ |  |  |  آ |  стихо
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,19,"​— | 󰡕 |  阅读全文 |  |  |  |  آ | ,… | ⌞ |  стихо"
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,20,󰡕 |  阅读全文 |  emphasises |  marvellous | </blockquote> |  стихо | ​— | ⌞ |  emphasise |  آ
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,21, marvellous |  emphasised |  emphasises |  emphasise |  آ | 󰡕 |  fertilisers |  muß | ⌞ |  стихо
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,22," emphasises |  marvellous |  emphasise |  emphasised |  آ | 󰡕 |  стихо |  fertilisers | ​— | ,…"
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,23,🩶 |  стихо | 𝄞 |  emphasised | Stabilise |  emphasises |  fertilisers |  emphasise | 🥹 |  آ
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,24, Pogis | 〝 |  aussitôt | 𝄞 | 诗人 | ≐ | ➰ |  стихо | ‛ |  হইয়াছে
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,25, marvellous |  emphasises | ...! |  emphasise | 诗人 | </blockquote> | 。... |  muß | !... |  হৃদয়
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,26, !” |  marvelous | 〝 |  speedily |  aussitôt |  marvellous |  thence |  thereupon | .’’ | !”.
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,27, aussitôt |  mustn |  speedily |  astonished |  uttered |  lingers | 诗人 |  marvellous |  thereupon |  proves
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,28, mustn |  proves |  aussitôt |  marvellous |  thereupon |  astonished |  therefor |  lingers |  loosing |  whereupon
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,29, mustn |  proves |  marvellous |  therefor |  prove |  wondrous |  insures | ៕ |  needn |  सुन्दर
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,30, marvellous |  mustn |  proves | ៕ |  mysteriously |  calmly |  quietly |  amazed |  calmed |  marvell
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,31, ölüm | Death |  смерть | death |  marvellous |  śmierci |  death |  Death |  sorrow |  ಸಾವ
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,32, ölüm | Death | death |  death |  смерть |  Death |  śmierci | 死亡 |  मृत्यु |  смерти
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,33,Death |  ölüm | death | 死亡 |  death |  смерть |  Death |  śmierci |  kematian |  مرگ
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,34, ölüm | death | Death |  death | 死亡 |  śmierci |  смерть |  kematian |  Death |  مرگ
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,35, ölüm | death | Death |  death |  смерть |  śmierci | 死亡 |  muerte |  Death |  مرگ
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,36,Death | death |  смерть |  ölüm |  death |  Death |  مرگ | 死亡 |  śmierci |  मौत
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,37,death |  смерть | Death |  ölüm |  death |  مرگ |  śmierci | 死亡 |  Death |  kematian
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,38, смерть | death | Death |  ölüm |  death |  śmierci |  مرگ | 死亡 |  kematian |  Death
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,39,death | Death |  death |  смерть |  ölüm |  śmierci |  Death |  مرگ |  मौत | 死亡
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,40,death | Death |  смерть |  death |  ölüm |  Death |  śmierci |  مرگ |  मौत | 死亡
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,41,death | Death |  death |  смерть |  ölüm |  Death |  śmierci |  مرگ | 死亡 |  muerte
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,42,death |  death | Death |  смерть |  Death |  śmierci | 死亡 |  ölüm |  muerte |  DEATH
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,43,death |  death | Death |  Death |  смерть |  śmierci | 死亡 |  ölüm |  muerte |  DEATH
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,44,death |  death | Death |  Death |  смерть |  śmierci |  ölüm | 死亡 |  muerte |  मौत
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,45,death |  death | Death |  смерть |  śmierci |  Death |  ölüm |  muerte |  मौत | 死亡
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,46, embraced |  vanqu |  surrounded | death |  Surrounded |  conquered |  embracing |  succumbed |  overtaken |  смерть
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,47, surrounded |  embraced |  Surrounded |  vanqu |  overtaken |  encircled |  succumbed |  conquered |  embracing |  engulfed
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,48, surrounded |  embraced |  Surrounded |  confronted |  encircled |  vanqu |  succumbed |  conquered |  embracing |  overtaken
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,49, embraced |  surrounded |  embracing |  confronted |  facing |  Surrounded |  vanqu |  confronting |  conquered |  engulfed
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,50, surrounded |  embraced |  embracing |  confronted |  facing |  Surrounded |  vanqu |  engulfed |  encircled |  conquered
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,51, surrounded |  embraced |  embracing |  facing |  confronted |  Surrounded |  vanqu |  engulfed |  confronting |  encircled
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,52, surrounded |  embraced |  embracing |  facing |  confronted |  Surrounded |  vanqu |  confronting |  defeated |  conquered
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,53, surrounded |  embraced |  embracing |  facing |  confronted |  Surrounded |  confronting |  vanqu |  faced |  conquered
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,54, surrounded |  embraced |  facing |  embracing |  Surrounded |  confronted |  faced |  surrendered |  vanqu |  confronting
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,55, surrendered |  embraced |  surrounded |  embracing |  facing |  confronted |  enveloped |  faced |  sur |  engulfed
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,56, embracing |  embraced |  facing |  faced |  surrounded |  surrendered |  Surrounded |  defeated | Facing |  succ
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,57, embracing |  embraced |  facing |  Embr |  surrendered |  surrounded |  faced |  Surrounded |  Facing | Facing
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,58, embraced |  Embr |  embracing |  Facing | Facing |  faced |  facing |  Surrounded |  surrendered |  surrounded
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,59,And | Sur | His | Em | Consumed | Facing | Lost |  embraced | A | Def
+gemma-3-27b-it,poetry,couplet-breath-death,death,released-J,60,And | A | Sur | Em | His | As | Lost | While | Con | Then
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,0,"
+ | 
+
+ | : | 
+
+
+ | ou | u | ; | 6 | ر | ,"
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,1,"
+ | 
+
+ | : | 
+
+
+ | ou | 8 | ر | 6 | u | ‌تر"
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,2,"
+ | 
+
+ | : | 
+
+
+ |  | il | ou | u | ' | </h3>"
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,3,"
+ | 
+
+ | ' | : | il |  | n | 
+
+
+ | u | ‌تر"
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,4,"
+ | 
+
+ | u | n | 
+
+
+ | il | ' | on |  | 
+
+
+
+"
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,5,"
+ | n | u | on | il | 
+
+ | ר |  SMK | ות | ,"
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,6,"
+ | n | on | u | il | m | em | el | et |  SMK"
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,7,"n | 
+ | on | il | u | m | el | et | in | em"
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,8,"u | il | on | n | 
+ | em | m | et | el | in"
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,9,"n | 
+ | u | on | il | em | in | et | an | m"
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,10,"on | u | 
+ | n | il | in | em | an | et | m"
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,11,"u | 
+ | on | n | il | an | in | em | et | p"
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,12,"u | on | n | 
+ | an | il | em | et | in | ak"
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,13,"n | on | u | 
+ | il | an | em | et | ak | in"
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,14,"n | u | 
+ | on | il | an | em | et | in | p"
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,15,"n | u | il | on | et | 
+ | em | an | in | ak"
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,16,"n | il | u | on | et | an | em | 
+ | p | in"
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,17,il | n | u | et | on | p | an | em | ak | is
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,18,il | et | u | n | on | an | p | em | is | a
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,19,il | et | u | an | p | n | on | em | a | ak
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,20,il | et | u | an | on | p | n | ből |  QnrB | l
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,21,il | et | ből | u | on |  Hacer |  చేసి | newToken | p |  чтоб
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,22,il | on | ből | u | et |  చేసి |  | avacanam | p | makes
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,23, |  చేసి | il | ből | attham | on | ımda |  समझाने | newToken |  Че
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,24, |  Че | 谒 | smoothing | ből |  создал |  чтоб | cityName | apadam |  छंद
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,25, |  Не | ற்புத | 㣩 | hatan |  чтоб | ֖ | ből | !“ |  svůj
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,26, Не | ően | 㣩 | ற்புத |  поверну |  svůj |  murió |  murdered | 那 |  Пи
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,27, Не | That | apes |  That |  Sister | ించ |  Drum |  its |  was |  Grandma
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,28,That |  Не |  That | 那 |  was |  Command |  to |  To |  it |  Buddha
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,29,That |  Не | To | Its | Can | And |  To |  That |  Turn | Only
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,30,That |  Death | Death | To | Give |  Не | Could | Its | Oh |  was
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,31, death |  Death | death | Death |  DEATH |  morte |  muerte |  смерть |  смерти |  죽
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,32, death | death |  Death | Death |  morte |  muerte |  DEATH |  смерти |  смерть | 死
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,33, death | death | Death |  Death |  morte |  muerte |  DEATH |  смерти |  смерть |  죽
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,34, death | death | Death |  Death |  muerte |  morte |  DEATH |  смерти |  śmierci |  смерть
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,35, death | death | Death |  Death |  muerte |  DEATH |  morte |  смерть |  मौत | 死
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,36, death | Death | death |  Death |  muerte |  смерти |  смерть |  DEATH |  morte |  मौत
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,37, death | death | Death |  Death |  muerte |  смерть |  DEATH |  morte |  смерти |  मौत
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,38, death | death | Death |  Death |  muerte |  смерть |  morte |  DEATH |  смерти |  मौत
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,39, death | death | Death |  Death |  смерть |  muerte |  morte |  मौत |  DEATH |  смерти
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,40, death | Death | death |  Death |  смерть |  morte |  muerte |  मौत |  مرگ |  śmierci
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,41, death | Death | death |  Death |  смерть |  muerte |  morte |  DEATH |  смерти |  मौत
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,42, death | Death | death |  Death |  muerte |  смерть |  morte |  DEATH |  смерти |  मौत
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,43, death | Death | death |  Death |  смерть |  muerte |  смерти |  morte |  मौत |  śmierci
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,44, death | Death | death |  Death |  muerte |  смерть |  मौत |  morte |  смерти |  śmierci
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,45,Death |  death | death |  Death |  morte |  смерть |  muerte |  मौत |  śmierci |  смерти
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,46, surrounded | Death |  embraced | death |  death |  Surrounded |  vanqu |  embracing |  facing |  defeated
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,47, surrounded |  embraced |  Surrounded | Death |  vanqu |  death | death |  encircled |  embracing |  overtaken
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,48, surrounded |  embraced |  Surrounded |  confronted |  vanqu |  encircled |  facing |  embracing |  confronting |  faced
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,49, surrounded |  embraced |  facing |  embracing |  confronted |  faced |  Surrounded |  vanqu |  defeated |  confronting
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,50, surrounded |  embraced |  facing |  confronted |  faced | facing |  vanqu |  defeated |  embracing |  Surrounded
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,51, surrounded |  facing |  embraced |  faced | facing |  confronted |  embracing |  Surrounded |  defeated | Death
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,52, surrounded |  embraced |  facing |  embracing |  faced | facing |  confronted | Death |  defeated |  vanqu
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,53, surrounded |  embraced |  facing |  embracing |  faced | facing | Death |  confronted |  defeated |  Surrounded
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,54, surrounded |  embraced |  facing |  embracing |  faced |  vanqu | facing |  Surrounded |  defeated |  confronted
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,55, surrounded |  embraced | Sur |  facing |  embracing | sur |  faced |  sur |  surrendered | facing
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,56, embraced |  embracing | Sur |  facing |  surrounded | Facing |  faced | facing | Def | His
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,57,Sur |  embraced | Def |  embracing | Facing |  surrounded |  facing | And | His | Con
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,58,Sur | Em | And | His | Def |  embraced | Con | Facing | As | Lost
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,59,And | Sur | Em | His | A | Con | Del | Lost | He | Def
+gemma-3-27b-it,poetry,couplet-breath-death,death,logit,60,And | A | Sur | Em | His | As | Lost | While | Con | Then

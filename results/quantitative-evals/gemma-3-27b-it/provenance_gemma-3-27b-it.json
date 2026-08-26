@@ -1,0 +1,30 @@
+{
+  "j-lens": {
+    "model_id": "google/gemma-3-27b-it",
+    "dataset_id": "NeelNanda/pile-10k",
+    "target_layer": 60,
+    "t_max": 128,
+    "n_prompts": 25,
+    "docs_consumed": 25,
+    "n_positions": 0.0,
+    "git_commit": "modal",
+    "skip_first": 4,
+    "config_json": "{\"estimator\": \"standard\"}",
+    "weighting": "uniform",
+    "corpus_mode": "pretrain"
+  },
+  "r-lens": {
+    "model_id": "google/gemma-3-27b-it",
+    "dataset_id": "NeelNanda/pile-10k",
+    "target_layer": 60,
+    "t_max": 128,
+    "n_prompts": 25,
+    "docs_consumed": 25,
+    "n_positions": 0.0,
+    "git_commit": "modal",
+    "skip_first": 4,
+    "config_json": "{\"estimator\": \"relp\", \"rules\": {\"ln_rule\": true, \"identity_rule\": true, \"half_rule\": true, \"half_rule_beta\": 0.5, \"include_qk_norms\": false, \"gated_norms\": false}}",
+    "weighting": "uniform",
+    "corpus_mode": "pretrain"
+  }
+}

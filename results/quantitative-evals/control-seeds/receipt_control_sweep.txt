@@ -1,0 +1,8 @@
+                   all_layers  first_half  max_cell  best_rank  hits@10  hits@50  hits@100  n_ranks
+16394619             0.000000    0.000000  0.000000       36.0      0.0      1.0       3.0   8820.0
+20262824             0.000000    0.000000  0.000000       47.0      0.0      1.0       3.0   8820.0
+92830461             0.000047    0.000095  0.014706        3.0      1.0      4.0       8.0   8820.0
+20260824-headline    0.000265    0.000000  0.083333        5.0      1.0      3.0       5.0   8820.0
+20262824 vs 16394619: non-control ranks identical on 26460 rows: True
+92830461 vs 16394619: non-control ranks identical on 26460 rows: True
+20260824-headline vs 16394619: non-control ranks identical on 26460 rows: True
