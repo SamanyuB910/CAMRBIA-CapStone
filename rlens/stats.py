@@ -16,7 +16,9 @@ narrow. Three levels of honesty, all computed from the parquet alone:
 Aggregation mirrors ``summarize_passk``: mean over intermediates per layer,
 then over layers, then over sets ("first half" = layers < (max+1)//2). The
 paper's any-layer pass@k (deviation 10) is reported as a separate, clearly
-labelled table: an intermediate counts if its best rank over layers is <= k.
+labelled table: an intermediate counts if its best rank over layers is <= k,
+together with the paper's own summary statistic - normalized pass@k AUC over
+log k (Figure 52), see :func:`auc_logk`.
 """
 
 from __future__ import annotations
@@ -38,7 +40,11 @@ def wilson_ci(hits: int, n: int, z: float = Z95) -> tuple[float, float]:
     denom = 1 + z**2 / n
     center = (p + z**2 / (2 * n)) / denom
     half = z * np.sqrt(p * (1 - p) / n + z**2 / (4 * n**2)) / denom
-    return (max(0.0, center - half), min(1.0, center + half))
+    # the p=0 / p=1 endpoints are exactly 0 and 1; float error leaves them a few
+    # 1e-17 off, which reads as "the CI excludes the observed rate"
+    lo = 0.0 if hits == 0 else max(0.0, center - half)
+    hi = 1.0 if hits == n else min(1.0, center + half)
+    return (lo, hi)
 
 
 def load_ranks(path: Path | str, k: int = 10) -> pd.DataFrame:
@@ -154,6 +160,33 @@ def any_layer_passk(raw: pd.DataFrame, ks: tuple[int, ...] = (1, 5, 10, 50)) -> 
         hit["MEAN"] = hit.mean(axis=1)
         out[f"pass@{k}"] = hit
     return pd.concat(out, axis=0)
+
+
+def auc_logk(raw: pd.DataFrame, k_max: int = 100) -> pd.DataFrame:
+    """The paper's SS A.6 summary statistic (Figure 52): the area under the
+    pass@k curve plotted against ``log k``, normalized so that a lens which
+    always ranks the intermediate first scores 1.
+
+    Uses the paper's any-layer pass@k, so it is the single-number companion to
+    :func:`any_layer_passk` - NOT the post's per-layer headline (deviation 10).
+
+    No k-grid is needed: pass@k for one intermediate is the step function
+    ``1{best_rank <= k}``, so its integral over ``log k`` from 1 to ``k_max``
+    is ``log(k_max) - log(best_rank)`` (zero once the rank falls outside
+    ``k_max``). Normalizing by ``log(k_max)`` gives, per intermediate,
+    ``max(0, 1 - log(rank) / log(k_max))`` - exact rather than quadrature.
+
+    ``k_max`` sets the right edge of the curve and changes the level (a wider
+    window is more forgiving), so report it alongside the number; the paper
+    does not state its own.
+    """
+    if k_max < 2:
+        raise ValueError(f"k_max must be >= 2 (got {k_max})")
+    best = raw.groupby(["set", "item_id", "intermediate", "lens"])["rank"].min()
+    score = np.clip(1.0 - np.log(best) / np.log(k_max), 0.0, None)
+    out = score.groupby(["set", "lens"]).mean().unstack("set")
+    out["MEAN"] = out.mean(axis=1)
+    return out
 
 
 def k_sweep(df_raw: pd.DataFrame, ks: tuple[int, ...] = (1, 5, 10, 50)) -> pd.DataFrame:

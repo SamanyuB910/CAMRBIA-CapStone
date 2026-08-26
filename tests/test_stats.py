@@ -86,3 +86,30 @@ def test_k_sweep_is_monotone_in_k():
     sweep = stats.k_sweep(df, ks=(1, 5, 10, 50))
     vals = sweep.loc["J"].to_numpy()
     assert (np.diff(vals) >= 0).all()
+
+
+def test_auc_logk_endpoints_and_clipping():
+    df = make_ranks({"perfect": 1, "at_edge": 100, "outside": 500})
+    out = stats.auc_logk(df, k_max=100)
+    assert out.loc["perfect", "MEAN"] == 1.0     # always rank 1 -> normalized score 1
+    assert out.loc["at_edge", "MEAN"] == 0.0     # rank == k_max -> zero area
+    assert out.loc["outside", "MEAN"] == 0.0     # never recovered -> clipped, not negative
+    with pytest.raises(ValueError):
+        stats.auc_logk(df, k_max=1)
+
+
+def test_auc_logk_matches_numeric_integration():
+    """The closed form must equal quadrature of the any-layer pass@k curve."""
+    rng = np.random.default_rng(0)
+    df = make_ranks({"J": 1})
+    df["rank"] = rng.integers(1, 300, size=len(df))
+    k_max = 100
+    out = stats.auc_logk(df, k_max=k_max)
+
+    best = df.groupby(["set", "item_id", "intermediate", "lens"])["rank"].min().reset_index()
+    log_grid = np.linspace(0.0, np.log(k_max), 20001)
+    for set_name in ("alpha", "beta"):
+        ranks = best.loc[best["set"] == set_name, "rank"].to_numpy()
+        passk = (ranks[:, None] <= np.exp(log_grid)[None, :]).mean(axis=0)
+        numeric = np.trapezoid(passk, log_grid) / np.log(k_max)
+        assert out.loc["J", set_name] == pytest.approx(numeric, abs=1e-3)

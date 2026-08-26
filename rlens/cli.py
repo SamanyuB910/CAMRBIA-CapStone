@@ -462,6 +462,7 @@ def cmd_stats(args) -> None:
     headline = stats.headline_bootstrap(df, n_draws=args.draws, seed=args.seed)
     sweep = stats.k_sweep(raw)
     any_layer = stats.any_layer_passk(raw)
+    auc = stats.auc_logk(raw, k_max=args.auc_kmax)
 
     lens_names = set(raw["lens"].unique())
     pairs = [(a, b) for a, b in [
@@ -505,6 +506,11 @@ def cmd_stats(args) -> None:
         sweep.to_markdown(floatfmt=".4f"),
         "\n## PAPER definition (SS A.6): recovered at any layer (NOT the post's headline)\n",
         any_layer.to_markdown(floatfmt=".4f"),
+        f"\n## PAPER summary statistic (SS A.6, Fig 52): normalized pass@k AUC over log k,"
+        f" k_max={args.auc_kmax}\n",
+        auc.to_markdown(floatfmt=".4f"),
+        "\nAny-layer pass@k integrated over log k and normalized so that always-rank-1 = 1."
+        "\nCompanion to the table above, not to the post's headline.\n",
         filter_note,
         f"\nPer-layer Wilson CIs -> results/stats_wilson_{args.model}.csv",
     ]
@@ -586,6 +592,8 @@ def main() -> None:
                    help="where the parquet lives (default: /workspace/results/quantitative-evals "
                         "on the pod, else results/)")
     p.add_argument("--k", type=int, default=10)
+    p.add_argument("--auc-kmax", type=int, default=100,
+                   help="right edge of the paper's pass@k AUC curve (SS A.6, Fig 52)")
     p.add_argument("--draws", type=int, default=2000)
     p.add_argument("--seed", type=int, default=0)
     p.set_defaults(func=cmd_stats)
