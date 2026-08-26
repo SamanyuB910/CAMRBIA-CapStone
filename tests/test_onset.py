@@ -262,6 +262,41 @@ def test_swap_band_spans_layers_and_nests(tiny_qwen):
         assert spans[l] < spans[l + 1], "band(l) must nest inside band(l+1)"
 
 
+def test_make_patch_replaces_rather_than_adds():
+    from rlens.onset import make_patch
+
+    torch.manual_seed(0)
+    donor, receiver = torch.randn(D), torch.randn(D)
+    out = make_patch(donor)(receiver.clone())
+    assert torch.allclose(out, donor), "patch must REPLACE the activation, not add to it"
+    assert not torch.allclose(out, receiver + donor)
+    # self-patch is an exact no-op
+    assert torch.equal(make_patch(receiver)(receiver.clone()), receiver)
+
+
+def test_patch_pairs_are_structurally_matched_and_nondegenerate():
+    """Pairs must differ in exactly the cue, and never share an answer."""
+    from rlens.onset import build_patch_pairs
+
+    tok = _FakeTok()
+
+    def item(name, cue_i, c, y, prompt_len=10):
+        it = _tiny_item(cue_i=cue_i, t_i=prompt_len - 1)
+        it.name, it.c, it.y = name, c, y
+        return it
+
+    # _FakeTok returns the same ids for every prompt, so all items share a
+    # template; only the degeneracy filters should remove pairs.
+    items = [item("a", 3, "Spain", "Madrid"), item("b", 3, "France", "Paris"),
+             item("c", 3, "France", "Paris")]
+    pairs = build_patch_pairs(items, tok)
+    names = {(r.name, d.name) for r, d in pairs}
+    assert ("a", "b") in names and ("b", "a") in names
+    assert ("b", "c") not in names and ("c", "b") not in names, "same-answer pair not dropped"
+    for r, d in pairs:
+        assert r.cue_i == d.cue_i and r.y != d.y and r.c != d.c
+
+
 def test_lens_vector_ranking_matches_actual_readout(tiny_qwen):
     """<v_c, h> ranking must equal the real lens readout unembed(norm(J h)) ranking
     (they differ only by the positive per-position RMS scalar)."""

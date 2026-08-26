@@ -131,6 +131,20 @@ def make_reflection_swap(v_s: torch.Tensor, v_t: torch.Tensor, alpha: float):
     return edit
 
 
+def make_patch(donor_h: torch.Tensor):
+    """Replace the activation outright with a donor run's activation.
+
+    The only intervention in this file that involves no lens at all: it
+    transports whatever the donor's residual holds at that (layer, position).
+    """
+    donor = donor_h.detach().clone()
+
+    def edit(h: torch.Tensor) -> torch.Tensor:
+        return donor.to(device=h.device, dtype=h.dtype).float()
+
+    return edit
+
+
 def make_random_displacement(delta_norm: float, d: int, seed: int):
     """h + g with ||g|| matched to a real intervention's displacement (§7.7.2)."""
     g = torch.randn(d, generator=torch.Generator().manual_seed(seed))
@@ -626,6 +640,138 @@ def run_measurements(
                     "top1_is_y": int(int(lg.argmax()) in token_ids_of(tok, item.y)),
                 })
     return pd.DataFrame(records)
+
+
+# ---------------------------------------------------------------------------
+# Lens-free ceiling: cross-prompt activation patching at the cue
+# ---------------------------------------------------------------------------
+
+
+def build_patch_pairs(items: list[OnsetItem], tok) -> list[tuple[OnsetItem, OnsetItem]]:
+    """Ordered (receiver, donor) pairs from token-identical prompt templates.
+
+    Two prompts qualify when they differ in exactly one token — the cue — so the
+    patch transports the cue's meaning without any structural mismatch. Pairs
+    with the same answer or the same intermediate are dropped (nothing to
+    detect).
+    """
+    groups: dict[tuple, list[OnsetItem]] = {}
+    for item in items:
+        ids = tok(item.prompt, return_tensors="pt").input_ids[0].tolist()
+        key = tuple("<CUE>" if i == item.cue_i else t for i, t in enumerate(ids))
+        groups.setdefault(key, []).append(item)
+
+    pairs = []
+    for members in groups.values():
+        for recv in members:
+            for donor in members:
+                if donor is recv or recv.y == donor.y or recv.c == donor.c:
+                    continue
+                assert recv.cue_i == donor.cue_i, "template group with mismatched cue index"
+                pairs.append((recv, donor))
+    return pairs
+
+
+@torch.no_grad()
+def run_patching(
+    hf_model, tok, items: list[OnsetItem], *, layers: list[int], batch_size: int = 24,
+    filler_offset: int = 2,
+) -> pd.DataFrame:
+    """Sweep the patch layer for every (receiver, donor) pair.
+
+    For each pair: run the receiver's own prompt, replace its cue activation
+    with the donor's at layer l, and measure the same margin the swap uses
+    (log p(y_donor) - log p(y_recv)) so l* is directly comparable to L_S.
+
+    Conditions: ``patch`` (cue position), ``patch_selfpatch`` (donor == receiver,
+    must be an exact no-op), ``patch_filler`` (same donor activation applied at a
+    non-cue position -> position specificity), ``patch_random`` (norm-matched
+    random vector -> generic-perturbation control).
+    """
+    from jlens.hooks import ActivationRecorder
+
+    device = hf_model.model.embed_tokens.weight.device
+    runner = EditRunner(hf_model)
+    pairs = build_patch_pairs(items, tok)
+
+    # cache each item's clean residual at the cue (and at the filler position)
+    cache: dict[str, dict[str, dict[int, torch.Tensor]]] = {}
+    for item in {p.name: p for pair in pairs for p in pair}.values():
+        input_ids = tok(item.prompt, return_tensors="pt").input_ids.to(device)
+        filler_i = max(0, item.cue_i - filler_offset)
+        with ActivationRecorder(hf_model.model.layers, at=layers) as rec:
+            hf_model(input_ids=input_ids, use_cache=False)
+            cache[item.name] = {
+                "cue": {l: rec.activations[l][0, item.cue_i].detach().float().cpu() for l in layers},
+                "filler": {l: rec.activations[l][0, filler_i].detach().float().cpu() for l in layers},
+                "filler_i": filler_i,
+            }
+
+    records = []
+    for recv, donor in pairs:
+        input_ids = tok(recv.prompt, return_tensors="pt").input_ids.to(device)
+        base = {"receiver": recv.name, "donor": donor.name, "category": recv.category,
+                "y_recv": recv.y, "y_donor": donor.y}
+        for layer in layers:
+            d_cue = cache[donor.name]["cue"][layer]
+            labels = [
+                ("identity", {}),
+                ("patch", {layer: make_patch(d_cue)}),
+                ("patch_selfpatch", {layer: make_patch(cache[recv.name]["cue"][layer])}),
+                ("patch_random", {layer: make_patch(
+                    torch.randn(d_cue.shape[0], generator=torch.Generator().manual_seed(
+                        _stable_seed(recv.name, donor.name, layer))) * (d_cue.norm() / (d_cue.shape[0] ** 0.5)))}),
+            ]
+            # position-specificity control: same donor vector, non-cue position
+            filler_edits = {layer: make_patch(cache[donor.name]["filler"][layer])}
+
+            logits = runner.run(input_ids, recv.cue_i, [e for _, e in labels], batch_size=batch_size)
+            filler_logits = runner.run(input_ids, cache[recv.name]["filler_i"], [filler_edits], batch_size=batch_size)
+
+            logp = logits.log_softmax(-1)
+            ref = float(logp[0][donor.y_id] - logp[0][recv.y_id])  # in-batch identity reference
+            for (name, _), lp, lg in zip(labels, logp, logits):
+                records.append({**base, "layer": layer, "condition": name,
+                                "margin": float(lp[donor.y_id] - lp[recv.y_id]), "clean_margin": ref,
+                                "top1_is_donor": int(int(lg.argmax()) in token_ids_of(tok, donor.y))})
+            flp = filler_logits.log_softmax(-1)[0]
+            records.append({**base, "layer": layer, "condition": "patch_filler",
+                            "margin": float(flp[donor.y_id] - flp[recv.y_id]), "clean_margin": ref,
+                            "top1_is_donor": int(int(filler_logits[0].argmax()) in token_ids_of(tok, donor.y))})
+    return pd.DataFrame(records)
+
+
+def analyze_patching(df: pd.DataFrame, *, rho: float = 0.2, w: int = 2, n_boot: int = 500, seed: int = 0) -> dict:
+    """l* = first layer where patching the cue transfers the donor's answer."""
+    df = df.copy()
+    df["effect"] = df["margin"] - df["clean_margin"]
+    pairs = sorted({(r, d) for r, d in zip(df["receiver"], df["donor"])})
+    rng = torch.Generator().manual_seed(seed)
+
+    def curves(sub: pd.DataFrame) -> dict[str, pd.Series]:
+        by = lambda c: sub[sub.condition == c].groupby("layer")["effect"].mean()
+        return {"patch": by("patch"), "filler": by("patch_filler"),
+                "random": by("patch_random"), "selfpatch": by("patch_selfpatch")}
+
+    def l_star(cv: dict) -> float | None:
+        return _onset(cv["patch"] - cv["random"], rho, w)
+
+    full = curves(df)
+    boot = []
+    for _ in range(n_boot):
+        pick = [pairs[i] for i in torch.randint(len(pairs), (len(pairs),), generator=rng).tolist()]
+        sub = pd.concat([df[(df.receiver == r) & (df.donor == d)] for r, d in pick])
+        v = l_star(curves(sub))
+        if v is not None:
+            boot.append(v)
+    s = pd.Series(boot)
+    return {
+        "curves": full, "l_star": l_star(full),
+        "l_star_ci": (float(s.quantile(0.025)), float(s.quantile(0.975))) if len(s) else None,
+        "defined_frac": len(boot) / max(n_boot, 1), "n_pairs": len(pairs),
+        "top1_flip_rate": float(df[df.condition == "patch"]["top1_is_donor"].mean()),
+        "selfpatch_max_drift": float(df[df.condition == "patch_selfpatch"]["effect"].abs().max()),
+    }
 
 
 # ---------------------------------------------------------------------------

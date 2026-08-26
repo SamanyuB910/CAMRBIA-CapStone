@@ -431,6 +431,24 @@ def cmd_onset(args) -> None:
                 print(f"  dropped {e['name']}: {e['reason']}")
         return
 
+    if args.stage == "patch":
+        # lens-free ceiling: cross-prompt activation patching at the cue
+        data = json.loads(items_path.read_text(encoding="utf-8"))
+        items = [onset.OnsetItem(**d) for d in data["items"]]
+        hf, tok = _onset_model(args.model, args.dtype, args.device)
+        layers = args.layers or list(range(hf.config.get_text_config().num_hidden_layers))
+        pairs = onset.build_patch_pairs(items, tok)
+        print(f"{len(pairs)} ordered (receiver, donor) pairs x {len(layers)} layers")
+        df = onset.run_patching(hf, tok, items, layers=layers, batch_size=args.batch_size)
+        out = REPO_ROOT / "results" / f"patch_records_{args.model}.parquet"
+        df.to_parquet(out)
+        result = onset.analyze_patching(df, rho=args.rho)
+        print(f"self-patch max |drift| = {result['selfpatch_max_drift']:.2e} (must be ~0)")
+        print(f"l* = {result['l_star']} CI {result['l_star_ci']}; "
+              f"top-1 flip rate {result['top1_flip_rate']:.1%}; pairs {result['n_pairs']}")
+        print(f"{len(df)} records -> {out}")
+        return
+
     if args.stage == "run":
         from jlens.lens import JacobianLens
 
@@ -507,6 +525,47 @@ def cmd_onset(args) -> None:
     if not args.at_cue:
         lines.append("\nNOTE: with interventions at t_i, `gap_cue*` columns mix positions "
                      "(cue readout vs t_i causality) - use the `gap*` columns here.")
+
+    # 2b. lens-free ceiling from cross-prompt patching, if it has been run
+    patch_path = REPO_ROOT / "results" / f"patch_records_{args.model}.parquet"
+    if patch_path.exists():
+        pres = onset.analyze_patching(pd.read_parquet(patch_path), rho=args.rho)
+        lines.append("\n## Lens-free ceiling: cross-prompt activation patching at the cue\n")
+        lines.append("No lens is involved: the receiver's cue activation is replaced wholesale by a")
+        lines.append("donor prompt's. l* is the earliest layer at which the cue's residual is causally")
+        lines.append("sufficient, so NO direction-based onset may legitimately precede it.\n")
+        lines.append(f"- **l\\* = {pres['l_star']}**, bootstrap 95% CI {pres['l_star_ci']} "
+                     f"({pres['n_pairs']} pairs, defined in {pres['defined_frac']:.0%} of resamples)")
+        lines.append(f"- top-1 flip rate to the donor's answer: {pres['top1_flip_rate']:.1%}")
+        lines.append(f"- self-patch drift (must be ~0): {pres['selfpatch_max_drift']:.2e}")
+        for lens in ("R", "J"):
+            lr = result["onsets"][lens].get("L_R_cue")
+            if lr is not None and pres["l_star"] is not None:
+                verdict = ("reads BEFORE the information is demonstrably usable (anticipatory)"
+                           if lr < pres["l_star"] else "reads at or after the lens-free ceiling")
+                lines.append(f"- {lens}: L_R_cue = {lr:.0f} vs l* = {pres['l_star']:.0f} -> {verdict}")
+
+    # 2c. threshold sensitivity (pre-registered rho sweep) and per-category split
+    lines.append("\n## Sensitivities\n")
+    grid = {}
+    for rho_v in (0.1, 0.2, 0.3):
+        r = onset.analyze(df, rho=rho_v, n_boot=0)
+        grid[f"rho={rho_v}"] = {
+            f"{lens}.{k}": r["onsets"][lens].get(k)
+            for lens in ("R", "J") for k in ("L_R_cue", f"L_causal", key)
+        }
+    lines.append("Threshold sweep (w=2):\n")
+    lines.append(pd.DataFrame(grid).T.to_markdown())
+    cats = df["category"].value_counts()
+    big = [c for c, n in cats.items() if n >= 6 * df["layer"].nunique()]
+    if big:
+        lines.append(f"\nPer-category onsets (categories with >= 6 items): {', '.join(big)}\n")
+        rows = {}
+        for cat in big:
+            r = onset.analyze(df[df.category == cat], rho=args.rho, n_boot=0)
+            rows[cat] = {f"{lens}.{k}": r["onsets"][lens].get(k) for lens in ("R", "J")
+                         for k in ("L_R_cue", "L_causal", key)}
+        lines.append(pd.DataFrame(rows).T.to_markdown())
 
     # 3. all onsets with bootstrap CIs (incl. cue readout = the H1 re-test)
     lines.append("\n## Onsets (bootstrap 95% CIs; None = never exceeded threshold)\n")
@@ -637,7 +696,7 @@ def main() -> None:
     p.set_defaults(func=cmd_eval)
 
     p = sub.add_parser("onset", help="temporal faithfulness experiment (causal concept onset)")
-    p.add_argument("--stage", choices=["data", "run", "analyze"], required=True)
+    p.add_argument("--stage", choices=["data", "run", "analyze", "patch"], required=True)
     p.add_argument("--model", choices=["qwen3.5-4b", "qwen3.5-27b"], default="qwen3.5-4b")
     p.add_argument("--position", type=int, default=-1, help="t_i: -1 primary, -2 sensitivity")
     p.add_argument("--at-cue", action="store_true",
