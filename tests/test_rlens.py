@@ -1348,7 +1348,7 @@ def test_anchor_verdicts_are_directional_not_exact_layer_match():
     # measured layers differ from reported (7 vs 2, 30 vs 14) but ordering holds
     v = verdicts(ranks_for(7, 30), lens_map, [anchor])
     assert v.loc["sushi", "verdict"].startswith("MATCH")
-    assert v.loc["sushi", "reported_R"] == 2 and v.loc["sushi", "measured_R"] == 7
+    assert v.loc["sushi", "reported_R"] == 2 and v.loc["sushi", "R_top10"] == 7
 
     assert verdicts(ranks_for(30, 7), lens_map, [anchor]).loc["sushi", "verdict"].startswith("INVERTED")
     assert verdicts(ranks_for(5, None), lens_map, [anchor]).loc["sushi", "verdict"].startswith("MATCH")
@@ -1367,3 +1367,21 @@ def test_printed_anchors_are_marked_and_quoted():
     for anchor in ANCHORS:
         assert anchor.quote, f"{anchor.name} must carry its source quote"
         assert anchor.reported.get("R") is not None, "every anchor reports an R-lens layer"
+
+
+def test_a_strict_top1_criterion_can_hide_a_real_ordering():
+    """On qwen3.5-27b, verona-italy reaches rank 8 under R-lens at L23 and rank 8
+    under J-lens only at L37 — the ordering the post describes — yet neither ever
+    hits rank 1, so a top1-only verdict reported NEITHER. Judge on top-10."""
+    from rlens.anchors import Anchor, verdicts
+
+    anchor = Anchor(name="verona", prompt="", position_token="", concept="", quote="",
+                    criterion="top1", reported={"R": 5, "J": None})
+    ranks = pd.DataFrame(
+        [{"anchor": "verona", "lens": "released-R", "layer": 23, "rank": 8},
+         {"anchor": "verona", "lens": "released-J", "layer": 37, "rank": 8}]
+    )
+    v = verdicts(ranks, {"R": "released-R", "J": "released-J"}, [anchor])
+    assert v.loc["verona", "verdict"].startswith("MATCH")
+    assert v.loc["verona", "R_top10"] == 23 and v.loc["verona", "J_top10"] == 37
+    assert pd.isna(v.loc["verona", "R_top1"]) or v.loc["verona", "R_top1"] is None

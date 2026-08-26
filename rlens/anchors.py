@@ -189,9 +189,18 @@ def run_anchors(model, lenses: dict, anchors=ANCHORS, *, max_seq_len: int = 128)
     return pd.DataFrame(rows)
 
 
-def onset(ranks: pd.DataFrame, anchor: Anchor, lens: str) -> int | None:
-    """First layer at which the concept meets the anchor's criterion, or None."""
-    threshold = 1 if anchor.criterion == "top1" else 10
+def onset(ranks: pd.DataFrame, anchor: Anchor, lens: str, *, threshold: int | None = None) -> int | None:
+    """First layer at which the concept reaches ``threshold``, or None.
+
+    Defaults to the anchor's own criterion, but both thresholds are reported:
+    a rank-1 criterion transferred from the post's model can read as "never
+    surfaces" on another model even when the concept clearly does surface. On
+    qwen3.5-27b the `verona-italy` and `typo-aganst` anchors reach single-digit
+    ranks under R-lens far earlier than under J-lens while never hitting rank 1
+    — the ordering the post describes, hidden by a strict threshold.
+    """
+    if threshold is None:
+        threshold = 1 if anchor.criterion == "top1" else 10
     if ranks.empty or "lens" not in ranks.columns:
         return None
     hit = ranks[(ranks["anchor"] == anchor.name) & (ranks["lens"] == lens) & (ranks["rank"] <= threshold)]
@@ -214,11 +223,14 @@ def verdicts(ranks: pd.DataFrame, lens_map: dict, anchors=ANCHORS) -> pd.DataFra
     present = set(ranks["lens"]) if "lens" in ranks.columns else set()
     rows = []
     for anchor in anchors:
-        measured = {
-            label: (onset(ranks, anchor, arm) if arm in present else None)
-            for label, arm in lens_map.items()
-        }
-        r, j = measured.get("R"), measured.get("J")
+        def at(arm, threshold):
+            return onset(ranks, anchor, arm, threshold=threshold) if arm in present else None
+
+        measured = {label: at(arm, None) for label, arm in lens_map.items()}
+        top10 = {label: at(arm, 10) for label, arm in lens_map.items()}
+        measured["logit"] = at("logit", None)
+        # Judge on top-10: it is the threshold that survives a change of model.
+        r, j = top10.get("R"), top10.get("J")
         if r is None and j is None:
             verdict = "NEITHER — concept never surfaces (check prompt/position)"
         elif r is not None and j is None:
@@ -237,10 +249,12 @@ def verdicts(ranks: pd.DataFrame, lens_map: dict, anchors=ANCHORS) -> pd.DataFra
                 "reconstructed": anchor.reconstructed,
                 "criterion": anchor.criterion,
                 "reported_R": anchor.reported.get("R"),
-                "measured_R": r,
+                "R_top10": top10.get("R"),
+                "R_top1": measured.get("R") if anchor.criterion == "top1" else at(lens_map.get("R"), 1),
                 "reported_J": anchor.reported.get("J"),
-                "measured_J": j,
-                "measured_logit": measured.get("logit"),
+                "J_top10": top10.get("J"),
+                "J_top1": at(lens_map.get("J"), 1),
+                "logit_top10": at("logit", 10),
                 "verdict": verdict,
             }
         )
