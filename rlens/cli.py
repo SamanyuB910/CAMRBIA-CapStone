@@ -977,7 +977,7 @@ def cmd_freeze_panel(args) -> None:
         depths[model_key] = load_depth_layers(root / model_key / "provenance.json")
 
     shared = shared_intersection(manifests)
-    selection = select_prompts(shared)
+    selection = select_prompts(shared, n_per_set=args.prompts_per_set)
     sample = freeze_panel_sample(selection, depths)
 
     shared_path = root / "shared_eligibility_manifest.json"

@@ -2151,3 +2151,22 @@ def test_eligibility_counts_tally_every_exclusion_reason():
     assert counts == {"total": 3, "eligible": 1,
                       "excluded": {"model_answers_target_incorrectly": 2}}
     assert m.to_dict()["protocol_salt"] == "coherence-v2-2026-08-26"
+
+
+def test_select_prompts_honours_n_per_set():
+    """`--prompts-per-set 4` was parsed but never forwarded: the CLI printed
+    'selected 8/4' and produced 400 cells regardless."""
+    ids = [f"i{i:03d}" for i in range(40)]
+    assert select_prompts({"typo": ids}, n_per_set=4)["typo"]["n_selected"] == 4
+    assert select_prompts({"typo": ids}, n_per_set=8)["typo"]["n_selected"] == 8
+    four = select_prompts({"typo": ids}, n_per_set=4)["typo"]["selected"]
+    eight = select_prompts({"typo": ids}, n_per_set=8)["typo"]["selected"]
+    assert four == eight[:4], "the smaller sample must be a prefix of the larger"
+
+
+def test_freeze_panel_cell_count_scales_with_n_per_set():
+    depths = {"m": [{"requested_depth": z, "layer": i, "actual_depth": z}
+                    for i, z in enumerate((0.0, 0.1, 0.2, 0.3, 0.4))]}
+    ids = {s: [f"{s}{i}" for i in range(20)] for s in ("a", "b", "c", "d", "e")}
+    assert freeze_panel_sample(select_prompts(ids, n_per_set=8), depths)["n_cells"] == 5*8*5
+    assert freeze_panel_sample(select_prompts(ids, n_per_set=4), depths)["n_cells"] == 5*4*5
