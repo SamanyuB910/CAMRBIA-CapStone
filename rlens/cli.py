@@ -1280,7 +1280,12 @@ def cmd_judge_validate(args) -> None:
         results, raw = {}, []
         print(f"\n=== {judge_id}: rating {len(controls)} control cells ===")
         for i, cell in enumerate(controls, start=1):
-            call = call_judge(cell.public(), judge_id=judge_id, api_key=api_key)
+            try:
+                call = call_judge(cell.public(), judge_id=judge_id, api_key=api_key)
+            except Exception as exc:  # noqa: BLE001 - a cell must never kill the panel
+                from rlens.autorate import JudgeCall
+                call = JudgeCall(judge_id=judge_id, cell_id=cell.cell_id, status="FAILED",
+                                 error=f"uncaught: {type(exc).__name__}: {exc}")
             mark = "." if call.status == "ok" else "F"
             print(mark, end="", flush=True)
             if i % 50 == 0 or i == len(controls):

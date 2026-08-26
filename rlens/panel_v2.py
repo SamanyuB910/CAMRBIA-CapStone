@@ -237,7 +237,8 @@ def panel_hash(public: list) -> str:
 CORRUPTION_TOKENS = ("«\\ufffd»", "«\\n\\n»", "«......»", "«\\u0000»", "«＊＊＊»",
                      "«»", "«\\t»", "«___»", "«\\ufffd\\ufffd»", "«|||»")
 
-CONTROL_KINDS = ("coherent_vs_corrupted", "duplicate_arms", "order_invariance",
+CONTROL_KINDS = ("coherent_vs_corrupted", "duplicate_arms",
+                 "order_invariance_original", "order_invariance",
                  "late_layer_positive", "identity_layer_equal")
 
 
@@ -297,17 +298,26 @@ def build_validation_panel(cells: list, key: list, *, n_each: int = 10,
     else:
         ordered = sorted(by_id)
 
-    # 1. coherent vs corrupted: one arm replaced with garbage
-    for i, cid in enumerate(ordered[:n_each]):
-        src = by_id[cid]
+    # 1. coherent vs corrupted. Sources are the LATE-layer cells, not the
+    # experimental z<=0.4 cells: at early depths all three real readouts are
+    # frequently incoherent already, so corrupting one arm produces no contrast
+    # and the control measures the material rather than the judge. §5.1 asks for
+    # an *obvious* comparison, which requires a coherent baseline.
+    corruption_sources = list(late_cells or [])
+    if not corruption_sources:
+        corruption_sources = [by_id[c] for c in ordered[:n_each]]
+    for i in range(n_each):
+        src = corruption_sources[i % len(corruption_sources)]
         target = ARM_LABELS[i % 3]
         cell = PanelCell(cell_id=f"vc-corrupt-{i:02d}", prompt_display=src.prompt_display,
                          readout_position=src.readout_position, readout_token=src.readout_token,
-                         arms={l: (corrupt_arm(src.arms[l], f"{cid}|{l}") if l == target
-                                   else list(src.arms[l])) for l in ARM_LABELS})
+                         arms={l: (corrupt_arm(src.arms[l], f"{src.cell_id}|{l}|{i}")
+                                   if l == target else list(src.arms[l]))
+                               for l in ARM_LABELS})
         controls.append(cell)
         meta.append({"cell_id": cell.cell_id, "kind": "coherent_vs_corrupted",
-                     "corrupted_arm": target})
+                     "corrupted_arm": target, "source_kind": "late_layer"
+                     if late_cells else "panel_early_layer"})
 
     # 2. duplicate arms: two candidates byte-identical
     for i, cid in enumerate(ordered[n_each:2 * n_each]):
@@ -322,16 +332,24 @@ def build_validation_panel(cells: list, key: list, *, n_each: int = 10,
         meta.append({"cell_id": cell.cell_id, "kind": "duplicate_arms",
                      "identical_arms": sorted([a, b])})
 
-    # 3. order invariance: the SAME content under a different A/B/C mapping
+    # 3. order invariance. BOTH members of each pair must be rated: the previous
+    # version pointed `twin_of` at a main-panel cell, which the judge never sees,
+    # so `comparable` was always zero and the control could not fire.
     for i, cid in enumerate(ordered[2 * n_each:3 * n_each]):
         src = by_id[cid]
-        rotated = {ARM_LABELS[(j + 1) % 3]: list(src.arms[ARM_LABELS[j]]) for j in range(3)}
-        cell = PanelCell(cell_id=f"vc-order-{i:02d}", prompt_display=src.prompt_display,
-                         readout_position=src.readout_position, readout_token=src.readout_token,
-                         arms=rotated)
-        controls.append(cell)
-        meta.append({"cell_id": cell.cell_id, "kind": "order_invariance",
-                     "twin_of": cid,
+        original = PanelCell(cell_id=f"vc-order-a-{i:02d}", prompt_display=src.prompt_display,
+                             readout_position=src.readout_position,
+                             readout_token=src.readout_token,
+                             arms={l: list(src.arms[l]) for l in ARM_LABELS})
+        rotated = PanelCell(cell_id=f"vc-order-b-{i:02d}", prompt_display=src.prompt_display,
+                            readout_position=src.readout_position,
+                            readout_token=src.readout_token,
+                            arms={ARM_LABELS[(j + 1) % 3]: list(src.arms[ARM_LABELS[j]])
+                                  for j in range(3)})
+        controls += [original, rotated]
+        meta.append({"cell_id": original.cell_id, "kind": "order_invariance_original"})
+        meta.append({"cell_id": rotated.cell_id, "kind": "order_invariance",
+                     "twin_of": original.cell_id,
                      "rotation": {ARM_LABELS[j]: ARM_LABELS[(j + 1) % 3] for j in range(3)}})
 
     for kind, source in (("late_layer_positive", late_cells),

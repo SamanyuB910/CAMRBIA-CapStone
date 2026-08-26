@@ -2445,7 +2445,8 @@ def test_validation_panel_builds_all_five_control_categories():
                                             late_cells=late, identity_cells=ident)
     kinds = {m["kind"] for m in meta}
     assert kinds == set(CONTROL_KINDS)
-    assert len(controls) == 10 + 10 + 10 + 5 + 5 == 40
+    # order invariance now contributes BOTH pair members, so 10 -> 20
+    assert len(controls) == 10 + 10 + 20 + 5 + 5 == 50
     assert all(len(c.arms) == 3 for c in controls)
     # identity-layer cells are flagged as genuinely equal-armed
     assert all(m["arms_identical"] for m in meta if m["kind"] == "identity_layer_equal")
@@ -2786,3 +2787,108 @@ def test_judge_validate_probes_before_spending_a_panel():
     assert source.index("probe_judge") < source.index("for cell in controls") \
         if "for cell in controls" in source else True
     assert "unreachable" in source
+
+
+def test_order_invariance_pair_members_are_both_in_the_rated_panel():
+    """Regression: `twin_of` pointed at a main-panel cell the judge never sees,
+    so `comparable` was always 0 and the control silently could not fire."""
+    cells = _cells(30)
+    controls, meta = build_validation_panel(cells, [], n_each=10, late_cells=_cells(4, "late"))
+    ids = {c.cell_id for c in controls}
+
+    rotated = [m for m in meta if m["kind"] == "order_invariance"]
+    assert rotated, "rotated cells must exist"
+    for m in rotated:
+        assert m["cell_id"] in ids
+        assert m["twin_of"] in ids, "the twin must itself be a rated control cell"
+
+    originals = [m for m in meta if m["kind"] == "order_invariance_original"]
+    assert len(originals) == len(rotated)
+
+
+def test_order_invariance_now_produces_comparable_pairs():
+    cells = _cells(30)
+    _, meta = build_validation_panel(cells, [], n_each=10, late_cells=_cells(4, "late"))
+    rotated = [m for m in meta if m["kind"] == "order_invariance"]
+
+    results = {}
+    for m in rotated:
+        results[m["twin_of"]] = _score(4, 1, 0, "A")
+        results[m["cell_id"]] = _score(1, 4, 0, m["rotation"]["A"])   # content moved with it
+    check = next(c for c in judge_validation_report(results, meta, judge_id="j")["checks"]
+                 if c["name"] == "winner_survives_permutation")
+    assert check["status"] == "PASS" and check["measured"] == 0.0
+
+
+def test_corruption_controls_are_built_from_coherent_late_layer_cells():
+    """§5.1 asks for an *obvious* coherent-vs-corrupted comparison. Early z<=0.4
+    readouts are frequently incoherent already, so corrupting one arm of three
+    garbage lists measures the material, not the judge."""
+    late = _cells(4, "late")
+    _, meta = build_validation_panel(_cells(30), [], n_each=10, late_cells=late)
+    corrupt = [m for m in meta if m["kind"] == "coherent_vs_corrupted"]
+    assert len(corrupt) == 10
+    assert all(m["source_kind"] == "late_layer" for m in corrupt)
+
+    # without late cells it falls back, and says so
+    _, meta2 = build_validation_panel(_cells(30), [], n_each=10)
+    assert all(m["source_kind"] == "panel_early_layer"
+               for m in meta2 if m["kind"] == "coherent_vs_corrupted")
+
+
+def test_a_dead_order_control_reports_why_rather_than_just_failing():
+    _, meta = build_validation_panel(_cells(30), [], n_each=10, late_cells=_cells(4, "late"))
+    check = next(c for c in judge_validation_report({}, meta, judge_id="j")["checks"]
+                 if c["name"] == "winner_survives_permutation")
+    assert check["status"] == "FAIL"
+    assert "rotated" in check["detail"] and "inert" in check["detail"]
+
+
+def test_none_content_is_a_cell_failure_not_a_crash():
+    """claude-fable-5 returned message.content = None; re.search raised
+    TypeError past the except tuple and aborted a paid panel after 7 cells."""
+    with pytest.raises(SchemaError, match="empty or non-string"):
+        parse_scores(None)
+    with pytest.raises(SchemaError, match="empty or non-string"):
+        parse_scores("")
+    with pytest.raises(SchemaError, match="empty or non-string"):
+        parse_scores("   ")
+
+
+def test_reasoning_only_response_is_rejected():
+    """The rubric forbids hidden reasoning; a response with reasoning and no
+    content is a schema failure, not something to salvage."""
+    import urllib.request
+
+    from rlens import autorate
+
+    def fake(request, timeout=None):
+        class R:
+            def __enter__(self): return self
+            def __exit__(self, *a): return False
+            def read(self):
+                return json.dumps({"choices": [{"message": {"content": None,
+                                                            "reasoning": "thinking..."}}]}).encode()
+        return R()
+
+    original, original_sleep = urllib.request.urlopen, autorate.time.sleep
+    urllib.request.urlopen, autorate.time.sleep = fake, lambda *_: None
+    try:
+        call = autorate.call_judge({"cell_id": "c0", "prompt": "p", "readout_position": 0,
+                                    "readout_token": "«t»", "note": "n",
+                                    "candidates": {"A": [], "B": [], "C": []}},
+                                   judge_id="v/m", api_key="x", max_retries=2)
+    finally:
+        urllib.request.urlopen, autorate.time.sleep = original, original_sleep
+
+    assert call.status == "FAILED" and "reasoning but no content" in call.error
+
+
+def test_an_unexpected_exception_marks_the_cell_not_the_run():
+    import inspect
+
+    from rlens import cli
+
+    source = inspect.getsource(cli.cmd_judge_validate)
+    assert "except Exception" in source and "uncaught:" in source, \
+        "a single bad cell must not abort a paid panel"

@@ -92,8 +92,15 @@ class SchemaError(ValueError):
     pass
 
 
-def parse_scores(text: str) -> dict:
-    """Strict schema validation. Never salvages scores from prose."""
+def parse_scores(text) -> dict:
+    """Strict schema validation. Never salvages scores from prose.
+
+    ``text`` may be None: some providers return a message with no content
+    (refusal, or reasoning-only output). That is a schema failure for the cell,
+    not a crash for the run.
+    """
+    if not isinstance(text, str) or not text.strip():
+        raise SchemaError(f"empty or non-string response content ({type(text).__name__})")
     match = re.search(r"\{.*\}", text, re.S)
     if not match:
         raise SchemaError("no JSON object in response")
@@ -177,9 +184,15 @@ def call_judge(cell_public: dict, *, judge_id: str, api_key: str,
             )
             with urllib.request.urlopen(request, timeout=timeout) as response:
                 payload = json.loads(response.read())
-            raw = payload["choices"][0]["message"]["content"]
+            message = (payload.get("choices") or [{}])[0].get("message") or {}
+            raw = message.get("content")
+            if not raw and message.get("reasoning"):
+                # some providers put everything in `reasoning` and leave content
+                # empty; the rubric forbids hidden reasoning, so this is a
+                # schema failure rather than something to salvage
+                raise SchemaError("response carried reasoning but no content")
             return JudgeCall(judge_id=judge_id, cell_id=cell_public["cell_id"],
-                             status="ok", scores=parse_scores(raw), raw=raw,
+                             status="ok", scores=parse_scores(raw), raw=raw or "",
                              attempts=attempt, usage=payload.get("usage", {}),
                              timestamp=time.time())
         except urllib.error.HTTPError as exc:
@@ -197,7 +210,11 @@ def call_judge(cell_public: dict, *, judge_id: str, api_key: str,
                                  status="FAILED", raw=detail, attempts=attempt,
                                  error=f"permanent: {last_error}", timestamp=time.time())
             time.sleep(min(2 ** attempt, 8))
-        except (SchemaError, urllib.error.URLError, KeyError, TimeoutError) as exc:
+        except Exception as exc:  # noqa: BLE001
+            # Deliberately broad. A malformed response from one provider must
+            # fail its own cell and be recorded, never abort a panel that has
+            # already cost real spend. The cell is marked FAILED below, and
+            # `incomplete_ratings` refuses analysis while any FAILED remains.
             last_error = f"{type(exc).__name__}: {exc}"
             time.sleep(min(2 ** attempt, 8))
     return JudgeCall(judge_id=judge_id, cell_id=cell_public["cell_id"], status="FAILED",
@@ -319,7 +336,13 @@ def judge_validation_report(results: dict, meta: list, *, judge_id: str) -> dict
             f"{flips}/{comparable} non-tied cells flipped ({rate:.0%}, threshold "
             f"{THRESHOLDS['order_flip_rate']:.0%})", rate)
     else:
-        add("winner_survives_permutation", False, "no comparable order-invariance pairs")
+        n_rot = len(by_kind.get("order_invariance", []))
+        n_orig = len(by_kind.get("order_invariance_original", []))
+        add("winner_survives_permutation", False,
+            f"no comparable pairs: {n_rot} rotated and {n_orig} original cells declared, "
+            f"{sum(1 for e in entries if e['cell_id'] in results)} rotated scored. "
+            "Both members of each pair must be in the rated panel; a `twin_of` "
+            "pointing at an unrated cell makes this control inert.")
 
     # 4. no systematic A/B/C position bias across the whole validation panel
     winners = [s["contextual_winner"] for s in results.values()
