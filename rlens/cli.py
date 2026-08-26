@@ -916,6 +916,102 @@ def cmd_preflight(args) -> None:
 
 
 # ---------------------------------------------------------------------------
+# eligibility / freeze-panel  (Coherence v2, Stage 3)
+# ---------------------------------------------------------------------------
+
+
+def cmd_eligibility(args) -> None:
+    """Per-model eligibility manifest with recorded exclusion reasons (§6)."""
+    import json
+
+    import jlens
+
+    from rlens.eligibility import evaluate_eligibility
+    from rlens.evals import EVAL_SETS
+
+    out_dir = Path(args.out_dir).expanduser() / args.model
+    prov = out_dir / "provenance.json"
+    if not prov.exists():
+        raise SystemExit(f"{prov} missing — run `rlens preflight --model {args.model}` first (§14)")
+    if json.loads(prov.read_text(encoding="utf-8")).get("status") == "FAIL":
+        raise SystemExit(f"{prov} records a FAILED preflight; §14 blocks Stage 3")
+
+    dest = out_dir / "eligibility.json"
+    if dest.exists() and not args.force:
+        raise SystemExit(f"{dest} exists; §14 forbids silent overwrites (pass --force to replace)")
+
+    hf, tok = _load_model(args.dtype, args.device, args.model)
+    model = jlens.from_hf(hf, tok)
+    manifest = evaluate_eligibility(
+        model, tok, tuple(args.sets), filter_correct=not args.no_filter_correct,
+        limit=args.limit, model_key=args.model,
+    )
+    dest.write_text(json.dumps(manifest.to_dict(), indent=2), encoding="utf-8")
+
+    for set_name, c in manifest.counts().items():
+        excl = ", ".join(f"{k}={v}" for k, v in sorted(c["excluded"].items())) or "none"
+        print(f"  {set_name:14s} eligible {c['eligible']:4d}/{c['total']:4d}   excluded: {excl}")
+    print(f"\neligibility -> {dest}")
+
+
+def cmd_freeze_panel(args) -> None:
+    """Freeze the shared intersection, the SHA-256 prompt sample, and the depths (§5, §6)."""
+    import json
+
+    from rlens.eligibility import (
+        EligibilityManifest, EligibilityRecord, freeze_panel_sample,
+        load_depth_layers, select_prompts, shared_intersection,
+    )
+
+    root = Path(args.out_dir).expanduser()
+    manifests, depths = {}, {}
+    for model_key in args.models:
+        elig = root / model_key / "eligibility.json"
+        if not elig.exists():
+            raise SystemExit(f"{elig} missing — run `rlens eligibility --model {model_key}` first")
+        d = json.loads(elig.read_text(encoding="utf-8"))
+        manifests[model_key] = EligibilityManifest(
+            model_key=model_key,
+            records=[EligibilityRecord(**r) for r in d["records"]],
+        )
+        depths[model_key] = load_depth_layers(root / model_key / "provenance.json")
+
+    shared = shared_intersection(manifests)
+    selection = select_prompts(shared)
+    sample = freeze_panel_sample(selection, depths)
+
+    shared_path = root / "shared_eligibility_manifest.json"
+    sample_path = root / "shared_panel_sample.json"
+    for path in (shared_path, sample_path):
+        if path.exists() and not args.force:
+            raise SystemExit(f"{path} exists; §14 forbids silent overwrites (--force to replace)")
+
+    root.mkdir(parents=True, exist_ok=True)
+    shared_path.write_text(json.dumps({
+        "protocol_salt": sample["protocol_salt"],
+        "models": sorted(manifests),
+        "per_model_counts": {k: m.counts() for k, m in manifests.items()},
+        "shared_eligible": {k: sorted(v) for k, v in shared.items()},
+        "n_shared": {k: len(v) for k, v in shared.items()},
+    }, indent=2), encoding="utf-8")
+    sample_path.write_text(json.dumps(sample, indent=2), encoding="utf-8")
+
+    print("shared eligible per set:")
+    for set_name in sorted(shared):
+        sel = selection[set_name]
+        flag = "  <-- UNDERPOWERED" if sel["underpowered"] else ""
+        print(f"  {set_name:14s} shared {len(shared[set_name]):4d}   "
+              f"selected {sel['n_selected']}/{args.prompts_per_set}{flag}")
+    print(f"\ncells: {sample['n_cells']}   sample sha256: {sample['sample_sha256'][:16]}...")
+    print(f"shared manifest -> {shared_path}")
+    print(f"frozen sample   -> {sample_path}")
+    if sample["underpowered_sets"]:
+        print(f"\nWARNING: underpowered sets (fewer than {args.prompts_per_set} shared eligible "
+              f"items, not topped up from elsewhere): {sample['underpowered_sets']}")
+
+
+
+# ---------------------------------------------------------------------------
 # entry point
 # ---------------------------------------------------------------------------
 
@@ -1071,6 +1167,24 @@ def main() -> None:
     p.add_argument("--device", default=default_device)
     p.add_argument("--dtype", choices=["bf16", "fp32"], default="bf16")
     p.set_defaults(func=cmd_preflight)
+
+    p = sub.add_parser("eligibility", help="v2 Stage 3: per-model eligibility manifest")
+    p.add_argument("--model", required=True)
+    p.add_argument("--sets", nargs="+", default=EVAL_SETS, choices=EVAL_SETS)
+    p.add_argument("--limit", type=int, default=None)
+    p.add_argument("--no-filter-correct", action="store_true")
+    p.add_argument("--out-dir", default="/workspace/results/coherence_v2")
+    p.add_argument("--force", action="store_true")
+    p.add_argument("--device", default=default_device)
+    p.add_argument("--dtype", choices=["bf16", "fp32"], default="bf16")
+    p.set_defaults(func=cmd_eligibility)
+
+    p = sub.add_parser("freeze-panel", help="v2 Stage 3: freeze shared intersection + sample")
+    p.add_argument("--models", nargs="+", default=["qwen3.5-27b", "gemma-3-27b-it"])
+    p.add_argument("--out-dir", default="/workspace/results/coherence_v2")
+    p.add_argument("--prompts-per-set", type=int, default=8)
+    p.add_argument("--force", action="store_true")
+    p.set_defaults(func=cmd_freeze_panel)
 
     args = parser.parse_args()
     args.func(args)

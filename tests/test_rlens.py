@@ -2004,3 +2004,150 @@ def test_v1_coherence_module_is_untouched_by_v2():
 
     assert hasattr(v1, "pin_lenses") and hasattr(v1, "model_device")
     assert hasattr(v1, "TRASH_SETS"), "v1 left intact for onset.py"
+
+
+# ---------------------------------------------------------------------------
+# Coherence v2 — Stage 3: frozen eligibility, prompts, depths
+# ---------------------------------------------------------------------------
+
+from rlens.eligibility import (
+    CORRECTNESS_FILTERED_SETS,
+    PROMPTS_PER_SET,
+    EligibilityManifest,
+    EligibilityRecord,
+    canonical_hash,
+    freeze_panel_sample,
+    item_id,
+    select_prompts,
+    selection_hash,
+    shared_intersection,
+    verify_sample_hash,
+)
+
+
+def _elig(model_key, per_set):
+    """per_set: {set_name: [(item_id, eligible, reasons)]}"""
+    recs = []
+    for s, items in per_set.items():
+        for idx, (ident, ok, reasons) in enumerate(items):
+            recs.append(EligibilityRecord(set_name=s, item_id=ident, item_index=idx,
+                                          eligible=ok, reasons=list(reasons)))
+    return EligibilityManifest(model_key=model_key, records=recs)
+
+
+def test_item_id_matches_the_quantitative_experiment():
+    """Both experiments must refer to the same items (§6)."""
+    assert item_id({"name": "sushi-01"}, 7) == "sushi-01"
+    assert item_id({}, 7) == "7", "fall back to the index, as evals.py does"
+
+
+def test_only_multihop_and_multilingual_are_correctness_filtered():
+    """§6: do not filter association, typo, or poetry."""
+    assert set(CORRECTNESS_FILTERED_SETS) == {"multihop", "multilingual"}
+
+
+def test_shared_intersection_keeps_only_items_eligible_under_both_models():
+    q = _elig("qwen", {"multihop": [("a", True, []), ("b", True, []), ("c", False, ["x"])]})
+    g = _elig("gemma", {"multihop": [("a", True, []), ("b", False, ["y"]), ("c", True, [])]})
+    shared = shared_intersection({"qwen": q, "gemma": g})
+    assert shared["multihop"] == ["a"], "only items eligible under BOTH models"
+
+
+def test_shared_intersection_is_empty_when_a_model_has_no_eligible_items():
+    q = _elig("qwen", {"typo": [("a", True, [])]})
+    g = _elig("gemma", {"typo": [("a", False, ["z"])]})
+    assert shared_intersection({"qwen": q, "gemma": g})["typo"] == []
+
+
+def test_prompt_selection_is_deterministic_and_depends_only_on_identity():
+    ids = [f"item-{i:03d}" for i in range(40)]
+    first = select_prompts({"multihop": ids})
+    second = select_prompts({"multihop": list(reversed(ids))})
+    assert first["multihop"]["selected"] == second["multihop"]["selected"], \
+        "input order must not matter"
+    assert len(first["multihop"]["selected"]) == PROMPTS_PER_SET
+
+    expected = sorted(ids, key=lambda i: selection_hash(
+        "coherence-v2-2026-08-26", "multihop", i))[:PROMPTS_PER_SET]
+    assert first["multihop"]["selected"] == expected
+
+    # a different salt selects a different sample
+    other = select_prompts({"multihop": ids}, salt="different-salt")
+    assert other["multihop"]["selected"] != first["multihop"]["selected"]
+
+
+def test_selection_differs_across_sets_for_the_same_item_id():
+    """The set name is part of the hash, so a shared id is not co-selected."""
+    ids = [f"i{i}" for i in range(30)]
+    picked = select_prompts({"multihop": ids, "typo": ids})
+    assert picked["multihop"]["selected"] != picked["typo"]["selected"]
+
+
+def test_underpowered_sets_are_flagged_and_never_topped_up():
+    """§6: use all available, do not replace from another set."""
+    picked = select_prompts({"poetry": ["a", "b", "c"], "typo": [f"t{i}" for i in range(20)]})
+    assert picked["poetry"]["underpowered"] is True
+    assert picked["poetry"]["n_selected"] == 3
+    assert set(picked["poetry"]["selected"]) <= {"a", "b", "c"}, "no cross-set borrowing"
+    assert picked["typo"]["underpowered"] is False
+
+
+def test_frozen_sample_enumerates_every_model_set_item_depth_cell():
+    """§6: 5 sets x 8 prompts x 5 depths x 2 models = 400 cells."""
+    selection = select_prompts({s: [f"{s}-{i:02d}" for i in range(20)]
+                                for s in ("multihop", "multilingual", "association",
+                                          "typo", "poetry")})
+    depths = {
+        "qwen3.5-27b": [{"requested_depth": z, "layer": l, "actual_depth": l / 62}
+                        for z, l in zip((0.0, 0.1, 0.2, 0.3, 0.4), (0, 6, 12, 19, 25))],
+        "gemma-3-27b-it": [{"requested_depth": z, "layer": l, "actual_depth": l / 60}
+                           for z, l in zip((0.0, 0.1, 0.2, 0.3, 0.4), (0, 6, 12, 18, 24))],
+    }
+    sample = freeze_panel_sample(selection, depths)
+    assert sample["n_cells"] == 5 * 8 * 5 * 2 == 400
+    assert sample["underpowered_sets"] == []
+
+    # both coordinates stored; §5 forbids raw-index cross-model comparison
+    for cell in sample["cells"]:
+        assert "layer" in cell and "actual_depth" in cell and "requested_depth" in cell
+
+    # the SAME prompts are used for both models
+    by_model = {}
+    for cell in sample["cells"]:
+        by_model.setdefault(cell["model_key"], set()).add((cell["set"], cell["item_id"]))
+    assert by_model["qwen3.5-27b"] == by_model["gemma-3-27b-it"]
+
+
+def test_sample_hash_is_stable_and_detects_tampering():
+    """§14: panel construction must refuse a sample whose hash no longer matches."""
+    selection = select_prompts({"typo": [f"t{i}" for i in range(20)]})
+    depths = {"m": [{"requested_depth": 0.0, "layer": 0, "actual_depth": 0.0}]}
+    sample = freeze_panel_sample(selection, depths)
+
+    assert verify_sample_hash(sample)
+    assert freeze_panel_sample(selection, depths)["sample_sha256"] == sample["sample_sha256"]
+
+    tampered = json.loads(json.dumps(sample))
+    tampered["cells"][0]["item_id"] = "smuggled-in"
+    assert not verify_sample_hash(tampered)
+
+    missing = {k: v for k, v in sample.items() if k != "sample_sha256"}
+    assert not verify_sample_hash(missing)
+
+
+def test_canonical_hash_ignores_key_order_only():
+    assert canonical_hash({"a": 1, "b": 2}) == canonical_hash({"b": 2, "a": 1})
+    assert canonical_hash({"a": 1}) != canonical_hash({"a": 2})
+
+
+def test_eligibility_counts_tally_every_exclusion_reason():
+    """§6: record every exclusion and its reason."""
+    m = _elig("qwen", {"multihop": [
+        ("a", True, []),
+        ("b", False, ["model_answers_target_incorrectly"]),
+        ("c", False, ["model_answers_target_incorrectly"]),
+    ]})
+    counts = m.counts()["multihop"]
+    assert counts == {"total": 3, "eligible": 1,
+                      "excluded": {"model_answers_target_incorrectly": 2}}
+    assert m.to_dict()["protocol_salt"] == "coherence-v2-2026-08-26"
