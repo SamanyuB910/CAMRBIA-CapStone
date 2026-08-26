@@ -16,7 +16,8 @@
    "c_wrong_id": 10679,
    "y_id": 40790,
    "y_prime_id": 14712,
-   "t_i": 13
+   "t_i": 13,
+   "cue_i": 11
   },
   {
    "name": "animal-cover-turtle",
@@ -33,7 +34,8 @@
    "c_wrong_id": 15477,
    "y_id": 12168,
    "y_prime_id": 5281,
-   "t_i": 23
+   "t_i": 23,
+   "cue_i": 12
   },
   {
    "name": "animal-nose-elephant",
@@ -50,7 +52,8 @@
    "c_wrong_id": 15477,
    "y_id": 36076,
    "y_prime_id": 23684,
-   "t_i": 19
+   "t_i": 19,
+   "cue_i": 11
   },
   {
    "name": "beverage-source-wine",
@@ -67,7 +70,8 @@
    "c_wrong_id": 15477,
    "y_id": 49431,
    "y_prime_id": 77931,
-   "t_i": 15
+   "t_i": 15,
+   "cue_i": 10
   },
   {
    "name": "bird-color-swan",
@@ -84,7 +88,8 @@
    "c_wrong_id": 15477,
    "y_id": 4022,
    "y_prime_id": 13477,
-   "t_i": 18
+   "t_i": 18,
+   "cue_i": 17
   },
   {
    "name": "christmas-season",
@@ -101,7 +106,8 @@
    "c_wrong_id": 11920,
    "y_id": 12050,
    "y_prime_id": 10151,
-   "t_i": 12
+   "t_i": 12,
+   "cue_i": 10
   },
   {
    "name": "city-state-Philadelphia",
@@ -118,7 +124,8 @@
    "c_wrong_id": 15477,
    "y_id": 19168,
    "y_prime_id": 6312,
-   "t_i": 15
+   "t_i": 15,
+   "cue_i": 12
   },
   {
    "name": "colosseum-currency",
@@ -135,7 +142,8 @@
    "c_wrong_id": 7548,
    "y_id": 18870,
    "y_prime_id": 35710,
-   "t_i": 15
+   "t_i": 15,
+   "cue_i": 11
   },
   {
    "name": "ex-city-capital-Barcelona-Toronto",
@@ -152,7 +160,8 @@
    "c_wrong_id": 14898,
    "y_id": 23327,
    "y_prime_id": 31106,
-   "t_i": 11
+   "t_i": 11,
+   "cue_i": 8
   },
   {
    "name": "ex-city-capital-Lyon-Naples",
@@ -169,7 +178,8 @@
    "c_wrong_id": 17163,
    "y_id": 11751,
    "y_prime_id": 21047,
-   "t_i": 11
+   "t_i": 11,
+   "cue_i": 8
   },
   {
    "name": "ex-city-capital-Naples-Barcelona",
@@ -186,7 +196,8 @@
    "c_wrong_id": 9338,
    "y_id": 21047,
    "y_prime_id": 23327,
-   "t_i": 11
+   "t_i": 11,
+   "cue_i": 8
   },
   {
    "name": "ex-city-capital-Toronto-Lyon",
@@ -203,7 +214,8 @@
    "c_wrong_id": 6124,
    "y_id": 31106,
    "y_prime_id": 11751,
-   "t_i": 11
+   "t_i": 11,
+   "cue_i": 8
   },
   {
    "name": "ex-city-continent-Toronto-Lyon",
@@ -220,7 +232,8 @@
    "c_wrong_id": 14437,
    "y_id": 4634,
    "y_prime_id": 4357,
-   "t_i": 11
+   "t_i": 11,
+   "cue_i": 8
   },
   {
    "name": "ex-city-currency-Toronto-Beijing",
@@ -237,7 +250,8 @@
    "c_wrong_id": 6535,
    "y_id": 11549,
    "y_prime_id": 69827,
-   "t_i": 13
+   "t_i": 13,
+   "cue_i": 9
   },
   {
    "name": "ex-city-language-Lyon-Naples",
@@ -254,7 +268,8 @@
    "c_wrong_id": 8100,
    "y_id": 8323,
    "y_prime_id": 14382,
-   "t_i": 12
+   "t_i": 12,
+   "cue_i": 9
   },
   {
    "name": "ex-element-state-26-8",
@@ -271,7 +286,8 @@
    "c_wrong_id": 49044,
    "y_id": 6235,
    "y_prime_id": 6605,
-   "t_i": 18
+   "t_i": 18,
+   "cue_i": 17
   },
   {
    "name": "ex-element-state-26-80",
@@ -288,7 +304,8 @@
    "c_wrong_id": 22817,
    "y_id": 6235,
    "y_prime_id": 14058,
-   "t_i": 18
+   "t_i": 18,
+   "cue_i": 17
   },
   {
    "name": "ex-element-symbol-11-26",
@@ -305,7 +322,8 @@
    "c_wrong_id": 6414,
    "y_id": 12444,
    "y_prime_id": 3713,
-   "t_i": 14
+   "t_i": 14,
+   "cue_i": 13
   },
   {
    "name": "ex-element-symbol-26-79",
@@ -322,7 +340,8 @@
    "c_wrong_id": 37315,
    "y_id": 3713,
    "y_prime_id": 30994,
-   "t_i": 14
+   "t_i": 14,
+   "cue_i": 13
   },
   {
    "name": "ex2-city-capital-Munich",
@@ -339,7 +358,8 @@
    "c_wrong_id": 15477,
    "y_id": 19241,
    "y_prime_id": 25358,
-   "t_i": 11
+   "t_i": 11,
+   "cue_i": 8
   },
   {
    "name": "ex2-city-capital-Osaka",
@@ -356,7 +376,8 @@
    "c_wrong_id": 6650,
    "y_id": 25358,
    "y_prime_id": 19241,
-   "t_i": 11
+   "t_i": 11,
+   "cue_i": 8
   },
   {
    "name": "ex2-city-continent-Lima",
@@ -373,7 +394,8 @@
    "c_wrong_id": 8071,
    "y_id": 4725,
    "y_prime_id": 9871,
-   "t_i": 11
+   "t_i": 11,
+   "cue_i": 8
   },
   {
    "name": "ex2-city-continent-Sydney",
@@ -390,7 +412,8 @@
    "c_wrong_id": 9338,
    "y_id": 8071,
    "y_prime_id": 9514,
-   "t_i": 11
+   "t_i": 11,
+   "cue_i": 8
   },
   {
    "name": "ex2-city-language-Cairo",
@@ -407,7 +430,8 @@
    "c_wrong_id": 15477,
    "y_id": 32988,
    "y_prime_id": 8260,
-   "t_i": 12
+   "t_i": 12,
+   "cue_i": 9
   },
   {
    "name": "ex2-city-language-Moscow",
@@ -424,7 +448,8 @@
    "c_wrong_id": 14898,
    "y_id": 8260,
    "y_prime_id": 32988,
-   "t_i": 12
+   "t_i": 12,
+   "cue_i": 9
   },
   {
    "name": "ex2-language-capital-Greek",
@@ -441,7 +466,8 @@
    "c_wrong_id": 26707,
    "y_id": 44299,
    "y_prime_id": 50332,
-   "t_i": 13
+   "t_i": 13,
+   "cue_i": 8
   },
   {
    "name": "ex2-language-capital-Hungarian",
@@ -458,7 +484,8 @@
    "c_wrong_id": 23655,
    "y_id": 67236,
    "y_prime_id": 69724,
-   "t_i": 13
+   "t_i": 13,
+   "cue_i": 8
   },
   {
    "name": "ex2-language-capital-Polish",
@@ -475,7 +502,8 @@
    "c_wrong_id": 41361,
    "y_id": 69724,
    "y_prime_id": 44299,
-   "t_i": 13
+   "t_i": 13,
+   "cue_i": 8
   },
   {
    "name": "ex2-language-capital-Swedish",
@@ -492,7 +520,8 @@
    "c_wrong_id": 23655,
    "y_id": 50332,
    "y_prime_id": 67236,
-   "t_i": 13
+   "t_i": 13,
+   "cue_i": 8
   },
   {
    "name": "ex2-river-capital-Thames",
@@ -509,7 +538,8 @@
    "c_wrong_id": 15477,
    "y_id": 6924,
    "y_prime_id": 19241,
-   "t_i": 14
+   "t_i": 14,
+   "cue_i": 9
   },
   {
    "name": "food-animal-butter",
@@ -526,7 +556,8 @@
    "c_wrong_id": 15477,
    "y_id": 18775,
    "y_prime_id": 35997,
-   "t_i": 14
+   "t_i": 14,
+   "cue_i": 8
   },
   {
    "name": "fruit-grows-grape",
@@ -543,7 +574,8 @@
    "c_wrong_id": 15477,
    "y_id": 28007,
    "y_prime_id": 4757,
-   "t_i": 18
+   "t_i": 18,
+   "cue_i": 14
   },
   {
    "name": "func-filters-count",
@@ -560,7 +592,8 @@
    "c_wrong_id": 19997,
    "y_id": 1330,
    "y_prime_id": 799,
-   "t_i": 15
+   "t_i": 15,
+   "cue_i": 14
   },
   {
    "name": "gem-color-ruby",
@@ -577,7 +610,8 @@
    "c_wrong_id": 15477,
    "y_id": 2438,
    "y_prime_id": 4022,
-   "t_i": 16
+   "t_i": 16,
+   "cue_i": 15
   },
   {
    "name": "greatwall-ocean",
@@ -594,7 +628,8 @@
    "c_wrong_id": 8964,
    "y_id": 15979,
    "y_prime_id": 21678,
-   "t_i": 14
+   "t_i": 14,
+   "cue_i": 12
   },
   {
    "name": "holiday-month-christmas2",
@@ -611,7 +646,8 @@
    "c_wrong_id": 15477,
    "y_id": 6443,
    "y_prime_id": 5632,
-   "t_i": 18
+   "t_i": 18,
+   "cue_i": 12
   },
   {
    "name": "mars-color",
@@ -628,7 +664,8 @@
    "c_wrong_id": 47334,
    "y_id": 2438,
    "y_prime_id": 6105,
-   "t_i": 11
+   "t_i": 11,
+   "cue_i": 7
   },
   {
    "name": "month-3-godof",
@@ -645,7 +682,8 @@
    "c_wrong_id": 19818,
    "y_id": 3980,
    "y_prime_id": 2854,
-   "t_i": 14
+   "t_i": 14,
+   "cue_i": 12
   },
   {
    "name": "organ-count-kidney2",
@@ -662,7 +700,8 @@
    "c_wrong_id": 15477,
    "y_id": 1330,
    "y_prime_id": 799,
-   "t_i": 18
+   "t_i": 18,
+   "cue_i": 13
   },
   {
    "name": "organ-location-heart",
@@ -679,7 +718,8 @@
    "c_wrong_id": 15477,
    "y_id": 14697,
    "y_prime_id": 1901,
-   "t_i": 15
+   "t_i": 15,
+   "cue_i": 13
   },
   {
    "name": "paper-continent",
@@ -696,7 +736,8 @@
    "c_wrong_id": 20403,
    "y_id": 13229,
    "y_prime_id": 4357,
-   "t_i": 12
+   "t_i": 12,
+   "cue_i": 9
   },
   {
    "name": "person-country-napoleon",
@@ -713,7 +754,8 @@
    "c_wrong_id": 52237,
    "y_id": 9338,
    "y_prime_id": 4994,
-   "t_i": 14
+   "t_i": 14,
+   "cue_i": 13
   },
   {
    "name": "person-firstname-darwin",
@@ -730,7 +772,8 @@
    "c_wrong_id": 20042,
    "y_id": 14496,
    "y_prime_id": 16993,
-   "t_i": 15
+   "t_i": 15,
+   "cue_i": 11
   },
   {
    "name": "person-firstname-einstein",
@@ -747,7 +790,8 @@
    "c_wrong_id": 42905,
    "y_id": 16993,
    "y_prime_id": 40134,
-   "t_i": 16
+   "t_i": 16,
+   "cue_i": 15
   },
   {
    "name": "person-firstname-mozart",
@@ -764,7 +808,8 @@
    "c_wrong_id": 40014,
    "y_id": 83509,
    "y_prime_id": 14496,
-   "t_i": 20
+   "t_i": 20,
+   "cue_i": 19
   },
   {
    "name": "person-firstname-newton",
@@ -781,7 +826,8 @@
    "c_wrong_id": 91400,
    "y_id": 40134,
    "y_prime_id": 12021,
-   "t_i": 18
+   "t_i": 18,
+   "cue_i": 12
   },
   {
    "name": "person-firstname-shakespeare",
@@ -798,7 +844,8 @@
    "c_wrong_id": 52237,
    "y_id": 12021,
    "y_prime_id": 83509,
-   "t_i": 13
+   "t_i": 13,
+   "cue_i": 12
   },
   {
    "name": "planet-rings-saturn2",
@@ -815,7 +862,8 @@
    "c_wrong_id": 15477,
    "y_id": 23769,
    "y_prime_id": 7458,
-   "t_i": 14
+   "t_i": 14,
+   "cue_i": 12
   },
   {
    "name": "season-next-winter",
@@ -832,7 +880,8 @@
    "c_wrong_id": 15477,
    "y_id": 10151,
    "y_prime_id": 40297,
-   "t_i": 15
+   "t_i": 15,
+   "cue_i": 10
   },
   {
    "name": "super-populous-capital",
@@ -849,7 +898,8 @@
    "c_wrong_id": 19914,
    "y_id": 25701,
    "y_prime_id": 21318,
-   "t_i": 13
+   "t_i": 13,
+   "cue_i": 8
   },
   {
    "name": "super-smallest-continent",
@@ -866,7 +916,8 @@
    "c_wrong_id": 16488,
    "y_id": 4357,
    "y_prime_id": 13229,
-   "t_i": 13
+   "t_i": 13,
+   "cue_i": 3
   },
   {
    "name": "vehicle-power-bicycle",
@@ -883,17 +934,20 @@
    "c_wrong_id": 15477,
    "y_id": 13795,
    "y_prime_id": 4560,
-   "t_i": 22
+   "t_i": 22,
+   "cue_i": 18
   }
  ],
  "filter_log": [
   {
    "name": "amazon-language",
-   "kept": true
+   "kept": true,
+   "cue": " River"
   },
   {
    "name": "animal-cover-turtle",
-   "kept": true
+   "kept": true,
+   "cue": "ile"
   },
   {
    "name": "animal-legs-buffalo2",
@@ -902,7 +956,8 @@
   },
   {
    "name": "animal-nose-elephant",
-   "kept": true
+   "kept": true,
+   "cue": " animal"
   },
   {
    "name": "atomic-80-state",
@@ -916,11 +971,13 @@
   },
   {
    "name": "beverage-source-wine",
-   "kept": true
+   "kept": true,
+   "cue": " communion"
   },
   {
    "name": "bird-color-swan",
-   "kept": true
+   "kept": true,
+   "cue": " ballet"
   },
   {
    "name": "bird-country-eagle",
@@ -959,15 +1016,18 @@
   },
   {
    "name": "christmas-season",
-   "kept": true
+   "kept": true,
+   "cue": " tree"
   },
   {
    "name": "city-state-Philadelphia",
-   "kept": true
+   "kept": true,
+   "cue": " Bell"
   },
   {
    "name": "colosseum-currency",
-   "kept": true
+   "kept": true,
+   "cue": "osse"
   },
   {
    "name": "element-color-gold2",
@@ -991,27 +1051,33 @@
   },
   {
    "name": "ex-city-capital-Barcelona-Toronto",
-   "kept": true
+   "kept": true,
+   "cue": " Barcelona"
   },
   {
    "name": "ex-city-capital-Lyon-Naples",
-   "kept": true
+   "kept": true,
+   "cue": " Lyon"
   },
   {
    "name": "ex-city-capital-Naples-Barcelona",
-   "kept": true
+   "kept": true,
+   "cue": " Naples"
   },
   {
    "name": "ex-city-capital-Toronto-Lyon",
-   "kept": true
+   "kept": true,
+   "cue": " Toronto"
   },
   {
    "name": "ex-city-continent-Toronto-Lyon",
-   "kept": true
+   "kept": true,
+   "cue": " Toronto"
   },
   {
    "name": "ex-city-currency-Toronto-Beijing",
-   "kept": true
+   "kept": true,
+   "cue": " Toronto"
   },
   {
    "name": "ex-city-currency-Toronto-Mumbai",
@@ -1020,15 +1086,18 @@
   },
   {
    "name": "ex-city-language-Lyon-Naples",
-   "kept": true
+   "kept": true,
+   "cue": " Lyon"
   },
   {
    "name": "ex-element-state-26-8",
-   "kept": true
+   "kept": true,
+   "cue": "6"
   },
   {
    "name": "ex-element-state-26-80",
-   "kept": true
+   "kept": true,
+   "cue": "6"
   },
   {
    "name": "ex-element-state-8-26",
@@ -1047,11 +1116,13 @@
   },
   {
    "name": "ex-element-symbol-11-26",
-   "kept": true
+   "kept": true,
+   "cue": "1"
   },
   {
    "name": "ex-element-symbol-26-79",
-   "kept": true
+   "kept": true,
+   "cue": "6"
   },
   {
    "name": "ex-planet-color-third-fourth",
@@ -1060,51 +1131,63 @@
   },
   {
    "name": "ex2-city-capital-Munich",
-   "kept": true
+   "kept": true,
+   "cue": " Munich"
   },
   {
    "name": "ex2-city-capital-Osaka",
-   "kept": true
+   "kept": true,
+   "cue": " Osaka"
   },
   {
    "name": "ex2-city-continent-Lima",
-   "kept": true
+   "kept": true,
+   "cue": " Lima"
   },
   {
    "name": "ex2-city-continent-Sydney",
-   "kept": true
+   "kept": true,
+   "cue": " Sydney"
   },
   {
    "name": "ex2-city-language-Cairo",
-   "kept": true
+   "kept": true,
+   "cue": " Cairo"
   },
   {
    "name": "ex2-city-language-Moscow",
-   "kept": true
+   "kept": true,
+   "cue": " Moscow"
   },
   {
    "name": "ex2-language-capital-Greek",
-   "kept": true
+   "kept": true,
+   "cue": " Greek"
   },
   {
    "name": "ex2-language-capital-Hungarian",
-   "kept": true
+   "kept": true,
+   "cue": " Hungarian"
   },
   {
    "name": "ex2-language-capital-Polish",
-   "kept": true
+   "kept": true,
+   "cue": " Polish"
   },
   {
    "name": "ex2-language-capital-Swedish",
-   "kept": true
+   "kept": true,
+   "cue": " Swedish"
   },
   {
    "name": "ex2-river-capital-Thames",
-   "kept": true
+   "kept": true,
+   "cue": " Thames"
   },
   {
    "name": "food-animal-butter",
-   "kept": true
+   "kept": true,
+   "cue": " dairy"
   },
   {
    "name": "food-animal-honey",
@@ -1113,11 +1196,13 @@
   },
   {
    "name": "fruit-grows-grape",
-   "kept": true
+   "kept": true,
+   "cue": " wine"
   },
   {
    "name": "func-filters-count",
-   "kept": true
+   "kept": true,
+   "cue": " urine"
   },
   {
    "name": "func-pumps-chambers",
@@ -1126,7 +1211,8 @@
   },
   {
    "name": "gem-color-ruby",
-   "kept": true
+   "kept": true,
+   "cue": " July"
   },
   {
    "name": "gem-source-pearl",
@@ -1135,11 +1221,13 @@
   },
   {
    "name": "greatwall-ocean",
-   "kept": true
+   "kept": true,
+   "cue": " Wall"
   },
   {
    "name": "holiday-month-christmas2",
-   "kept": true
+   "kept": true,
+   "cue": "green"
   },
   {
    "name": "instr-body-trumpet",
@@ -1153,11 +1241,13 @@
   },
   {
    "name": "mars-color",
-   "kept": true
+   "kept": true,
+   "cue": " fourth"
   },
   {
    "name": "month-3-godof",
-   "kept": true
+   "kept": true,
+   "cue": " Roman"
   },
   {
    "name": "organ-acid-stomach",
@@ -1166,7 +1256,8 @@
   },
   {
    "name": "organ-count-kidney2",
-   "kept": true
+   "kept": true,
+   "cue": " urine"
   },
   {
    "name": "organ-location-brain",
@@ -1175,7 +1266,8 @@
   },
   {
    "name": "organ-location-heart",
-   "kept": true
+   "kept": true,
+   "cue": " blood"
   },
   {
    "name": "osu-rival-mascot",
@@ -1184,7 +1276,8 @@
   },
   {
    "name": "paper-continent",
-   "kept": true
+   "kept": true,
+   "cue": " paper"
   },
   {
    "name": "person-century-lincoln",
@@ -1193,7 +1286,8 @@
   },
   {
    "name": "person-country-napoleon",
-   "kept": true
+   "kept": true,
+   "cue": " Waterloo"
   },
   {
    "name": "person-country-shakespeare",
@@ -1202,23 +1296,28 @@
   },
   {
    "name": "person-firstname-darwin",
-   "kept": true
+   "kept": true,
+   "cue": " evolution"
   },
   {
    "name": "person-firstname-einstein",
-   "kept": true
+   "kept": true,
+   "cue": "ativity"
   },
   {
    "name": "person-firstname-mozart",
-   "kept": true
+   "kept": true,
+   "cue": "ute"
   },
   {
    "name": "person-firstname-newton",
-   "kept": true
+   "kept": true,
+   "cue": " apple"
   },
   {
    "name": "person-firstname-shakespeare",
-   "kept": true
+   "kept": true,
+   "cue": " Juliet"
   },
   {
    "name": "planet-3-moons",
@@ -1227,7 +1326,8 @@
   },
   {
    "name": "planet-rings-saturn2",
-   "kept": true
+   "kept": true,
+   "cue": " Sun"
   },
   {
    "name": "rhyme-chair-flag",
@@ -1246,7 +1346,8 @@
   },
   {
    "name": "season-next-winter",
-   "kept": true
+   "kept": true,
+   "cue": "dest"
   },
   {
    "name": "spaceneedle-border",
@@ -1265,11 +1366,13 @@
   },
   {
    "name": "super-populous-capital",
-   "kept": true
+   "kept": true,
+   "cue": " populous"
   },
   {
    "name": "super-smallest-continent",
-   "kept": true
+   "kept": true,
+   "cue": " smallest"
   },
   {
    "name": "tree-product-oak",
@@ -1278,7 +1381,8 @@
   },
   {
    "name": "vehicle-power-bicycle",
-   "kept": true
+   "kept": true,
+   "cue": " France"
   },
   {
    "name": "violin-strings",
