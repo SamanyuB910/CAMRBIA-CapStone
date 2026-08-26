@@ -138,6 +138,75 @@ def test_edit_runner_multi_layer_persistent_edit(tiny_qwen, tiny_batch):
     assert torch.allclose(logits[2], clean, atol=1e-5), "multi-layer identity changed the forward"
 
 
+class _FakeTok:
+    """Minimal tokenizer surface used by run_measurements."""
+
+    def __init__(self, n_tokens=10):
+        self.n_tokens = n_tokens
+
+    def __call__(self, text, return_tensors=None):
+        from types import SimpleNamespace
+
+        return SimpleNamespace(input_ids=torch.arange(1, self.n_tokens + 1)[None, :])
+
+    def encode(self, s, add_special_tokens=False):
+        return [abs(hash(s)) % 64 + 1]
+
+    def decode(self, ids, **kw):
+        return f"t{list(ids)[0]}"
+
+
+def _tiny_lenses(tiny_qwen):
+    from jlens.lens import JacobianLens
+
+    d = tiny_qwen.config.hidden_size
+    torch.manual_seed(3)
+    n = tiny_qwen.config.num_hidden_layers
+    return {
+        name: JacobianLens(
+            jacobians={l: torch.eye(d) + 0.05 * torch.randn(d, d) for l in range(n)},
+            n_prompts=1, d_model=d,
+        )
+        for name in ("R", "J")
+    }
+
+
+def _tiny_item(cue_i, t_i):
+    from rlens.onset import OnsetItem
+
+    return OnsetItem(
+        name="x", category="c", prompt="p", control_prompt="q",
+        c="a", c_prime="b", c_wrong="w", y="y", y_prime="z",
+        c_id=5, c_prime_id=6, c_wrong_id=7, y_id=8, y_prime_id=9,
+        t_i=t_i, cue_i=cue_i,
+    )
+
+
+def test_intervene_at_cue_actually_moves_the_intervention(tiny_qwen):
+    """Regression: the runner must apply edits at the intervention site.
+
+    Edit fns are built from lens vectors (not from the activation), so passing
+    the wrong position silently reproduces the t_i run exactly — which is how
+    an earlier cue run came back byte-identical to the t_i run.
+    """
+    from rlens.onset import run_measurements
+
+    tok, lenses = _FakeTok(), _tiny_lenses(tiny_qwen)
+    item = _tiny_item(cue_i=3, t_i=9)
+    layers = [0, 1]
+    kw = dict(layers=layers, batch_size=8)
+    at_t = run_measurements(tiny_qwen, tok, lenses, [item], intervene_at="t", **kw)
+    at_cue = run_measurements(tiny_qwen, tok, lenses, [item], intervene_at="cue", **kw)
+
+    def effects(df):
+        d = df[(df.condition == "ablate") & (df.alpha == 1.0)]
+        return d.sort_values(["lens", "layer"])["logp_y"].to_numpy()
+
+    assert not torch.allclose(
+        torch.tensor(effects(at_t)), torch.tensor(effects(at_cue)), atol=1e-6
+    ), "cue-position interventions produced identical results to t_i — position ignored"
+
+
 def test_lens_vector_ranking_matches_actual_readout(tiny_qwen):
     """<v_c, h> ranking must equal the real lens readout unembed(norm(J h)) ranking
     (they differ only by the positive per-position RMS scalar)."""

@@ -453,7 +453,8 @@ def run_measurements(
             with ActivationRecorder(hf_model.model.layers, at=layers) as rec:
                 hf_model(input_ids=ids, use_cache=False)
                 for l in layers:
-                    h = rec.activations[l][0, item.t_i].float().cpu()
+                    mu_pos = item.cue_i if intervene_at == "cue" else item.t_i
+                    h = rec.activations[l][0, mu_pos].float().cpu()
                     sums[l] = h if sums[l] is None else sums[l] + h
             count += 1
         mu_by_layer = {l: sums[l] / count for l in layers}
@@ -546,7 +547,10 @@ def run_measurements(
                     labels.append({"lens": lens, "condition": f"random_{cond}", "alpha": 1.0, "delta_norm": dn})
                     edits.append({layer: make_random_displacement(dn, h_t.shape[0], seed=hash((item.name, layer, lens, cond, b)) & 0x7FFFFFFF)})
 
-            logits = runner.run(input_ids, item.t_i, edits, batch_size=batch_size)
+            # NB: pos_i, not item.t_i — the edits must be applied at the
+            # intervention site. (Edit fns are built from lens vectors, so a
+            # wrong position here silently reproduces the t_i run exactly.)
+            logits = runner.run(input_ids, pos_i, edits, batch_size=batch_size)
             logp = logits.log_softmax(-1)
             # effects are referenced to the IN-BATCH identity condition
             # (labels[0]): identical kernel shapes -> bf16 shape-noise cancels
