@@ -58,10 +58,11 @@ def _load_model(dtype: str, device: str, model: str = DEFAULT_MODEL):
     if revision is None:
         print(f"WARNING: {model} has revision: null in pins.yaml - this run is not reproducible")
     torch_dtype = {"bf16": torch.bfloat16, "fp32": torch.float32}[dtype]
+    loader = getattr(transformers, spec.get("loader", "AutoModelForCausalLM"))
     rev_tag = revision[:8] if revision else "unpinned"
-    print(f"loading {spec['hf_id']}@{rev_tag} dtype={dtype} device={device} ...")
+    print(f"loading {spec['hf_id']}@{rev_tag} via {loader.__name__} dtype={dtype} device={device} ...")
     t0 = time.perf_counter()
-    hf = transformers.AutoModelForCausalLM.from_pretrained(
+    hf = loader.from_pretrained(
         spec["hf_id"], revision=revision, dtype=torch_dtype, device_map=device
     )
     tok = transformers.AutoTokenizer.from_pretrained(spec["hf_id"], revision=revision)

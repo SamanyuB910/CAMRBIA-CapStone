@@ -33,6 +33,7 @@ model:                       # harness-VERIFICATION model (post reports the R=J 
 experiment_models:           # R>J effect phase: post reports an R-lens advantage on BOTH of these.
   qwen3.5-27b:               # same qwen3_5 architecture our patch registry already verifies (no new code)
     hf_id: Qwen/Qwen3.5-27B
+    loader: AutoModelForCausalLM
     revision: fc05daec18b0a78c049392ed2e771dde82bdf654    # resolve + pin when downloading on the GPU box (~56 GB)
     n_layers: 64
     d_model: 5120
@@ -42,6 +43,8 @@ experiment_models:           # R>J effect phase: post reports an R-lens advantag
       - qwen3.5-27b/r-lens/lens.pt
   gemma-3-27b-it:            # only Gemma in the released set; (1+w) RMSNorm in a different codebase.
     hf_id: google/gemma-3-27b-it   # GATED on HF: accept Google's license + set HF_TOKEN before downloading (~54 GB)
+    loader: AutoModelForImageTextToText   # multimodal wrapper; CausalLM cannot load it (C1b).
+                                          # jlens from_hf auto-detects the model.language_model layout.
     revision: 005ad3404e59d6023443cb575daa05336842228a
     n_layers: 62
     d_model: 5376
