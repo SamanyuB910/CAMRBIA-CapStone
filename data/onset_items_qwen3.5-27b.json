@@ -36,6 +36,91 @@
    "t_i": 23
   },
   {
+   "name": "animal-nose-elephant",
+   "category": "animal-nose",
+   "prompt": "Fact: The long flexible body part that the largest land animal uses to pick things up is called a",
+   "control_prompt": "Fact: The long flexible body part that a snake uses to smell is called a",
+   "c": "elephant",
+   "c_prime": "snake",
+   "c_wrong": "Brazil",
+   "y": "trunk",
+   "y_prime": "tongue",
+   "c_id": 44217,
+   "c_prime_id": 24463,
+   "c_wrong_id": 15477,
+   "y_id": 36076,
+   "y_prime_id": 23684,
+   "t_i": 19
+  },
+  {
+   "name": "beverage-source-wine",
+   "category": "beverage-source",
+   "prompt": "Fact: The fruit that the alcoholic drink served at communion is made from is the",
+   "control_prompt": "Fact: The grain that beer is made from is",
+   "c": "wine",
+   "c_prime": "beer",
+   "c_wrong": "Brazil",
+   "y": "grape",
+   "y_prime": "barley",
+   "c_id": 12701,
+   "c_prime_id": 12514,
+   "c_wrong_id": 15477,
+   "y_id": 49431,
+   "y_prime_id": 77931,
+   "t_i": 15
+  },
+  {
+   "name": "bird-color-swan",
+   "category": "bird-color",
+   "prompt": "Fact: The color of the long-necked bird in the famous Tchaikovsky ballet is",
+   "control_prompt": "Fact: The typical color of an eagle's feathers is",
+   "c": "swan",
+   "c_prime": "eagle",
+   "c_wrong": "Brazil",
+   "y": "white",
+   "y_prime": "brown",
+   "c_id": 41966,
+   "c_prime_id": 57867,
+   "c_wrong_id": 15477,
+   "y_id": 4022,
+   "y_prime_id": 13477,
+   "t_i": 18
+  },
+  {
+   "name": "christmas-season",
+   "category": "multihop",
+   "prompt": "Fact: The season when the holiday with a decorated tree occurs is",
+   "control_prompt": "Fact: The season when Easter occurs is",
+   "c": "Christmas",
+   "c_prime": "Easter",
+   "c_wrong": "Mexico",
+   "y": "winter",
+   "y_prime": "spring",
+   "c_id": 9777,
+   "c_prime_id": 31330,
+   "c_wrong_id": 11920,
+   "y_id": 12050,
+   "y_prime_id": 10151,
+   "t_i": 12
+  },
+  {
+   "name": "city-state-Philadelphia",
+   "category": "city-state",
+   "prompt": "Fact: The US state where the city famous for the Liberty Bell is located is",
+   "control_prompt": "Fact: The US state where Seattle is located is",
+   "c": "Philadelphia",
+   "c_prime": "Seattle",
+   "c_wrong": "Brazil",
+   "y": "Pennsylvania",
+   "y_prime": "Washington",
+   "c_id": 18749,
+   "c_prime_id": 15875,
+   "c_wrong_id": 15477,
+   "y_id": 19168,
+   "y_prime_id": 6312,
+   "t_i": 15
+  },
+  {
    "name": "colosseum-currency",
    "category": "multihop",
    "prompt": "Fact: The currency used in the country where the Colosseum stands is the",
@@ -118,6 +203,23 @@
    "c_wrong_id": 6124,
    "y_id": 31106,
    "y_prime_id": 11751,
+   "t_i": 11
+  },
+  {
+   "name": "ex-city-continent-Toronto-Lyon",
+   "category": "city-continent",
+   "prompt": "Fact: The continent of the country where Toronto is located is",
+   "control_prompt": "Fact: The continent where France is located is",
+   "c": "Canada",
+   "c_prime": "France",
+   "c_wrong": "Egypt",
+   "y": "North",
+   "y_prime": "Europe",
+   "c_id": 6650,
+   "c_prime_id": 9338,
+   "c_wrong_id": 14437,
+   "y_id": 4634,
+   "y_prime_id": 4357,
    "t_i": 11
   },
   {
@@ -257,6 +359,40 @@
    "t_i": 11
   },
   {
+   "name": "ex2-city-continent-Lima",
+   "category": "city-continent",
+   "prompt": "Fact: The continent of the country where Lima is located is",
+   "control_prompt": "Fact: The continent where Egypt is located is",
+   "c": "Peru",
+   "c_prime": "Egypt",
+   "c_wrong": "Australia",
+   "y": "South",
+   "y_prime": "Africa",
+   "c_id": 46157,
+   "c_prime_id": 14437,
+   "c_wrong_id": 8071,
+   "y_id": 4725,
+   "y_prime_id": 9871,
+   "t_i": 11
+  },
+  {
+   "name": "ex2-city-continent-Sydney",
+   "category": "city-continent",
+   "prompt": "Fact: The continent of the country where Sydney is located is",
+   "control_prompt": "Fact: The continent where Peru is located is",
+   "c": "Australia",
+   "c_prime": "Peru",
+   "c_wrong": "France",
+   "y": "Australia",
+   "y_prime": "South",
+   "c_id": 8071,
+   "c_prime_id": 46157,
+   "c_wrong_id": 9338,
+   "y_id": 8071,
+   "y_prime_id": 9514,
+   "t_i": 11
+  },
+  {
    "name": "ex2-city-language-Cairo",
    "category": "city-language",
    "prompt": "Fact: The language spoken in the country where Cairo is located is",
@@ -376,6 +512,57 @@
    "t_i": 14
   },
   {
+   "name": "food-animal-butter",
+   "category": "food-animal",
+   "prompt": "Fact: The animal that produces the yellow dairy spread used on bread is the",
+   "control_prompt": "Fact: The animal that produces honey is the",
+   "c": "butter",
+   "c_prime": "honey",
+   "c_wrong": "Brazil",
+   "y": "cow",
+   "y_prime": "bee",
+   "c_id": 13696,
+   "c_prime_id": 24924,
+   "c_wrong_id": 15477,
+   "y_id": 18775,
+   "y_prime_id": 35997,
+   "t_i": 14
+  },
+  {
+   "name": "fruit-grows-grape",
+   "category": "fruit-grows",
+   "prompt": "Fact: The kind of plant that the small round fruit used to make wine grows on is a",
+   "control_prompt": "Fact: The kind of plant that an apple grows on is a",
+   "c": "grape",
+   "c_prime": "apple",
+   "c_wrong": "Brazil",
+   "y": "vine",
+   "y_prime": "tree",
+   "c_id": 49431,
+   "c_prime_id": 22544,
+   "c_wrong_id": 15477,
+   "y_id": 28007,
+   "y_prime_id": 4757,
+   "t_i": 18
+  },
+  {
+   "name": "func-filters-count",
+   "category": "multihop",
+   "prompt": "Fact: In humans, the number of organs that filter blood to make urine is",
+   "control_prompt": "Fact: In humans, the number of livers a person has is",
+   "c": "kidney",
+   "c_prime": "liver",
+   "c_wrong": "lung",
+   "y": "2",
+   "y_prime": "1",
+   "c_id": 36690,
+   "c_prime_id": 24694,
+   "c_wrong_id": 19997,
+   "y_id": 1330,
+   "y_prime_id": 799,
+   "t_i": 15
+  },
+  {
    "name": "gem-color-ruby",
    "category": "gem-color",
    "prompt": "Fact: The color of the gemstone that is the traditional birthstone for July is",
@@ -410,6 +597,23 @@
    "t_i": 14
   },
   {
+   "name": "holiday-month-christmas2",
+   "category": "holiday-month",
+   "prompt": "Fact: The month of the holiday celebrated with a decorated evergreen tree and gift-giving is",
+   "control_prompt": "Fact: The month in which Easter most often falls is",
+   "c": "Christmas",
+   "c_prime": "Easter",
+   "c_wrong": "Brazil",
+   "y": "December",
+   "y_prime": "April",
+   "c_id": 9777,
+   "c_prime_id": 31330,
+   "c_wrong_id": 15477,
+   "y_id": 6443,
+   "y_prime_id": 5632,
+   "t_i": 18
+  },
+  {
    "name": "mars-color",
    "category": "multihop",
    "prompt": "Fact: The color of the planet fourth from the Sun is",
@@ -425,6 +629,261 @@
    "y_id": 2438,
    "y_prime_id": 6105,
    "t_i": 11
+  },
+  {
+   "name": "month-3-godof",
+   "category": "multihop",
+   "prompt": "Fact: The third month of the year is named after the Roman god of",
+   "control_prompt": "Fact: In Roman mythology, Venus is the goddess of",
+   "c": "Mars",
+   "c_prime": "Venus",
+   "c_wrong": "Wisconsin",
+   "y": "war",
+   "y_prime": "love",
+   "c_id": 20403,
+   "c_prime_id": 47334,
+   "c_wrong_id": 19818,
+   "y_id": 3980,
+   "y_prime_id": 2854,
+   "t_i": 14
+  },
+  {
+   "name": "organ-count-kidney2",
+   "category": "organ-count",
+   "prompt": "Fact: The number of the bean-shaped organs that filter blood into urine in a human body is",
+   "control_prompt": "Fact: The number of hearts in a human body is",
+   "c": "kidney",
+   "c_prime": "heart",
+   "c_wrong": "Brazil",
+   "y": "two",
+   "y_prime": "one",
+   "c_id": 36690,
+   "c_prime_id": 4593,
+   "c_wrong_id": 15477,
+   "y_id": 1330,
+   "y_prime_id": 799,
+   "t_i": 18
+  },
+  {
+   "name": "organ-location-heart",
+   "category": "organ-location",
+   "prompt": "Fact: The part of the body that contains the organ that pumps blood is the",
+   "control_prompt": "Fact: The part of the body that contains the brain is the",
+   "c": "heart",
+   "c_prime": "brain",
+   "c_wrong": "Brazil",
+   "y": "chest",
+   "y_prime": "head",
+   "c_id": 4593,
+   "c_prime_id": 7853,
+   "c_wrong_id": 15477,
+   "y_id": 14697,
+   "y_prime_id": 1901,
+   "t_i": 15
+  },
+  {
+   "name": "paper-continent",
+   "category": "multihop",
+   "prompt": "Fact: The continent where the country that invented paper is located is",
+   "control_prompt": "Fact: The continent where France is located is",
+   "c": "China",
+   "c_prime": "France",
+   "c_wrong": "Mars",
+   "y": "Asia",
+   "y_prime": "Europe",
+   "c_id": 5440,
+   "c_prime_id": 9338,
+   "c_wrong_id": 20403,
+   "y_id": 13229,
+   "y_prime_id": 4357,
+   "t_i": 12
+  },
+  {
+   "name": "person-country-napoleon",
+   "category": "person-country",
+   "prompt": "Fact: The country whose army was led by the emperor defeated at Waterloo is",
+   "control_prompt": "Fact: Abraham Lincoln was the president of the United States of",
+   "c": "Napoleon",
+   "c_prime": "Lincoln",
+   "c_wrong": "Einstein",
+   "y": "France",
+   "y_prime": "America",
+   "c_id": 67076,
+   "c_prime_id": 23608,
+   "c_wrong_id": 52237,
+   "y_id": 9338,
+   "y_prime_id": 4994,
+   "t_i": 14
+  },
+  {
+   "name": "person-firstname-darwin",
+   "category": "person-firstname",
+   "prompt": "Fact: The first name of the naturalist who proposed evolution by natural selection was",
+   "control_prompt": "Fact: The first name of the physicist Einstein was",
+   "c": "Darwin",
+   "c_prime": "Einstein",
+   "c_wrong": "Newton",
+   "y": "Charles",
+   "y_prime": "Albert",
+   "c_id": 42905,
+   "c_prime_id": 52237,
+   "c_wrong_id": 20042,
+   "y_id": 14496,
+   "y_prime_id": 16993,
+   "t_i": 15
+  },
+  {
+   "name": "person-firstname-einstein",
+   "category": "person-firstname",
+   "prompt": "Fact: The first name of the physicist who developed the theory of general relativity was",
+   "control_prompt": "Fact: The first name of the scientist Newton was",
+   "c": "Einstein",
+   "c_prime": "Newton",
+   "c_wrong": "Darwin",
+   "y": "Albert",
+   "y_prime": "Isaac",
+   "c_id": 52237,
+   "c_prime_id": 20042,
+   "c_wrong_id": 42905,
+   "y_id": 16993,
+   "y_prime_id": 40134,
+   "t_i": 16
+  },
+  {
+   "name": "person-firstname-mozart",
+   "category": "person-firstname",
+   "prompt": "Fact: The first name of the child-prodigy composer from Salzburg who wrote The Magic Flute was",
+   "control_prompt": "Fact: The first name of the naturalist Darwin was",
+   "c": "Mozart",
+   "c_prime": "Darwin",
+   "c_wrong": "Shakespeare",
+   "y": "Wolfgang",
+   "y_prime": "Charles",
+   "c_id": 91400,
+   "c_prime_id": 42905,
+   "c_wrong_id": 40014,
+   "y_id": 83509,
+   "y_prime_id": 14496,
+   "t_i": 20
+  },
+  {
+   "name": "person-firstname-newton",
+   "category": "person-firstname",
+   "prompt": "Fact: The first name of the scientist on whose head an apple is said to have fallen was",
+   "control_prompt": "Fact: The first name of the playwright Shakespeare was",
+   "c": "Newton",
+   "c_prime": "Shakespeare",
+   "c_wrong": "Mozart",
+   "y": "Isaac",
+   "y_prime": "William",
+   "c_id": 20042,
+   "c_prime_id": 40014,
+   "c_wrong_id": 91400,
+   "y_id": 40134,
+   "y_prime_id": 12021,
+   "t_i": 18
+  },
+  {
+   "name": "person-firstname-shakespeare",
+   "category": "person-firstname",
+   "prompt": "Fact: The first name of the playwright who wrote Romeo and Juliet was",
+   "control_prompt": "Fact: The first name of the composer Mozart was",
+   "c": "Shakespeare",
+   "c_prime": "Mozart",
+   "c_wrong": "Einstein",
+   "y": "William",
+   "y_prime": "Wolfgang",
+   "c_id": 40014,
+   "c_prime_id": 91400,
+   "c_wrong_id": 52237,
+   "y_id": 12021,
+   "y_prime_id": 83509,
+   "t_i": 13
+  },
+  {
+   "name": "planet-rings-saturn2",
+   "category": "planet-feature",
+   "prompt": "Fact: The most famous feature of the sixth planet from the Sun is its",
+   "control_prompt": "Fact: The most famous feature of the planet Jupiter is its great red",
+   "c": "Saturn",
+   "c_prime": "Jupiter",
+   "c_wrong": "Brazil",
+   "y": "rings",
+   "y_prime": "spot",
+   "c_id": 47503,
+   "c_prime_id": 48017,
+   "c_wrong_id": 15477,
+   "y_id": 23769,
+   "y_prime_id": 7458,
+   "t_i": 14
+  },
+  {
+   "name": "season-next-winter",
+   "category": "season-next",
+   "prompt": "Fact: The season that comes immediately after the coldest season of the year is",
+   "control_prompt": "Fact: The season that comes immediately after summer is",
+   "c": "winter",
+   "c_prime": "summer",
+   "c_wrong": "Brazil",
+   "y": "spring",
+   "y_prime": "autumn",
+   "c_id": 12050,
+   "c_prime_id": 7094,
+   "c_wrong_id": 15477,
+   "y_id": 10151,
+   "y_prime_id": 40297,
+   "t_i": 15
+  },
+  {
+   "name": "super-populous-capital",
+   "category": "multihop",
+   "prompt": "Fact: The capital city of the most populous country in the world is",
+   "control_prompt": "Fact: The capital city of India is New",
+   "c": "China",
+   "c_prime": "India",
+   "c_wrong": "Singapore",
+   "y": "Beijing",
+   "y_prime": "Delhi",
+   "c_id": 5440,
+   "c_prime_id": 6535,
+   "c_wrong_id": 19914,
+   "y_id": 25701,
+   "y_prime_id": 21318,
+   "t_i": 13
+  },
+  {
+   "name": "super-smallest-continent",
+   "category": "multihop",
+   "prompt": "Fact: The smallest country in the world is located on the continent of",
+   "control_prompt": "Fact: The country of Singapore is located on the continent of",
+   "c": "Vatican",
+   "c_prime": "Singapore",
+   "c_wrong": "guitar",
+   "y": "Europe",
+   "y_prime": "Asia",
+   "c_id": 44993,
+   "c_prime_id": 19914,
+   "c_wrong_id": 16488,
+   "y_id": 4357,
+   "y_prime_id": 13229,
+   "t_i": 13
+  },
+  {
+   "name": "vehicle-power-bicycle",
+   "category": "vehicle-power",
+   "prompt": "Fact: The source of power for the two-wheeled vehicle ridden in the Tour de France is the rider's",
+   "control_prompt": "Fact: The source of power for a train is its",
+   "c": "bicycle",
+   "c_prime": "train",
+   "c_wrong": "Brazil",
+   "y": "legs",
+   "y_prime": "engine",
+   "c_id": 33828,
+   "c_prime_id": 5257,
+   "c_wrong_id": 15477,
+   "y_id": 13795,
+   "y_prime_id": 4560,
+   "t_i": 22
   }
  ],
  "filter_log": [
@@ -443,8 +902,7 @@
   },
   {
    "name": "animal-nose-elephant",
-   "kept": false,
-   "reason": "no control template (add to data/onset_controls.json)"
+   "kept": true
   },
   {
    "name": "atomic-80-state",
@@ -458,13 +916,11 @@
   },
   {
    "name": "beverage-source-wine",
-   "kept": false,
-   "reason": "no control template (add to data/onset_controls.json)"
+   "kept": true
   },
   {
    "name": "bird-color-swan",
-   "kept": false,
-   "reason": "control answer wrong"
+   "kept": true
   },
   {
    "name": "bird-country-eagle",
@@ -503,13 +959,11 @@
   },
   {
    "name": "christmas-season",
-   "kept": false,
-   "reason": "no control template (add to data/onset_controls.json)"
+   "kept": true
   },
   {
    "name": "city-state-Philadelphia",
-   "kept": false,
-   "reason": "control answer wrong"
+   "kept": true
   },
   {
    "name": "colosseum-currency",
@@ -553,8 +1007,7 @@
   },
   {
    "name": "ex-city-continent-Toronto-Lyon",
-   "kept": false,
-   "reason": "control answer wrong"
+   "kept": true
   },
   {
    "name": "ex-city-currency-Toronto-Beijing",
@@ -615,13 +1068,11 @@
   },
   {
    "name": "ex2-city-continent-Lima",
-   "kept": false,
-   "reason": "control answer wrong"
+   "kept": true
   },
   {
    "name": "ex2-city-continent-Sydney",
-   "kept": false,
-   "reason": "control answer wrong"
+   "kept": true
   },
   {
    "name": "ex2-city-language-Cairo",
@@ -653,8 +1104,7 @@
   },
   {
    "name": "food-animal-butter",
-   "kept": false,
-   "reason": "no control template (add to data/onset_controls.json)"
+   "kept": true
   },
   {
    "name": "food-animal-honey",
@@ -663,13 +1113,11 @@
   },
   {
    "name": "fruit-grows-grape",
-   "kept": false,
-   "reason": "no control template (add to data/onset_controls.json)"
+   "kept": true
   },
   {
    "name": "func-filters-count",
-   "kept": false,
-   "reason": "no control template (add to data/onset_controls.json)"
+   "kept": true
   },
   {
    "name": "func-pumps-chambers",
@@ -691,8 +1139,7 @@
   },
   {
    "name": "holiday-month-christmas2",
-   "kept": false,
-   "reason": "control answer wrong"
+   "kept": true
   },
   {
    "name": "instr-body-trumpet",
@@ -710,8 +1157,7 @@
   },
   {
    "name": "month-3-godof",
-   "kept": false,
-   "reason": "no control template (add to data/onset_controls.json)"
+   "kept": true
   },
   {
    "name": "organ-acid-stomach",
@@ -720,8 +1166,7 @@
   },
   {
    "name": "organ-count-kidney2",
-   "kept": false,
-   "reason": "control answer wrong"
+   "kept": true
   },
   {
    "name": "organ-location-brain",
@@ -730,8 +1175,7 @@
   },
   {
    "name": "organ-location-heart",
-   "kept": false,
-   "reason": "control answer wrong"
+   "kept": true
   },
   {
    "name": "osu-rival-mascot",
@@ -740,8 +1184,7 @@
   },
   {
    "name": "paper-continent",
-   "kept": false,
-   "reason": "no control template (add to data/onset_controls.json)"
+   "kept": true
   },
   {
    "name": "person-century-lincoln",
@@ -750,8 +1193,7 @@
   },
   {
    "name": "person-country-napoleon",
-   "kept": false,
-   "reason": "no control template (add to data/onset_controls.json)"
+   "kept": true
   },
   {
    "name": "person-country-shakespeare",
@@ -760,28 +1202,23 @@
   },
   {
    "name": "person-firstname-darwin",
-   "kept": false,
-   "reason": "no control template (add to data/onset_controls.json)"
+   "kept": true
   },
   {
    "name": "person-firstname-einstein",
-   "kept": false,
-   "reason": "no control template (add to data/onset_controls.json)"
+   "kept": true
   },
   {
    "name": "person-firstname-mozart",
-   "kept": false,
-   "reason": "no control template (add to data/onset_controls.json)"
+   "kept": true
   },
   {
    "name": "person-firstname-newton",
-   "kept": false,
-   "reason": "no control template (add to data/onset_controls.json)"
+   "kept": true
   },
   {
    "name": "person-firstname-shakespeare",
-   "kept": false,
-   "reason": "no control template (add to data/onset_controls.json)"
+   "kept": true
   },
   {
    "name": "planet-3-moons",
@@ -790,13 +1227,12 @@
   },
   {
    "name": "planet-rings-saturn2",
-   "kept": false,
-   "reason": "no control template (add to data/onset_controls.json)"
+   "kept": true
   },
   {
    "name": "rhyme-chair-flag",
    "kept": false,
-   "reason": "no control template (add to data/onset_controls.json)"
+   "reason": "control answer wrong"
   },
   {
    "name": "rhyme-rain-neighbor",
@@ -810,13 +1246,12 @@
   },
   {
    "name": "season-next-winter",
-   "kept": false,
-   "reason": "control answer wrong"
+   "kept": true
   },
   {
    "name": "spaceneedle-border",
    "kept": false,
-   "reason": "no control template (add to data/onset_controls.json)"
+   "reason": "control answer wrong"
   },
   {
    "name": "spider-legs",
@@ -830,13 +1265,11 @@
   },
   {
    "name": "super-populous-capital",
-   "kept": false,
-   "reason": "control answer wrong"
+   "kept": true
   },
   {
    "name": "super-smallest-continent",
-   "kept": false,
-   "reason": "no control template (add to data/onset_controls.json)"
+   "kept": true
   },
   {
    "name": "tree-product-oak",
@@ -845,8 +1278,7 @@
   },
   {
    "name": "vehicle-power-bicycle",
-   "kept": false,
-   "reason": "no control template (add to data/onset_controls.json)"
+   "kept": true
   },
   {
    "name": "violin-strings",
