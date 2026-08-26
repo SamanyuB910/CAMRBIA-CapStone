@@ -359,11 +359,22 @@ def verdict(contrasts: pd.DataFrame, *, min_control_items: int = MIN_CONTROL_ITE
             )
         elif pd.notna(row["ci_lo"]) and row["ci_lo"] > 0:
             share = row["delta_layers"] / true["delta_layers"]
-            blocking.append(
+            message = (
                 f"ANSWER SMUGGLING — the final answer also surfaces "
                 f"{row['delta_layers']:.1f} layers earlier ({share:.0%} of the true gap), so "
                 "the gap does not show the lens tracking an intermediate step"
             )
+            # A positive mean with a sub-50% win rate is carried by a few items,
+            # not by the population. Report it as weak rather than as a blocker,
+            # or a handful of outliers can veto a consistent primary effect.
+            if row["win_rate"] < 0.5:
+                notes.append(
+                    message + f" — but the reference lens wins on only {row['win_rate']:.0%} "
+                    "of items here, so this mean is outlier-driven and the confound is "
+                    "suggestive rather than established"
+                )
+            else:
+                blocking.append(message)
 
     headline = (
         f"R-lens surfaces the true concept {true['delta_layers']:.1f} layers earlier "
