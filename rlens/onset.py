@@ -428,6 +428,7 @@ def _edit_battery(
 def run_measurements(
     hf_model, tok, lenses: dict[str, "object"], items: list[OnsetItem], *,
     layers: list[int], ridge: float = 0.0, center: bool = False, batch_size: int = 24,
+    intervene_at: str = "t",  # "t" = pre-registered t_i; "cue" = the cue token
 ) -> pd.DataFrame:
     """One record per (item, layer, lens, condition, alpha) with margins/logps,
     plus readout rows (condition='readout') and clean rows per item.
@@ -496,13 +497,15 @@ def run_measurements(
                 "cos_Rlogit": float((vR @ vL) / (vR.norm() * vL.norm())),
             })
 
+        pos_i = item.cue_i if intervene_at == "cue" else item.t_i
         for layer in layers:
-            h_t = acts[layer][item.t_i].float().cpu()
+            h_t = acts[layer][pos_i].float().cpu()  # intervention-site activation
+            h_final = acts[layer][item.t_i].float().cpu()
             h_cue = acts[layer][item.cue_i].float().cpu()
             jacobians = _layer_jacobians(lenses, layer)
             for lens in LENSES:
                 J = jacobians[lens]
-                for h_pos, suffix in ((h_t, ""), (h_cue, "_cue")):
+                for h_pos, suffix in ((h_final, ""), (h_cue, "_cue")):
                     read = h_pos if J is None else h_pos @ J.float().T
                     logits_l = unembed(read)
                     for concept, cond in ((item.c, f"readout{suffix}"), (shuf.c, f"readout_shuffled{suffix}")):

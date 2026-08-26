@@ -410,8 +410,9 @@ def cmd_onset(args) -> None:
 
     from rlens import onset
 
+    suffix = "_cue" if getattr(args, "at_cue", False) else ""
     items_path = REPO_ROOT / "data" / f"onset_items_{args.model}.json"
-    records_path = REPO_ROOT / "results" / f"onset_records_{args.model}.parquet"
+    records_path = REPO_ROOT / "results" / f"onset_records_{args.model}{suffix}.parquet"
 
     if args.stage == "data":
         hf, tok = _onset_model(args.model, args.dtype, args.device)
@@ -443,6 +444,7 @@ def cmd_onset(args) -> None:
         df = onset.run_measurements(
             hf, tok, lenses, items, layers=layers,
             ridge=args.ridge, center=args.center, batch_size=args.batch_size,
+            intervene_at="cue" if args.at_cue else "t",
         )
         # alpha=0 numerics checks: in-batch identity IS the effect reference
         # (must be exactly 0); vs the batch-of-1 forward, bf16 kernel-shape
@@ -522,7 +524,7 @@ def cmd_onset(args) -> None:
         p = result["curves"][lens]["N_persist"].iloc[0] if len(result["curves"][lens]["N_persist"]) else float("nan")
         lines.append(f"\nsanity {lens}: N_band(last)={b:.3f} vs N_persist(first)={p:.3f} (must agree within noise)")
 
-    out = REPO_ROOT / "results" / f"onset_{args.model}.md"
+    out = REPO_ROOT / "results" / f"onset_{args.model}{suffix}.md"
     out.write_text("\n".join(lines), encoding="utf-8")
     print(f"report -> {out}")
 
@@ -584,6 +586,8 @@ def main() -> None:
     p.add_argument("--stage", choices=["data", "run", "analyze"], required=True)
     p.add_argument("--model", choices=["qwen3.5-4b", "qwen3.5-27b"], default="qwen3.5-4b")
     p.add_argument("--position", type=int, default=-1, help="t_i: -1 primary, -2 sensitivity")
+    p.add_argument("--at-cue", action="store_true",
+                   help="apply interventions at the cue token instead of t_i (iteration 4)")
     p.add_argument("--limit", type=int, default=None, help="max items (smoke runs)")
     p.add_argument("--layers", type=int, nargs="+", default=None)
     p.add_argument("--ridge", type=float, default=0.0, help="ridge lambda for the pinv swap")
