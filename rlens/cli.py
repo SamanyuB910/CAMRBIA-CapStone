@@ -5,6 +5,7 @@
     uv run rlens fit --lens {j,r} [--draw ...]    fit our own lens with the released recipe
     uv run rlens compare [--functional]           our fits vs released -> results/verification_report.md
     uv run rlens eval [--sets ...] [--limit N]    pass@10 battery: R vs J vs logit -> results/
+    uv run rlens stats [--model ...]              C5 statistics over the rank parquet (CPU)
 """
 
 from __future__ import annotations
@@ -438,6 +439,84 @@ def cmd_eval(args) -> None:
 
 
 # ---------------------------------------------------------------------------
+# stats (C5) - CPU, reads the C2 parquet, no model or GPU needed
+# ---------------------------------------------------------------------------
+
+
+def cmd_stats(args) -> None:
+    import pandas as pd
+
+    from rlens import stats
+
+    ranks_path = _ranks_dir(args.ranks_dir) / f"passk_{args.model}.parquet"
+    if not ranks_path.exists():
+        raise SystemExit(f"{ranks_path} not found - run `rlens eval --model {args.model}` first")
+    raw = pd.read_parquet(ranks_path)
+    df = raw.copy()
+    df["hit"] = df["rank"] <= args.k
+    print(f"{ranks_path}: {len(raw)} rows, sets={sorted(raw['set'].unique())}, "
+          f"lenses={sorted(raw['lens'].unique())}, {raw['layer'].nunique()} layers")
+
+    wilson = stats.per_layer_wilson(df)
+    headline = stats.headline_bootstrap(df, n_draws=args.draws, seed=args.seed)
+    sweep = stats.k_sweep(raw)
+    any_layer = stats.any_layer_passk(raw)
+
+    lens_names = set(raw["lens"].unique())
+    pairs = [(a, b) for a, b in [
+        ("released-R", "released-J"), ("ours-R", "ours-J"),
+        ("released-R", "logit"), ("released-R", "control"),
+    ] if a in lens_names and b in lens_names]
+    paired = {f"{a} vs {b}": stats.paired_diff_bootstrap(df, a, b, n_draws=args.draws, seed=args.seed)
+              for a, b in pairs}
+
+    out_dir = REPO_ROOT / "results"
+    out_dir.mkdir(exist_ok=True)
+    wilson.to_csv(out_dir / f"stats_wilson_{args.model}.csv", index=False)
+
+    items_path = ranks_path.with_name(ranks_path.stem + "_items.parquet")
+    filter_note = ""
+    if items_path.exists():
+        it = pd.read_parquet(items_path)
+        kept = it.groupby("set")["kept"].agg(["sum", "count"])
+        unfiltered = it[it["kept"] & ~it["filter_applicable"]].groupby("set").size()
+        drop = 1 - it[it["kept"]].groupby("set")["n_intermediates_single_token"].sum()                    / it[it["kept"]].groupby("set")["n_intermediates_total"].sum()
+        filter_note = (
+            "\n## Item accounting\n\n"
+            + pd.DataFrame({"kept": kept["sum"], "total": kept["count"],
+                            "kept_but_unfilterable": unfiltered,
+                            "intermediate_drop_rate": drop}).fillna(0).to_markdown(floatfmt=".3f")
+            + "\n\n`kept_but_unfilterable`: target has no single-token surface form, so the"
+            "\ncorrectness filter could not run (deviation 7). `intermediate_drop_rate`:"
+            "\nfraction of intermediates with no single-token surface form (deviation 1).\n"
+        )
+
+    lines = [
+        f"# C5 statistics - {args.model} (pass@{args.k}, {args.draws} bootstrap draws, seed {args.seed})\n",
+        "All intervals 95%. POST definition (per-layer) unless the section says otherwise;",
+        "'first half' = layers < (max+1)//2, sets weighted equally (deviation 10).\n",
+        "## Headline: first-half-of-layers mean, item-level bootstrap CI\n",
+        headline.to_markdown(floatfmt=".4f"),
+        "\n## Paired per-item differences, first-half layers (the actual R>J test)\n",
+        pd.DataFrame(paired).T.to_markdown(floatfmt=".4f"),
+        "\np_one_sided = fraction of bootstrap draws where the difference <= 0.\n",
+        "\n## k sweep, post definition, first-half means\n",
+        sweep.to_markdown(floatfmt=".4f"),
+        "\n## PAPER definition (SS A.6): recovered at any layer (NOT the post's headline)\n",
+        any_layer.to_markdown(floatfmt=".4f"),
+        filter_note,
+        f"\nPer-layer Wilson CIs -> results/stats_wilson_{args.model}.csv",
+    ]
+    report = out_dir / f"stats_{args.model}.md"
+    report.write_text("\n".join(lines), encoding="utf-8")
+    print(f"\n{headline.to_string(float_format='%.4f')}\n")
+    for name, d in paired.items():
+        print(f"{name}: diff={d['diff']:+.4f} [{d['ci_lo']:+.4f}, {d['ci_hi']:+.4f}] "
+              f"p_one_sided={d['p_one_sided']:.4f}")
+    print(f"report -> {report}")
+
+
+# ---------------------------------------------------------------------------
 # entry point
 # ---------------------------------------------------------------------------
 
@@ -498,6 +577,17 @@ def main() -> None:
     p.add_argument("--device", default=default_device)
     p.add_argument("--dtype", choices=["bf16", "fp32"], default="bf16")
     p.set_defaults(func=cmd_eval)
+
+    p = sub.add_parser("stats", help="C5: Wilson CIs, item bootstrap, paired R-J test <- rank parquet")
+    p.add_argument("--model", default=DEFAULT_MODEL,
+                   help="which passk_{model}.parquet to analyse")
+    p.add_argument("--ranks-dir", default=None,
+                   help="where the parquet lives (default: /workspace/results/quantitative-evals "
+                        "on the pod, else results/)")
+    p.add_argument("--k", type=int, default=10)
+    p.add_argument("--draws", type=int, default=2000)
+    p.add_argument("--seed", type=int, default=0)
+    p.set_defaults(func=cmd_stats)
 
     args = parser.parse_args()
     args.func(args)
