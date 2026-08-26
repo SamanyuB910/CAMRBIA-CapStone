@@ -389,3 +389,30 @@ def audit_outgoing_payload(payload_text: str) -> list:
     if re.search(r"\blayer\s+\d+\b", lowered):
         findings.append("layer <n>")
     return sorted(set(findings))
+
+
+def present_for_judge(cell_public: dict, judge_id: str) -> tuple[dict, dict]:
+    """Re-label a cell's candidates for one judge.
+
+    §8 requires arm order randomized per RATER ASSIGNMENT, not once per cell.
+    The panel file carries one fixed A/B/C; if every judge saw it, position bias
+    would be shared across judges and therefore invisible to the agreement
+    statistics. Each judge instead gets its own permutation, and the mapping is
+    recorded so unblinding can compose
+    ``judge label -> panel label -> lens``.
+
+    Returns ``(relabelled_cell, {judge_label: panel_label})``.
+    """
+    labels = sorted(cell_public["candidates"])
+    order = arm_permutation(cell_public["cell_id"], judge_id, len(labels))
+    mapping = {labels[i]: labels[order[i]] for i in range(len(labels))}
+    relabelled = dict(cell_public)
+    relabelled["candidates"] = {judge_label: cell_public["candidates"][panel_label]
+                                for judge_label, panel_label in mapping.items()}
+    return relabelled, mapping
+
+
+def compose_arms(panel_arms: dict, judge_mapping: dict) -> dict:
+    """``{judge_label: lens}`` from the panel key and one judge's permutation."""
+    return {judge_label: panel_arms[panel_label]
+            for judge_label, panel_label in judge_mapping.items()}

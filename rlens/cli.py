@@ -1326,6 +1326,187 @@ def cmd_judge_validate(args) -> None:
 
 
 # ---------------------------------------------------------------------------
+# autorate  (Coherence v2, Stage 5: the main 200-cell run)
+# ---------------------------------------------------------------------------
+
+
+def cmd_autorate(args) -> None:
+    """Rate the frozen panel with two judges plus third-family adjudication.
+
+    Writes raw responses, parsed scores, and an adjudication table. Does NOT
+    unblind and does NOT analyse: those are gated on every cell being rated
+    (docs/coherence_v2.md §10).
+    """
+    import json
+    import time
+
+    from rlens.autorate import (
+        call_judge, combine, incomplete_ratings, needs_adjudication, probe_judge, rubric_hash,
+    )
+    from rlens.panel_v2 import present_for_judge
+
+    api_key = os.environ.get("OPENROUTER_API_KEY")
+    if not api_key:
+        raise SystemExit("set OPENROUTER_API_KEY")
+    if len(args.judges) != 2:
+        raise SystemExit("--judges takes exactly two model ids from different families")
+    if args.adjudicator in args.judges:
+        raise SystemExit("--adjudicator must be a THIRD family, distinct from both judges")
+
+    panel_dir = Path(args.panel_dir).expanduser()
+    out_dir = Path(args.out_dir).expanduser()
+    if out_dir.exists() and any(out_dir.iterdir()):
+        raise SystemExit(f"{out_dir} exists and is not empty; use a fresh versioned "
+                         "destination (§8 forbids overwriting score files)")
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    cells = [json.loads(l) for l in (panel_dir / "panel_public.jsonl").read_text().splitlines() if l]
+    print(f"panel: {len(cells)} cells   rubric {rubric_hash()}")
+
+    for judge_id in (*args.judges, args.adjudicator):
+        ok, detail = probe_judge(judge_id, api_key)
+        print(f"  probe {judge_id}: {'OK' if ok else 'FAILED — ' + detail}")
+        if not ok:
+            raise SystemExit(f"{judge_id!r} unreachable")
+
+    def rate(judge_id, subset):
+        """Rate `subset` with `judge_id`, each cell under this judge's own
+        permutation. Returns (scores_by_cell, mappings, raw_rows)."""
+        scores, mappings, raw = {}, {}, []
+        print(f"\n=== {judge_id}: {len(subset)} cells ===")
+        for i, cell in enumerate(subset, start=1):
+            shown, mapping = present_for_judge(cell, judge_id)
+            try:
+                call = call_judge(shown, judge_id=judge_id, api_key=api_key,
+                                  max_retries=args.max_retries)
+            except Exception as exc:  # noqa: BLE001 - one cell must not kill the run
+                from rlens.autorate import JudgeCall
+                call = JudgeCall(judge_id=judge_id, cell_id=cell["cell_id"], status="FAILED",
+                                 error=f"uncaught: {type(exc).__name__}: {exc}")
+            raw.append({"judge_id": judge_id, "cell_id": call.cell_id, "status": call.status,
+                        "attempts": call.attempts, "error": call.error, "raw": call.raw,
+                        "usage": call.usage, "timestamp": call.timestamp,
+                        "arm_mapping": mapping})
+            if call.status == "ok":
+                scores[call.cell_id] = call.scores
+                mappings[call.cell_id] = mapping
+            print("." if call.status == "ok" else "F", end="", flush=True)
+            if i % 50 == 0 or i == len(subset):
+                print(f"  {i}/{len(subset)}", flush=True)
+        return scores, mappings, raw
+
+    started = time.time()
+    all_scores, all_mappings, all_raw, usage_by_judge = {}, {}, [], {}
+    for judge_id in args.judges:
+        scores, mappings, raw = rate(judge_id, cells)
+        all_scores[judge_id], all_mappings[judge_id] = scores, mappings
+        all_raw += raw
+        usage_by_judge[judge_id] = _sum_usage(raw)
+
+    # adjudication: contextual scores differ by >=2 on any arm, or winners differ
+    a, b = args.judges
+    disputed = []
+    for cell in cells:
+        cid = cell["cell_id"]
+        if cid not in all_scores[a] or cid not in all_scores[b]:
+            continue
+        # compare on PANEL labels, not judge labels: the two judges saw
+        # different permutations, so a raw label-wise comparison is meaningless
+        pa = _to_panel_labels(all_scores[a][cid], all_mappings[a][cid])
+        pb = _to_panel_labels(all_scores[b][cid], all_mappings[b][cid])
+        if needs_adjudication(pa, pb):
+            disputed.append(cell)
+    print(f"\n\nadjudication needed on {len(disputed)}/{len(cells)} cells "
+          f"({len(disputed) / max(1, len(cells)):.0%})")
+
+    if disputed:
+        scores, mappings, raw = rate(args.adjudicator, disputed)
+        all_scores[args.adjudicator], all_mappings[args.adjudicator] = scores, mappings
+        all_raw += raw
+        usage_by_judge[args.adjudicator] = _sum_usage(raw)
+
+    for judge_id in all_scores:
+        slug = judge_id.replace("/", "_")
+        (out_dir / f"raw_{slug}.jsonl").write_text(
+            "\n".join(json.dumps(r) for r in all_raw if r["judge_id"] == judge_id),
+            encoding="utf-8")
+
+    # parsed scores, expressed on PANEL labels so downstream never sees a
+    # judge-specific permutation
+    rows = []
+    for judge_id, scores in all_scores.items():
+        for cid, s in scores.items():
+            panel_scores = _to_panel_labels(s, all_mappings[judge_id][cid])
+            for label in ("A", "B", "C"):
+                rows.append({"cell_id": cid, "judge_id": judge_id, "panel_arm": label,
+                             **panel_scores[label]})
+            rows[-1]["contextual_winner"] = panel_scores["contextual_winner"]
+    import pandas as pd
+
+    pd.DataFrame(rows).to_csv(out_dir / "scores_blinded.csv", index=False)
+
+    combined = {}
+    for cell in cells:
+        cid = cell["cell_id"]
+        parts = [_to_panel_labels(all_scores[j][cid], all_mappings[j][cid])
+                 for j in all_scores if cid in all_scores[j]]
+        if parts:
+            combined[cid] = combine(parts)
+    (out_dir / "combined_scores.json").write_text(json.dumps(combined, indent=2),
+                                                  encoding="utf-8")
+    (out_dir / "adjudication.json").write_text(json.dumps(
+        {"n_cells": len(cells), "n_disputed": len(disputed),
+         "disputed_cell_ids": [c["cell_id"] for c in disputed],
+         "adjudicator": args.adjudicator}, indent=2), encoding="utf-8")
+
+    completeness = incomplete_ratings([c["cell_id"] for c in cells],
+                                      {j: {r["cell_id"]: {"status": r["status"]}
+                                           for r in all_raw if r["judge_id"] == j}
+                                       for j in args.judges})
+    (out_dir / "completeness.json").write_text(json.dumps(completeness, indent=2),
+                                               encoding="utf-8")
+    (out_dir / "cost_report.json").write_text(json.dumps({
+        "rubric_hash": rubric_hash(), "judges": list(args.judges),
+        "adjudicator": args.adjudicator, "temperature": 0.0,
+        "elapsed_seconds": round(time.time() - started, 1),
+        "usage_by_judge": usage_by_judge,
+        "n_calls": len(all_raw)}, indent=2), encoding="utf-8")
+
+    print(f"\nscores    -> {out_dir / 'scores_blinded.csv'}")
+    print(f"combined  -> {out_dir / 'combined_scores.json'}")
+    print(f"cost      -> {out_dir / 'cost_report.json'}")
+    if not completeness["complete"]:
+        print(f"\nINCOMPLETE: {completeness['blocking_reason']}")
+        print("Analysis is blocked until every cell is rated (§10). Re-run the failed cells.")
+        raise SystemExit(2)
+    print("\nEvery cell rated. Ready to unblind and analyse.")
+
+
+def _sum_usage(raw_rows) -> dict:
+    total = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0, "calls": 0}
+    for row in raw_rows:
+        usage = row.get("usage") or {}
+        for k in ("prompt_tokens", "completion_tokens", "total_tokens"):
+            total[k] += int(usage.get(k) or 0)
+        total["calls"] += 1
+    return total
+
+
+def _to_panel_labels(scores: dict, mapping: dict) -> dict:
+    """Re-express one judge's scores on PANEL labels.
+
+    ``mapping`` is ``{judge_label: panel_label}``. Two judges see different
+    permutations, so comparing them label-wise without this step compares
+    different candidates.
+    """
+    out = {mapping[j]: scores[j] for j in ("A", "B", "C")}
+    winner = scores["contextual_winner"]
+    out["contextual_winner"] = mapping.get(winner, winner) if winner != "tie" else "tie"
+    return out
+
+
+
+# ---------------------------------------------------------------------------
 # entry point
 # ---------------------------------------------------------------------------
 
@@ -1528,6 +1709,14 @@ def main() -> None:
                         "exceed the minimum comparable-pair count")
     p.add_argument("--n-late", type=int, default=5)
     p.set_defaults(func=cmd_judge_validate)
+
+    p = sub.add_parser("autorate", help="v2 Stage 5: rate the frozen 200-cell panel")
+    p.add_argument("--panel-dir", required=True)
+    p.add_argument("--out-dir", required=True, help="FRESH versioned destination")
+    p.add_argument("--judges", nargs=2, required=True, metavar="MODEL")
+    p.add_argument("--adjudicator", required=True, help="a THIRD family")
+    p.add_argument("--max-retries", type=int, default=3)
+    p.set_defaults(func=cmd_autorate)
 
     args = parser.parse_args()
     args.func(args)

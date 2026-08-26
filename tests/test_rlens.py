@@ -2990,3 +2990,81 @@ def test_one_failure_in_fifty_is_tolerated():
     report = judge_validation_report({}, meta, judge_id="j", n_attempted=50, n_failed=1)
     check = next(c for c in report["checks"] if c["name"] == "response_completeness")
     assert check["status"] == "PASS", "2% is the documented tolerance"
+
+
+# --- v2 Stage 5: the main run ------------------------------------------------
+
+from rlens.panel_v2 import compose_arms, present_for_judge
+
+
+def test_each_judge_sees_its_own_arm_permutation():
+    """§8: randomized per RATER ASSIGNMENT. A shared panel order would make
+    position bias common to both judges and therefore invisible."""
+    cell = _cell().public()
+    shown_a, map_a = present_for_judge(cell, "judge-a")
+    shown_b, map_b = present_for_judge(cell, "judge-b")
+
+    assert set(map_a) == set(map_b) == {"A", "B", "C"}
+    assert sorted(map_a.values()) == sorted(map_b.values()) == ["A", "B", "C"]
+    assert present_for_judge(cell, "judge-a")[1] == map_a, "deterministic"
+
+    perms = {tuple(present_for_judge(_cell(f"c{i}").public(), "j")[1].items())
+             for i in range(40)}
+    assert len(perms) > 1, "must vary across cells"
+
+    # the content actually moves with the relabelling
+    for judge_label, panel_label in map_a.items():
+        assert shown_a["candidates"][judge_label] == cell["candidates"][panel_label]
+
+
+def test_compose_arms_maps_a_judge_label_all_the_way_to_a_lens():
+    panel_arms = {"A": "released-R", "B": "released-J", "C": "logit"}
+    _, mapping = present_for_judge(_cell().public(), "judge-a")
+    composed = compose_arms(panel_arms, mapping)
+    assert sorted(composed.values()) == ["logit", "released-J", "released-R"]
+    for judge_label, panel_label in mapping.items():
+        assert composed[judge_label] == panel_arms[panel_label]
+
+
+def test_scores_are_translated_to_panel_labels_before_comparison():
+    """Two judges see different permutations; comparing them label-wise without
+    translating would compare different candidates."""
+    from rlens.cli import _to_panel_labels
+
+    scores = json.loads(_valid(a=4, b=1, c=2, winner="A"))
+    mapping = {"A": "C", "B": "A", "C": "B"}          # judge A showed panel C
+    panel = _to_panel_labels(scores, mapping)
+
+    assert panel["C"]["contextual_coherence"] == 4, "judge's A was panel's C"
+    assert panel["A"]["contextual_coherence"] == 1
+    assert panel["B"]["contextual_coherence"] == 2
+    assert panel["contextual_winner"] == "C", "the winner is translated too"
+
+
+def test_tie_survives_label_translation():
+    from rlens.cli import _to_panel_labels
+
+    scores = json.loads(_valid(a=3, b=3, c=1, winner="tie"))
+    assert _to_panel_labels(scores, {"A": "B", "B": "C", "C": "A"})["contextual_winner"] == "tie"
+
+
+def test_usage_totals_survive_missing_usage_blocks():
+    from rlens.cli import _sum_usage
+
+    rows = [{"usage": {"prompt_tokens": 10, "completion_tokens": 2, "total_tokens": 12}},
+            {"usage": {}}, {"usage": None}, {}]
+    total = _sum_usage(rows)
+    assert total["prompt_tokens"] == 10 and total["total_tokens"] == 12
+    assert total["calls"] == 4
+
+
+def test_autorate_requires_a_third_family_adjudicator():
+    import inspect
+
+    from rlens import cli
+
+    source = inspect.getsource(cli.cmd_autorate)
+    assert "must be a THIRD family" in source
+    assert "exactly two model ids" in source
+    assert "forbids overwriting score files" in source
+    assert "_to_panel_labels" in source, "comparison must happen on panel labels"
