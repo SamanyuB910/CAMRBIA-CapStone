@@ -21,6 +21,37 @@ from rlens.onset import (
 )
 
 
+def test_onset_is_nan_safe():
+    """One missing layer must not poison the whole curve (with plain .max()
+    a single NaN makes every comparison False and silently returns None)."""
+    import numpy as np
+    import pandas as pd
+
+    from rlens.onset import _onset
+
+    clean = pd.Series([0.0, 0.0, 0.5, 1.0, 1.0], index=[0, 1, 2, 3, 4])
+    assert _onset(clean, rho=0.2, w=2) == 2.0
+    holed = clean.copy()
+    holed.iloc[0] = np.nan  # a NaN far from the crossing
+    assert _onset(holed, rho=0.2, w=2) == 2.0, "NaN elsewhere in the curve changed the onset"
+    assert _onset(pd.Series([np.nan] * 4, index=range(4)), rho=0.2, w=2) is None
+    assert _onset(pd.Series([-1.0, -2.0], index=[0, 1]), rho=0.2, w=2) is None
+
+
+def test_stable_seed_is_process_independent():
+    """Builtin hash() is salted per process; the random controls must not be."""
+    import subprocess
+    import sys
+
+    from pathlib import Path
+
+    code = "from rlens.onset import _stable_seed; print(_stable_seed('item', 3, 'R', 'ablate', 0))"
+    cwd = str(Path(__file__).resolve().parents[1])
+    outs = {subprocess.run([sys.executable, "-c", code], capture_output=True, text=True,
+                           cwd=cwd).stdout.strip() for _ in range(2)}
+    assert len(outs) == 1 and outs != {""}, f"seed differs across processes: {outs}"
+
+
 def test_find_cue_rule():
     # last capitalized token wins (proper noun in the descriptor)
     toks = "Fact :  The  language  spoken  in  the  country  where  the  Amazon  River  ends  is".split("  ")
@@ -205,6 +236,30 @@ def test_intervene_at_cue_actually_moves_the_intervention(tiny_qwen):
     assert not torch.allclose(
         torch.tensor(effects(at_t)), torch.tensor(effects(at_cue)), atol=1e-6
     ), "cue-position interventions produced identical results to t_i — position ignored"
+
+
+def test_swap_band_spans_layers_and_nests(tiny_qwen):
+    """The band swap must intervene at every layer 0..l (repair-robust), and
+    band(l) must be a subset of band(l+1)."""
+    from rlens.onset import _edit_battery
+
+    d = tiny_qwen.config.hidden_size
+    layers = [0, 1, 2, 3]
+    torch.manual_seed(0)
+    dirs = {key: {lens: {l: torch.randn(d) for l in layers} for lens in ("R", "J", "logit")}
+            for key in ("c", "c_prime", "wrong", "y")}
+    jac = {lens: None for lens in ("R", "J", "logit")}
+    item = _tiny_item(cue_i=3, t_i=9)
+
+    spans = {}
+    for layer in layers:
+        labels, edits = _edit_battery(tiny_qwen, jac, item, layer=layer, dirs=dirs,
+                                      all_layers=layers, ridge=0.0, center_mu=None)
+        band = next(e for lab, e in zip(labels, edits) if lab["condition"] == "swap_band" and lab["lens"] == "R")
+        spans[layer] = set(band)
+    assert spans[0] == {0} and spans[3] == {0, 1, 2, 3}, f"band spans wrong: {spans}"
+    for l in layers[:-1]:
+        assert spans[l] < spans[l + 1], "band(l) must nest inside band(l+1)"
 
 
 def test_lens_vector_ranking_matches_actual_readout(tiny_qwen):

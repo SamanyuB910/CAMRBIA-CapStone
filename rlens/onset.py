@@ -28,7 +28,9 @@ reference/idhantgulati-j-lens — see EXPERIMENT-causal-onset.md):
 
 from __future__ import annotations
 
+import hashlib
 import json
+import random
 import re
 from dataclasses import dataclass
 from pathlib import Path
@@ -106,8 +108,11 @@ def make_pinv_swap(v_s: torch.Tensor, v_t: torch.Tensor, alpha: float, ridge: fl
         Vd, Gd = V.to(h.device), gram.to(h.device).double()
         rhs = (Vd.T @ h).double()
         # fp64 2x2 solve: kills the squared conditioning of the normal equations
+        # A = V^T V (+ ridge) is 2x2 positive definite; solve is exact and,
+        # unlike lstsq, does not silently return garbage on CUDA for
+        # near-singular input
         A = Gd + ridge * torch.eye(2, device=h.device, dtype=torch.float64)
-        z = torch.linalg.solve(A, rhs) if ridge > 0 else torch.linalg.lstsq(A, rhs).solution
+        z = torch.linalg.solve(A, rhs)
         return h + Vd @ (alpha * (z.flip(0) - z)).float()
 
     return edit
@@ -211,9 +216,11 @@ class OnsetItem:
     c_prime_id: int
     c_wrong_id: int
     y_id: int              # chosen by clean-logit argmax over surface forms
-    y_prime_id: int
+    y_prime_id: int        # chosen under the CONTROL prompt (where y' is the answer)
     t_i: int               # absolute intervention/readout position
     cue_i: int             # cue-token position (the post's flagship readouts live here)
+    c_wrong_same_category: bool = True   # realized quality of the §7.7.3 control
+    shuffled_c: str = ""   # readout baseline concept (different category, seeded)
 
 
 #: pre-registered stopword list for the cue auto-rule
@@ -250,6 +257,13 @@ def find_cue(token_strs: list[str], override_word: str | None = None) -> int:
         if t.isalpha() and t not in _CUE_STOPWORDS:
             return i
     return len(stripped) - 1
+
+
+def _stable_seed(*parts) -> int:
+    """Process-independent seed (builtin hash() is salted per process, which
+    made the random controls irreproducible across runs)."""
+    digest = hashlib.blake2b("\x1f".join(map(str, parts)).encode(), digest_size=8).digest()
+    return int.from_bytes(digest, "big") & 0x7FFFFFFF
 
 
 def _direction_id(tok, word: str) -> int | None:
@@ -317,7 +331,8 @@ def build_dataset(hf_model, tok, *, position: int = -1, min_p_answer: float = 1e
         ids = {k: _direction_id(tok, v) for k, v in {"c": c, "c'": c_prime, "y": y, "y'": y_prime}.items()}
         if any(v is None for v in ids.values()):
             drop(item, f"multi-token: {[k for k, v in ids.items() if v is None]}"); continue
-        if c.lower() in prompt.lower() or c_prime.lower() in prompt.lower():
+        # word-boundary, not substring: "Oman" must not match "Roman"
+        if any(re.search(rf"\b{re.escape(w.lower())}\b", prompt.lower()) for w in (c, c_prime)):
             drop(item, "c or c' verbatim in prompt"); continue
 
         y_set, yp_set = token_ids_of(tok, y), token_ids_of(tok, y_prime)
@@ -330,20 +345,28 @@ def build_dataset(hf_model, tok, *, position: int = -1, min_p_answer: float = 1e
         control = build_control_prompt(prompt, c_prime, overrides)
         if control is None:
             drop(item, "no control template (add to data/onset_controls.json)"); continue
-        control_ok, _, _ = top1_and_logp(control, yp_set)
+        control_ok, _, control_logp = top1_and_logp(control, yp_set)
         if not control_ok:
             drop(item, "control answer wrong"); continue
 
-        # wrong-concept control: same-category preferred (§7.7.3); global pool
-        # fallback for singleton categories (documented deviation)
-        cat_items = by_cat[item["category"]]
-        nxt = cat_items[(cat_items.index(item) + 1) % len(cat_items)]
-        candidates = [nxt["swap_to"], nxt["intermediate"]]
-        candidates += [w for other in raw for w in (other["intermediate"], other["swap_to"])]
-        c_wrong = next(
-            (w for w in candidates if w.lower() not in (c.lower(), c_prime.lower()) and _direction_id(tok, w)),
-            None,
-        )
+        # Wrong-concept control (§7.7.3): must be SAME category — the control
+        # asks "does any concept of this kind do this?". Singleton categories
+        # fall back to a per-item *shuffled* global pool (never a fixed token:
+        # the old first-match-wins fallback handed 52% of items the same word).
+        cat_items = [o for o in by_cat[item["category"]] if o is not item]
+        same_cat_pool = [w for o in cat_items for w in (o["intermediate"], o["swap_to"])]
+        rng_item = random.Random(_stable_seed(item["name"], "wrong"))
+        global_pool = [w for o in raw for w in (o["intermediate"], o["swap_to"])]
+        rng_item.shuffle(global_pool)
+        excluded = {c.lower(), c_prime.lower()}
+
+        def pick(pool):
+            return next((w for w in pool if w.lower() not in excluded and _direction_id(tok, w) is not None), None)
+
+        c_wrong = pick(same_cat_pool)
+        same_category = c_wrong is not None
+        if c_wrong is None:
+            c_wrong = pick(global_pool)
         if c_wrong is None:
             drop(item, "no wrong-concept candidate"); continue
 
@@ -352,7 +375,9 @@ def build_dataset(hf_model, tok, *, position: int = -1, min_p_answer: float = 1e
         token_strs = [tok.decode([t]) for t in token_ids]
         cue_i = find_cue(token_strs, cue_overrides.get(prompt))
         y_id = y_set[int(logp[y_set].argmax())]
-        yp_id = yp_set[int(logp[yp_set].argmax())]
+        # y' surface form is chosen where y' is actually the answer (the
+        # control prompt), not under the clean prompt where it never appears
+        yp_id = yp_set[int(control_logp[yp_set].argmax())]
         kept.append(
             OnsetItem(
                 name=item["name"], category=item["category"], prompt=prompt,
@@ -361,10 +386,17 @@ def build_dataset(hf_model, tok, *, position: int = -1, min_p_answer: float = 1e
                 c_id=ids["c"], c_prime_id=ids["c'"], c_wrong_id=_direction_id(tok, c_wrong),
                 y_id=y_id, y_prime_id=yp_id,
                 t_i=seq_len + position if position < 0 else position,
-                cue_i=cue_i,
+                cue_i=cue_i, c_wrong_same_category=same_category,
             )
         )
-        log.append({"name": item["name"], "kept": True, "cue": token_strs[cue_i]})
+        log.append({"name": item["name"], "kept": True, "cue": token_strs[cue_i],
+                    "c_wrong": c_wrong, "c_wrong_same_category": same_category})
+
+    # readout baseline: a concept from a DIFFERENT category, seeded per item
+    # (the old items[(i+1) % n] neighbour was same-category 32.7% of the time)
+    for it in kept:
+        others = [o for o in kept if o.category != it.category] or [o for o in kept if o is not it]
+        it.shuffled_c = random.Random(_stable_seed(it.name, "shuffled")).choice(others).c
     return kept, log
 
 
@@ -395,6 +427,17 @@ def _edit_battery(
     def multi(token, lens, layer_set):
         return {l2: make_ablation(dirs[token][lens][l2], 1.0, mu=center_mu) for l2 in layer_set}
 
+    def multi_swap(lens, layer_set):
+        """Band swap: the pinv swap applied at every layer in the set, each
+        with that layer's own directions. The anti-self-repair counterpart of
+        the swap, and the shape of the released 'swap across the band'
+        protocol. NB persist (l->end) is maximal at l=0 by construction, so
+        the band (0->l) is the correct repair-robust ONSET direction."""
+        return {
+            l2: make_pinv_swap(dirs["c"][lens][l2], dirs["c_prime"][lens][l2], 1.0, ridge=ridge)
+            for l2 in layer_set
+        }
+
     add("-", "identity", 0.0, {layer: lambda h: h})  # alpha=0 numerics check
     later = [l2 for l2 in all_layers if l2 >= layer]
     upto = [l2 for l2 in all_layers if l2 <= layer]
@@ -418,6 +461,7 @@ def _edit_battery(
         add(lens, "ablate_answer", 1.0, {layer: make_ablation(v_y, 1.0, mu=center_mu)})
         for alpha in ALPHAS:
             add(lens, "swap", alpha, {layer: make_pinv_swap(v_c, v_cp, alpha, ridge=ridge)})
+        add(lens, "swap_band", 1.0, multi_swap(lens, upto))
         add(lens, "swap_reflection", 1.0, {layer: make_reflection_swap(v_c, v_cp, 1.0)})
         add(lens, "swap_wrong", 1.0, {layer: make_pinv_swap(v_wrong, v_cp, 1.0, ridge=ridge)})
         add(lens, "swap_answer", 1.0, {layer: make_pinv_swap(v_y, v_yp, 1.0, ridge=ridge)})
@@ -474,12 +518,15 @@ def run_measurements(
             "clean_logp_y_single": float(clean_logp[item.y_id]), "clean_margin_single": clean_margin,
         }
 
-        # shuffled-label baseline concept for the readout (fixed derangement)
-        shuf = items[(item_idx + 1) % len(items)]
+        # shuffled-label readout baseline: a different-category concept fixed
+        # per item at dataset-build time (falls back to the cyclic neighbour
+        # for datasets built before this field existed)
+        shuffled_c = getattr(item, "shuffled_c", "") or items[(item_idx + 1) % len(items)].c
 
         # per-layer directions for c / wrong-concept / answer (multi-layer
         # conditions), once per item
-        token_ids_by_key = {"c": item.c_id, "wrong": item.c_wrong_id, "y": item.y_id}
+        token_ids_by_key = {"c": item.c_id, "c_prime": item.c_prime_id,
+                            "wrong": item.c_wrong_id, "y": item.y_id}
         dirs = {key: {lens: {} for lens in LENSES} for key in token_ids_by_key}
         for l in layers:
             per_layer_J = _layer_jacobians(lenses, l)
@@ -497,6 +544,16 @@ def run_measurements(
                 "cos_RJ": float((vR @ vJ) / (vR.norm() * vJ.norm())),
                 "cos_Rlogit": float((vR @ vL) / (vR.norm() * vL.norm())),
             })
+            # per-(layer, item) swap-pair conditioning (§7.7.6) + the within-lens
+            # norm ratio, which is the confound the pinv swap is actually
+            # sensitive to (it is invariant to rescaling BOTH vectors)
+            for lens in LENSES:
+                v_c, v_cp = dirs["c"][lens][l], dirs["c_prime"][lens][l]
+                records.append({
+                    **base, "layer": l, "lens": lens, "condition": "diagnostics", "alpha": 0.0,
+                    **swap_diagnostics(v_c, v_cp),
+                    "norm_ratio_cp_c": float(v_cp.norm() / v_c.norm()),
+                })
 
         pos_i = item.cue_i if intervene_at == "cue" else item.t_i
         for layer in layers:
@@ -509,7 +566,7 @@ def run_measurements(
                 for h_pos, suffix in ((h_final, ""), (h_cue, "_cue")):
                     read = h_pos if J is None else h_pos @ J.float().T
                     logits_l = unembed(read)
-                    for concept, cond in ((item.c, f"readout{suffix}"), (shuf.c, f"readout_shuffled{suffix}")):
+                    for concept, cond in ((item.c, f"readout{suffix}"), (shuffled_c, f"readout_shuffled{suffix}")):
                         ids = token_ids_of(tok, concept)
                         records.append({**base, "layer": layer, "lens": lens, "condition": cond, "alpha": 0.0, "rank_c": rank_of(logits_l, ids)})
 
@@ -545,7 +602,8 @@ def run_measurements(
             for (lens, cond), dn in deltas.items():
                 for b in range(N_RANDOM):
                     labels.append({"lens": lens, "condition": f"random_{cond}", "alpha": 1.0, "delta_norm": dn})
-                    edits.append({layer: make_random_displacement(dn, h_t.shape[0], seed=hash((item.name, layer, lens, cond, b)) & 0x7FFFFFFF)})
+                    edits.append({layer: make_random_displacement(
+                        dn, h_t.shape[0], seed=_stable_seed(item.name, layer, lens, cond, b))})
 
             # NB: pos_i, not item.t_i — the edits must be applied at the
             # intervention site. (Edit fns are built from lens vectors, so a
@@ -567,11 +625,6 @@ def run_measurements(
                     "top1_is_yp": int(int(lg.argmax()) in token_ids_of(tok, item.y_prime)),
                     "top1_is_y": int(int(lg.argmax()) in token_ids_of(tok, item.y)),
                 })
-        # per-item swap diagnostics at a middle layer for the report
-        mid = layers[len(layers) // 2]
-        for lens, J in _layer_jacobians(lenses, mid).items():
-            v_c, v_cp = lens_vectors(hf_model, J, [item.c_id, item.c_prime_id])
-            records.append({**base, "layer": mid, "lens": lens, "condition": "diagnostics", "alpha": 0.0, **swap_diagnostics(v_c, v_cp)})
     return pd.DataFrame(records)
 
 
@@ -581,14 +634,24 @@ def run_measurements(
 
 
 def _onset(curve: pd.Series, rho: float, w: int = 2) -> float | None:
-    excess = curve.to_numpy()
-    peak = excess.max()
-    if peak <= 0:
+    """First layer whose normalized excess stays >= rho for w layers.
+
+    NaN-safe: a missing layer must not poison the whole curve. (With plain
+    ``.max()`` one NaN makes ``peak`` NaN, every comparison False, and the
+    function returns None — an "undefined onset" caused by a gap in the data
+    rather than by the data itself.)
+    """
+    import numpy as np
+
+    excess = curve.to_numpy(dtype=float)
+    peak = np.nanmax(excess) if np.any(np.isfinite(excess)) else np.nan
+    if not np.isfinite(peak) or peak <= 0:
         return None
     norm = excess / (peak + 1e-9)
     layers = curve.index.to_numpy()
     for i in range(len(norm) - w + 1):
-        if (norm[i : i + w] >= rho).all():
+        window = norm[i : i + w]
+        if np.all(np.isfinite(window)) and np.all(window >= rho):
             return float(layers[i])
     return None
 
@@ -615,68 +678,112 @@ def analyze(df: pd.DataFrame, *, rho: float = 0.2, w: int = 2, n_boot: int = 100
                 return d[m].groupby("layer")[col].mean()
 
             rand_abl = by_layer("random_ablate", "necessity")
+            rand_swap = by_layer("random_swap", "swap_effect")
             out[lens] = {
                 "R": by_layer("readout", "hit10") - by_layer("readout_shuffled", "hit10"),
                 "R_cue": by_layer("readout_cue", "hit10") - by_layer("readout_shuffled_cue", "hit10"),
                 "N": by_layer("ablate", "necessity", 1.0) - rand_abl,
-                "S": by_layer("swap", "swap_effect", 1.0) - by_layer("random_swap", "swap_effect"),
-                # multi-layer curves (informational; primary onsets use N and S):
-                "N_persist": by_layer("ablate_persist", "necessity", 1.0) - rand_abl,
+                "S": by_layer("swap", "swap_effect", 1.0) - rand_swap,
+                # magnitude-controlled (cross-lens equalized displacement)
+                "N_eqnorm": by_layer("ablate_eqnorm", "necessity", 1.0) - rand_abl,
+                "S_eqnorm": by_layer("swap_eqnorm", "swap_effect", 1.0) - rand_swap,
+                # repair-robust: intervene at every layer 0..l
                 "N_band": by_layer("ablate_band", "necessity", 1.0) - rand_abl,
+                "S_band": by_layer("swap_band", "swap_effect", 1.0) - rand_swap,
+                # informational only — persist (l->end) is maximal at l=0 by
+                # construction, so it is NOT an onset statistic
+                "N_persist": by_layer("ablate_persist", "necessity", 1.0) - rand_abl,
                 "N_wrong_persist": by_layer("ablate_wrong_persist", "necessity", 1.0) - rand_abl,
                 "N_answer_persist": by_layer("ablate_answer_persist", "necessity", 1.0) - rand_abl,
-                "N_eqnorm": by_layer("ablate_eqnorm", "necessity", 1.0) - rand_abl,
-                "S_eqnorm": by_layer("swap_eqnorm", "swap_effect", 1.0) - by_layer("random_swap", "swap_effect"),
             }
         return out
 
-    ONSET_KEYS = ("R", "R_cue", "N", "S")
+    #: onsets computed for every variant; L_causal is derived three ways
+    ONSET_KEYS = ("R", "R_cue", "N", "S", "N_eqnorm", "S_eqnorm", "N_band", "S_band")
+    #: (variant name, necessity curve, sufficiency curve) — raw is the
+    #: pre-registered primary; the other two must agree for the result to hold
+    VARIANTS = (("raw", "N", "S"), ("eqnorm", "N_eqnorm", "S_eqnorm"), ("band", "N_band", "S_band"))
+
+    def _joint(cv_lens: dict, n_key: str, s_key: str) -> float | None:
+        """First layer where BOTH necessity and sufficiency stay above rho."""
+        import numpy as np
+
+        n_curve, s_curve = cv_lens[n_key], cv_lens[s_key]
+        n_peak, s_peak = np.nanmax(n_curve.to_numpy(dtype=float)), np.nanmax(s_curve.to_numpy(dtype=float))
+        if not (np.isfinite(n_peak) and np.isfinite(s_peak)) or n_peak <= 0 or s_peak <= 0:
+            return None
+        ok = ((n_curve / (n_peak + 1e-9) >= rho) & (s_curve / (s_peak + 1e-9) >= rho)).to_numpy()
+        for i in range(len(ok) - w + 1):
+            if ok[i : i + w].all():
+                return float(n_curve.index[i])
+        return None
 
     def onsets(cv: dict) -> dict:
         res = {}
         for lens in LENSES:
             r = {f"L_{k}": _onset(cv[lens][k], rho, w) for k in ONSET_KEYS}
-            joint = None
-            if r["L_N"] is not None and r["L_S"] is not None:
-                nn = cv[lens]["N"] / (cv[lens]["N"].max() + 1e-9)
-                ss = cv[lens]["S"] / (cv[lens]["S"].max() + 1e-9)
-                both = pd.Series(((nn >= rho) & (ss >= rho)).to_numpy().astype(float), index=nn.index)
-                for i in range(len(both) - w + 1):
-                    if both.iloc[i : i + w].all():
-                        joint = float(both.index[i]); break
-            r["L_causal"] = joint
-            r["gap"] = (joint - r["L_R"]) if (joint is not None and r["L_R"] is not None) else None
-            r["gap_cue"] = (joint - r["L_R_cue"]) if (joint is not None and r["L_R_cue"] is not None) else None
+            for name, n_key, s_key in VARIANTS:
+                joint = _joint(cv[lens], n_key, s_key)
+                suffix = "" if name == "raw" else f"_{name}"
+                r[f"L_causal{suffix}"] = joint
+                # gap: naming -> usable. gap_cue is the apples-to-apples one for
+                # cue-site interventions; gap uses the final-token readout and
+                # therefore MIXES positions (kept for continuity, do not headline).
+                r[f"gap{suffix}"] = (joint - r["L_R"]) if (joint is not None and r["L_R"] is not None) else None
+                r[f"gap_cue{suffix}"] = (joint - r["L_R_cue"]) if (joint is not None and r["L_R_cue"] is not None) else None
             res[lens] = r
         return res
 
     full_curves = curves(df)
     full_onsets = onsets(full_curves)
 
-    boot_gaps, boot_onsets = [], {lens: {k: [] for k in (*[f"L_{x}" for x in ONSET_KEYS], "L_causal", "gap")} for lens in LENSES}
+    # every gap flavour gets its own bootstrap distribution; the gap_cue* keys
+    # are the apples-to-apples quantities for cue-site interventions
+    gap_keys = [k for k in full_onsets["R"] if k.startswith("gap")]
+    onset_keys = [k for k in full_onsets["R"] if k.startswith("L_")]
+    boot_diffs = {k: [] for k in gap_keys}
+    boot_onsets = {lens: {k: [] for k in onset_keys} for lens in LENSES}
     for _ in range(n_boot):
         pick = torch.randint(len(items), (len(items),), generator=rng).tolist()
-        chosen = [items[i] for i in pick]
-        sub = pd.concat([df[df.item == it] for it in chosen])
+        sub = pd.concat([df[df.item == items[i]] for i in pick])
         o = onsets(curves(sub))
         for lens in LENSES:
             for k, dist in boot_onsets[lens].items():
                 if o[lens][k] is not None:
                     dist.append(o[lens][k])
-        gR, gJ = o["R"]["gap"], o["J"]["gap"]
-        if gR is not None and gJ is not None:
-            boot_gaps.append(gR - gJ)
+        for k in gap_keys:
+            gR, gJ = o["R"][k], o["J"][k]
+            if gR is not None and gJ is not None:
+                boot_diffs[k].append(gR - gJ)
 
     def ci_of(vals):
+        if not len(vals):
+            return None
         s = pd.Series(vals)
-        return (float(s.quantile(0.025)), float(s.quantile(0.975)), len(vals) / n_boot) if len(vals) else None
+        return (float(s.quantile(0.025)), float(s.quantile(0.975)), len(vals) / max(n_boot, 1))
 
-    gap_diff = full_onsets["R"]["gap"], full_onsets["J"]["gap"]
+    def summary_of(vals):
+        """Onsets are integers, so a percentile CI lands on mass points —
+        report P(>0) and the histogram next to the interval."""
+        if not len(vals):
+            return None
+        s = pd.Series(vals)
+        return {"ci": (float(s.quantile(0.025)), float(s.quantile(0.975))),
+                "p_gt_0": float((s > 0).mean()), "median": float(s.median()),
+                "defined_frac": len(vals) / max(n_boot, 1),
+                "hist": {float(k): int(v) for k, v in s.value_counts().sort_index().items()}}
+
+    diffs = {k: ((full_onsets["R"][k] - full_onsets["J"][k])
+                 if (full_onsets["R"][k] is not None and full_onsets["J"][k] is not None) else None)
+             for k in gap_keys}
     return {
         "curves": full_curves, "onsets": full_onsets,
         "onset_cis": {lens: {k: ci_of(v) for k, v in dists.items()} for lens, dists in boot_onsets.items()},
-        "gap_R": gap_diff[0], "gap_J": gap_diff[1],
-        "delta_R_minus_delta_J": (gap_diff[0] - gap_diff[1]) if None not in gap_diff else None,
-        "boot_ci": ci_of(boot_gaps)[:2] if boot_gaps else None,
-        "boot_defined_frac": (len(boot_gaps) / n_boot) if n_boot else 0.0,
+        "gap_diffs": diffs,
+        "gap_boot": {k: summary_of(v) for k, v in boot_diffs.items()},
+        # back-compat for the existing report code
+        "gap_R": full_onsets["R"].get("gap"), "gap_J": full_onsets["J"].get("gap"),
+        "delta_R_minus_delta_J": diffs.get("gap"),
+        "boot_ci": (ci_of(boot_diffs["gap"])[:2] if boot_diffs.get("gap") else None),
+        "boot_defined_frac": (len(boot_diffs.get("gap", [])) / n_boot) if n_boot else 0.0,
     }

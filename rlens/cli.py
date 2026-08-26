@@ -481,7 +481,34 @@ def cmd_onset(args) -> None:
             rows[(lens, key)] = {f"L{lo}-{hi}": cv[(cv.index >= lo) & (cv.index <= hi)].mean() for lo, hi in bands}
     lines.append(pd.DataFrame(rows).T.to_markdown(floatfmt=".3f"))
 
-    # 2. onsets with bootstrap CIs (incl. cue-position readout = the H1 re-test)
+    # 2. the payoff: gap variants side by side (raw / magnitude-controlled / repair-robust)
+    key = "gap_cue" if args.at_cue else "gap"
+    label = "gap_cue = L_causal - L_R_cue" if args.at_cue else "gap = L_causal - L_R"
+    lines.append(f"\n## Payoff: {label}, under three control regimes\n")
+    lines.append("raw = pre-registered primary; eqnorm = cross-lens equalized push size;")
+    lines.append("band = intervene at every layer 0..l (repair-robust). All three must agree.\n")
+    rows = {}
+    for variant in ("", "_eqnorm", "_band"):
+        k = f"{key}{variant}"
+        name = variant.lstrip("_") or "raw"
+        boot = result["gap_boot"].get(k)
+        rows[name] = {
+            "R": result["onsets"]["R"].get(k), "J": result["onsets"]["J"].get(k),
+            "R - J": result["gap_diffs"].get(k),
+            "95% CI": (f"({boot['ci'][0]:.0f}, {boot['ci'][1]:.0f})" if boot else "-"),
+            "P(R>J)": (f"{boot['p_gt_0']:.1%}" if boot else "-"),
+            "defined": (f"{boot['defined_frac']:.0%}" if boot else "-"),
+        }
+    lines.append(pd.DataFrame(rows).T.to_markdown())
+    primary = result["gap_boot"].get(key)
+    if primary:
+        lines.append("\nOnsets are integers, so the percentile CI sits on mass points. Bootstrap histogram")
+        lines.append(f"of (R - J) for the raw variant: {primary['hist']}")
+    if not args.at_cue:
+        lines.append("\nNOTE: with interventions at t_i, `gap_cue*` columns mix positions "
+                     "(cue readout vs t_i causality) - use the `gap*` columns here.")
+
+    # 3. all onsets with bootstrap CIs (incl. cue readout = the H1 re-test)
     lines.append("\n## Onsets (bootstrap 95% CIs; None = never exceeded threshold)\n")
     table = {}
     for lens in onset.LENSES:
@@ -492,11 +519,8 @@ def cmd_onset(args) -> None:
         table[lens] = row
     lines.append(pd.DataFrame(table).T.to_markdown())
     lines.append("\nH1 check: L_R_cue (cue-token readout onset) is where the post's early-readout claim lives.")
-    lines.append(f"\n**Δ = L_causal − L_R: Δ_R = {result['gap_R']}, Δ_J = {result['gap_J']}; Δ_R − Δ_J = {result['delta_R_minus_delta_J']}**")
-    if result["boot_ci"]:
-        lines.append(f"Paired bootstrap 95% CI: {result['boot_ci']} (defined in {result['boot_defined_frac']:.0%} of resamples).")
-    lines.append("\nPhrasing: on this item set, at these positions, on this model, this is a *no detectable")
-    lines.append("difference* result; the CI does not rule out moderate differences in either direction.\n")
+    lines.append("\nPhrasing: report as 'on this item set, at this position, on this model'; state the CI")
+    lines.append("width and whether an early-readout advantage exists at all before interpreting any gap.\n")
 
     # 3. lens geometry + magnitude confound
     geo = df[df.condition == "lens_cos"]
