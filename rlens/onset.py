@@ -213,9 +213,16 @@ def onset_contrasts(
     """
     rows = []
     for condition, sub in df[df["lens"].isin([reference, other])].groupby("condition"):
+        # `pivot_table(dropna=False)` on a MultiIndex builds the CARTESIAN product
+        # of set x item, inventing (set, item) pairs that do not exist -- which
+        # inflated `neither` to 510 on a 386-item run. Reindex onto the pairs that
+        # actually occur.
+        real_pairs = pd.MultiIndex.from_frame(
+            sub[["set", "item"]].drop_duplicates().sort_values(["set", "item"])
+        )
         wide = sub.pivot_table(
             index=["set", "item"], columns="lens", values="onset", dropna=False
-        )
+        ).reindex(real_pairs)
         if reference not in wide or other not in wide:
             continue
         both = wide[[reference, other]].dropna()
@@ -236,7 +243,7 @@ def onset_contrasts(
                      "p_two_sided": float("nan"), "win_rate": float("nan")}
         rank_wide = sub.pivot_table(
             index=["set", "item"], columns="lens", values="mean_log_rank", dropna=False
-        )
+        ).reindex(real_pairs)
         rank_stats = {}
         if reference in rank_wide and other in rank_wide:
             rank_both = rank_wide[[reference, other]].dropna()
@@ -312,6 +319,13 @@ def verdict(contrasts: pd.DataFrame, *, min_control_items: int = MIN_CONTROL_ITE
                 "concept detection."
             )
 
+    if true["win_rate"] < 0.5:
+        notes.append(
+            f"the true-concept mean gap is positive but the reference lens wins on only "
+            f"{true['win_rate']:.0%} of items — the mean is driven by outliers, not a "
+            "consistent per-item effect"
+        )
+
     for name in ("wrong", "random"):
         if name not in contrasts.index:
             continue
@@ -322,10 +336,19 @@ def verdict(contrasts: pd.DataFrame, *, min_control_items: int = MIN_CONTROL_ITE
                 "it did not test the hypothesis, so it cannot support it"
             )
         elif pd.notna(row["ci_lo"]) and row["ci_lo"] > 0:
-            share = row["delta_layers"] / true["delta_layers"]
+            # Quote the log-rank share when available: the onset share is computed
+            # on only the items where a control probe happened to surface, which
+            # selects for exactly the cases that look confounded.
+            if pd.notna(row.get("d_log_rank")) and pd.notna(true.get("d_log_rank")) and true["d_log_rank"]:
+                share = row["d_log_rank"] / true["d_log_rank"]
+                basis = (f"Δlog-rank {row['d_log_rank']:.3f} vs {true['d_log_rank']:.3f} "
+                         f"on {int(row['n_rank_items'])} items")
+            else:
+                share = row["delta_layers"] / true["delta_layers"]
+                basis = f"{row['delta_layers']:.1f}-layer onset gap"
             blocking.append(
-                f"NOT CONCEPT-SPECIFIC — the `{name}` control also shows a "
-                f"{row['delta_layers']:.1f}-layer gap ({share:.0%} of the true gap)"
+                f"NOT CONCEPT-SPECIFIC — the `{name}` control also improves ({basis}, "
+                f"{share:.0%} of the true effect); onset n={int(row['n_both_surfaced'])}"
             )
 
     if "answer" in contrasts.index:
@@ -347,7 +370,20 @@ def verdict(contrasts: pd.DataFrame, *, min_control_items: int = MIN_CONTROL_ITE
         f"(95% CI [{true['ci_lo']:.1f}, {true['ci_hi']:.1f}], wins on "
         f"{true['win_rate']:.0%} of {int(true['n_both_surfaced'])} paired items)"
     )
+    if "random" in contrasts.index and "d_log_rank_hi" in contrasts.columns:
+        row = contrasts.loc["random"]
+        if pd.notna(row.get("d_log_rank_hi")) and row["d_log_rank_hi"] < 0:
+            notes.append(
+                f"rank-inflation control PASSED — arbitrary vocabulary tokens are ranked "
+                f"{-row['d_log_rank']:.3f} log10-units *worse* by the reference lens "
+                f"(95% CI [{row['d_log_rank_lo']:.3f}, {row['d_log_rank_hi']:.3f}]), so the "
+                "effect is not a global readout-distribution artifact"
+            )
+
     if blocking:
+        return ("CONFOUNDED — " + headline + ". But: " + "; ".join(blocking)
+                + ("." if not notes else ". Also: " + "; ".join(notes) + "."))
+    if False:
         return "CONFOUNDED — " + headline + ". But: " + "; ".join(blocking) + "."
     if notes:
         return "UNVERIFIED — " + headline + ", but " + "; ".join(notes) + "."
