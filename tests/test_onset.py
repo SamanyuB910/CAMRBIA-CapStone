@@ -238,6 +238,28 @@ def test_intervene_at_cue_actually_moves_the_intervention(tiny_qwen):
     ), "cue-position interventions produced identical results to t_i — position ignored"
 
 
+def test_pinv_swap_is_an_involution_but_clamp_is_idempotent():
+    """Why band swaps must use the clamp: the plain swap undoes itself.
+
+    Applying the pinv swap at every layer of a band alternates rather than
+    clamping (measured in production as a LOWER flip rate than a single-layer
+    swap). The clamp sets the coordinates to fixed swapped clean values, so
+    repeated application is a no-op.
+    """
+    from rlens.onset import make_clamp_swap
+
+    v_c, v_cp, h = _pair()
+    swap = make_pinv_swap(v_c, v_cp, 1.0)
+    assert torch.allclose(swap(swap(h.clone())), h, atol=1e-5), "pinv swap should be an involution"
+
+    clamp = make_clamp_swap(v_c, v_cp, h, 1.0)
+    once = clamp(h.clone())
+    twice = clamp(once.clone())
+    assert torch.allclose(once, twice, atol=1e-5), "clamp must be idempotent"
+    # and at alpha=1 the clamp reproduces the single-shot swap on the clean input
+    assert torch.allclose(once, swap(h.clone()), atol=1e-4)
+
+
 def test_swap_band_spans_layers_and_nests(tiny_qwen):
     """The band swap must intervene at every layer 0..l (repair-robust), and
     band(l) must be a subset of band(l+1)."""
@@ -250,11 +272,13 @@ def test_swap_band_spans_layers_and_nests(tiny_qwen):
             for key in ("c", "c_prime", "wrong", "y")}
     jac = {lens: None for lens in ("R", "J", "logit")}
     item = _tiny_item(cue_i=3, t_i=9)
+    clean_h = {l: torch.randn(d) for l in layers}
 
     spans = {}
     for layer in layers:
         labels, edits = _edit_battery(tiny_qwen, jac, item, layer=layer, dirs=dirs,
-                                      all_layers=layers, ridge=0.0, center_mu=None)
+                                      all_layers=layers, ridge=0.0, center_mu=None,
+                                      clean_h=clean_h)
         band = next(e for lab, e in zip(labels, edits) if lab["condition"] == "swap_band" and lab["lens"] == "R")
         spans[layer] = set(band)
     assert spans[0] == {0} and spans[3] == {0, 1, 2, 3}, f"band spans wrong: {spans}"

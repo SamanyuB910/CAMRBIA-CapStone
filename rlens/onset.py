@@ -118,6 +118,36 @@ def make_pinv_swap(v_s: torch.Tensor, v_t: torch.Tensor, alpha: float, ridge: fl
     return edit
 
 
+def make_clamp_swap(v_c: torch.Tensor, v_cp: torch.Tensor, h_clean: torch.Tensor,
+                    alpha: float = 1.0, ridge: float = 0.0):
+    """Clamp the two lens coordinates to their swapped CLEAN values.
+
+    Idempotent by construction: after the edit ``V^+ h == Pi z_clean`` whatever
+    upstream layers did, so it can be applied across a band of layers.
+
+    The plain pinv swap must NOT be used that way -- it is an exact involution
+    (``swap(swap(h)) == h``), so applying it at every band layer alternates
+    instead of clamping and cancels itself out. This is the operator the
+    released protocol means by "clamping a lens coordinate ... at every band
+    layer".
+    """
+    V = torch.stack([v_c, v_cp], dim=1).float()
+    gram = (V.T @ V).double()
+
+    def _coords(h: torch.Tensor, Vd: torch.Tensor, Gd: torch.Tensor) -> torch.Tensor:
+        A = Gd + ridge * torch.eye(2, device=h.device, dtype=torch.float64)
+        return torch.linalg.solve(A, (Vd.T @ h).double())
+
+    z_target = _coords(h_clean.float(), V, gram).flip(0)  # the swapped clean coordinates
+
+    def edit(h: torch.Tensor) -> torch.Tensor:
+        Vd, Gd = V.to(h.device), gram.to(h.device)
+        z_now = _coords(h, Vd, Gd)
+        return h + Vd @ (alpha * (z_target.to(h.device) - z_now)).float()
+
+    return edit
+
+
 def make_reflection_swap(v_s: torch.Tensor, v_t: torch.Tensor, alpha: float):
     """Community cross-check: h - 2 alpha <h, u_hat> u_hat, u_hat ∝ v_hat_s - v_hat_t.
     Identical to the pinv swap for one UNIT-normed pair at alpha=1."""
@@ -427,7 +457,7 @@ def _layer_jacobians(lenses: dict, layer: int) -> dict[str, torch.Tensor | None]
 def _edit_battery(
     hf_model, jacobians: dict[str, torch.Tensor | None], item: OnsetItem, *,
     layer: int, dirs: dict[str, dict[str, dict[int, torch.Tensor]]], all_layers: list[int],
-    ridge: float, center_mu: torch.Tensor | None,
+    ridge: float, center_mu: torch.Tensor | None, clean_h: dict[int, torch.Tensor] | None = None,
 ):
     """All (lens, condition, alpha) edits for one (item, layer) as
     ``{layer: edit_fn}`` dicts. ``dirs[token][lens][l]`` are per-layer
@@ -442,13 +472,17 @@ def _edit_battery(
         return {l2: make_ablation(dirs[token][lens][l2], 1.0, mu=center_mu) for l2 in layer_set}
 
     def multi_swap(lens, layer_set):
-        """Band swap: the pinv swap applied at every layer in the set, each
-        with that layer's own directions. The anti-self-repair counterpart of
-        the swap, and the shape of the released 'swap across the band'
-        protocol. NB persist (l->end) is maximal at l=0 by construction, so
-        the band (0->l) is the correct repair-robust ONSET direction."""
+        """Band swap = CLAMP the coordinates at every layer in the set.
+
+        Must be the idempotent clamp, not the plain pinv swap: that swap is an
+        exact involution, so applying it across a band alternates and cancels
+        (measured: band flip rate 1.9% vs 11.5% single-layer, i.e. weaker, not
+        stronger). NB persist (l->end) is maximal at l=0 by construction, so
+        the band (0->l) is the correct repair-robust ONSET direction.
+        """
         return {
-            l2: make_pinv_swap(dirs["c"][lens][l2], dirs["c_prime"][lens][l2], 1.0, ridge=ridge)
+            l2: make_clamp_swap(dirs["c"][lens][l2], dirs["c_prime"][lens][l2],
+                                clean_h[l2], 1.0, ridge=ridge)
             for l2 in layer_set
         }
 
@@ -587,6 +621,7 @@ def run_measurements(
             labels, edits = _edit_battery(
                 hf_model, jacobians, item, layer=layer, dirs=dirs, all_layers=layers,
                 ridge=ridge, center_mu=mu_by_layer.get(layer),
+                clean_h={l2: acts[l2][pos_i].float().cpu() for l2 in layers},
             )
             # cross-lens norm-equalized variants (magnitude confound: early-band
             # ||dh_R||/||dh_J|| measured at 3-4x): same directions, displacement
