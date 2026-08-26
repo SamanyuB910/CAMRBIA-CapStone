@@ -263,14 +263,33 @@ THRESHOLDS = {
     "late_positive_margin_over_corrupted": 1.0,
     # Identity-layer arms are byte-identical, so a competent judge should tie.
     "identity_tie_rate_min": 0.5,
+    # A rate estimated from a handful of trials cannot support OR refute a
+    # threshold. Below this many comparable pairs the permutation control is
+    # reported UNDERPOWERED rather than passed or failed.
+    "min_order_pairs": 12,
+    "alpha": 0.05,
+    # A judge that cannot return parseable output reliably cannot complete a
+    # 200-cell panel: `incomplete_ratings` blocks analysis on ANY terminal
+    # FAILED, so an unreliable judge stalls the experiment rather than biasing
+    # it. Validation must catch that here, not after the spend.
+    "max_failure_rate": 0.02,
 }
+
+
+def binomial_tail_ge(k: int, n: int, p: float) -> float:
+    """P(X >= k) for X ~ Binomial(n, p). No scipy dependency."""
+    from math import comb
+
+    return sum(comb(n, i) * p ** i * (1 - p) ** (n - i) for i in range(k, n + 1))
 
 
 def _winner_scores(scores: dict) -> dict:
     return {l: scores[l]["contextual_coherence"] for l in ("A", "B", "C")}
 
 
-def judge_validation_report(results: dict, meta: list, *, judge_id: str) -> dict:
+def judge_validation_report(results: dict, meta: list, *, judge_id: str,
+                            n_attempted: int | None = None,
+                            n_failed: int = 0) -> dict:
     """Score one judge against the five control categories.
 
     ``results`` maps cell_id -> parsed score dict. ``meta`` is the control key.
@@ -332,9 +351,30 @@ def judge_validation_report(results: dict, meta: list, *, judge_id: str) -> dict
             flips += 1
     if comparable:
         rate = flips / comparable
-        add("winner_survives_permutation", rate <= THRESHOLDS["order_flip_rate"],
-            f"{flips}/{comparable} non-tied cells flipped ({rate:.0%}, threshold "
-            f"{THRESHOLDS['order_flip_rate']:.0%})", rate)
+        threshold = THRESHOLDS["order_flip_rate"]
+        # One-sided exact binomial test of H0: true flip rate <= threshold.
+        # Reject only when the data actually support rejection; a point estimate
+        # above the threshold on a handful of pairs does not.
+        pvalue = binomial_tail_ge(flips, comparable, threshold)
+        detail = (f"{flips}/{comparable} non-tied cells flipped ({rate:.0%}, threshold "
+                  f"{threshold:.0%}, exact binomial p={pvalue:.3f})")
+        if rate <= threshold:
+            add("winner_survives_permutation", True, detail, rate)
+        elif pvalue < THRESHOLDS["alpha"]:
+            # Significant evidence the true flip rate exceeds the threshold.
+            # Judged on evidence, not sample size: 10/10 flips is conclusive at
+            # n=10, while 1/6 is not conclusive at any alpha.
+            add("winner_survives_permutation", False, detail, rate)
+        else:
+            achievable = ", ".join(f"{i / comparable:.0%}" for i in range(3))
+            report["checks"].append({
+                "name": "winner_survives_permutation", "status": "UNDERPOWERED",
+                "detail": detail + f" — above the threshold but not significantly "
+                          f"(p={pvalue:.3f} >= {THRESHOLDS['alpha']}). With {comparable} "
+                          f"comparable pairs the achievable rates are {achievable}..., so the "
+                          f"threshold is not resolvable. Raise --n-order rather than "
+                          "changing judge.",
+                "measured": rate})
     else:
         n_rot = len(by_kind.get("order_invariance", []))
         n_orig = len(by_kind.get("order_invariance_original", []))
@@ -421,7 +461,23 @@ def judge_validation_report(results: dict, meta: list, *, judge_id: str) -> dict
     add("no_identity_speculation", not leaks,
         f"{len(leaks)} responses mention a lens name" if leaks else "none", len(leaks))
 
+    # Completeness. Every check above is computed only over cells that PARSED,
+    # so failures make the other criteria easier rather than harder. Without this
+    # check a judge failing 7 of 50 cells reads as PASS on the 43 that worked.
+    attempted = n_attempted if n_attempted is not None else len(results) + n_failed
+    if attempted:
+        rate = n_failed / attempted
+        add("response_completeness", rate <= THRESHOLDS["max_failure_rate"],
+            f"{n_failed}/{attempted} cells returned no parseable rating "
+            f"({rate:.1%}, max {THRESHOLDS['max_failure_rate']:.0%}). Every other check "
+            "here is computed only over cells that parsed.", rate)
+        report["detail"]["n_attempted"] = attempted
+        report["detail"]["n_failed"] = n_failed
+
     report["passed"] = all(c["status"] == "PASS" for c in report["checks"])
+    report["underpowered"] = [c["name"] for c in report["checks"]
+                              if c["status"] == "UNDERPOWERED"]
+    report["failed"] = [c["name"] for c in report["checks"] if c["status"] == "FAIL"]
     return report
 
 

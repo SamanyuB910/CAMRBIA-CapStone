@@ -277,6 +277,7 @@ def stratified_sample(cells: list, key: list, n: int) -> list:
 
 
 def build_validation_panel(cells: list, key: list, *, n_each: int = 10,
+                           n_order: int | None = None,
                            late_cells: list | None = None,
                            identity_cells: list | None = None) -> tuple[list, list]:
     """Five control categories (§5). Returns (public_cells, control_key).
@@ -335,7 +336,8 @@ def build_validation_panel(cells: list, key: list, *, n_each: int = 10,
     # 3. order invariance. BOTH members of each pair must be rated: the previous
     # version pointed `twin_of` at a main-panel cell, which the judge never sees,
     # so `comparable` was always zero and the control could not fire.
-    for i, cid in enumerate(ordered[2 * n_each:3 * n_each]):
+    n_order = n_order or n_each
+    for i, cid in enumerate(ordered[2 * n_each:2 * n_each + n_order]):
         src = by_id[cid]
         original = PanelCell(cell_id=f"vc-order-a-{i:02d}", prompt_display=src.prompt_display,
                              readout_position=src.readout_position,

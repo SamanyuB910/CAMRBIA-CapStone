@@ -2515,6 +2515,7 @@ def test_order_invariance_uses_the_rotation_to_define_the_expected_winner():
     bad = next(c for c in judge_validation_report(flipped, meta, judge_id="j")["checks"]
                if c["name"] == "winner_survives_permutation")
     assert good["status"] == "PASS" and good["measured"] == 0.0
+    # 100% flips is conclusive even on 10 pairs: judged on evidence, not n
     assert bad["status"] == "FAIL" and bad["measured"] == 1.0
 
 
@@ -2892,3 +2893,100 @@ def test_an_unexpected_exception_marks_the_cell_not_the_run():
     source = inspect.getsource(cli.cmd_judge_validate)
     assert "except Exception" in source and "uncaught:" in source, \
         "a single bad cell must not abort a paid panel"
+
+
+def test_binomial_tail_matches_hand_computed_values():
+    from rlens.autorate import binomial_tail_ge
+
+    assert binomial_tail_ge(0, 6, 0.15) == pytest.approx(1.0)
+    assert binomial_tail_ge(1, 6, 0.15) == pytest.approx(1 - 0.85 ** 6, rel=1e-9)
+    assert binomial_tail_ge(7, 6, 0.15) == 0.0
+
+
+def _order_results(meta, flips, comparable):
+    """Score `comparable` pairs, `flips` of which stay on the winning slot."""
+    rotated = [m for m in meta if m["kind"] == "order_invariance"][:comparable]
+    results = {}
+    for i, m in enumerate(rotated):
+        results[m["twin_of"]] = _score(4, 1, 0, "A")
+        winner = "A" if i < flips else m["rotation"]["A"]      # "A" = stuck on the slot
+        results[m["cell_id"]] = (_score(4, 1, 0, "A") if i < flips
+                                 else _score(1, 4, 0, winner))
+    return results
+
+
+def test_one_flip_in_six_pairs_is_underpowered_not_a_failure():
+    """The real run: 1/6 = 17% against a 15% threshold. At n=6 the achievable
+    rates are 0%, 17%, 33% — the threshold is not resolvable, so the control
+    cannot support OR refute it."""
+    _, meta = build_validation_panel(_cells(60), [], n_each=10, n_order=24,
+                                     late_cells=_cells(4, "late"))
+    report = judge_validation_report(_order_results(meta, flips=1, comparable=6),
+                                     meta, judge_id="j")
+    check = next(c for c in report["checks"] if c["name"] == "winner_survives_permutation")
+    assert check["status"] == "UNDERPOWERED"
+    assert "not resolvable" in check["detail"] and "not significantly" in check["detail"]
+    assert "--n-order" in check["detail"], "must name the fix"
+    assert "winner_survives_permutation" in report["underpowered"]
+    assert "winner_survives_permutation" not in report["failed"], \
+        "an underpowered control is not a judge failure"
+    assert report["passed"] is False, "but it still blocks the run"
+
+
+def test_a_flip_rate_at_or_below_threshold_passes_at_any_n():
+    _, meta = build_validation_panel(_cells(60), [], n_each=10, n_order=24,
+                                     late_cells=_cells(4, "late"))
+    report = judge_validation_report(_order_results(meta, flips=0, comparable=6),
+                                     meta, judge_id="j")
+    check = next(c for c in report["checks"] if c["name"] == "winner_survives_permutation")
+    assert check["status"] == "PASS" and check["measured"] == 0.0
+
+
+def test_a_genuinely_biased_judge_fails_once_there_are_enough_pairs():
+    """With 20 comparable pairs and 10 flips (50%), the exact binomial rejects."""
+    _, meta = build_validation_panel(_cells(60), [], n_each=10, n_order=24,
+                                     late_cells=_cells(4, "late"))
+    report = judge_validation_report(_order_results(meta, flips=10, comparable=20),
+                                     meta, judge_id="j")
+    check = next(c for c in report["checks"] if c["name"] == "winner_survives_permutation")
+    assert check["status"] == "FAIL", "50% flips on 20 pairs is real position stickiness"
+    assert "winner_survives_permutation" in report["failed"]
+    assert "winner_survives_permutation" not in report["underpowered"]
+
+
+def test_n_order_controls_the_number_of_permutation_pairs():
+    _, small = build_validation_panel(_cells(60), [], n_each=10, n_order=10)
+    _, large = build_validation_panel(_cells(60), [], n_each=10, n_order=24)
+    assert len([m for m in small if m["kind"] == "order_invariance"]) == 10
+    assert len([m for m in large if m["kind"] == "order_invariance"]) == 24
+
+
+def test_a_judge_that_fails_cells_cannot_pass_validation():
+    """The real run: claude-fable-5 failed 7/50 cells and was reported PASS,
+    because every other check is computed only over cells that parsed —
+    failures made the criteria easier, not harder."""
+    _, meta = build_validation_panel(_cells(60), [], n_each=10, n_order=24,
+                                     late_cells=_cells(4, "late"))
+    corrupt = [m for m in meta if m["kind"] == "coherent_vs_corrupted"]
+    clean = {m["cell_id"]: _score(0, 4, 4, "B" if m["corrupted_arm"] == "A" else "A")
+             for m in corrupt}
+
+    ok = judge_validation_report(clean, meta, judge_id="j", n_attempted=50, n_failed=0)
+    completeness = next(c for c in ok["checks"] if c["name"] == "response_completeness")
+    assert completeness["status"] == "PASS"
+
+    flaky = judge_validation_report(clean, meta, judge_id="j", n_attempted=50, n_failed=7)
+    check = next(c for c in flaky["checks"] if c["name"] == "response_completeness")
+    assert check["status"] == "FAIL"
+    assert "14.0%" in check["detail"]
+    assert "only over cells that parsed" in check["detail"]
+    assert flaky["passed"] is False
+    assert "response_completeness" in flaky["failed"]
+
+
+def test_one_failure_in_fifty_is_tolerated():
+    _, meta = build_validation_panel(_cells(60), [], n_each=10, n_order=24,
+                                     late_cells=_cells(4, "late"))
+    report = judge_validation_report({}, meta, judge_id="j", n_attempted=50, n_failed=1)
+    check = next(c for c in report["checks"] if c["name"] == "response_completeness")
+    assert check["status"] == "PASS", "2% is the documented tolerance"

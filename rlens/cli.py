@@ -1258,6 +1258,7 @@ def cmd_judge_validate(args) -> None:
             "criteria cannot be evaluated.")
 
     controls, meta = build_validation_panel(cells, key, n_each=args.n_each,
+                                            n_order=args.n_order,
                                             late_cells=late, identity_cells=identity)
     val_dir = out_dir / "judge_validation"
     if val_dir.exists() and any(val_dir.iterdir()):
@@ -1298,9 +1299,11 @@ def cmd_judge_validate(args) -> None:
         slug = judge_id.replace("/", "_")
         (val_dir / f"raw_{slug}.jsonl").write_text(
             "\n".join(json.dumps(r) for r in raw), encoding="utf-8")
-        report = judge_validation_report(results, meta, judge_id=judge_id)
+        n_failed = sum(1 for r in raw if r["status"] == "FAILED")
+        report = judge_validation_report(results, meta, judge_id=judge_id,
+                                         n_attempted=len(controls), n_failed=n_failed)
         report["n_scored"] = len(results)
-        report["n_failed"] = sum(1 for r in raw if r["status"] == "FAILED")
+        report["n_failed"] = n_failed
         reports.append(report)
         print(f"\n=== {judge_id} — {'PASS' if report['passed'] else 'FAIL'} "
               f"({len(results)}/{len(controls)} scored, {report['n_failed']} FAILED) ===")
@@ -1311,7 +1314,12 @@ def cmd_judge_validate(args) -> None:
         json.dumps(reports, indent=2), encoding="utf-8")
     print(f"\nreport -> {val_dir / 'judge_validation_report.json'}")
     if not all(r["passed"] for r in reports):
-        print("\nAt least one judge FAILED validation; do not launch the 200-cell run.")
+        for r in reports:
+            if r.get("failed"):
+                print(f"\n{r['judge_id']}: FAILED {r['failed']} — swap this judge.")
+            if r.get("underpowered"):
+                print(f"\n{r['judge_id']}: UNDERPOWERED {r['underpowered']} — the control, "
+                      "not the judge, is the problem. Raise --n-order and re-run.")
         raise SystemExit(2)
     print("\nBoth judges passed. Stop here for review before the full run.")
 
@@ -1515,6 +1523,9 @@ def main() -> None:
     p.add_argument("--control-key", default=None,
                    help="control_key.jsonl (default: alongside the panel key)")
     p.add_argument("--n-each", type=int, default=10)
+    p.add_argument("--n-order", type=int, default=24,
+                   help="order-invariance PAIRS; ties are not comparable, so this must "
+                        "exceed the minimum comparable-pair count")
     p.add_argument("--n-late", type=int, default=5)
     p.set_defaults(func=cmd_judge_validate)
 
