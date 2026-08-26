@@ -439,12 +439,14 @@ def cmd_onset(args) -> None:
         layers = args.layers or list(range(hf.config.get_text_config().num_hidden_layers))
         pairs = onset.build_patch_pairs(items, tok)
         print(f"{len(pairs)} ordered (receiver, donor) pairs x {len(layers)} layers")
-        df = onset.run_patching(hf, tok, items, layers=layers, batch_size=args.batch_size)
-        out = REPO_ROOT / "results" / f"patch_records_{args.model}.parquet"
+        df = onset.run_patching(hf, tok, items, layers=layers, batch_size=args.batch_size,
+                                patch_at=args.patch_at)
+        out = REPO_ROOT / "results" / f"patch_records_{args.model}_{args.patch_at}.parquet"
         df.to_parquet(out)
         result = onset.analyze_patching(df, rho=args.rho)
-        print(f"self-patch max |drift| = {result['selfpatch_max_drift']:.2e} (must be ~0)")
-        print(f"l* = {result['l_star']} CI {result['l_star_ci']}; "
+        print(f"self-patch drift: mean {result['selfpatch_mean_drift']:.3f}, "
+              f"worst layer {result['selfpatch_max_layer_drift']:.3f} (must be ~0)")
+        print(f"l* = {result['l_star']} CI {result['l_star_ci']}; offset = {result['l_offset']}; "
               f"top-1 flip rate {result['top1_flip_rate']:.1%}; pairs {result['n_pairs']}")
         print(f"{len(df)} records -> {out}")
         return
@@ -701,6 +703,10 @@ def main() -> None:
     p.add_argument("--position", type=int, default=-1, help="t_i: -1 primary, -2 sensitivity")
     p.add_argument("--at-cue", action="store_true",
                    help="apply interventions at the cue token instead of t_i (iteration 4)")
+    p.add_argument("--patch-at", choices=["final", "cue"], default="final",
+                   help="patch site for --stage patch: 'final' gives a real onset (shared token, "
+                        "so only computed state transfers); 'cue' is trivially 0 at early layers "
+                        "because it transplants the token itself - use it for the OFFSET only")
     p.add_argument("--limit", type=int, default=None, help="max items (smoke runs)")
     p.add_argument("--layers", type=int, nargs="+", default=None)
     p.add_argument("--ridge", type=float, default=0.0, help="ridge lambda for the pinv swap")

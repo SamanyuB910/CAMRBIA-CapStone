@@ -675,18 +675,30 @@ def build_patch_pairs(items: list[OnsetItem], tok) -> list[tuple[OnsetItem, Onse
 @torch.no_grad()
 def run_patching(
     hf_model, tok, items: list[OnsetItem], *, layers: list[int], batch_size: int = 24,
-    filler_offset: int = 2,
+    filler_offset: int = 2, patch_at: str = "final",
 ) -> pd.DataFrame:
     """Sweep the patch layer for every (receiver, donor) pair.
 
-    For each pair: run the receiver's own prompt, replace its cue activation
-    with the donor's at layer l, and measure the same margin the swap uses
-    (log p(y_donor) - log p(y_recv)) so l* is directly comparable to L_S.
+    ``patch_at="final"`` (default, the informative one): patch the FINAL prompt
+    token. Template-matched pairs share that token exactly ("... is"), so the
+    patch transports only *computed* state -- l* is then a genuine onset for
+    "by layer l the final position encodes enough to produce the donor's
+    answer".
 
-    Conditions: ``patch`` (cue position), ``patch_selfpatch`` (donor == receiver,
-    must be an exact no-op), ``patch_filler`` (same donor activation applied at a
-    non-cue position -> position specificity), ``patch_random`` (norm-matched
-    random vector -> generic-perturbation control).
+    ``patch_at="cue"``: patch the cue token. Beware -- at early layers the cue
+    position still *is* the cue token, so patching it is equivalent to editing
+    the prompt and downstream simply recomputes. That makes l* trivially 0; the
+    cue sweep is informative only for its OFFSET (the layer by which the cue
+    stops being decisive, i.e. the information has moved on).
+
+    Metrics: ``top1_is_donor`` (primary -- directional, only satisfied by
+    installing the donor's answer) and the swap-comparable margin
+    log p(y_donor) - log p(y_recv) (secondary: it also rewards merely
+    destroying the receiver's answer, which the random control does).
+
+    Conditions: ``patch``, ``patch_selfpatch`` (donor == receiver, no-op check),
+    ``patch_filler`` (donor vector at a different position), ``patch_random``
+    (norm-matched random vector).
     """
     from jlens.hooks import ActivationRecorder
 
@@ -694,15 +706,21 @@ def run_patching(
     runner = EditRunner(hf_model)
     pairs = build_patch_pairs(items, tok)
 
-    # cache each item's clean residual at the cue (and at the filler position)
+    def site_of(item: OnsetItem) -> int:
+        return item.cue_i if patch_at == "cue" else item.t_i
+
+    # cache each item's clean residual at the patch site (and at a control
+    # position). Recorded with the same batch shape the patched forwards use,
+    # so bf16 kernel-shape noise cancels in the self-patch check.
     cache: dict[str, dict[str, dict[int, torch.Tensor]]] = {}
     for item in {p.name: p for pair in pairs for p in pair}.values():
         input_ids = tok(item.prompt, return_tensors="pt").input_ids.to(device)
-        filler_i = max(0, item.cue_i - filler_offset)
+        site_i = site_of(item)
+        filler_i = max(0, site_i - filler_offset)
         with ActivationRecorder(hf_model.model.layers, at=layers) as rec:
-            hf_model(input_ids=input_ids, use_cache=False)
+            hf_model(input_ids=input_ids.expand(batch_size, -1), use_cache=False)
             cache[item.name] = {
-                "cue": {l: rec.activations[l][0, item.cue_i].detach().float().cpu() for l in layers},
+                "cue": {l: rec.activations[l][0, site_i].detach().float().cpu() for l in layers},
                 "filler": {l: rec.activations[l][0, filler_i].detach().float().cpu() for l in layers},
                 "filler_i": filler_i,
             }
@@ -711,7 +729,7 @@ def run_patching(
     for recv, donor in pairs:
         input_ids = tok(recv.prompt, return_tensors="pt").input_ids.to(device)
         base = {"receiver": recv.name, "donor": donor.name, "category": recv.category,
-                "y_recv": recv.y, "y_donor": donor.y}
+                "y_recv": recv.y, "y_donor": donor.y, "patch_at": patch_at}
         for layer in layers:
             d_cue = cache[donor.name]["cue"][layer]
             labels = [
@@ -725,7 +743,7 @@ def run_patching(
             # position-specificity control: same donor vector, non-cue position
             filler_edits = {layer: make_patch(cache[donor.name]["filler"][layer])}
 
-            logits = runner.run(input_ids, recv.cue_i, [e for _, e in labels], batch_size=batch_size)
+            logits = runner.run(input_ids, site_of(recv), [e for _, e in labels], batch_size=batch_size)
             filler_logits = runner.run(input_ids, cache[recv.name]["filler_i"], [filler_edits], batch_size=batch_size)
 
             logp = logits.log_softmax(-1)
@@ -749,12 +767,16 @@ def analyze_patching(df: pd.DataFrame, *, rho: float = 0.2, w: int = 2, n_boot: 
     rng = torch.Generator().manual_seed(seed)
 
     def curves(sub: pd.DataFrame) -> dict[str, pd.Series]:
-        by = lambda c: sub[sub.condition == c].groupby("layer")["effect"].mean()
+        by = lambda c, col="effect": sub[sub.condition == c].groupby("layer")[col].mean()
         return {"patch": by("patch"), "filler": by("patch_filler"),
-                "random": by("patch_random"), "selfpatch": by("patch_selfpatch")}
+                "random": by("patch_random"), "selfpatch": by("patch_selfpatch"),
+                # directional: only satisfied by installing the DONOR's answer.
+                # The margin alone also rewards destroying the receiver's answer,
+                # which is exactly what a random vector does.
+                "flip": by("patch", "top1_is_donor"), "flip_random": by("patch_random", "top1_is_donor")}
 
     def l_star(cv: dict) -> float | None:
-        return _onset(cv["patch"] - cv["random"], rho, w)
+        return _onset(cv["flip"] - cv["flip_random"], rho, w)
 
     full = curves(df)
     boot = []
@@ -770,7 +792,14 @@ def analyze_patching(df: pd.DataFrame, *, rho: float = 0.2, w: int = 2, n_boot: 
         "l_star_ci": (float(s.quantile(0.025)), float(s.quantile(0.975))) if len(s) else None,
         "defined_frac": len(boot) / max(n_boot, 1), "n_pairs": len(pairs),
         "top1_flip_rate": float(df[df.condition == "patch"]["top1_is_donor"].mean()),
-        "selfpatch_max_drift": float(df[df.condition == "patch_selfpatch"]["effect"].abs().max()),
+        # per-layer MEAN drift is the meaningful check; a record-level max is
+        # dominated by bf16 tails on single (pair, layer) cells
+        "selfpatch_mean_drift": float(full["selfpatch"].abs().mean()),
+        "selfpatch_max_layer_drift": float(full["selfpatch"].abs().max()),
+        "patch_at": (df["patch_at"].iloc[0] if "patch_at" in df else "cue"),
+        # the offset: last layer where patching still flips the answer
+        "l_offset": (float(full["flip"][full["flip"] > 0.5 * full["flip"].max()].index.max())
+                     if float(full["flip"].max()) > 0 else None),
     }
 
 
