@@ -143,6 +143,7 @@ def run_onsets(
             probes = {c: v for c, v in probes.items() if c in conditions}
 
             found: dict[tuple[str, str], int] = {}
+            log_ranks: dict[tuple[str, str], list[float]] = {}
             with torch.no_grad():
                 for layer in layers:
                     residual = acts[layer][positions]           # [n_pos, d_model]
@@ -151,9 +152,15 @@ def run_onsets(
                         logits = model.unembed(read).float()    # [n_pos, vocab]
                         for condition, ids in probes.items():
                             key = (name, condition)
-                            if key in found:
-                                continue
-                            if _min_rank_over_positions(logits, ids) <= k:
+                            rank = _min_rank_over_positions(logits, ids)
+                            # Rank is recorded at EVERY layer, not just at onset.
+                            # An onset-only measure cannot detect rank inflation:
+                            # a token that never reaches the top-k still moves
+                            # from rank 200k to rank 300 under a lens that ranks
+                            # everything better, and that is the artifact the
+                            # `random` condition exists to catch.
+                            log_ranks.setdefault(key, []).append(np.log10(rank))
+                            if key not in found and rank <= k:
                                 found[key] = layer
 
             for name in lenses:
@@ -163,6 +170,8 @@ def run_onsets(
                             "set": set_name, "item": index, "lens": name,
                             "condition": condition,
                             "onset": found.get((name, condition), float("nan")),
+                            "mean_log_rank": float(np.mean(log_ranks[(name, condition)])),
+                            "min_log_rank": float(np.min(log_ranks[(name, condition)])),
                             "n_layers": len(layers),
                         }
                     )
@@ -185,6 +194,9 @@ def onset_summary(df: pd.DataFrame) -> pd.DataFrame:
             "median_onset": grouped["onset"].median(),
             "mean_onset": grouped["onset"].mean(),
             "surfaced": grouped["onset"].apply(lambda s: float(s.notna().mean())),
+            # Defined for every item, unlike onset — this is what makes the
+            # `random` condition able to detect rank inflation at all.
+            "mean_log_rank": grouped["mean_log_rank"].mean(),
             "n_items": grouped["onset"].size(),
         }
     )
@@ -222,6 +234,23 @@ def onset_contrasts(
         else:
             stats = {"delta_layers": float("nan"), "ci_lo": float("nan"), "ci_hi": float("nan"),
                      "p_two_sided": float("nan"), "win_rate": float("nan")}
+        rank_wide = sub.pivot_table(
+            index=["set", "item"], columns="lens", values="mean_log_rank", dropna=False
+        )
+        rank_stats = {}
+        if reference in rank_wide and other in rank_wide:
+            rank_both = rank_wide[[reference, other]].dropna()
+            rank_diff = (rank_both[other] - rank_both[reference]).to_numpy()
+            if rank_diff.size:
+                rng2 = np.random.default_rng(seed + 1)
+                rboot = rank_diff[rng2.integers(0, rank_diff.size, size=(n_boot, rank_diff.size))].mean(axis=1)
+                rboot.sort()
+                rank_stats = {
+                    "d_log_rank": float(rank_diff.mean()),
+                    "d_log_rank_lo": float(rboot[int(0.025 * n_boot)]),
+                    "d_log_rank_hi": float(rboot[int(0.975 * n_boot)]),
+                    "n_rank_items": int(rank_diff.size),
+                }
         rows.append(
             {
                 "condition": condition,
@@ -230,13 +259,35 @@ def onset_contrasts(
                 f"only_{other}": int((wide[other].notna() & wide[reference].isna()).sum()),
                 "neither": int((wide[reference].isna() & wide[other].isna()).sum()),
                 **stats,
+                **rank_stats,
             }
         )
     return pd.DataFrame(rows).set_index("condition")
 
 
-def verdict(contrasts: pd.DataFrame) -> str:
-    """Whether the true-concept gap survives its own controls."""
+MIN_CONTROL_ITEMS = 10
+
+
+def verdict(contrasts: pd.DataFrame, *, min_control_items: int = MIN_CONTROL_ITEMS) -> str:
+    """Whether the true-concept gap survives its own controls.
+
+    A control that produced almost no data is NOT evidence of no confound. The
+    first version of this function treated "the control never surfaced" as "the
+    control is flat" and printed SUPPORTED while the `answer` control was
+    failing at p=0.035 — the exact false reassurance a control is meant to
+    prevent. Controls are therefore judged on three separate grounds:
+
+    * ``answer``: a positive gap means the lens surfaces the final answer as
+      early as the intermediate, i.e. it is not tracking a multi-step
+      computation (answer smuggling). This is a confound, not a nuisance.
+    * ``wrong`` / ``random`` onset gaps: concept-specificity.
+    * ``d_log_rank``: mean log10 rank across ALL layers, defined for every item
+      even when a probe never enters the top-k. This is the only measure that
+      can detect rank inflation, because onset cannot.
+
+    Any control with fewer than ``min_control_items`` paired observations is
+    reported as UNDERPOWERED rather than passed.
+    """
     if "true" not in contrasts.index:
         return "no true-concept contrast computed"
     true = contrasts.loc["true"]
@@ -245,19 +296,59 @@ def verdict(contrasts: pd.DataFrame) -> str:
             "NOT SUPPORTED — the true-concept onset gap is not significantly positive; "
             "R-lens does not surface concepts earlier than J-lens at scale on this model."
         )
-    controls = [c for c in ("wrong", "random") if c in contrasts.index]
-    leaking = [c for c in controls if contrasts.loc[c, "ci_lo"] > 0]
-    if leaking:
-        worst = max(leaking, key=lambda c: contrasts.loc[c, "delta_layers"])
-        ratio = contrasts.loc[worst, "delta_layers"] / true["delta_layers"]
-        return (
-            f"CONFOUNDED — the gap is positive ({true['delta_layers']:.1f} layers) but the "
-            f"'{worst}' control also shows a positive gap "
-            f"({contrasts.loc[worst, 'delta_layers']:.1f} layers, {ratio:.0%} as large). "
-            "R-lens ranks unrelated tokens earlier too, so earliness is not concept-specific."
-        )
-    return (
-        f"SUPPORTED — R-lens surfaces the true concept {true['delta_layers']:.1f} layers "
-        f"earlier (95% CI [{true['ci_lo']:.1f}, {true['ci_hi']:.1f}], "
-        f"wins on {true['win_rate']:.0%} of items), and the controls do not."
+
+    notes, blocking = [], []
+
+    # Rank inflation, measured on `random` where available: does the reference
+    # lens rank an arbitrary token better at every layer?
+    if "random" in contrasts.index and "d_log_rank" in contrasts.columns:
+        row = contrasts.loc["random"]
+        if pd.notna(row.get("d_log_rank_lo")) and row["d_log_rank_lo"] > 0:
+            blocking.append(
+                f"RANK INFLATION — an arbitrary vocabulary token is ranked "
+                f"{row['d_log_rank']:.2f} log10-units better by the reference lens at every "
+                f"layer (95% CI [{row['d_log_rank_lo']:.2f}, {row['d_log_rank_hi']:.2f}]). "
+                "Earliness is at least partly a property of the readout distribution, not of "
+                "concept detection."
+            )
+
+    for name in ("wrong", "random"):
+        if name not in contrasts.index:
+            continue
+        row = contrasts.loc[name]
+        if row["n_both_surfaced"] < min_control_items:
+            notes.append(
+                f"`{name}` control UNDERPOWERED ({int(row['n_both_surfaced'])} paired items) — "
+                "it did not test the hypothesis, so it cannot support it"
+            )
+        elif pd.notna(row["ci_lo"]) and row["ci_lo"] > 0:
+            share = row["delta_layers"] / true["delta_layers"]
+            blocking.append(
+                f"NOT CONCEPT-SPECIFIC — the `{name}` control also shows a "
+                f"{row['delta_layers']:.1f}-layer gap ({share:.0%} of the true gap)"
+            )
+
+    if "answer" in contrasts.index:
+        row = contrasts.loc["answer"]
+        if row["n_both_surfaced"] < min_control_items:
+            notes.append(
+                f"`answer` control UNDERPOWERED ({int(row['n_both_surfaced'])} paired items)"
+            )
+        elif pd.notna(row["ci_lo"]) and row["ci_lo"] > 0:
+            share = row["delta_layers"] / true["delta_layers"]
+            blocking.append(
+                f"ANSWER SMUGGLING — the final answer also surfaces "
+                f"{row['delta_layers']:.1f} layers earlier ({share:.0%} of the true gap), so "
+                "the gap does not show the lens tracking an intermediate step"
+            )
+
+    headline = (
+        f"R-lens surfaces the true concept {true['delta_layers']:.1f} layers earlier "
+        f"(95% CI [{true['ci_lo']:.1f}, {true['ci_hi']:.1f}], wins on "
+        f"{true['win_rate']:.0%} of {int(true['n_both_surfaced'])} paired items)"
     )
+    if blocking:
+        return "CONFOUNDED — " + headline + ". But: " + "; ".join(blocking) + "."
+    if notes:
+        return "UNVERIFIED — " + headline + ", but " + "; ".join(notes) + "."
+    return "SUPPORTED — " + headline + ", and every control stayed flat."

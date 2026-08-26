@@ -1417,14 +1417,14 @@ def test_onset_verdict_supported_only_when_controls_stay_flat():
     for item in range(30):
         rows += [
             {"set": "multihop", "item": item, "lens": "released-R", "condition": "true",
-             "onset": 5.0, "n_layers": 64},
+             "onset": 5.0, "mean_log_rank": 1.0, "n_layers": 64},
             {"set": "multihop", "item": item, "lens": "released-J", "condition": "true",
-             "onset": 15.0, "n_layers": 64},
+             "onset": 15.0, "mean_log_rank": 2.0, "n_layers": 64},
             # controls: both lenses identical -> zero gap
             {"set": "multihop", "item": item, "lens": "released-R", "condition": "wrong",
-             "onset": 20.0, "n_layers": 64},
+             "onset": 20.0, "mean_log_rank": 3.0, "n_layers": 64},
             {"set": "multihop", "item": item, "lens": "released-J", "condition": "wrong",
-             "onset": 20.0, "n_layers": 64},
+             "onset": 20.0, "mean_log_rank": 3.0, "n_layers": 64},
         ]
     contrasts = onset_contrasts(_onset_frame(rows), reference="released-R",
                                 other="released-J", n_boot=500)
@@ -1442,15 +1442,15 @@ def test_onset_verdict_flags_rank_inflation_as_confounded():
         for condition, r, j in (("true", 5.0, 15.0), ("random", 8.0, 16.0)):
             rows += [
                 {"set": "s", "item": item, "lens": "released-R", "condition": condition,
-                 "onset": r, "n_layers": 64},
+                 "onset": r, "mean_log_rank": 2.0, "n_layers": 64},
                 {"set": "s", "item": item, "lens": "released-J", "condition": condition,
-                 "onset": j, "n_layers": 64},
+                 "onset": j, "mean_log_rank": 2.0, "n_layers": 64},
             ]
     contrasts = onset_contrasts(_onset_frame(rows), reference="released-R",
                                 other="released-J", n_boot=500)
     message = verdict(contrasts)
     assert message.startswith("CONFOUNDED")
-    assert "random" in message and "80%" in message   # 8 of 10 layers explained by the control
+    assert "NOT CONCEPT-SPECIFIC" in message and "80%" in message
 
 
 def test_onset_verdict_not_supported_when_the_gap_is_null():
@@ -1460,9 +1460,9 @@ def test_onset_verdict_not_supported_when_the_gap_is_null():
     for item in range(30):
         rows += [
             {"set": "s", "item": item, "lens": "released-R", "condition": "true",
-             "onset": 10.0 + (item % 3), "n_layers": 64},
+             "onset": 10.0 + (item % 3), "mean_log_rank": 2.0, "n_layers": 64},
             {"set": "s", "item": item, "lens": "released-J", "condition": "true",
-             "onset": 10.0 + ((item + 1) % 3), "n_layers": 64},
+             "onset": 10.0 + ((item + 1) % 3), "mean_log_rank": 2.0, "n_layers": 64},
         ]
     contrasts = onset_contrasts(_onset_frame(rows), reference="released-R",
                                 other="released-J", n_boot=500)
@@ -1474,12 +1474,12 @@ def test_never_surfaced_items_are_counted_not_imputed():
     from rlens.onset import onset_contrasts
 
     rows = [
-        {"set": "s", "item": 0, "lens": "released-R", "condition": "true", "onset": 5.0, "n_layers": 64},
-        {"set": "s", "item": 0, "lens": "released-J", "condition": "true", "onset": float("nan"), "n_layers": 64},
-        {"set": "s", "item": 1, "lens": "released-R", "condition": "true", "onset": float("nan"), "n_layers": 64},
-        {"set": "s", "item": 1, "lens": "released-J", "condition": "true", "onset": float("nan"), "n_layers": 64},
-        {"set": "s", "item": 2, "lens": "released-R", "condition": "true", "onset": 4.0, "n_layers": 64},
-        {"set": "s", "item": 2, "lens": "released-J", "condition": "true", "onset": 9.0, "n_layers": 64},
+        {"set": "s", "item": 0, "lens": "released-R", "condition": "true", "onset": 5.0, "mean_log_rank": 1.0, "n_layers": 64},
+        {"set": "s", "item": 0, "lens": "released-J", "condition": "true", "onset": float("nan"), "mean_log_rank": 2.0, "n_layers": 64},
+        {"set": "s", "item": 1, "lens": "released-R", "condition": "true", "onset": float("nan"), "mean_log_rank": 1.0, "n_layers": 64},
+        {"set": "s", "item": 1, "lens": "released-J", "condition": "true", "onset": float("nan"), "mean_log_rank": 2.0, "n_layers": 64},
+        {"set": "s", "item": 2, "lens": "released-R", "condition": "true", "onset": 4.0, "mean_log_rank": 1.0, "n_layers": 64},
+        {"set": "s", "item": 2, "lens": "released-J", "condition": "true", "onset": 9.0, "mean_log_rank": 2.0, "n_layers": 64},
     ]
     c = onset_contrasts(_onset_frame(rows), reference="released-R", other="released-J", n_boot=200)
     assert c.loc["true", "n_both_surfaced"] == 1
@@ -1510,9 +1510,81 @@ def test_onset_summary_reports_surfacing_rate():
     from rlens.onset import onset_summary
 
     rows = [
-        {"set": "s", "item": 0, "lens": "R", "condition": "true", "onset": 5.0, "n_layers": 64},
-        {"set": "s", "item": 1, "lens": "R", "condition": "true", "onset": float("nan"), "n_layers": 64},
+        {"set": "s", "item": 0, "lens": "R", "condition": "true", "onset": 5.0, "mean_log_rank": 1.0, "n_layers": 64},
+        {"set": "s", "item": 1, "lens": "R", "condition": "true", "onset": float("nan"), "mean_log_rank": 2.0, "n_layers": 64},
     ]
     table = onset_summary(_onset_frame(rows))
     assert table.loc[("true", "R"), "surfaced"] == 0.5
     assert table.loc[("true", "R"), "median_onset"] == 5.0
+
+
+def test_an_underpowered_control_is_never_reported_as_passing():
+    """The pilot run printed SUPPORTED while `random` had 0 paired items and
+    `wrong` had 2. A control that produced no data did not test anything."""
+    from rlens.onset import onset_contrasts, verdict
+
+    rows = []
+    for item in range(30):
+        rows += [
+            {"set": "s", "item": item, "lens": "released-R", "condition": "true",
+             "onset": 5.0, "mean_log_rank": 1.0, "n_layers": 64},
+            {"set": "s", "item": item, "lens": "released-J", "condition": "true",
+             "onset": 15.0, "mean_log_rank": 1.0, "n_layers": 64},
+        ]
+    # only two items ever surface under the `wrong` probe
+    for item in range(2):
+        rows += [
+            {"set": "s", "item": item, "lens": "released-R", "condition": "wrong",
+             "onset": 20.0, "mean_log_rank": 3.0, "n_layers": 64},
+            {"set": "s", "item": item, "lens": "released-J", "condition": "wrong",
+             "onset": 20.0, "mean_log_rank": 3.0, "n_layers": 64},
+        ]
+    message = verdict(onset_contrasts(_onset_frame(rows), reference="released-R",
+                                      other="released-J", n_boot=500))
+    assert message.startswith("UNVERIFIED")
+    assert "UNDERPOWERED" in message and "2 paired items" in message
+
+
+def test_answer_smuggling_is_treated_as_a_confound():
+    """The pilot's `answer` control fired at p=0.035 and the first verdict
+    function did not look at it."""
+    from rlens.onset import onset_contrasts, verdict
+
+    rows = []
+    for item in range(30):
+        for condition, r, j in (("true", 5.0, 15.0), ("answer", 8.0, 14.0)):
+            rows += [
+                {"set": "s", "item": item, "lens": "released-R", "condition": condition,
+                 "onset": r, "mean_log_rank": 1.0, "n_layers": 64},
+                {"set": "s", "item": item, "lens": "released-J", "condition": condition,
+                 "onset": j, "mean_log_rank": 1.0, "n_layers": 64},
+            ]
+    message = verdict(onset_contrasts(_onset_frame(rows), reference="released-R",
+                                      other="released-J", n_boot=500))
+    assert message.startswith("CONFOUNDED")
+    assert "ANSWER SMUGGLING" in message and "60%" in message
+
+
+def test_rank_inflation_is_detected_even_when_nothing_ever_surfaces():
+    """`random` onset is always NaN, so only the log-rank measure can catch a
+    lens that ranks arbitrary tokens better at every layer."""
+    from rlens.onset import onset_contrasts, verdict
+
+    rows = []
+    for item in range(30):
+        rows += [
+            {"set": "s", "item": item, "lens": "released-R", "condition": "true",
+             "onset": 5.0, "mean_log_rank": 1.0, "n_layers": 64},
+            {"set": "s", "item": item, "lens": "released-J", "condition": "true",
+             "onset": 15.0, "mean_log_rank": 2.0, "n_layers": 64},
+            # never surfaces, but R ranks it a full decade better everywhere
+            {"set": "s", "item": item, "lens": "released-R", "condition": "random",
+             "onset": float("nan"), "mean_log_rank": 3.0, "n_layers": 64},
+            {"set": "s", "item": item, "lens": "released-J", "condition": "random",
+             "onset": float("nan"), "mean_log_rank": 4.0, "n_layers": 64},
+        ]
+    contrasts = onset_contrasts(_onset_frame(rows), reference="released-R",
+                                other="released-J", n_boot=500)
+    assert contrasts.loc["random", "d_log_rank"] == pytest.approx(1.0)
+    message = verdict(contrasts)
+    assert message.startswith("CONFOUNDED") and "RANK INFLATION" in message
