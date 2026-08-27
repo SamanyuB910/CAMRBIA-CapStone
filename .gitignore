@@ -32,3 +32,11 @@ results/coherence_readouts_*.parquet
 # working from the repo) unblind the panel before rating. Keep it local until
 # ratings are in, then commit deliberately with `git add -f`.
 **/coherence_panel_key.jsonl
+
+# Paper build: figures are copied from results/coherence_v2/figures at compile
+# time (see \graphicspath), and page rasters are inspection scratch.
+paper/figures/
+paper/page-*.png
+paper/*.aux
+paper/*.log
+paper/*.out

@@ -2128,6 +2128,45 @@ def cmd_figures(args) -> None:
 
 
 # ---------------------------------------------------------------------------
+# manifest  (Stage 9: final reproducibility manifest)
+# ---------------------------------------------------------------------------
+
+
+def cmd_manifest(args) -> None:
+    """Hash every frozen artifact and record what is missing or unvalidated."""
+    import json
+
+    from rlens.manifest import build
+
+    dirs = {"panel": args.panel_dir, "analysis": args.analysis_dir,
+            "ratings": args.ratings_dir, "robustness": args.robustness_dir,
+            "audit": args.audit_dir, "figures": args.figures_dir}
+    manifest = build(
+        dirs=dirs,
+        seeds={"analysis_bootstrap_permutation": args.analysis_seed,
+               "robustness_bootstrap_permutation": args.robustness_seed},
+        salt=args.salt, judges=list(args.judges), adjudicator=args.adjudicator,
+        outstanding_gates=list(args.outstanding_gate or []),
+    )
+    out = Path(args.out).expanduser()
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+
+    print(f"artifacts hashed: {len(manifest['artifacts'])}")
+    audit = manifest["audit"]
+    print(f"audit: {audit.get('status')} "
+          f"({audit.get('n_failed', '?')} failed of {audit.get('n_conditions', '?')})")
+    if audit.get("failed_conditions"):
+        for name in audit["failed_conditions"]:
+            print(f"  FAILED: {name}")
+    for name in manifest["missing_artifacts"]:
+        print(f"  MISSING: {name}")
+    for gate in manifest["outstanding_validation_gates"]:
+        print(f"  GATE NOT RUN: {gate}")
+    print(f"\ncomplete: {manifest['complete']}  ->  {out}")
+
+
+# ---------------------------------------------------------------------------
 # recombine  (no API: rebuild combined scores from the frozen raw responses)
 # ---------------------------------------------------------------------------
 
@@ -2480,6 +2519,23 @@ def main() -> None:
     p.add_argument("--echo-table", help="echo_existing_scores.csv from `rlens robustness`")
     p.add_argument("--echo-detail", help="echo_existing_scores.json from `rlens robustness`")
     p.set_defaults(func=cmd_figures)
+
+    p = sub.add_parser("manifest", help="Stage 9: final reproducibility manifest")
+    p.add_argument("--out", required=True)
+    p.add_argument("--panel-dir")
+    p.add_argument("--analysis-dir")
+    p.add_argument("--ratings-dir")
+    p.add_argument("--robustness-dir")
+    p.add_argument("--audit-dir")
+    p.add_argument("--figures-dir")
+    p.add_argument("--judges", nargs=2, required=True)
+    p.add_argument("--adjudicator", required=True)
+    p.add_argument("--salt", default="coherence-v2-2026-08-26")
+    p.add_argument("--analysis-seed", type=int, default=20260826)
+    p.add_argument("--robustness-seed", type=int, default=20260827)
+    p.add_argument("--outstanding-gate", action="append",
+                   help="a validation gate that has NOT been run; repeatable")
+    p.set_defaults(func=cmd_manifest)
 
     p = sub.add_parser("recombine", help="rebuild combined scores from frozen raw responses (no API)")
     p.add_argument("--ratings-dir", required=True)
