@@ -2063,6 +2063,71 @@ def _robustness_markdown(table, echo_table, echo_detail, args):
 
 
 # ---------------------------------------------------------------------------
+# figures  (Stage 8: publication-quality vector figures from frozen artifacts)
+# ---------------------------------------------------------------------------
+
+
+def cmd_figures(args) -> None:
+    """Draw the publication figures from artifacts already on disk.
+
+    Reads only frozen outputs. The per-lens means in figure 1a are not stored by
+    ``analyse-v2``, so they are recomputed here from the unblinded panel rather
+    than transcribed from a report -- a number typed into a plotting script is a
+    number nobody can check.
+    """
+    import json
+
+    import pandas as pd
+
+    from rlens.figures import build_all
+
+    stats = json.loads(Path(args.statistical_results).expanduser().read_text(encoding="utf-8"))
+
+    if args.combined and args.key and args.sample:
+        from rlens.analysis_v2 import unblind_panel
+        combined = json.loads(Path(args.combined).expanduser().read_text(encoding="utf-8"))
+        key_rows = [json.loads(l) for l
+                    in Path(args.key).expanduser().read_text(encoding="utf-8").splitlines() if l]
+        sample = json.loads(Path(args.sample).expanduser().read_text(encoding="utf-8"))
+        panel = unblind_panel(combined, key_rows, sample)
+        if len(panel):
+            means = (panel.groupby(["model_key", "lens"])["contextual_coherence"]
+                     .mean().unstack())
+            stats["mean_scores"] = {m: {l: float(v) for l, v in row.items() if v == v}
+                                    for m, row in means.iterrows()}
+
+    def maybe_csv(path):
+        if not path:
+            return None
+        path = Path(path).expanduser()
+        return pd.read_csv(path) if path.exists() else None
+
+    def maybe_json(path):
+        if not path:
+            return None
+        path = Path(path).expanduser()
+        if not path.exists():
+            return None
+        loaded = json.loads(path.read_text(encoding="utf-8"))
+        return loaded.get("detail", loaded)
+
+    result = build_all(
+        stats=stats,
+        judge_table=maybe_csv(args.judge_sensitivity),
+        echo_table=maybe_csv(args.echo_table),
+        echo_detail=maybe_json(args.echo_detail),
+        out_dir=Path(args.out_dir).expanduser(),
+    )
+    for stem, files in result["figures"].items():
+        print(f"  {stem}: " + ", ".join(Path(f).name for f in files))
+    for stem, why in result["skipped"].items():
+        print(f"  SKIPPED {stem}: {why}")
+    if not result["figures"]:
+        raise SystemExit("no figures could be drawn; check the input paths")
+    print(f"\n{len(result['figures'])} figures -> {args.out_dir}")
+
+
+# ---------------------------------------------------------------------------
 # recombine  (no API: rebuild combined scores from the frozen raw responses)
 # ---------------------------------------------------------------------------
 
@@ -2404,6 +2469,17 @@ def main() -> None:
     p.add_argument("--n-perm", type=int, default=10000)
     p.add_argument("--seed", type=int, default=20260827)
     p.set_defaults(func=cmd_robustness)
+
+    p = sub.add_parser("figures", help="Stage 8: publication figures from frozen artifacts")
+    p.add_argument("--statistical-results", required=True)
+    p.add_argument("--out-dir", required=True)
+    p.add_argument("--combined", help="combined_scores.json, for the per-lens means in fig 1a")
+    p.add_argument("--key")
+    p.add_argument("--sample")
+    p.add_argument("--judge-sensitivity", help="judge_sensitivity.csv from `rlens robustness`")
+    p.add_argument("--echo-table", help="echo_existing_scores.csv from `rlens robustness`")
+    p.add_argument("--echo-detail", help="echo_existing_scores.json from `rlens robustness`")
+    p.set_defaults(func=cmd_figures)
 
     p = sub.add_parser("recombine", help="rebuild combined scores from frozen raw responses (no API)")
     p.add_argument("--ratings-dir", required=True)
