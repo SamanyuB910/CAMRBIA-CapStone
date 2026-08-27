@@ -225,3 +225,29 @@ def test_figure_six_renders_a_null_result_too(tmp_path):
 def test_build_all_adds_figure_six_when_given_results(tmp_path):
     out = figures.build_all(stats=_stats(), non_echo=_non_echo(), out_dir=tmp_path)
     assert "fig6_non_echo" in out["figures"]
+
+
+def test_panel_a_means_come_from_the_same_scoring_rule_as_panel_b():
+    """Regression: cmd_figures recomputed per-lens means from --combined, which
+    is the adjudicated file regardless of --scoring. Figure 1 then showed
+    mean-of-two contrasts beside adjudicated means."""
+    import inspect
+
+    from rlens import cli
+
+    src = inspect.getsource(cli.cmd_figures)
+    assert 'by_dim.get(PRIMARY)' in src
+    assert "if embedded:" in src
+    # the --combined path must be a fallback, not the default
+    assert src.index("if embedded:") < src.index("unblind_panel(combined")
+
+
+def test_figure_one_prefers_embedded_means(tmp_path):
+    stats = _stats()
+    stats["mean_scores"] = {"qwen3.5-27b": {"logit": 9.9, "released-J": 9.9,
+                                            "released-R": 9.9}}
+    for model in stats["per_model"]:
+        stats["per_model"][model]["means"] = {
+            "contextual_coherence": {"logit": 1.25, "released-J": 1.295,
+                                     "released-R": 1.985}}
+    assert figures.fig_primary(stats, tmp_path)

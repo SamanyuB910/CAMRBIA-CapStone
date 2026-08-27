@@ -2117,16 +2117,32 @@ def cmd_figures(args) -> None:
 
     stats = json.loads(Path(args.statistical_results).expanduser().read_text(encoding="utf-8"))
 
-    if args.combined and args.key and args.sample:
+    # Panel (a) of figure 1 must be computed under the SAME scoring rule as the
+    # contrasts beside it. `analyse-v2` already stores per-lens means under that
+    # rule, so prefer them. Recomputing from --combined reads the adjudicated
+    # scores whatever --scoring says, which put two different rules in one
+    # figure: panel (b) showed the mean-of-two contrasts while panel (a) showed
+    # adjudicated means.
+    from rlens.analysis_v2 import PRIMARY
+    embedded = {}
+    for model, entry in (stats.get("per_model") or {}).items():
+        by_dim = (entry or {}).get("means") or {}
+        per_lens = by_dim.get(PRIMARY) or {}
+        if per_lens:
+            embedded[model] = {l: float(v) for l, v in per_lens.items() if v == v}
+    if embedded:
+        stats["mean_scores"] = embedded
+    elif args.combined and args.key and args.sample:
         from rlens.analysis_v2 import unblind_panel
+        print("  note: statistical results carry no per-lens means; recomputing from "
+              "--combined, which reads the adjudicated scores")
         combined = json.loads(Path(args.combined).expanduser().read_text(encoding="utf-8"))
         key_rows = [json.loads(l) for l
                     in Path(args.key).expanduser().read_text(encoding="utf-8").splitlines() if l]
         sample = json.loads(Path(args.sample).expanduser().read_text(encoding="utf-8"))
         panel = unblind_panel(combined, key_rows, sample)
         if len(panel):
-            means = (panel.groupby(["model_key", "lens"])["contextual_coherence"]
-                     .mean().unstack())
+            means = (panel.groupby(["model_key", "lens"])[PRIMARY].mean().unstack())
             stats["mean_scores"] = {m: {l: float(v) for l, v in row.items() if v == v}
                                     for m, row in means.iterrows()}
 
