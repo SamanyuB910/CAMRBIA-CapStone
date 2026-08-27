@@ -66,6 +66,46 @@ Return STRICT JSON only, exactly this shape:
  "contextual_winner": "A|B|C|tie"}"""
 
 
+
+@dataclass(frozen=True)
+class RubricSpec:
+    """A rubric plus the exact schema its responses must satisfy.
+
+    Introduced for Stage 5, which scores coherence with copied spans excluded
+    and therefore needs different dimension names and a different winner key.
+    The v2 rubric is ``DEFAULT_SPEC`` and is unchanged: every frozen artifact
+    must keep parsing byte-identically, so the parameter is threaded through
+    with a default rather than swapped in globally.
+    """
+
+    name: str
+    text: str
+    dimensions: tuple           # ((field, max), ...) -- first is primary
+    winner_key: str
+    salt: str
+
+    @property
+    def primary(self) -> str:
+        return self.dimensions[0][0]
+
+    @property
+    def field_names(self) -> set:
+        return {d for d, _ in self.dimensions}
+
+    def hash(self) -> str:
+        return hashlib.sha256(self.text.encode()).hexdigest()[:16]
+
+
+DEFAULT_SPEC = RubricSpec(
+    name="coherence-v2",
+    text=RUBRIC,
+    dimensions=(("contextual_coherence", CONTEXTUAL_MAX),
+                ("lexical_integrity", SECONDARY_MAX),
+                ("prompt_echo", SECONDARY_MAX)),
+    winner_key="contextual_winner",
+    salt="coherence-v2-2026-08-26",
+)
+
 def rubric_hash() -> str:
     return hashlib.sha256(RUBRIC.encode()).hexdigest()[:16]
 
@@ -92,13 +132,14 @@ class SchemaError(ValueError):
     pass
 
 
-def parse_scores(text) -> dict:
+def parse_scores(text, spec: "RubricSpec | None" = None) -> dict:
     """Strict schema validation. Never salvages scores from prose.
 
     ``text`` may be None: some providers return a message with no content
     (refusal, or reasoning-only output). That is a schema failure for the cell,
     not a crash for the run.
     """
+    spec = spec or DEFAULT_SPEC
     if not isinstance(text, str) or not text.strip():
         raise SchemaError(f"empty or non-string response content ({type(text).__name__})")
     match = re.search(r"\{.*\}", text, re.S)
@@ -109,20 +150,18 @@ def parse_scores(text) -> dict:
     except json.JSONDecodeError as exc:
         raise SchemaError(f"invalid JSON: {exc}") from None
 
-    if set(payload) != {"A", "B", "C", "contextual_winner"}:
+    if set(payload) != {"A", "B", "C", spec.winner_key}:
         raise SchemaError(f"unexpected top-level keys: {sorted(payload)}")
-    if payload["contextual_winner"] not in {"A", "B", "C", "tie"}:
-        raise SchemaError(f"bad winner: {payload['contextual_winner']!r}")
+    if payload[spec.winner_key] not in {"A", "B", "C", "tie"}:
+        raise SchemaError(f"bad winner: {payload[spec.winner_key]!r}")
 
     for label in ("A", "B", "C"):
         arm = payload[label]
         if not isinstance(arm, dict):
             raise SchemaError(f"{label} is not an object")
-        if set(arm) != {"contextual_coherence", "lexical_integrity", "prompt_echo", "evidence"}:
+        if set(arm) != spec.field_names | {"evidence"}:
             raise SchemaError(f"{label} has keys {sorted(arm)}")
-        for field_name, top in (("contextual_coherence", CONTEXTUAL_MAX),
-                                ("lexical_integrity", SECONDARY_MAX),
-                                ("prompt_echo", SECONDARY_MAX)):
+        for field_name, top in spec.dimensions:
             value = arm[field_name]
             if not isinstance(value, int) or isinstance(value, bool) or not 0 <= value <= top:
                 raise SchemaError(f"{label}.{field_name} = {value!r}, expected int 0..{top}")
@@ -132,10 +171,10 @@ def parse_scores(text) -> dict:
     # Winner/score consistency. A judge that names a winner its own scores do not
     # support has not followed the rubric; salvaging such a response would let an
     # incoherent rating enter the primary estimate.
-    contextual = {l: payload[l]["contextual_coherence"] for l in ("A", "B", "C")}
+    contextual = {l: payload[l][spec.primary] for l in ("A", "B", "C")}
     best = max(contextual.values())
     leaders = sorted(l for l, v in contextual.items() if v == best)
-    winner = payload["contextual_winner"]
+    winner = payload[spec.winner_key]
     if winner == "tie":
         if len(leaders) < 2:
             raise SchemaError(
@@ -161,16 +200,17 @@ class JudgeCall:
 
 def call_judge(cell_public: dict, *, judge_id: str, api_key: str,
                temperature: float = 0.0, max_retries: int = 3,
-               timeout: int = 120) -> JudgeCall:
+               timeout: int = 120, spec: "RubricSpec | None" = None) -> JudgeCall:
     """One blinded rating. Retries transient and schema failures; on exhaustion
     records FAILED rather than inventing or dropping a score."""
     import urllib.error
     import urllib.request
 
+    spec = spec or DEFAULT_SPEC
     body = {
         "model": judge_id,
         "temperature": temperature,
-        "messages": [{"role": "system", "content": RUBRIC},
+        "messages": [{"role": "system", "content": spec.text},
                      {"role": "user", "content": render_cell(cell_public)}],
     }
     last_error, raw = "", ""
@@ -192,7 +232,7 @@ def call_judge(cell_public: dict, *, judge_id: str, api_key: str,
                 # schema failure rather than something to salvage
                 raise SchemaError("response carried reasoning but no content")
             return JudgeCall(judge_id=judge_id, cell_id=cell_public["cell_id"],
-                             status="ok", scores=parse_scores(raw), raw=raw or "",
+                             status="ok", scores=parse_scores(raw, spec), raw=raw or "",
                              attempts=attempt, usage=payload.get("usage", {}),
                              timestamp=time.time())
         except urllib.error.HTTPError as exc:

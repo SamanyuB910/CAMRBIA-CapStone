@@ -2207,6 +2207,325 @@ def cmd_manifest(args) -> None:
 
 
 # ---------------------------------------------------------------------------
+# non-echo  (Stage 5: coherence with copied prompt spans excluded)
+# ---------------------------------------------------------------------------
+
+
+def _non_echo_projection(args, n_cells: int):
+    """Project spend and refuse to start a run the budget cannot finish."""
+    import json
+
+    from rlens.non_echo import check_budget, project_cost, write_projection
+
+    cost_report = json.loads(Path(args.cost_report).expanduser().read_text()) \
+        if args.cost_report else {}
+    projection = project_cost(n_cells=n_cells, judges=list(args.judges),
+                              cost_report=cost_report,
+                              rubric_ratio=args.rubric_ratio)
+    out = write_projection(projection,
+                           Path(args.out_dir).expanduser() / "non_echo_cost_projection.json")
+    print(f"\nprojected spend for {n_cells} cells x {len(args.judges)} judges:")
+    for judge, row in projection["per_judge"].items():
+        print(f"  {judge}: ${row['projected_usd']:.2f} "
+              f"({row['prompt_tokens_per_call']} in / "
+              f"{row['completion_tokens_per_call']} out per call, {row['basis']})")
+    print(f"  TOTAL ${projection['projected_usd']:.2f}   -> {out}")
+    ok, message = check_budget(projection, args.budget_usd)
+    print(f"  {message}")
+    if not ok:
+        raise SystemExit(2)
+    return projection
+
+
+def cmd_non_echo_validate(args) -> None:
+    """Validate the non-echo rubric against pure-prompt-copy controls.
+
+    The rubric's whole claim is that copied material does not count. If the
+    pure-copy arm still wins, the rubric is not measuring what it says and its
+    scores must not be used, however the main comparison turns out.
+    """
+    import json
+
+    from rlens.autorate import call_judge, probe_judge
+    from rlens.non_echo import (NON_ECHO_SPEC, build_copy_controls,
+                                copy_control_report)
+
+    api_key = os.environ.get("OPENROUTER_API_KEY")
+    if not api_key:
+        raise SystemExit("set OPENROUTER_API_KEY")
+
+    late = [json.loads(l) for l
+            in Path(args.control_cells).expanduser().read_text().splitlines() if l]
+    key_rows = [json.loads(l) for l
+                in Path(args.control_key).expanduser().read_text().splitlines() if l]
+    late_ids = {r["cell_id"] for r in key_rows if r.get("kind") == "late_layer_positive"}
+    late = [c for c in late if c["cell_id"] in late_ids]
+    if len(late) < args.n_controls:
+        raise SystemExit(
+            f"only {len(late)} late-layer control cells available, need "
+            f"{args.n_controls}. These are the source of the 'meaningful' arms; "
+            "synthesising them would make the control test nothing real.")
+
+    controls, control_key = build_copy_controls(late, n=args.n_controls)
+    out_dir = Path(args.out_dir).expanduser()
+    if out_dir.exists() and (out_dir / "copy_control_report.json").exists():
+        raise SystemExit(f"{out_dir} already holds a copy-control report; "
+                         "use a fresh --out-dir rather than overwriting evidence")
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    _non_echo_projection(args, len(controls) * len(args.judges))
+
+    (out_dir / "copy_controls.jsonl").write_text(
+        "\n".join(json.dumps(c, ensure_ascii=False) for c in controls), encoding="utf-8")
+    (out_dir / "copy_control_key.jsonl").write_text(
+        "\n".join(json.dumps(k) for k in control_key), encoding="utf-8")
+
+    reports = []
+    for judge_id in args.judges:
+        ok, detail = probe_judge(judge_id, api_key)
+        print(f"  probe {judge_id}: {'OK' if ok else 'FAILED — ' + detail}")
+        if not ok:
+            raise SystemExit(f"judge {judge_id!r} unreachable; not spending a panel on it")
+
+        results, raw = {}, []
+        for i, cell in enumerate(controls, 1):
+            call = call_judge(cell, judge_id=judge_id, api_key=api_key,
+                              spec=NON_ECHO_SPEC)
+            raw.append({"cell_id": call.cell_id, "status": call.status,
+                        "scores": call.scores, "error": call.error,
+                        "usage": call.usage, "timestamp": call.timestamp})
+            if call.status == "ok":
+                results[call.cell_id] = call.scores
+            print(f"    {i}/{len(controls)}", end="\r")
+        slug = judge_id.replace("/", "_")
+        (out_dir / f"raw_copy_{slug}.jsonl").write_text(
+            "\n".join(json.dumps(r) for r in raw), encoding="utf-8")
+
+        check = copy_control_report(results, control_key)
+        n_failed = sum(1 for r in raw if r["status"] != "ok")
+        report = {"judge_id": judge_id, "rubric_hash": NON_ECHO_SPEC.hash(),
+                  "salt": NON_ECHO_SPEC.salt, "n_scored": len(results),
+                  "n_failed": n_failed, "checks": [check],
+                  "passed": check["status"] == "PASS" and n_failed == 0}
+        reports.append(report)
+        print(f"\n=== {judge_id} — {'PASS' if report['passed'] else 'FAIL'} "
+              f"({len(results)}/{len(controls)} scored) ===")
+        print(f"  [{check['status']}] {check['name']}: {check['detail']}")
+        if n_failed:
+            print(f"  [FAIL] response_completeness: {n_failed} cells returned no rating")
+
+    (out_dir / "copy_control_report.json").write_text(
+        json.dumps(reports, indent=2), encoding="utf-8")
+    print(f"\nreport -> {out_dir / 'copy_control_report.json'}")
+    if not all(r["passed"] for r in reports):
+        raise SystemExit(
+            "\nThe non-echo rubric did not clear its copy control. Do NOT rate the "
+            "main panel with it: a rubric that rewards prompt copying cannot answer "
+            "the question it was written for. Revise the rubric and re-validate.")
+    print("\nAll judges cleared the copy control. Safe to rate the main panel.")
+
+
+def cmd_non_echo_rate(args) -> None:
+    """Rate the frozen 200-cell panel under the non-echo rubric.
+
+    Refuses to start unless the rubric has cleared its copy control, because a
+    rubric that rewards prompt copying produces numbers that look like an answer
+    and are not one.
+    """
+    import json
+
+    from rlens.autorate import call_judge
+    from rlens.non_echo import NON_ECHO_SPEC
+
+    api_key = os.environ.get("OPENROUTER_API_KEY")
+    if not api_key:
+        raise SystemExit("set OPENROUTER_API_KEY")
+
+    validation = Path(args.copy_control_report).expanduser()
+    if not validation.is_file():
+        raise SystemExit(f"{validation} not found; run `rlens non-echo-validate` first")
+    reports = json.loads(validation.read_text())
+    unvalidated = [r["judge_id"] for r in reports if not r.get("passed")]
+    missing = [j for j in args.judges if j not in {r["judge_id"] for r in reports}]
+    if unvalidated or missing:
+        raise SystemExit(
+            f"refusing to rate: judges failing the copy control {unvalidated}, "
+            f"judges with no copy-control result {missing}. A rubric that rewards "
+            "prompt copying cannot answer the question it was written for.")
+    stale = [r["judge_id"] for r in reports if r.get("rubric_hash") != NON_ECHO_SPEC.hash()]
+    if stale:
+        raise SystemExit(
+            f"the copy control was run against a different rubric text ({stale}); "
+            "re-validate before rating, or the validation does not apply")
+
+    panel = [json.loads(l) for l
+             in Path(args.panel).expanduser().read_text().splitlines() if l]
+    out_dir = Path(args.out_dir).expanduser()
+    if out_dir.exists() and any(out_dir.glob("raw_*.jsonl")):
+        raise SystemExit(f"{out_dir} already holds ratings; use a fresh --out-dir")
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    _non_echo_projection(args, len(panel) * len(args.judges))
+
+    all_scores = {}
+    for judge_id in args.judges:
+        results, raw = {}, []
+        for i, cell in enumerate(panel, 1):
+            call = call_judge(cell, judge_id=judge_id, api_key=api_key,
+                              spec=NON_ECHO_SPEC)
+            raw.append({"cell_id": call.cell_id, "status": call.status,
+                        "scores": call.scores, "error": call.error,
+                        "usage": call.usage, "timestamp": call.timestamp})
+            if call.status == "ok":
+                results[call.cell_id] = call.scores
+            if i % 25 == 0 or i == len(panel):
+                print(f"  {judge_id}: {i}/{len(panel)}")
+        slug = judge_id.replace("/", "_")
+        (out_dir / f"raw_{slug}.jsonl").write_text(
+            "\n".join(json.dumps(r) for r in raw), encoding="utf-8")
+        all_scores[judge_id] = results
+        n_failed = sum(1 for r in raw if r["status"] != "ok")
+        print(f"  {judge_id}: {len(results)}/{len(panel)} scored, {n_failed} FAILED")
+
+    # Mean of the validated judges -- the same rule the primary v2 estimate uses
+    # after the adjudicator was demoted. No adjudication here at all.
+    combined = {}
+    for cell in panel:
+        cid = cell["cell_id"]
+        per = [all_scores[j][cid] for j in args.judges if cid in all_scores[j]]
+        if len(per) != len(args.judges):
+            continue
+        entry = {}
+        for label in ("A", "B", "C"):
+            entry[label] = {d: sum(s[label][d] for s in per) / len(per)
+                            for d, _ in NON_ECHO_SPEC.dimensions}
+        primary = {l: entry[l][NON_ECHO_SPEC.primary] for l in ("A", "B", "C")}
+        best = max(primary.values())
+        leaders = sorted(l for l, v in primary.items() if v == best)
+        entry["contextual_winner"] = leaders[0] if len(leaders) == 1 else "tie"
+        combined[cid] = entry
+
+    (out_dir / "combined_scores.json").write_text(json.dumps(combined, indent=2),
+                                                  encoding="utf-8")
+    # Per-judge long form, so a later analysis can recompute any scoring rule
+    # without re-reading the raw logs.
+    rows = [{"cell_id": cid, "judge_id": judge, "panel_arm": label,
+             **{d: scores[label][d] for d, _ in NON_ECHO_SPEC.dimensions}}
+            for judge, per_cell in all_scores.items()
+            for cid, scores in per_cell.items()
+            for label in ("A", "B", "C") if label in scores]
+    import pandas as pd
+    pd.DataFrame(rows).to_csv(out_dir / "scores_blinded.csv", index=False)
+
+    complete = {"complete": len(combined) == len(panel),
+                "n_cells": len(panel), "n_combined": len(combined),
+                "blocking_reason": None if len(combined) == len(panel)
+                else f"{len(panel) - len(combined)} cells lack a rating from every judge"}
+    (out_dir / "completeness.json").write_text(json.dumps(complete, indent=2),
+                                               encoding="utf-8")
+    print(f"\n{len(combined)}/{len(panel)} cells combined -> {out_dir}")
+    if not complete["complete"]:
+        print(f"INCOMPLETE: {complete['blocking_reason']}")
+
+
+def cmd_non_echo_analyse(args) -> None:
+    """Same estimand and same statistics as the primary analysis, on the
+    non-echo dimension. If R-Lens still leads here, the coherence advantage is
+    not an artefact of prompt copying."""
+    import json
+
+    import pandas as pd
+
+    from rlens.analysis_v2 import (_paired_cells, equal_weight_delta, holm,
+                                   prompt_cluster_bootstrap, signflip_permutation_p,
+                                   unblind_panel, win_rates)
+    from rlens.non_echo import NON_ECHO_SPEC
+
+    ratings = Path(args.ratings_dir).expanduser()
+    completeness = json.loads((ratings / "completeness.json").read_text())
+    if not completeness.get("complete"):
+        raise SystemExit(f"ratings incomplete ({completeness.get('blocking_reason')}); "
+                         "unblinding is blocked until every cell is rated")
+
+    combined = json.loads((ratings / "combined_scores.json").read_text())
+    key_rows = [json.loads(l) for l in Path(args.key).read_text().splitlines() if l]
+    sample = json.loads(Path(args.sample).read_text())
+
+    dims = tuple(d for d, _ in NON_ECHO_SPEC.dimensions)
+    primary = NON_ECHO_SPEC.primary
+    df = unblind_panel(combined, key_rows, sample, dimensions=dims, primary=primary)
+    if df.empty:
+        raise SystemExit("no rows after unblinding; check --key and --sample")
+
+    out_dir = Path(args.out_dir).expanduser()
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    contrasts = [("released-R", "released-J"), ("released-R", "logit"),
+                 ("released-J", "logit")]
+    results, rows = {"dimension": primary, "rubric_hash": NON_ECHO_SPEC.hash(),
+                     "salt": NON_ECHO_SPEC.salt, "n_cells": len(combined)}, []
+    per_model = {}
+    for model_key, sub in df.groupby("model_key"):
+        entry = {}
+        for a, b in contrasts:
+            paired = _paired_cells(sub, a, b, primary)
+            if paired.empty:
+                continue
+            delta = equal_weight_delta(paired)
+            ci = prompt_cluster_bootstrap(paired, n_boot=args.n_boot, seed=args.seed)
+            perm = signflip_permutation_p(paired, n_perm=args.n_perm, seed=args.seed)
+            entry[f"{a} - {b}"] = {"delta": delta, **ci, **perm,
+                                   "win_rates": win_rates(sub, a, b, primary)}
+            rows.append({"model": model_key, "contrast": f"{a} - {b}", "delta": delta,
+                         "ci_lo": ci["ci_lo"], "ci_hi": ci["ci_hi"],
+                         "p": perm["p_display"], **{k: round(v, 3) for k, v in
+                                                    win_rates(sub, a, b, primary).items()
+                                                    if k in ("win", "tie", "loss")}})
+        per_model[model_key] = entry
+    results["per_model"] = per_model
+
+    depth_p = {}
+    by_depth = {}
+    for model_key, sub in df.groupby("model_key"):
+        by_depth[model_key] = {}
+        for depth, chunk in sub.groupby("requested_depth"):
+            paired = _paired_cells(chunk, "released-R", "released-J", primary)
+            if paired.empty:
+                continue
+            perm = signflip_permutation_p(paired, n_perm=args.n_perm, seed=args.seed)
+            by_depth[model_key][str(depth)] = {
+                "delta": equal_weight_delta(paired),
+                **prompt_cluster_bootstrap(paired, n_boot=args.n_boot, seed=args.seed),
+                **perm}
+            depth_p[(model_key, str(depth))] = perm["p_value"]
+    for (model_key, depth), adj in holm(depth_p).items():
+        by_depth[model_key][depth]["p_holm"] = adj
+    results["by_depth"] = by_depth
+
+    means = df.groupby(["model_key", "lens"])[primary].mean().unstack()
+    results["mean_scores"] = {m: {l: float(v) for l, v in row.items() if v == v}
+                              for m, row in means.iterrows()}
+
+    (out_dir / "non_echo_results.json").write_text(json.dumps(results, indent=2),
+                                                   encoding="utf-8")
+    table = pd.DataFrame(rows)
+    table.to_csv(out_dir / "non_echo_contrasts.csv", index=False)
+
+    lines = [f"# Non-echo coherence (Stage 5)", "",
+             "Coherence scored with copied prompt spans EXCLUDED, under a separate",
+             f"rubric (hash `{NON_ECHO_SPEC.hash()}`, salt `{NON_ECHO_SPEC.salt}`) that",
+             "cleared a pure-prompt-copy control before any panel cell was rated.", "",
+             "Same estimand, same equal-weight statistics, same prompt-cluster",
+             "bootstrap and sign-flip permutation test as the primary analysis.", "",
+             "## Contrasts", "", table.to_markdown(index=False, floatfmt=".3f"), "",
+             "## Mean non-echo coherence by lens", "",
+             means.to_markdown(floatfmt=".3f"), ""]
+    (out_dir / "non_echo_report.md").write_text("\n".join(lines), encoding="utf-8")
+    print("\n".join(lines))
+    print(f"\nresults -> {out_dir / 'non_echo_results.json'}")
+
+
+# ---------------------------------------------------------------------------
 # recombine  (no API: rebuild combined scores from the frozen raw responses)
 # ---------------------------------------------------------------------------
 
@@ -2590,6 +2909,42 @@ def main() -> None:
     p.add_argument("--outstanding-gate", action="append",
                    help="a validation gate that has NOT been run; repeatable")
     p.set_defaults(func=cmd_manifest)
+
+    p = sub.add_parser("non-echo-validate",
+                       help="Stage 5: validate the non-echo rubric against pure-copy controls")
+    p.add_argument("--control-cells", required=True,
+                   help="control_cells.jsonl from panel-v2 (source of the meaningful arms)")
+    p.add_argument("--control-key", required=True, help="control_key.jsonl")
+    p.add_argument("--out-dir", required=True)
+    p.add_argument("--judges", nargs="+", required=True)
+    p.add_argument("--n-controls", type=int, default=10)
+    p.add_argument("--cost-report", help="a previous cost_report.json, for the projection")
+    p.add_argument("--rubric-ratio", type=float, default=1.0,
+                   help="expected completion-token multiplier vs the measured rubric")
+    p.add_argument("--budget-usd", type=float, default=25.0,
+                   help="abort before spending if the projection exceeds this")
+    p.set_defaults(func=cmd_non_echo_validate)
+
+    p = sub.add_parser("non-echo-rate", help="Stage 5: rate the panel under the non-echo rubric")
+    p.add_argument("--panel", required=True, help="panel_public.jsonl")
+    p.add_argument("--copy-control-report", required=True,
+                   help="copy_control_report.json from `rlens non-echo-validate`")
+    p.add_argument("--out-dir", required=True)
+    p.add_argument("--judges", nargs="+", required=True)
+    p.add_argument("--cost-report")
+    p.add_argument("--rubric-ratio", type=float, default=1.0)
+    p.add_argument("--budget-usd", type=float, default=25.0)
+    p.set_defaults(func=cmd_non_echo_rate)
+
+    p = sub.add_parser("non-echo-analyse", help="Stage 5: analyse the non-echo ratings")
+    p.add_argument("--ratings-dir", required=True)
+    p.add_argument("--key", required=True)
+    p.add_argument("--sample", required=True)
+    p.add_argument("--out-dir", required=True)
+    p.add_argument("--n-boot", type=int, default=10000)
+    p.add_argument("--n-perm", type=int, default=10000)
+    p.add_argument("--seed", type=int, default=20260827)
+    p.set_defaults(func=cmd_non_echo_analyse)
 
     p = sub.add_parser("recombine", help="rebuild combined scores from frozen raw responses (no API)")
     p.add_argument("--ratings-dir", required=True)

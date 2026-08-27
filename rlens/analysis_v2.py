@@ -30,10 +30,15 @@ import numpy as np
 import pandas as pd
 
 DIMENSIONS = ("contextual_coherence", "lexical_integrity", "prompt_echo")
+# Stage 5 scores a different primary dimension under a different rubric. The
+# analysis machinery is identical, so the dimension is a parameter rather than a
+# second copy of it; the v2 default keeps every frozen call site unchanged.
+PRIMARY = "contextual_coherence"
 LENSES = ("released-R", "released-J", "logit")
 
 
-def unblind_panel(combined: dict, key_rows: list, sample: dict) -> pd.DataFrame:
+def unblind_panel(combined: dict, key_rows: list, sample: dict,
+                  dimensions: tuple = DIMENSIONS, primary: str = PRIMARY) -> pd.DataFrame:
     """Join combined scores to lens identity. Long form, one row per (cell, lens).
 
     The key is applied only here, after ratings are frozen (§8).
@@ -60,7 +65,7 @@ def unblind_panel(combined: dict, key_rows: list, sample: dict) -> pd.DataFrame:
                 "requested_depth": depth.get("requested_depth"),
                 "actual_depth": depth.get("actual_depth"),
                 "lens": lens,
-                **{d: float(arm[d]) for d in DIMENSIONS if d in arm},
+                **{d: float(arm[d]) for d in dimensions if d in arm},
                 "won": scores.get("contextual_winner") == panel_label,
             })
     return pd.DataFrame(rows)
@@ -157,9 +162,9 @@ def signflip_permutation_p(paired: pd.DataFrame, *, n_perm: int = 10000,
             "p_display": f"< {1 / (n_perm + 1):.0e}" if at_least == 0 else f"{p:.4f}"}
 
 
-def win_rates(df: pd.DataFrame, a: str, b: str) -> dict:
-    """Paired win / tie / loss on contextual coherence, per cell."""
-    paired = _paired_cells(df, a, b, "contextual_coherence")
+def win_rates(df: pd.DataFrame, a: str, b: str, dimension: str = PRIMARY) -> dict:
+    """Paired win / tie / loss on the primary dimension, per cell."""
+    paired = _paired_cells(df, a, b, dimension)
     if paired.empty:
         return {}
     wins = int((paired["diff"] > 0).sum())
@@ -181,7 +186,8 @@ def holm(pvalues: dict) -> dict:
     return adjusted
 
 
-def judge_agreement(scores_blinded: pd.DataFrame, judges: list) -> dict:
+def judge_agreement(scores_blinded: pd.DataFrame, judges: list,
+                    dimension: str = PRIMARY) -> dict:
     """Ordinal agreement between two judges on the primary dimension.
 
     Quadratic-weighted Cohen's kappa plus exact winner agreement.
@@ -190,7 +196,7 @@ def judge_agreement(scores_blinded: pd.DataFrame, judges: list) -> dict:
         return {}
     a, b = judges[0], judges[1]
     wide = scores_blinded.pivot_table(index=["cell_id", "panel_arm"], columns="judge_id",
-                                      values="contextual_coherence")
+                                      values=dimension)
     if a not in wide.columns or b not in wide.columns:
         return {}
     both = wide[[a, b]].dropna()
