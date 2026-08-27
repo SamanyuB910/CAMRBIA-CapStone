@@ -2247,7 +2247,7 @@ def cmd_non_echo_validate(args) -> None:
     import json
 
     from rlens.autorate import call_judge, probe_judge
-    from rlens.non_echo import (NON_ECHO_SPEC, build_copy_controls,
+    from rlens.non_echo import (NON_ECHO_SPEC, Progress, build_copy_controls,
                                 copy_control_report)
 
     api_key = os.environ.get("OPENROUTER_API_KEY")
@@ -2288,7 +2288,8 @@ def cmd_non_echo_validate(args) -> None:
             raise SystemExit(f"judge {judge_id!r} unreachable; not spending a panel on it")
 
         results, raw = {}, []
-        for i, cell in enumerate(controls, 1):
+        bar = Progress(len(controls), judge_id, every=5)
+        for cell in controls:
             call = call_judge(cell, judge_id=judge_id, api_key=api_key,
                               spec=NON_ECHO_SPEC)
             raw.append({"cell_id": call.cell_id, "status": call.status,
@@ -2296,7 +2297,7 @@ def cmd_non_echo_validate(args) -> None:
                         "usage": call.usage, "timestamp": call.timestamp})
             if call.status == "ok":
                 results[call.cell_id] = call.scores
-            print(f"    {i}/{len(controls)}", end="\r")
+            bar.emit(call.status == "ok")
         slug = judge_id.replace("/", "_")
         (out_dir / f"raw_copy_{slug}.jsonl").write_text(
             "\n".join(json.dumps(r) for r in raw), encoding="utf-8")
@@ -2335,7 +2336,7 @@ def cmd_non_echo_rate(args) -> None:
     import json
 
     from rlens.autorate import call_judge
-    from rlens.non_echo import NON_ECHO_SPEC
+    from rlens.non_echo import NON_ECHO_SPEC, Progress
 
     api_key = os.environ.get("OPENROUTER_API_KEY")
     if not api_key:
@@ -2370,7 +2371,9 @@ def cmd_non_echo_rate(args) -> None:
     all_scores = {}
     for judge_id in args.judges:
         results, raw = {}, []
-        for i, cell in enumerate(panel, 1):
+        bar = Progress(len(panel), judge_id)
+        print(f"\nrating {len(panel)} cells with {judge_id}")
+        for cell in panel:
             call = call_judge(cell, judge_id=judge_id, api_key=api_key,
                               spec=NON_ECHO_SPEC)
             raw.append({"cell_id": call.cell_id, "status": call.status,
@@ -2378,8 +2381,7 @@ def cmd_non_echo_rate(args) -> None:
                         "usage": call.usage, "timestamp": call.timestamp})
             if call.status == "ok":
                 results[call.cell_id] = call.scores
-            if i % 25 == 0 or i == len(panel):
-                print(f"  {judge_id}: {i}/{len(panel)}")
+            bar.emit(call.status == "ok")
         slug = judge_id.replace("/", "_")
         (out_dir / f"raw_{slug}.jsonl").write_text(
             "\n".join(json.dumps(r) for r in raw), encoding="utf-8")

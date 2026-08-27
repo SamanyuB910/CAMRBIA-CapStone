@@ -255,3 +255,63 @@ def write_projection(projection: dict, path) -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(projection, indent=2), encoding="utf-8")
     return path
+
+
+# ---------------------------------------------------------------------------
+# progress
+# ---------------------------------------------------------------------------
+
+
+class Progress:
+    """Live per-call progress for long judge runs.
+
+    A 200-cell GPT-5 pass takes hours and prints nothing useful between cells,
+    which is indistinguishable from a hang. This writes a carriage-returned
+    status line after EVERY call, so silence means stuck and movement means
+    working -- and it emits a newline periodically so a piped log
+    (``| tee``) still shows history rather than one overwritten line.
+    """
+
+    def __init__(self, total: int, label: str, *, clock=None, every: int = 25):
+        import time as _time
+        self.total, self.label, self.every = total, label, every
+        self._clock = clock or _time.monotonic
+        self.start = self._clock()
+        self.done = self.ok = self.failed = 0
+
+    def update(self, ok: bool) -> str:
+        self.done += 1
+        self.ok += bool(ok)
+        self.failed += not ok
+        return self.line()
+
+    def line(self) -> str:
+        elapsed = self._clock() - self.start
+        pct = 100.0 * self.done / self.total if self.total else 0.0
+        per = elapsed / self.done if self.done else 0.0
+        remaining = per * (self.total - self.done)
+        text = (f"  {self.label}  {self.done}/{self.total} ({pct:.0f}%)  "
+                f"elapsed {fmt_duration(elapsed)}  eta {fmt_duration(remaining)}  "
+                f"ok={self.ok}")
+        if self.failed:
+            text += f" FAILED={self.failed}"
+        return text
+
+    def emit(self, ok: bool, *, stream=None) -> None:
+        import sys
+        stream = stream or sys.stdout
+        line = self.update(ok)
+        # \r keeps an interactive terminal to one line; the periodic newline
+        # means a piped log still records progress instead of one final line.
+        end = "\n" if (self.done % self.every == 0 or self.done == self.total) else "\r"
+        stream.write(line.ljust(96) + end)
+        stream.flush()
+
+
+def fmt_duration(seconds: float) -> str:
+    seconds = max(0, int(seconds))
+    if seconds < 60:
+        return f"{seconds}s"
+    if seconds < 3600:
+        return f"{seconds // 60}m{seconds % 60:02d}s"
+    return f"{seconds // 3600}h{(seconds % 3600) // 60:02d}m"

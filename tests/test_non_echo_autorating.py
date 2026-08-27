@@ -236,3 +236,74 @@ def test_validate_refuses_to_overwrite_an_existing_copy_control_report():
     src = inspect.getsource(cli.cmd_non_echo_validate)
     assert "already holds a copy-control report" in src
     assert "args.force" not in src
+
+
+# --- progress reporting ---------------------------------------------------
+
+def test_progress_reports_after_every_call():
+    """A 200-cell GPT-5 pass printing only every 25 cells goes silent for ~12
+    minutes at a time, which is indistinguishable from a hang."""
+    import io
+
+    from rlens.non_echo import Progress
+
+    clock = [0.0]
+    bar = Progress(200, "judge", clock=lambda: clock[0])
+    buf = io.StringIO()
+    for i in range(1, 4):
+        clock[0] = i * 30.0
+        bar.emit(True, stream=buf)
+    assert buf.getvalue().count("1/200") == 1
+    assert "3/200" in buf.getvalue()
+
+
+def test_progress_shows_eta_and_failures():
+    import io
+
+    from rlens.non_echo import Progress
+
+    clock = [0.0]
+    bar = Progress(100, "j", clock=lambda: clock[0])
+    buf = io.StringIO()
+    clock[0] = 60.0
+    bar.emit(False, stream=buf)
+    out = buf.getvalue()
+    assert "FAILED=1" in out
+    assert "eta 1h39m" in out, out
+    assert "elapsed 1m00s" in out
+
+
+def test_progress_emits_newlines_so_a_piped_log_keeps_history():
+    """With `| tee`, a carriage-return-only line records one row for the whole
+    run. A periodic newline keeps the log readable."""
+    import io
+
+    from rlens.non_echo import Progress
+
+    clock = [0.0]
+    bar = Progress(10, "j", clock=lambda: clock[0], every=5)
+    buf = io.StringIO()
+    for i in range(1, 11):
+        clock[0] = i
+        bar.emit(True, stream=buf)
+    assert buf.getvalue().count("\n") == 2, "newline at 5 and at 10"
+
+
+def test_duration_formatting_is_readable_at_every_scale():
+    from rlens.non_echo import fmt_duration
+
+    assert fmt_duration(12) == "12s"
+    assert fmt_duration(95) == "1m35s"
+    assert fmt_duration(4210) == "1h10m"
+    assert fmt_duration(-5) == "0s"
+
+
+def test_rate_and_validate_both_use_the_progress_bar():
+    import inspect
+
+    from rlens import cli
+
+    for fn in (cli.cmd_non_echo_rate, cli.cmd_non_echo_validate):
+        src = inspect.getsource(fn)
+        assert "Progress(" in src and "bar.emit(" in src
+        assert "% 25 == 0" not in src, "no silent batching"
