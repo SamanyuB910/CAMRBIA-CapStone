@@ -21,7 +21,8 @@
   },
   "seeds": {
     "analysis_bootstrap_permutation": 20260826,
-    "robustness_bootstrap_permutation": 20260827
+    "robustness_bootstrap_permutation": 20260827,
+    "non_echo_bootstrap_permutation": 20260827
   },
   "audit": {
     "status": "PASS",
@@ -101,34 +102,96 @@
       "bytes": 3863
     },
     "figures/fig1_primary_result.pdf": {
-      "sha256": "b90791e5bed6ccaf815a857b850bc23fffd23adc7f8bd8ed06848abb09f67288",
-      "bytes": 20253
+      "sha256": "c3023e15ba7c33db4695154d7f60354a30e6b694ba739946425f3b358510df68",
+      "bytes": 20226
     },
     "figures/fig2_depth_profile.pdf": {
-      "sha256": "4e28faa55f0ee9ef392b71a474b5260b78dcfdc599510fd2758a3faf0d44963c",
+      "sha256": "793ccd977c962e585896f69a9fe68f7108ac786f62090eb262024eefe2f8b260",
       "bytes": 14786
     },
     "figures/fig3_judge_sensitivity.pdf": {
-      "sha256": "ac86e19cb84a6adf123383c5e2a72391c5841cc6b49fa5fcffb072ba317b8e2b",
+      "sha256": "feca633f388f497d17cef4831ce2c4798a4b54a30bbd98af87b4211c02730508",
       "bytes": 16584
     },
     "figures/fig4_echo_sensitivity.pdf": {
-      "sha256": "a32e8d31a80a86e4396c3eed3dc08a6d0e25280513c5ae39b6030225656e8a66",
+      "sha256": "37e0269434bc4eef1c8d0ed937ffbca060e44b93eaa6774d912b6d5419abf018",
       "bytes": 23082
     },
     "figures/fig5_judge_agreement.pdf": {
-      "sha256": "5e4adeb4b6736639157c82d96c2a79303b42812098cfd28899c2443e22e81c81",
+      "sha256": "d55478d5777b39e802a60a5e0f06f1c1e2c5be090077d64604eb85cdbe23a283",
       "bytes": 15706
     },
+    "figures/fig6_non_echo.pdf": {
+      "sha256": "33e0dac749c74f6fa89f578acd5c24a81286227e59821f68d12e37ed0b87e182",
+      "bytes": 18567
+    },
     "figures/figure_manifest.json": {
-      "sha256": "c680b529e1e82fb42027f215314fa791e304c805743dc1777cd61857fd688380",
-      "bytes": 1358
+      "sha256": "f9a8b5a63d56756c301e3e90281ee8ff2a30f3e617a3cca179b2a587589bd65d",
+      "bytes": 1468
+    },
+    "non_echo_validation/copy_control_report.json": {
+      "sha256": "42af3d57d2275e500a20002b8a2f26fbb375ab302db905fad88ad6f2cf53f313",
+      "bytes": 935
+    },
+    "non_echo_validation/copy_controls.jsonl": {
+      "sha256": "d41b020d04d826d7962093fa94e96e773b7c667feb0aed75e393cc25b232e33c",
+      "bytes": 14370
+    },
+    "non_echo_validation/copy_control_key.jsonl": {
+      "sha256": "f64b172c350c5ee83f96f17de2d20a72aef9b31ebeadc4f19fd8cee29c374e46",
+      "bytes": 1209
+    },
+    "non_echo_validation/non_echo_cost_projection.json": {
+      "sha256": "56c16025ba9e0bf629bea96595585448579d33158c60b8e5a413fd13bf9e3df4",
+      "bytes": 747
+    },
+    "non_echo_ratings/combined_scores.json": {
+      "sha256": "f952038d1df3b56d3a87fd6c786623b332deea5d27d0595ae9e4dc1df406e680",
+      "bytes": 61514
+    },
+    "non_echo_ratings/scores_blinded.csv": {
+      "sha256": "f2dfc13462ebf04616399bab37ef3dd1735a5acaaf86150c59032a093fca21da",
+      "bytes": 52265
+    },
+    "non_echo_ratings/completeness.json": {
+      "sha256": "e99300c1e9607622339fe3474d1618c122eac8d7b1dca64c7bd332b0c011ea1a",
+      "bytes": 88
+    },
+    "non_echo_analysis/non_echo_results.json": {
+      "sha256": "6d3c5a29540268194c0e963296239d2850dca9a0317db72765ad20abdafd7cb7",
+      "bytes": 7913
+    },
+    "non_echo_analysis/non_echo_report.md": {
+      "sha256": "d8a76aa5f265df13e806b21640f07c1dde0610066947578d943d58ef3a80ac3f",
+      "bytes": 2637
+    },
+    "non_echo_analysis/non_echo_contrasts.csv": {
+      "sha256": "6d523dbebab94c8b95d13892e5ed417ee036a6a9acfd1ff7e84a33f99dbdf76e",
+      "bytes": 619
+    },
+    "small_sample/leave_one_prompt_out.csv": {
+      "sha256": "1dffa5936c101ae366230f187cd05d6666c49de287dfec2c5135a09ce59040a3",
+      "bytes": 6056
+    },
+    "small_sample/leave_one_set_out.csv": {
+      "sha256": "01720d29e619187196a8e3482177e4cff57f905757f6f47e69fb9118ea3f3f27",
+      "bytes": 1087
+    },
+    "small_sample/prompt_level_effects.csv": {
+      "sha256": "ccfa7c45209f510a9cb9aaf423cac298753547378e969f0620f6904ee642b35c",
+      "bytes": 5850
+    },
+    "small_sample/small_sample_report.json": {
+      "sha256": "c54edafc029fc54dd65a1cffdd91c791f3fcc2b827781d5e210a1e22609252f9",
+      "bytes": 3127
+    },
+    "small_sample/small_sample_report.md": {
+      "sha256": "8312e9e83ce7a6347064e46cdf1418e0440e2589f0228bc236383f1fc9c786af",
+      "bytes": 13468
     }
   },
   "missing_artifacts": [],
-  "outstanding_validation_gates": [
-    "non-echo coherence rubric (Stage 5)"
-  ],
-  "complete": false,
+  "outstanding_validation_gates": [],
+  "complete": true,
   "notes": {}
 }
