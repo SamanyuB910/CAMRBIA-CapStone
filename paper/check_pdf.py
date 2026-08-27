@@ -27,10 +27,20 @@ def pdf_text(path: Path) -> str:
 
 
 def expected_means(stats: dict) -> dict:
+    """Per-lens means, from either artifact shape.
+
+    `analyse-v2` nests them at per_model[model]["means"][dimension]; the
+    non-echo analysis writes a flat top-level "mean_scores". Accepting only one
+    shape made the checker silently pass on a file it was not reading.
+    """
     means = {}
     for model, entry in (stats.get("per_model") or {}).items():
-        per_lens = ((entry or {}).get("means") or {}).get(PRIMARY_DIM) or {}
+        by_dim = (entry or {}).get("means") or {}
+        per_lens = by_dim.get(PRIMARY_DIM) or by_dim.get(stats.get("dimension", "")) or {}
         if per_lens:
+            means[model] = {l: round(float(v), 2) for l, v in per_lens.items()}
+    if not means:
+        for model, per_lens in (stats.get("mean_scores") or {}).items():
             means[model] = {l: round(float(v), 2) for l, v in per_lens.items()}
     return means
 
