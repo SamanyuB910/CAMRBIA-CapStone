@@ -22,3 +22,4 @@ lenses/**/*.ckpt.pt
 # Local scratch
 results/plumbing/
 NUL
+backup_from_box/
