@@ -687,7 +687,13 @@ ours. Token-form statistics are not a substitute for rating the readouts.
       larger one was judged not worth its cost.
 \item \textbf{Released lenses use the 25-prompt light recipe}, not the
       1000-prompt recipe of the source post. Effect sizes are not comparable to
-      the authors'.
+      the authors'. R-Lens and J-Lens may also differ in sample efficiency, so
+      matching both arms at $n{=}25$ makes the comparison internally fair
+      without making it equivalent to the full-recipe comparison.
+\item \textbf{Model choice was fixed by the capstone brief}: Qwen3.5-27B and
+      Gemma-3-27B-it. We did not verify that these are the exact revisions used
+      in the source post, and make no claim that they are. All results are
+      reported for these artifacts.
 \item \textbf{Twenty prompts per model.} Adequate for the pooled estimand,
       which is why intervals are prompt-clustered; not adequate for the
       per-set breakdown, which is descriptive only.

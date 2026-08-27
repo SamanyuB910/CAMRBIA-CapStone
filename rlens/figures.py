@@ -446,9 +446,124 @@ def fig_non_echo(stats: dict, non_echo: dict, out_dir: Path) -> list[str]:
     return save(fig, out_dir, "fig6_non_echo")
 
 
+def fig_stability(loo, los, out_dir: Path) -> list[str]:
+    """Figure 7 -- leave-one-out stability.
+
+    A pooled estimate with a tight interval can still rest on one prompt. This
+    plots every single-deletion estimate against the full-sample value, so a
+    reader can see the spread rather than take a summary sentence on trust. The
+    set-deletion panel is where the Gemma non-echo fragility is visible: one
+    deletion crosses zero.
+    """
+    plt = _style()
+    if loo is None or not len(loo):
+        return []
+    constructs = list(dict.fromkeys(loo["construct"]))
+    models = [m for m in ("qwen3.5-27b", "gemma-3-27b-it") if m in set(loo["model"])]
+    if not models:
+        return []
+
+    fig, axes = plt.subplots(1, 2, figsize=(7.4, 3.2), width_ratios=[1.35, 1])
+    shades = {"qwen3.5-27b": "#D55E00", "gemma-3-27b-it": "#CC79A7"}
+    marks = {"standard": "o", "non_echo_norefill": "s", "non_echo_refilled": "^"}
+    nice = {"standard": "standard", "non_echo_norefill": "non-echo",
+            "non_echo_refilled": "refilled"}
+
+    ax = axes[0]
+    ticks, labels = [], []
+    for i, construct in enumerate(constructs):
+        for j, model in enumerate(models):
+            sub = loo[(loo["construct"] == construct) & (loo["model"] == model)]
+            if sub.empty:
+                continue
+            x = i * (len(models) + 0.7) + j
+            ticks.append(x)
+            labels.append(f"{nice.get(construct, construct)}\n{SHORT_LABEL.get(model, model)}")
+            vals = sub["delta"].to_numpy()
+            # deterministic jitter: index order, not randomness
+            offs = [(k - (len(vals) - 1) / 2) / max(1, len(vals)) * 0.55
+                    for k in range(len(vals))]
+            ax.scatter([x + o for o in offs], vals, s=16, alpha=0.75,
+                       color=shades.get(model, MUTED), edgecolor="none")
+            ax.plot([x - 0.32, x + 0.32], [vals.mean()] * 2, color="black", lw=1.4)
+    ax.axhline(0, color="black", lw=0.9, ls=(0, (4, 3)))
+    ax.set_xticks(ticks)
+    ax.set_xticklabels(labels, fontsize=7)
+    ax.set_ylabel("R − J after deleting one prompt")
+    ax.set_title("a  Leave-one-prompt-out (20 deletions each)", loc="left")
+    ax.grid(axis="x", visible=False)
+
+    ax = axes[1]
+    if los is not None and len(los):
+        ticks, labels = [], []
+        for i, construct in enumerate(constructs):
+            for j, model in enumerate(models):
+                sub = los[(los["construct"] == construct) & (los["model"] == model)]
+                if sub.empty:
+                    continue
+                x = i * (len(models) + 0.7) + j
+                ticks.append(x)
+                labels.append(f"{nice.get(construct, construct)}\n{SHORT_LABEL.get(model, model)}")
+                for _, row in sub.iterrows():
+                    below = row["delta"] <= 0
+                    ax.scatter([x], [row["delta"]], s=34,
+                               color="#000000" if below else shades.get(model, MUTED),
+                               marker="X" if below else marks.get(construct, "o"),
+                               zorder=3)
+                    if below:
+                        ax.annotate(f"−{row['dropped_set']}",
+                                    (x, row["delta"]), textcoords="offset points",
+                                    xytext=(7, -2), fontsize=6.5, color="black")
+        ax.axhline(0, color="black", lw=0.9, ls=(0, (4, 3)))
+        ax.set_xticks(ticks)
+        ax.set_xticklabels(labels, fontsize=7)
+        ax.set_title("b  Leave-one-set-out (5 deletions each)", loc="left")
+        ax.grid(axis="x", visible=False)
+        ax.text(0.99, 0.02, "✕ = deletion that crosses zero", transform=ax.transAxes,
+                ha="right", va="bottom", fontsize=6.5, color=MUTED)
+    fig.tight_layout()
+    return save(fig, out_dir, "fig7_stability")
+
+
+def fig_non_echo_contrasts(non_echo: dict, out_dir: Path) -> list[str]:
+    """Figure 8 -- the lenses against the logit baseline, non-echo scoring.
+
+    The R - J comparison dominates the discussion, but the result with the
+    strongest cross-model support is that BOTH Jacobian lenses beat the logit
+    lens on non-copied content. That belongs in its own figure rather than
+    buried in a table.
+    """
+    plt = _style()
+    per_model = (non_echo or {}).get("per_model") or {}
+    models = [m for m in ("qwen3.5-27b", "gemma-3-27b-it") if m in per_model]
+    if not models:
+        return []
+    rows = []
+    for model in models:
+        for contrast in ("released-R - logit", "released-J - logit",
+                         "released-R - released-J"):
+            r = per_model[model].get(contrast)
+            if not r:
+                continue
+            pv = r.get("p_value")
+            rows.append((f"{MODEL_LABEL.get(model, model)}   {CONTRAST_LABEL[contrast]}",
+                         r["delta"], r["ci_lo"], r["ci_hi"],
+                         None if pv is None else pv < 0.05))
+    if not rows:
+        return []
+    fig, ax = plt.subplots(figsize=(5.6, 2.9))
+    _forest(ax, rows, xlabel="Difference in non-echo coherence (points)",
+            title="Non-echo coherence: every contrast")
+    ax.text(0.99, 0.02, "filled = permutation p < 0.05", transform=ax.transAxes,
+            ha="right", va="bottom", fontsize=7, color=MUTED)
+    fig.tight_layout()
+    return save(fig, out_dir, "fig8_non_echo_contrasts")
+
+
 def build_all(*, stats: dict, judge_table=None, echo_table=None,
               echo_detail: dict | None = None, out_dir: Path,
-              scoring: str = "adjudicated", non_echo: dict | None = None) -> dict:
+              scoring: str = "adjudicated", non_echo: dict | None = None,
+              loo=None, los=None) -> dict:
     """Draw every figure whose inputs are present; name the ones that are not."""
     out_dir = Path(out_dir)
     made, skipped = {}, {}
@@ -464,6 +579,11 @@ def build_all(*, stats: dict, judge_table=None, echo_table=None,
         ("fig5_judge_agreement", lambda: fig_agreement(stats, out_dir),
          bool(stats.get("per_model"))),
         ("fig6_non_echo", lambda: fig_non_echo(stats, non_echo or {}, out_dir),
+         bool(non_echo and non_echo.get("per_model"))),
+        ("fig7_stability", lambda: fig_stability(loo, los, out_dir),
+         loo is not None and len(loo) > 0),
+        ("fig8_non_echo_contrasts",
+         lambda: fig_non_echo_contrasts(non_echo or {}, out_dir),
          bool(non_echo and non_echo.get("per_model"))),
     ]
     for stem, fn, ok in plan:

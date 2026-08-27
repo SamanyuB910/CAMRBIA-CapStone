@@ -81,7 +81,8 @@ def test_build_all_writes_three_formats_per_figure(tmp_path):
     out = figures.build_all(stats=_stats(), judge_table=_judge_table(),
                             echo_table=_echo_table(), echo_detail=ECHO_DETAIL,
                             non_echo=_non_echo(), out_dir=tmp_path)
-    assert len(out["figures"]) == 6 and not out["skipped"]
+    assert len(out["figures"]) == 7          # fig8 needs the logit contrasts
+    assert set(out["skipped"]) == {"fig7_stability"}
     for stem, files in out["figures"].items():
         exts = sorted(f.rsplit(".", 1)[1] for f in files)
         assert exts == ["pdf", "png", "svg"], stem
@@ -95,14 +96,15 @@ def test_missing_inputs_are_named_not_faked(tmp_path):
     out = figures.build_all(stats=_stats(), judge_table=None, echo_table=None,
                             echo_detail=None, out_dir=tmp_path)
     assert set(out["skipped"]) == {"fig3_judge_sensitivity", "fig4_echo_sensitivity",
-                                   "fig6_non_echo"}
+                                   "fig6_non_echo", "fig7_stability",
+                                   "fig8_non_echo_contrasts"}
     assert not (tmp_path / "fig3_judge_sensitivity.pdf").exists()
     assert len(out["figures"]) == 3
 
 
 def test_empty_stats_produces_no_figures(tmp_path):
     out = figures.build_all(stats={}, out_dir=tmp_path)
-    assert not out["figures"] and len(out["skipped"]) == 6
+    assert not out["figures"] and len(out["skipped"]) == 8
 
 
 def test_manifest_records_what_was_drawn(tmp_path):
@@ -112,7 +114,8 @@ def test_manifest_records_what_was_drawn(tmp_path):
     assert set(manifest["figures"]) == {
         "fig1_primary_result", "fig2_depth_profile", "fig3_judge_sensitivity",
         "fig4_echo_sensitivity", "fig5_judge_agreement"}
-    assert manifest["skipped"] == {"fig6_non_echo": "required input missing"}
+    assert set(manifest["skipped"]) == {"fig6_non_echo", "fig7_stability",
+                                        "fig8_non_echo_contrasts"}
 
 
 def test_lens_colours_are_fixed_and_distinct():
@@ -251,3 +254,77 @@ def test_figure_one_prefers_embedded_means(tmp_path):
             "contextual_coherence": {"logit": 1.25, "released-J": 1.295,
                                      "released-R": 1.985}}
     assert figures.fig_primary(stats, tmp_path)
+
+
+def _loo_los():
+    pd = pytest.importorskip("pandas")
+    loo = pd.DataFrame([
+        {"construct": c, "model": m, "dropped_prompt": f"p{i}",
+         "delta": d + i * 0.01, "n_prompts": 19, "n_cells": 95}
+        for c, d in (("standard", 0.7), ("non_echo_norefill", 0.1))
+        for m in ("qwen3.5-27b", "gemma-3-27b-it") for i in range(20)])
+    los = pd.DataFrame([
+        {"construct": c, "model": m, "dropped_set": s_,
+         "delta": d if s_ != "poetry" else -0.08, "n_sets": 4, "n_cells": 80}
+        for c, d in (("standard", 0.7), ("non_echo_norefill", 0.1))
+        for m in ("qwen3.5-27b", "gemma-3-27b-it")
+        for s_ in ("association", "multihop", "multilingual", "poetry", "typo")])
+    return loo, los
+
+
+def test_stability_figure_renders(tmp_path):
+    loo, los = _loo_los()
+    assert figures.fig_stability(loo, los, tmp_path)
+    assert (tmp_path / "fig7_stability.pdf").exists()
+
+
+def test_stability_figure_marks_deletions_that_cross_zero(tmp_path):
+    """The Gemma non-echo estimate goes negative when poetry is removed. A
+    reader must be able to see that, not only read it."""
+    import inspect
+
+    src = inspect.getsource(figures.fig_stability)
+    assert 'row["delta"] <= 0' in src
+    assert 'marker="X"' in src
+    assert "dropped_set" in src
+
+
+def test_stability_jitter_is_deterministic_not_random(tmp_path):
+    """Random jitter would make two runs of the same data produce different
+    figures, which breaks byte-level reproducibility of the bundle."""
+    import inspect
+
+    src = inspect.getsource(figures.fig_stability)
+    assert "deterministic jitter" in src
+    # no runtime randomness: offsets come from enumeration order
+    assert "random.".lower() not in src.lower()
+    assert "np.random" not in src and "rng" not in src
+
+
+def test_non_echo_contrasts_figure_renders(tmp_path):
+    ne = _non_echo()
+    for m in ne["per_model"]:
+        ne["per_model"][m].update({
+            "released-R - logit": {"delta": 0.9, "ci_lo": 0.7, "ci_hi": 1.1,
+                                   "p_value": 1e-5},
+            "released-J - logit": {"delta": 0.6, "ci_lo": 0.4, "ci_hi": 0.8,
+                                   "p_value": 1e-4}})
+    assert figures.fig_non_echo_contrasts(ne, tmp_path)
+
+
+def test_build_all_reaches_eight_figures(tmp_path):
+    loo, los = _loo_los()
+    ne = _non_echo()
+    for m in ne["per_model"]:
+        ne["per_model"][m].update({
+            "released-R - logit": {"delta": 0.9, "ci_lo": 0.7, "ci_hi": 1.1},
+            "released-J - logit": {"delta": 0.6, "ci_lo": 0.4, "ci_hi": 0.8}})
+    out = figures.build_all(stats=_stats(), judge_table=_judge_table(),
+                            echo_table=_echo_table(), echo_detail=ECHO_DETAIL,
+                            non_echo=ne, loo=loo, los=los, out_dir=tmp_path)
+    assert len(out["figures"]) == 8 and not out["skipped"]
+
+
+def test_stability_figures_skip_without_small_sample_data(tmp_path):
+    out = figures.build_all(stats=_stats(), out_dir=tmp_path)
+    assert out["skipped"]["fig7_stability"] == "required input missing"

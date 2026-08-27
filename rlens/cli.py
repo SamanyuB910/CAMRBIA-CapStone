@@ -2176,6 +2176,8 @@ def cmd_figures(args) -> None:
         out_dir=Path(args.out_dir).expanduser(),
         scoring=args.scoring,
         non_echo=maybe_json(args.non_echo_results),
+        loo=maybe_csv(args.leave_one_prompt_out),
+        los=maybe_csv(args.leave_one_set_out),
     )
     for stem, files in result["figures"].items():
         print(f"  {stem}: " + ", ".join(Path(f).name for f in files))
@@ -3199,7 +3201,10 @@ def main() -> None:
                         "the rule that produced --statistical-results")
     p.add_argument("--non-echo-results",
                    help="non_echo_results.json from `rlens non-echo-analyse`; "
-                        "adds figure 6")
+                        "adds figures 6 and 8")
+    p.add_argument("--leave-one-prompt-out",
+                   help="leave_one_prompt_out.csv from `rlens small-sample`; adds figure 7")
+    p.add_argument("--leave-one-set-out", help="leave_one_set_out.csv from `rlens small-sample`")
     p.set_defaults(func=cmd_figures)
 
     p = sub.add_parser("manifest", help="Stage 9: final reproducibility manifest")
