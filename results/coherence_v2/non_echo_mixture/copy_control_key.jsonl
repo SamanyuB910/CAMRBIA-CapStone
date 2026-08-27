@@ -1,0 +1,30 @@
+{"cell_id": "04616b5bf72bdb86", "kind": "pure_copy_vs_meaningful", "copied_arm": "A", "source_cell": "0205e56ce25bcdab"}
+{"cell_id": "43bc7773a069a389", "kind": "pure_copy_vs_meaningful", "copied_arm": "A", "source_cell": "0588b44b1a688aa5"}
+{"cell_id": "4e0f6799e90b851f", "kind": "pure_copy_vs_meaningful", "copied_arm": "C", "source_cell": "498307acaeff49f6"}
+{"cell_id": "75e770787d646766", "kind": "pure_copy_vs_meaningful", "copied_arm": "A", "source_cell": "56c82fe9c93e1d53"}
+{"cell_id": "01d84af1a8b1e09c", "kind": "pure_copy_vs_meaningful", "copied_arm": "C", "source_cell": "7eeb98659f9187d6"}
+{"cell_id": "04a8a6eb8fc03995", "kind": "pure_copy_vs_meaningful", "copied_arm": "B", "source_cell": "9841427b18cbcd87"}
+{"cell_id": "4b574aa0201ba03c", "kind": "pure_copy_vs_meaningful", "copied_arm": "B", "source_cell": "c2eb2dcbea697492"}
+{"cell_id": "8ff9ba109aa888d3", "kind": "pure_copy_vs_meaningful", "copied_arm": "B", "source_cell": "df80248fce1dac4a"}
+{"cell_id": "9af8267810006fff", "kind": "pure_copy_vs_meaningful", "copied_arm": "C", "source_cell": "e681d397ab9e0634"}
+{"cell_id": "b0d83b26c5bfc348", "kind": "pure_copy_vs_meaningful", "copied_arm": "B", "source_cell": "ec0ae8dd2b9659d3"}
+{"cell_id": "b6f4b109ffd3b9ba", "kind": "mixture_invariance", "pad_kind": "typo_normalised", "pads_by_arm": {"A": 0, "B": 3, "C": 6}, "source_cell": "0170bee2809765cd"}
+{"cell_id": "f51341836d1975f0", "kind": "mixture_invariance", "pad_kind": "case_variant", "pads_by_arm": {"A": 0, "B": 3, "C": 6}, "source_cell": "02b63bb7dc1752e4"}
+{"cell_id": "520d3629e7e16a2f", "kind": "mixture_invariance", "pad_kind": "literal", "pads_by_arm": {"A": 0, "B": 3, "C": 6}, "source_cell": "031d3e49114df5ba"}
+{"cell_id": "2d738eb12c92c59c", "kind": "mixture_invariance", "pad_kind": "case_variant", "pads_by_arm": {"A": 0, "B": 3, "C": 6}, "source_cell": "04e653268beb8df0"}
+{"cell_id": "347971da555a338b", "kind": "mixture_invariance", "pad_kind": "literal", "pads_by_arm": {"A": 0, "B": 3, "C": 6}, "source_cell": "053340e8f8752d9c"}
+{"cell_id": "bd246f2e8bfdd13d", "kind": "mixture_invariance", "pad_kind": "literal", "pads_by_arm": {"A": 0, "B": 3, "C": 6}, "source_cell": "06210a26fbfb7c13"}
+{"cell_id": "0874e3758d573a7d", "kind": "mixture_invariance", "pad_kind": "typo_normalised", "pads_by_arm": {"A": 0, "B": 3, "C": 6}, "source_cell": "076ff80aa9bc6058"}
+{"cell_id": "2fd72b9123c0c475", "kind": "mixture_invariance", "pad_kind": "literal", "pads_by_arm": {"A": 0, "B": 3, "C": 6}, "source_cell": "07eb5d3d72e377cb"}
+{"cell_id": "a757b41f02402ac6", "kind": "mixture_invariance", "pad_kind": "literal", "pads_by_arm": {"A": 0, "B": 3, "C": 6}, "source_cell": "0c92d9751502fa82"}
+{"cell_id": "412fd32a3cee8a2f", "kind": "mixture_invariance", "pad_kind": "literal", "pads_by_arm": {"A": 0, "B": 3, "C": 6}, "source_cell": "0e9394e82562e0de"}
+{"cell_id": "d8c2b1354ef9cc8e", "kind": "mixture_invariance", "pad_kind": "typo_normalised", "pads_by_arm": {"A": 0, "B": 3, "C": 6}, "source_cell": "0ee8d59b12bcad40"}
+{"cell_id": "a0c5cf40076202dd", "kind": "mixture_invariance", "pad_kind": "typo_normalised", "pads_by_arm": {"A": 0, "B": 3, "C": 6}, "source_cell": "10ef8276864ef484"}
+{"cell_id": "31a0b6308401e347", "kind": "mixture_invariance", "pad_kind": "typo_normalised", "pads_by_arm": {"A": 0, "B": 3, "C": 6}, "source_cell": "11f07765b57afd1f"}
+{"cell_id": "d9e06d5ad61dc52b", "kind": "mixture_invariance", "pad_kind": "case_variant", "pads_by_arm": {"A": 0, "B": 3, "C": 6}, "source_cell": "129ab235aff11194"}
+{"cell_id": "670da3a825ad26d3", "kind": "mixture_invariance", "pad_kind": "typo_normalised", "pads_by_arm": {"A": 0, "B": 3, "C": 6}, "source_cell": "12b3ab6eedb5a43f"}
+{"cell_id": "79aec746bd74b58b", "kind": "mixture_invariance", "pad_kind": "literal", "pads_by_arm": {"A": 0, "B": 3, "C": 6}, "source_cell": "1322cd8a426a9b1b"}
+{"cell_id": "9713712ffeb6d628", "kind": "mixture_invariance", "pad_kind": "typo_normalised", "pads_by_arm": {"A": 0, "B": 3, "C": 6}, "source_cell": "1431ccd9a9f4ea8a"}
+{"cell_id": "d6fecd3dd1bc516b", "kind": "mixture_invariance", "pad_kind": "typo_normalised", "pads_by_arm": {"A": 0, "B": 3, "C": 6}, "source_cell": "157a8169b3afdeee"}
+{"cell_id": "f4fa3a185291068d", "kind": "mixture_invariance", "pad_kind": "case_variant", "pads_by_arm": {"A": 0, "B": 3, "C": 6}, "source_cell": "159005c37d25fd2b"}
+{"cell_id": "b738e65967df678e", "kind": "mixture_invariance", "pad_kind": "literal", "pads_by_arm": {"A": 0, "B": 3, "C": 6}, "source_cell": "16c08e2ddf2dc89e"}

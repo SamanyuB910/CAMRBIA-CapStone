@@ -1,0 +1,76 @@
+[
+  {
+    "judge_id": "openai/gpt-5",
+    "rubric_hash": "55e95a7b273087ef",
+    "salt": "non-echo-2026-08-27",
+    "n_scored": 30,
+    "n_failed": 0,
+    "checks": [
+      {
+        "name": "pure_copy_does_not_win",
+        "status": "PASS",
+        "detail": "the pure-copy arm won 0/10 (0%, max 10%); mean non-echo score of the copied arm 0.00/4",
+        "rate": 0.0,
+        "n": 10,
+        "mean_copied_score": 0.0
+      },
+      {
+        "name": "mixture_invariance",
+        "status": "PASS",
+        "detail": "median within-family spread 1.00 (max 1.00); 1/20 families decline monotonically with padding (5%, max 34%)",
+        "median_spread": 1,
+        "monotone_rate": 0.05,
+        "n": 20,
+        "spread_by_pad_kind": {
+          "typo_normalised": 0.75,
+          "case_variant": 0.5,
+          "literal": 0.875
+        }
+      }
+    ],
+    "criteria": {
+      "max_median_within_family_spread": 1.0,
+      "max_monotone_families": 0.34,
+      "max_punctuation_score": 1.0,
+      "min_coherent_beats_incoherent": 0.7
+    },
+    "passed": true
+  },
+  {
+    "judge_id": "deepseek/deepseek-chat-v3.1",
+    "rubric_hash": "55e95a7b273087ef",
+    "salt": "non-echo-2026-08-27",
+    "n_scored": 30,
+    "n_failed": 0,
+    "checks": [
+      {
+        "name": "pure_copy_does_not_win",
+        "status": "PASS",
+        "detail": "the pure-copy arm won 0/10 (0%, max 10%); mean non-echo score of the copied arm 0.00/4",
+        "rate": 0.0,
+        "n": 10,
+        "mean_copied_score": 0.0
+      },
+      {
+        "name": "mixture_invariance",
+        "status": "PASS",
+        "detail": "median within-family spread 0.00 (max 1.00); 2/20 families decline monotonically with padding (10%, max 34%)",
+        "median_spread": 0,
+        "monotone_rate": 0.1,
+        "n": 20,
+        "spread_by_pad_kind": {
+          "typo_normalised": 1.0,
+          "case_variant": 0.0,
+          "literal": 0.0
+        }
+      }
+    ],
+    "criteria": {
+      "max_median_within_family_spread": 1.0,
+      "max_monotone_families": 0.34,
+      "max_punctuation_score": 1.0,
+      "min_coherent_beats_incoherent": 0.7
+    },
+    "passed": true
+  }
+]
