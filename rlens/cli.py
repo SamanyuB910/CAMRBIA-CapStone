@@ -2521,6 +2521,31 @@ def cmd_non_echo_analyse(args) -> None:
     results["mean_scores"] = {m: {l: float(v) for l, v in row.items() if v == v}
                               for m, row in means.iterrows()}
 
+    # Residual substance is the mechanism. If R-Lens loses its advantage under
+    # non-echo scoring because it had LESS non-copied material to begin with,
+    # that is a different finding from the judge simply scoring it lower, and
+    # only this dimension separates the two.
+    secondary = [d for d, _ in NON_ECHO_SPEC.dimensions if d != primary]
+    for dim in secondary:
+        if dim not in df.columns:
+            continue
+        table = df.groupby(["model_key", "lens"])[dim].mean().unstack()
+        results.setdefault("secondary_means", {})[dim] = {
+            m: {l: float(v) for l, v in row.items() if v == v}
+            for m, row in table.iterrows()}
+        per = {}
+        for model_key, sub in df.groupby("model_key"):
+            entry = {}
+            for a, b in contrasts:
+                paired = _paired_cells(sub, a, b, dim)
+                if paired.empty:
+                    continue
+                entry[f"{a} - {b}"] = {
+                    "delta": equal_weight_delta(paired),
+                    **prompt_cluster_bootstrap(paired, n_boot=args.n_boot, seed=args.seed)}
+            per[model_key] = entry
+        results.setdefault("secondary_contrasts", {})[dim] = per
+
     (out_dir / "non_echo_results.json").write_text(json.dumps(results, indent=2),
                                                    encoding="utf-8")
     table = pd.DataFrame(rows)
@@ -2535,6 +2560,20 @@ def cmd_non_echo_analyse(args) -> None:
              "## Contrasts", "", table.to_markdown(index=False, floatfmt=".3f"), "",
              "## Mean non-echo coherence by lens", "",
              means.to_markdown(floatfmt=".3f"), ""]
+    for dim, table in (results.get("secondary_means") or {}).items():
+        frame = pd.DataFrame(table).T
+        lines += [f"## Mean {dim.replace('_', ' ')} by lens", "",
+                  frame.to_markdown(floatfmt=".3f"), "",
+                  "How much non-copied material each lens offered the judge. A lens",
+                  "with less residual substance had less to be scored on, which is a",
+                  "different explanation from being scored lower on what it had.", ""]
+        rows2 = [{"model": m, "contrast": c, "delta": v["delta"],
+                  "ci_lo": v["ci_lo"], "ci_hi": v["ci_hi"]}
+                 for m, per in (results.get("secondary_contrasts") or {}).get(dim, {}).items()
+                 for c, v in per.items()]
+        if rows2:
+            lines += [f"### {dim.replace('_', ' ')} contrasts", "",
+                      pd.DataFrame(rows2).to_markdown(index=False, floatfmt=".3f"), ""]
     (out_dir / "non_echo_report.md").write_text("\n".join(lines), encoding="utf-8")
     print("\n".join(lines))
     print(f"\nresults -> {out_dir / 'non_echo_results.json'}")

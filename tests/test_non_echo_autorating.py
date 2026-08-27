@@ -364,3 +364,16 @@ def test_existing_ratings_are_never_silently_overwritten():
     assert "already holds ratings" in src
     assert "Pass --resume" in src
     assert "never silently overwritten" in src
+
+
+def test_analysis_reports_residual_substance_not_only_the_primary():
+    """If R-Lens loses its lead under non-echo scoring because it had less
+    non-copied material, that is a different finding from being scored lower on
+    what it had. Only the secondary dimension separates the two."""
+    import inspect
+
+    from rlens import cli
+
+    src = inspect.getsource(cli.cmd_non_echo_analyse)
+    assert "secondary_means" in src and "secondary_contrasts" in src
+    assert "d != primary" in src, "must derive the secondary set, not hardcode it"
