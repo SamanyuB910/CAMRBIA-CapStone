@@ -163,3 +163,48 @@ def test_validate_resumes_rather_than_re_paying_for_a_completed_judge():
     src = inspect.getsource(cli.cmd_non_echo_validate)
     assert "RatingLog(" in src and "resume_plan(controls, log)" in src
     assert "reusing" in src
+
+
+def test_a_near_zero_core_produces_trivially_perfect_invariance():
+    """The flaw the first run had. If every arm of a family scores ~0, the
+    within-family spread is 0 no matter how the judge treats padding, so the
+    family tests nothing and inflates the pass rate."""
+    _, key = build_mixture_controls(_cells())
+    degenerate = {r["cell_id"]: {a: {"non_echo_coherence": 0} for a in "ABC"}
+                  for r in key}
+    report = mixture_report(degenerate, key)
+    assert report["status"] == "PASS"          # passes, and means nothing
+    assert report["median_spread"] == 0.0
+
+
+def test_cores_are_taken_from_arms_the_judges_actually_scored():
+    """With core_scores supplied, only cells whose best arm cleared
+    MIN_CORE_SCORE become families."""
+    from rlens.non_echo import MIN_CORE_SCORE
+
+    cells = _cells(n=6)
+    for i, c in enumerate(cells):
+        c["candidates"]["B"] = [{"rank": j + 1, "token": t}
+                                for j, t in enumerate(CORE)]
+    scores = {c["cell_id"]: {"A": 0.0, "B": 3.0} for c in cells[:3]}
+    scores.update({c["cell_id"]: {"A": 0.5, "B": 1.0} for c in cells[3:]})
+    controls, key = build_mixture_controls(cells, n_families=6, core_scores=scores)
+    assert len(controls) == 3, "only the three cells with a scoreable arm qualify"
+    assert MIN_CORE_SCORE == 2.0
+
+
+def test_without_core_scores_behaviour_is_unchanged():
+    """Back-compatible: the original path still builds families."""
+    controls, _ = build_mixture_controls(_cells())
+    assert len(controls) == 20
+
+
+def test_padding_kind_is_named_for_what_it_actually_is():
+    """`typo_normalised` implied poeple->people. The function doubles a
+    character (the->thhe), which is a near-miss spelling, not a normalisation."""
+    from rlens.non_echo import PAD_KINDS, _pad_tokens
+
+    assert "misspelled_variant" in PAD_KINDS
+    assert "typo_normalised" not in PAD_KINDS
+    out = _pad_tokens("the stadium was packed", "misspelled_variant", 2)
+    assert out != ["the", "stadium"] and all(len(t) >= 3 for t in out)

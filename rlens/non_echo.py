@@ -396,7 +396,13 @@ MIXTURE_CRITERIA = {
     "min_coherent_beats_incoherent": 0.70,    # coherent core must win
 }
 PAD_COUNTS = (0, 3, 6)
-PAD_KINDS = ("literal", "case_variant", "typo_normalised")
+# "misspelled_variant" doubles a character in a prompt word ("the" -> "thhe").
+# It tests whether a near-miss spelling of a prompt word counts as prompt-local.
+# It is NOT a normalisation (poeple -> people); naming it so would oversell it.
+PAD_KINDS = ("literal", "case_variant", "misspelled_variant")
+# A family whose core scores near zero shows spread zero whatever the judge does,
+# so it tests nothing. Cores must come from cells the judges actually scored.
+MIN_CORE_SCORE = 2.0
 
 
 def _pad_tokens(prompt: str, kind: str, n: int) -> list:
@@ -409,13 +415,14 @@ def _pad_tokens(prompt: str, kind: str, n: int) -> list:
             out.append(w)
         elif kind == "case_variant":
             out.append(w.upper() if w.islower() else w.lower())
-        else:                                   # typo_normalised
+        else:                                   # misspelled_variant
             out.append(w[:-1] + w[-2] + w[-1] if len(w) > 2 else w + w[-1])
     return out
 
 
 def build_mixture_controls(cells: list, *, n_families: int = 20,
-                           salt: str = MIXTURE_SALT) -> tuple:
+                           salt: str = MIXTURE_SALT,
+                           core_scores: dict | None = None) -> tuple:
     """Families holding the non-local core FIXED while padding varies.
 
     Within a family every arm carries the same coherent non-prompt-local tokens
@@ -427,9 +434,24 @@ def build_mixture_controls(cells: list, *, n_families: int = 20,
     unrelated to echo.
     """
     controls, key = [], []
-    for index, cell in enumerate(sorted(cells, key=lambda c: c["cell_id"])[:n_families]):
+    ordered = sorted(cells, key=lambda c: c["cell_id"])
+    for cell in ordered:
+        if len(controls) >= n_families:
+            break
         arms_source = cell.get("candidates") or {}
-        core = [t["token"] for t in next(iter(arms_source.values()), [])][:10]
+        # Prefer the arm the judges scored highest on this cell, and skip the
+        # cell entirely if nothing on it cleared MIN_CORE_SCORE. Without this,
+        # a family built on newline tokens shows perfect invariance trivially:
+        # every arm scores zero, so the spread is zero regardless of padding.
+        scores = (core_scores or {}).get(cell["cell_id"]) or {}
+        if scores:
+            best_arm = max(scores, key=lambda a: scores[a])
+            if scores[best_arm] < MIN_CORE_SCORE or best_arm not in arms_source:
+                continue
+            source = arms_source[best_arm]
+        else:
+            source = next(iter(arms_source.values()), [])
+        core = [t["token"] for t in source][:10]
         if len(core) < 10:
             continue
         digest = hashlib.sha256(f"{salt}|{cell['cell_id']}".encode()).hexdigest()

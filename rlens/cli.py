@@ -2308,7 +2308,17 @@ def cmd_non_echo_validate(args) -> None:
         # mixed with real content, which is what the panel actually contains.
         panel_cells = [json.loads(l) for l
                        in Path(args.mixture).expanduser().read_text().splitlines() if l]
-        mix, mix_key = build_mixture_controls(panel_cells, n_families=args.n_mixture)
+        # Cores are drawn from arms the judges actually scored; a family built
+        # on a near-zero core cannot detect padding sensitivity.
+        core_scores = None
+        if args.core_scores:
+            import json as _json
+            combined = _json.loads(Path(args.core_scores).expanduser().read_text())
+            core_scores = {cid: {a: v.get(NON_ECHO_SPEC.primary, 0.0)
+                                 for a, v in arms.items() if isinstance(v, dict)}
+                           for cid, arms in combined.items()}
+        mix, mix_key = build_mixture_controls(panel_cells, n_families=args.n_mixture,
+                                              core_scores=core_scores)
         if len(mix) < args.n_mixture:
             raise SystemExit(
                 f"only {len(mix)} of {args.n_mixture} mixture families could be built "
@@ -3440,6 +3450,10 @@ def main() -> None:
                         "a fixed ten-token non-prompt-local core with 0/3/6 "
                         "prompt-local distractors at constant list length")
     p.add_argument("--n-mixture", type=int, default=20)
+    p.add_argument("--core-scores", metavar="COMBINED_JSON",
+                   help="non-echo combined_scores.json; families are built only "
+                        "from arms that already scored >= 2, so a near-zero core "
+                        "cannot produce trivial invariance")
     p.add_argument("--cost-report", help="a previous cost_report.json, for the projection")
     p.add_argument("--rubric-ratio", type=float, default=1.0,
                    help="expected completion-token multiplier vs the measured rubric")
