@@ -569,10 +569,61 @@ def fig_non_echo_contrasts(non_echo: dict, out_dir: Path) -> list[str]:
     return save(fig, out_dir, "fig8_non_echo_contrasts")
 
 
+def fig_attenuation(prompt_effects, out_dir: Path) -> list[str]:
+    """Figure 9 -- per-prompt standard vs non-echo effect.
+
+    The pooled attenuation (53% Qwen, 89% Gemma) could describe a uniform shrink
+    across prompts or a few prompts collapsing while the rest hold. Those imply
+    different things about what the standard rubric was rewarding, and only a
+    per-prompt view separates them. Each point is one prompt averaged over its
+    five depths; the y=x line is where a prompt loses nothing to echo.
+    """
+    plt = _style()
+    if prompt_effects is None or not len(prompt_effects):
+        return []
+    wide = prompt_effects.pivot_table(index=["model", "prompt"], columns="construct",
+                                      values="delta").reset_index()
+    if not {"standard", "non_echo_norefill"} <= set(wide.columns):
+        return []
+    models = [m for m in ("qwen3.5-27b", "gemma-3-27b-it") if m in set(wide["model"])]
+    if not models:
+        return []
+
+    fig, axes = plt.subplots(1, len(models), figsize=(3.6 * len(models), 3.5),
+                             sharex=True, sharey=True)
+    axes = [axes] if len(models) == 1 else list(axes)
+    lo = min(wide["standard"].min(), wide["non_echo_norefill"].min()) - 0.4
+    hi = max(wide["standard"].max(), wide["non_echo_norefill"].max()) + 0.4
+    for ax, model in zip(axes, models):
+        sub = wide[wide["model"] == model]
+        ax.plot([lo, hi], [lo, hi], color=MUTED, lw=1.0, ls=(0, (4, 3)), zorder=1)
+        ax.axhline(0, color="black", lw=0.8, zorder=1)
+        ax.axvline(0, color="black", lw=0.8, zorder=1)
+        ax.scatter(sub["standard"], sub["non_echo_norefill"], s=34,
+                   color="#D55E00" if model.startswith("qwen") else "#CC79A7",
+                   edgecolor="white", linewidth=0.7, zorder=3)
+        # name the prompts that lose the most, since those drive the pooled drop
+        sub = sub.assign(drop=sub["standard"] - sub["non_echo_norefill"])
+        for _, row in sub.nlargest(2, "drop").iterrows():
+            ax.annotate(str(row["prompt"]).split("::")[-1][:14],
+                        (row["standard"], row["non_echo_norefill"]),
+                        textcoords="offset points", xytext=(5, -8),
+                        fontsize=6, color=MUTED)
+        ax.set_xlim(lo, hi); ax.set_ylim(lo, hi)
+        ax.set_aspect("equal", adjustable="box")
+        ax.set_xlabel("Standard R − J")
+        ax.set_title(MODEL_LABEL.get(model, model), loc="left")
+    axes[0].set_ylabel("Non-echo R − J")
+    axes[0].text(0.03, 0.97, "on the dashed line = no loss\nbelow it = loses to echo",
+                 transform=axes[0].transAxes, va="top", fontsize=6.5, color=MUTED)
+    fig.tight_layout()
+    return save(fig, out_dir, "fig9_attenuation")
+
+
 def build_all(*, stats: dict, judge_table=None, echo_table=None,
               echo_detail: dict | None = None, out_dir: Path,
               scoring: str = "adjudicated", non_echo: dict | None = None,
-              loo=None, los=None) -> dict:
+              loo=None, los=None, prompt_effects=None) -> dict:
     """Draw every figure whose inputs are present; name the ones that are not."""
     out_dir = Path(out_dir)
     made, skipped = {}, {}
@@ -594,6 +645,8 @@ def build_all(*, stats: dict, judge_table=None, echo_table=None,
         ("fig8_non_echo_contrasts",
          lambda: fig_non_echo_contrasts(non_echo or {}, out_dir),
          bool(non_echo and non_echo.get("per_model"))),
+        ("fig9_attenuation", lambda: fig_attenuation(prompt_effects, out_dir),
+         prompt_effects is not None and len(prompt_effects) > 0),
     ]
     for stem, fn, ok in plan:
         if not ok:

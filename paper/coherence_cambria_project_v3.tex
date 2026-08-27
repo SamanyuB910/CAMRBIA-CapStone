@@ -38,10 +38,11 @@ Prompt Echo in Early R-Lens Readouts}
 
 \begin{abstract}
 \noindent
-R-Lens is a variant of J-Lens that fits its layer-to-final-layer transport with
-LRP stop-gradients. Its authors report, qualitatively and without a released
-scorer, that R-Lens readouts at early layers are more coherent than J-Lens
-readouts. We evaluate that claim on two 27B models with a blinded,
+R-Lens uses the J-Lens fitting pipeline but replaces ordinary-gradient transport
+with LRP-derived relevance coefficients, applying modified backward rules for
+normalisation and gated MLP components while leaving the forward pass unchanged.
+Its authors report, qualitatively and without a released scorer, that R-Lens
+readouts at early layers are more coherent than J-Lens readouts. We evaluate that claim on two 27B models with a blinded,
 pre-specified and frozen rating panel of 200 three-arm cells, scored by two
 independently validated LLM autoraters.
 
@@ -54,8 +55,8 @@ We therefore built a second, separately validated rubric that instructs judges
 to discard tokens copied from the prompt and score only what remains. Under it
 the R--J gap attenuates by 53\% on Qwen, to $+0.325$ \ci{0.165}{0.480}, and by
 89\% on Gemma, to $+0.110$ \ci{-0.045}{0.255}, which no longer excludes zero.
-Both Jacobian-based lenses nevertheless remain clearly better than the logit
-lens on non-copied content.
+On non-copied content R-Lens still beats the logit lens on both models, and
+J-Lens does so clearly on Gemma but only suggestively on Qwen ($p = 0.070$).
 
 The contribution is therefore not a simple confirmation. R-Lens's advantage
 under conventional contextual scoring is real and reproduces on both models,
@@ -353,8 +354,11 @@ bias ($\chi^2 = 0.66$ on 2 df), scored provably-identical arms identically,
 returned a tie on 5/5 identity-layer cells, showed full dynamic range on
 late-layer controls, and left 0/190 responses unparseable.
 
-It did not clear the order-invariance gate, and---importantly---it did not fail
-it either. Rotating the arm order flipped the winner on \textbf{10 of 53
+It did not clear the order-invariance gate. Admission used the frozen
+\emph{operational} rule --- an observed order-flip rate of at most 15\% --- not
+an inferential non-inferiority test; GPT-5 passed at 1/15 (6.7\%) and the
+adjudicator failed at 10/53. Intervals are reported below because both estimates
+carry considerable uncertainty, and neither judge's true rate is established. Rotating the arm order flipped the winner on \textbf{10 of 53
 non-tied pairs (18.9\%, 95\% CI \ci{9.4\%}{32.0\%})} against a 15\% ceiling.
 An exact binomial test cannot reject 15\% ($p = 0.266$), and the interval is far
 too wide to establish that the rate is acceptable. Escalating the battery does
@@ -420,9 +424,11 @@ while DeepSeek rates it significantly \emph{better} ($+0.770$,
 \ci{0.57}{0.97})---same cells, disjoint intervals, opposite signs. Every
 unstable contrast involves the logit lens; every R $-$ J contrast is stable.
 
-The natural reading is a floor effect: the judges agree about the relative
-ordering of two Jacobian transports and anchor the bottom of a 0--4 scale
-differently when asked to score near-noise. Any comparison against the logit
+One plausible explanation is a floor effect: the judges may agree about the
+relative ordering of two Jacobian transports while anchoring the bottom of a
+0--4 scale differently when scoring near-noise. We have not tested that
+mechanism, and the pattern is also consistent with rubric underdetermination at
+the low end. Any comparison against the logit
 lens in this report should be read with both judges' values in view and must
 not be quoted as a single number.
 
@@ -430,11 +436,11 @@ not be quoted as a single number.
 scores, exact agreement 39.3\%, mean absolute difference 0.91 points. The two
 validated judges disagreed on 63\% of cells---the disagreements the third judge
 was introduced to settle, and which the primary rule now simply averages over.
-\flag{This is moderate agreement at best.} With validated judges it is evidence
-about the material rather than the instrument---the readouts being rated are
-genuinely ambiguous, which is what one expects of early-layer readouts---but a
-$\kappa$ of 0.51 is not a precise instrument, and every interval in this
-document inherits that noise.
+\flag{This is moderate agreement at best.} Validation reduces the concern that this is gross judge failure, but it does not
+establish that the disagreement originates in the readouts. It may reflect
+genuine ambiguity in early-layer readouts, differences in judge calibration, or
+residual underdetermination in the rubric. A $\kappa$ of 0.51 is not a precise
+instrument, and every interval in this document inherits that noise.
 
 \subsection{Prompt echo}
 \label{sec:echo}
@@ -571,20 +577,42 @@ zero ($p=0.070$).}
 \label{fig:nonechocontrasts}
 \end{figure}
 
-\paragraph{What strengthens under non-echo scoring.} Both Jacobian lenses beat
-the logit lens on both models, and J $-$ logit is \emph{larger} here than under
-standard scoring on Gemma ($+0.875$, $p<10^{-4}$, against $+0.430$, $p=0.112$).
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth]{fig9_attenuation.pdf}
+\caption{\textbf{Attenuation is systematic, not driven by a few prompts.} Each
+point is one prompt's R $-$ J averaged over its five depths, standard scoring on
+the $x$ axis against non-echo scoring on the $y$. A prompt on the dashed
+$y{=}x$ line loses nothing when copied tokens are excluded. On Qwen most prompts
+sit modestly below the line; on Gemma they sit much further below it and more
+variably, with several large standard effects collapsing to zero or negative.}
+\label{fig:attenuation}
+\end{figure}
+
+\paragraph{What strengthens under non-echo scoring.} R-Lens beats the logit
+lens on both models; J-Lens clearly does so on Gemma ($+0.875$, $p<10^{-4}$,
+against $+0.430$ under standard scoring) and suggestively on Qwen ($+0.250$,
+\ci{0.025}{0.465}, $p=0.070$ --- the interval excludes zero but the
+pre-specified permutation test does not reject).
 J-Lens echoes less than R-Lens, so standard scoring was penalising it for
 content the non-echo rubric ignores. The cross-model, cross-rubric result with
 the strongest support is therefore about the Jacobian transport in general, not
 about the LRP variant specifically.
 
-\paragraph{The two echo analyses disagree, and the direct one should be
-believed.} Restriction (\S\ref{sec:echo}) retained 74\% of the effect on Qwen
-and 102\% on Gemma. Direct measurement retains 47\% and 11\%. Conditioning on
-equal observed echo and excluding echoed content answer different questions: the
-former selects on a lens-affected variable, the latter changes the scoring
-construct. Neither identifies a formal mediation fraction.
+\paragraph{The two echo analyses disagree.} Restriction (\S\ref{sec:echo})
+retained 74\% of the effect on Qwen and 102\% on Gemma. Direct measurement
+retains 47\% and 11\%. Conditioning on equal observed echo and excluding echoed
+content answer different questions: the former selects on a lens-affected
+variable, the latter changes the scoring construct. Neither identifies a formal
+mediation fraction.
+
+For the specific question of whether R-Lens contributes coherent content
+\emph{beyond} prompt copying, the direct rubric is the more relevant instrument.
+It is not simply the more trustworthy one: it measures a narrower construct, and
+it can penalise a readout that mixes copied and novel tokens through top-10
+crowd-out. We therefore read the attenuation as evidence that the standard-rubric
+advantage is highly sensitive to how prompt echo is treated, not as an exact
+estimate of echo's contribution.
 
 \subsection{Judge behaviour}
 
@@ -719,9 +747,14 @@ ours. Token-form statistics are not a substitute for rating the readouts.
 \item \textbf{Twenty prompts per model.} Adequate for the pooled estimand,
       which is why intervals are prompt-clustered; not adequate for the
       per-set breakdown, which is descriptive only.
-\item \textbf{Autoraters, not humans.} No human panel was run. Judges were
-      validated against controls, but LLM raters may share biases with each
-      other and with the models being read.
+\item \textbf{Autoraters, not humans.} No human ratings were used in the
+      primary experiment. A superseded exploratory panel collected 150 human
+      judgements and is reported in \S8 only as historical context for a
+      negative result about token-form proxies; none of it enters any estimate
+      here. Judges were validated against controls, but LLM raters may share
+      biases with each other and with the models being read, and no external
+      human anchor establishes that their ``contextual coherence'' matches the
+      construct a human interpretability researcher cares about.
 \item \textbf{Echo is not causally controlled}, only restricted on.
 \item \textbf{Logit-lens comparisons are judge-dependent} and should not be
       quoted as single numbers.
@@ -747,6 +780,30 @@ ours. Token-form statistics are not a substitute for rating the readouts.
       too few to say whether the position, the genre, or chance is responsible.
 \end{enumerate}
 
+\section{Conclusion}
+
+We evaluate R-Lens's early-layer contextual-coherence claim on Qwen3.5-27B and
+Gemma-3-27B-it using a blinded, pre-specified and frozen 200-cell panel scored by
+two independently validated LLM autoraters. Under a standard prompt-aware rubric
+the claimed advantage reproduces on both models and is robust: it survives every
+scoring rule we tried, the deletion of any single prompt, and the deletion of any
+single evaluation set.
+
+R-Lens, however, also surfaces significantly more prompt-overlapping content.
+When copied tokens are excluded before scoring, the R $-$ J advantage falls by
+roughly half on Qwen and becomes small and inconclusive on Gemma, while the
+lens-versus-baseline comparisons largely persist.
+
+The conclusion is therefore neither a clean confirmation nor a refutation.
+R-Lens's advantage under ordinary coherence scoring is real and reproducible, but
+ordinary coherence conflates novel coherent content with prompt echo. Once the
+two are separated, the residual advantage is substantial on one model, minimal on
+the other, and less statistically stable than the headline number suggests. We
+read this as a caution about the construct rather than about the method: a
+qualitative judgement that a readout ``looks coherent'' cannot distinguish
+between recovering intermediate computation and reproducing nearby prompt tokens,
+and the difference matters for what an early-layer lens is claimed to show.
+
 \section{Supported and unsupported claims}
 \label{sec:claims}
 
@@ -761,8 +818,10 @@ ours. Token-form statistics are not a substitute for rating the readouts.
       prompt-overlapping content.
 \item On Qwen a smaller non-echo advantage survives; on Gemma the non-echo
       estimate is inconclusive.
-\item Both Jacobian-based lenses outperform the logit lens on non-copied
-      content, on both models. This is the most robust cross-model result here.
+\item On non-copied content, R-Lens outperforms the logit lens on both models,
+      and J-Lens does so clearly on Gemma with positive but inconclusive
+      evidence on Qwen ($p=0.070$). The lens-versus-baseline comparison is the
+      most robust family of results here; the R-over-J increment is not.
 \item The standard-rubric R $-$ J difference survives deletion of any single
       prompt and any single evaluation set, on both models
       (\S\ref{sec:smallsample}).
@@ -778,7 +837,9 @@ ours. Token-form statistics are not a substitute for rating the readouts.
       lens type. It conditions on a lens-affected variable.
 \item That the source post's $n{=}1000$ fitting recipe was replicated. We
       evaluate the released $n{=}25$ light-recipe artifacts.
-\item That autorater scores equal human judgement. No human rated anything here.
+\item That autorater scores equal human judgement, or that the rubric is a
+      validated measure of interpretation quality. The control battery shows the
+      judges follow the intended behaviours; it does not validate the construct.
 \item That J-Lens consistently beats the logit lens under the standard rubric.
       That contrast is judge-dependent and reverses in sign between judges.
 \item That the excluded adjudicator was shown to be order-biased.
@@ -812,6 +873,7 @@ ours. Token-form statistics are not a substitute for rating the readouts.
 \end{itemize}
 
 \section{Reproducibility}
+\label{sec:repro}
 
 Every number in this document is produced by a command in the repository
 operating on frozen artifacts; none is transcribed by hand into a plotting
@@ -852,5 +914,51 @@ protocol salts, all seeds and the audit verdicts are recorded in
 \texttt{final\_reproducibility\_\allowbreak manifest.json}. The unblinding key is
 deliberately absent from the repository and from this document's source tree.
 \end{sloppypar}
+
+
+\section*{References}
+\small
+\begin{enumerate}[leftmargin=1.4em,itemsep=1pt]
+\item C.~Blank, A.~Bhatia and N.~Nanda. \emph{R-Lens: Making J-Lens More Faithful
+      on Early Layers.} LessWrong / AlignmentForum, August 2026. The source of
+      the coherence claim under evaluation. No scorer was released with it.
+\item The J-Lens method and its released artifacts, as distributed in the
+      \texttt{jlens} library (commit \texttt{581d398}) and the
+      \texttt{camilablank/\allowbreak{}workspace-lenses} artifact repository
+      (commit \texttt{d740106d}).
+\item S.~Bach et al. \emph{On Pixel-Wise Explanations for Non-Linear Classifier
+      Decisions by Layer-Wise Relevance Propagation.} PLoS ONE, 2015. The
+      relevance-propagation family whose backward rules R-Lens adapts.
+\item L.~Zheng et al. \emph{Judging LLM-as-a-Judge with MT-Bench and Chatbot
+      Arena.} NeurIPS Datasets and Benchmarks, 2023. Position bias and
+      model-dependent instability in LLM raters; the reason arm order is
+      permuted per (cell, rater) here and position bias is an admission gate.
+\item J.~Montgomery, B.~Nyhan and M.~Torres. \emph{How Conditioning on
+      Post-Treatment Variables Can Ruin Your Experiment and What to Do About It.}
+      American Journal of Political Science, 2018. The basis for treating the
+      equal-echo restriction (\S\ref{sec:echo}) as descriptive rather than as an
+      estimate of a direct effect.
+\item A.~C.~Cameron, J.~B.~Gelbach and D.~L.~Miller. \emph{Bootstrap-Based
+      Improvements for Inference with Clustered Errors.} Review of Economics and
+      Statistics, 2008. Cluster-level resampling, applied here at the prompt.
+\item P.~Good. \emph{Permutation, Parametric and Bootstrap Tests of Hypotheses.}
+      Springer, 3rd ed., 2005. Sign-flip permutation inference for paired designs.
+\item J.~Cohen. \emph{Weighted Kappa: Nominal Scale Agreement with Provision for
+      Scaled Disagreement or Partial Credit.} Psychological Bulletin, 1968. The
+      quadratic-weighted $\kappa$ reported in \S5.3.
+\item S.~Holm. \emph{A Simple Sequentially Rejective Multiple Test Procedure.}
+      Scandinavian Journal of Statistics, 1979. Multiplicity correction within
+      model for the depth and set breakdowns.
+\item C.~J.~Clopper and E.~S.~Pearson. \emph{The Use of Confidence or Fiducial
+      Limits Illustrated in the Case of the Binomial.} Biometrika, 1934. Exact
+      intervals on the order-flip rates in \S\ref{sec:adjudicator}.
+\end{enumerate}
+
+\paragraph{Artifacts.} Repository \texttt{SamanyuB910/CAMRBIA-CapStone}, branch
+\texttt{coherence-branch}. Every figure and table in this document is produced by
+a command listed in \S\ref{sec:repro} operating on frozen artifacts. Panel hash,
+both rubric hashes, both protocol salts, all seeds, the exact judge model
+identifiers and the SHA-256 of every artifact are recorded in
+\texttt{final\_reproducibility\_\allowbreak manifest.json}.
 
 \end{document}

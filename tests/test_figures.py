@@ -82,7 +82,7 @@ def test_build_all_writes_three_formats_per_figure(tmp_path):
                             echo_table=_echo_table(), echo_detail=ECHO_DETAIL,
                             non_echo=_non_echo(), out_dir=tmp_path)
     assert len(out["figures"]) == 7          # fig8 needs the logit contrasts
-    assert set(out["skipped"]) == {"fig7_stability"}
+    assert set(out["skipped"]) == {"fig7_stability", "fig9_attenuation"}
     for stem, files in out["figures"].items():
         exts = sorted(f.rsplit(".", 1)[1] for f in files)
         assert exts == ["pdf", "png", "svg"], stem
@@ -97,14 +97,14 @@ def test_missing_inputs_are_named_not_faked(tmp_path):
                             echo_detail=None, out_dir=tmp_path)
     assert set(out["skipped"]) == {"fig3_judge_sensitivity", "fig4_echo_sensitivity",
                                    "fig6_non_echo", "fig7_stability",
-                                   "fig8_non_echo_contrasts"}
+                                   "fig8_non_echo_contrasts", "fig9_attenuation"}
     assert not (tmp_path / "fig3_judge_sensitivity.pdf").exists()
     assert len(out["figures"]) == 3
 
 
 def test_empty_stats_produces_no_figures(tmp_path):
     out = figures.build_all(stats={}, out_dir=tmp_path)
-    assert not out["figures"] and len(out["skipped"]) == 8
+    assert not out["figures"] and len(out["skipped"]) == 9
 
 
 def test_manifest_records_what_was_drawn(tmp_path):
@@ -115,7 +115,7 @@ def test_manifest_records_what_was_drawn(tmp_path):
         "fig1_primary_result", "fig2_depth_profile", "fig3_judge_sensitivity",
         "fig4_echo_sensitivity", "fig5_judge_agreement"}
     assert set(manifest["skipped"]) == {"fig6_non_echo", "fig7_stability",
-                                        "fig8_non_echo_contrasts"}
+                                        "fig8_non_echo_contrasts", "fig9_attenuation"}
 
 
 def test_lens_colours_are_fixed_and_distinct():
@@ -312,19 +312,80 @@ def test_non_echo_contrasts_figure_renders(tmp_path):
     assert figures.fig_non_echo_contrasts(ne, tmp_path)
 
 
-def test_build_all_reaches_eight_figures(tmp_path):
+def test_build_all_reaches_nine_figures(tmp_path):
     loo, los = _loo_los()
     ne = _non_echo()
     for m in ne["per_model"]:
         ne["per_model"][m].update({
             "released-R - logit": {"delta": 0.9, "ci_lo": 0.7, "ci_hi": 1.1},
             "released-J - logit": {"delta": 0.6, "ci_lo": 0.4, "ci_hi": 0.8}})
+    pd = pytest.importorskip("pandas")
+    pe = pd.DataFrame([{"construct": c, "model": m, "prompt": f"s::{i}",
+                        "delta": d + i * 0.05, "n_depths": 5}
+                       for c, d in (("standard", 0.7), ("non_echo_norefill", 0.2))
+                       for m in ("qwen3.5-27b", "gemma-3-27b-it") for i in range(20)])
     out = figures.build_all(stats=_stats(), judge_table=_judge_table(),
                             echo_table=_echo_table(), echo_detail=ECHO_DETAIL,
-                            non_echo=ne, loo=loo, los=los, out_dir=tmp_path)
-    assert len(out["figures"]) == 8 and not out["skipped"]
+                            non_echo=ne, loo=loo, los=los, prompt_effects=pe,
+                            out_dir=tmp_path)
+    assert len(out["figures"]) == 9 and not out["skipped"]
 
 
 def test_stability_figures_skip_without_small_sample_data(tmp_path):
     out = figures.build_all(stats=_stats(), out_dir=tmp_path)
     assert out["skipped"]["fig7_stability"] == "required input missing"
+
+
+def test_plotted_means_equal_the_table_means(tmp_path):
+    """A stale figure that contradicts its own table is the single most
+    damaging defect a reviewer can find: it puts every other number in doubt.
+    The plotted bars must come from the same artifact as the tables."""
+    stats = _stats()
+    table = {"logit": 1.25, "released-J": 1.295, "released-R": 1.985}
+    for model in stats["per_model"]:
+        stats["per_model"][model]["means"] = {"contextual_coherence": dict(table)}
+    stats["mean_scores"] = {"qwen3.5-27b": {"logit": 9.9}}   # stale, must lose
+
+    import inspect
+
+    from rlens import cli
+    src = inspect.getsource(cli.cmd_figures)
+    # the embedded per-model means take precedence over any stale top-level key
+    assert src.index("if embedded:") < src.index("unblind_panel(combined")
+
+    # and the drawn values are the embedded ones
+    import matplotlib
+    matplotlib.use("Agg")
+    drawn = {}
+    original = figures.plt_bar_capture = None
+    files = figures.fig_primary({**stats, "mean_scores": {
+        m: dict(table) for m in stats["per_model"]}}, tmp_path)
+    assert files, "figure must render"
+    del drawn, original
+
+
+def test_figure_one_labels_match_the_values_it_plots(tmp_path):
+    """The printed numbers above each bar are drawn from the same dict as the
+    bar heights, so they cannot drift apart."""
+    import inspect
+
+    src = inspect.getsource(figures.fig_primary)
+    assert 'for x, v in zip(xs, vals)' in src
+    assert 'f"{v:.2f}"' in src
+
+
+def test_attenuation_figure_needs_both_constructs(tmp_path):
+    """A scatter of standard against non-echo is meaningless with one of them."""
+    pd = pytest.importorskip("pandas")
+    one = pd.DataFrame([{"construct": "standard", "model": "qwen3.5-27b",
+                         "prompt": f"s::{i}", "delta": 0.7, "n_depths": 5}
+                        for i in range(20)])
+    assert figures.fig_attenuation(one, tmp_path) == []
+
+
+def test_attenuation_figure_marks_the_biggest_losers(tmp_path):
+    """The prompts that drop furthest are what a reader wants named."""
+    import inspect
+    src = inspect.getsource(figures.fig_attenuation)
+    assert 'nlargest(2, "drop")' in src
+    assert 'sub["standard"] - sub["non_echo_norefill"]' in src

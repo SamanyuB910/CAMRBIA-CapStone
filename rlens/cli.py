@@ -2178,6 +2178,7 @@ def cmd_figures(args) -> None:
         non_echo=maybe_json(args.non_echo_results),
         loo=maybe_csv(args.leave_one_prompt_out),
         los=maybe_csv(args.leave_one_set_out),
+        prompt_effects=maybe_csv(args.prompt_effects),
     )
     for stem, files in result["figures"].items():
         print(f"  {stem}: " + ", ".join(Path(f).name for f in files))
@@ -2833,6 +2834,115 @@ def cmd_refill_panel(args) -> None:
     print(f"panel -> {out_dir / 'panel_public.jsonl'}  key -> {key_dir}")
 
 
+def cmd_examples(args) -> None:
+    """Qualitative readout examples for the paper: the actual tokens.
+
+    An interpretability paper that never shows a readout asks the reader to take
+    every score on trust. Three cells are selected by rule, not by eye:
+    the clearest genuine R-Lens gain, the clearest echo-driven gain, and the
+    clearest judge disagreement. Copied tokens are marked so the echo case is
+    legible without the reader cross-referencing the prompt.
+    """
+    import json
+
+    import pandas as pd
+
+    from rlens.analysis_v2 import unblind_panel
+    from rlens.non_echo import NON_ECHO_SPEC
+
+    key_rows = [json.loads(l) for l in Path(args.key).read_text().splitlines() if l]
+    sample = json.loads(Path(args.sample).read_text())
+    panel = {json.loads(l)["cell_id"]: json.loads(l)
+             for l in Path(args.panel).read_text().splitlines() if l}
+
+    std = unblind_panel(json.loads(Path(args.standard).read_text()), key_rows, sample)
+    ne_dims = tuple(d for d, _ in NON_ECHO_SPEC.dimensions)
+    ne = unblind_panel(json.loads(Path(args.non_echo).read_text()), key_rows, sample,
+                       dimensions=ne_dims, primary=NON_ECHO_SPEC.primary)
+
+    keys = ["cell_id", "model_key", "set", "item_id", "requested_depth", "lens"]
+    merged = std.merge(ne[keys + [NON_ECHO_SPEC.primary]], on=keys, how="inner")
+    wide = merged.pivot_table(
+        index=["cell_id", "model_key", "set", "item_id", "requested_depth"],
+        columns="lens",
+        values=["contextual_coherence", "prompt_echo", NON_ECHO_SPEC.primary]).reset_index()
+    wide.columns = ["_".join(c).strip("_") if isinstance(c, tuple) else c
+                    for c in wide.columns]
+
+    def col(dim, lens):
+        return f"{dim}_{lens}"
+
+    std_gap = wide[col("contextual_coherence", "released-R")] - \
+        wide[col("contextual_coherence", "released-J")]
+    ne_gap = wide[col(NON_ECHO_SPEC.primary, "released-R")] - \
+        wide[col(NON_ECHO_SPEC.primary, "released-J")]
+    echo_gap = wide[col("prompt_echo", "released-R")] - wide[col("prompt_echo", "released-J")]
+    wide = wide.assign(std_gap=std_gap, ne_gap=ne_gap, echo_gap=echo_gap)
+
+    picks = {
+        # R wins on standard AND keeps it under non-echo: a genuine gain
+        "genuine_gain": wide.assign(score=wide.std_gap + wide.ne_gap).nlargest(1, "score"),
+        # R wins on standard, loses it under non-echo, and echoes more: the confound
+        "echo_driven": wide[wide.std_gap > 0].assign(
+            score=wide[wide.std_gap > 0].std_gap - wide[wide.std_gap > 0].ne_gap
+            + wide[wide.std_gap > 0].echo_gap).nlargest(1, "score"),
+        # every arm scores low: the case where no lens is informative
+        "all_poor": wide.assign(score=-(
+            wide[col("contextual_coherence", "released-R")]
+            + wide[col("contextual_coherence", "released-J")]
+            + wide[col("contextual_coherence", "logit")])).nlargest(1, "score"),
+    }
+
+    def copied(tokens, prompt):
+        low = {w.strip().lower() for w in prompt.replace("\n", " ").split(" ") if w.strip()}
+        return [t.strip().lower().strip("«»[]<>") in low for t in tokens]
+
+    out_dir = Path(args.out_dir).expanduser()
+    out_dir.mkdir(parents=True, exist_ok=True)
+    rows, md = [], ["# Qualitative readout examples", "",
+                    "Selected by rule from the frozen panel, not by eye. Tokens marked",
+                    "`*` appear in the prompt up to and including the readout position.", ""]
+    for label, frame in picks.items():
+        if frame.empty:
+            continue
+        r = frame.iloc[0]
+        cell = panel.get(r["cell_id"])
+        if not cell:
+            continue
+        lens_of = {v: k for k, v in
+                   next(x for x in key_rows if x["cell_id"] == r["cell_id"])["arms"].items()}
+        md += [f"## {label.replace('_', ' ')}", "",
+               f"- **model** {r['model_key']} · **set** {r['set']} · "
+               f"**item** {r['item_id']} · **z** {r['requested_depth']}",
+               f"- **prompt** `{cell['prompt']}`",
+               f"- **readout token** `{cell['readout_token']}` "
+               f"at index {cell['readout_position']}", ""]
+        md += ["| lens | top-10 readout | contextual | echo | non-echo |",
+               "|---|---|---|---|---|"]
+        for lens in ("logit", "released-J", "released-R"):
+            arm = cell["candidates"].get(lens_of.get(lens, ""), [])
+            toks = [t["token"] for t in arm]
+            flags = copied(toks, cell["prompt"])
+            shown = " ".join(f"`{t}`{'*' if f else ''}" for t, f in zip(toks, flags))
+            md.append(f"| {lens} | {shown} | "
+                      f"{r[col('contextual_coherence', lens)]:.1f} | "
+                      f"{r[col('prompt_echo', lens)]:.1f} | "
+                      f"{r[col(NON_ECHO_SPEC.primary, lens)]:.1f} |")
+            rows.append({"example": label, "cell_id": r["cell_id"],
+                         "model": r["model_key"], "set": r["set"],
+                         "item_id": r["item_id"], "depth": r["requested_depth"],
+                         "lens": lens, "tokens": " | ".join(toks),
+                         "n_copied": int(sum(flags)),
+                         "contextual": r[col("contextual_coherence", lens)],
+                         "echo": r[col("prompt_echo", lens)],
+                         "non_echo": r[col(NON_ECHO_SPEC.primary, lens)]})
+        md.append("")
+    pd.DataFrame(rows).to_csv(out_dir / "qualitative_examples.csv", index=False)
+    (out_dir / "qualitative_examples.md").write_text("\n".join(md), encoding="utf-8")
+    print("\n".join(md))
+    print(f"\nexamples -> {out_dir / 'qualitative_examples.md'}")
+
+
 # ---------------------------------------------------------------------------
 # recombine  (no API: rebuild combined scores from the frozen raw responses)
 # ---------------------------------------------------------------------------
@@ -3205,6 +3315,8 @@ def main() -> None:
     p.add_argument("--leave-one-prompt-out",
                    help="leave_one_prompt_out.csv from `rlens small-sample`; adds figure 7")
     p.add_argument("--leave-one-set-out", help="leave_one_set_out.csv from `rlens small-sample`")
+    p.add_argument("--prompt-effects",
+                   help="prompt_level_effects.csv from `rlens small-sample`; adds figure 9")
     p.set_defaults(func=cmd_figures)
 
     p = sub.add_parser("manifest", help="Stage 9: final reproducibility manifest")
@@ -3290,6 +3402,15 @@ def main() -> None:
     p.add_argument("--device", default="auto")
     p.add_argument("--lens-device", default="gpu")
     p.set_defaults(func=cmd_refill_panel)
+
+    p = sub.add_parser("examples", help="qualitative readout examples for the paper")
+    p.add_argument("--panel", required=True)
+    p.add_argument("--key", required=True)
+    p.add_argument("--sample", required=True)
+    p.add_argument("--standard", required=True, help="standard combined_scores.json")
+    p.add_argument("--non-echo", required=True, help="non-echo combined_scores.json")
+    p.add_argument("--out-dir", required=True)
+    p.set_defaults(func=cmd_examples)
 
     p = sub.add_parser("recombine", help="rebuild combined scores from frozen raw responses (no API)")
     p.add_argument("--ratings-dir", required=True)
