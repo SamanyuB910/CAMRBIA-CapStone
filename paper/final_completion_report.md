@@ -39,7 +39,7 @@ in the report body, not only in a limitations list:
 
 | # | Stage | Status |
 |---|---|---|
-| 1 | Integrity audit and freeze | **Done** — 19/20 pass, 1 real defect found and fixed |
+| 1 | Integrity audit and freeze | **Done** — defect found, fixed, re-audited: **20/20 pass** |
 | 2 | Adjudicator validation | **OUTSTANDING** — needs `OPENROUTER_API_KEY` |
 | 3 | Judge-dependence sensitivity | **Done** — strong judge robustness for R − J |
 | 4 | Prompt-echo sensitivity | **Done** — survives echo matching, 24/24 subsets |
@@ -58,8 +58,8 @@ own logs: panel hash recomputed, per-(cell, rater) arm permutation replayed and
 compared to the key, all 400 outgoing payloads reconstructed and scanned for
 lens-identity leakage, every stored judge response re-parsed.
 
-Nineteen passed — including **zero unparseable responses across 526 stored
-ratings** and zero arm-mapping mismatches.
+On the first pass nineteen held — including **zero unparseable responses across
+526 stored ratings** and zero arm-mapping mismatches.
 
 One failed, and it was real: `combine()` derived the combined winner by *voting*
 on the judges' winners while *averaging* their scores, letting the two disagree
@@ -67,8 +67,12 @@ on **18 of 200 cells**. Fixed at the source; the frozen raw responses were
 re-combined with no new API call via `rlens recombine`.
 
 **Re-running the full analysis on the corrected scores changed no reported
-number.** All 18 cells were ties under both rules. This is stated because a
-defect that changes nothing still has to be reported.
+number.** All 18 cells were ties under both rules.
+
+The audit was then re-run against the corrected ratings and the analysis they
+produced: **all 20 conditions pass**, including `winner_matches_max_score` across
+200 cells and `ratings_frozen_before_analysis`. Panel hash reproduces exactly
+(`a4984e34d835c60e…`).
 
 ---
 

@@ -278,15 +278,27 @@ the panel hash, replayed the per-(cell, rater) arm permutation and compared it
 to the key, reconstructed all 400 outgoing judge payloads and scanned them for
 lens-identity leakage, and re-parsed every stored judge response.
 
-Twenty conditions were checked. Nineteen passed, including zero unparseable
-responses across 526 stored ratings, zero arm-mapping mismatches, and an exact
-panel-hash reproduction. One failed: the score-combination rule derived the
+Twenty conditions were checked. On the first pass nineteen held---including
+zero unparseable responses across 526 stored ratings, zero arm-mapping
+mismatches, and an exact reproduction of the panel hash
+(\texttt{a4984e34\allowbreak{}d835c60e\allowbreak{}cb661552\allowbreak{}ec0a794e}
+\dots).
+
+One condition failed, and it was ours. The score-combination rule derived the
 combined winner by \emph{voting} on the judges' winners while \emph{averaging}
 their scores, which let the two disagree on 18 of 200 cells. The rule was
 corrected to derive the winner from the combined scores, and the frozen raw
-responses were re-combined without any new API call. \textbf{Re-running the full
-analysis on the corrected scores changed no reported number}---all 18 cells were
-ties under both rules.
+responses were re-combined without any new API call, so no cell was re-rated and
+no rating changed.
+
+\textbf{Re-running the full analysis on the corrected scores changed no reported
+number}---all 18 cells were ties under both rules. The audit was then re-run
+against the corrected ratings and the analysis those ratings produced, and
+\textbf{all twenty conditions pass}, including
+\texttt{winner\_matches\_max\_score} across all 200 cells and
+\texttt{ratings\_frozen\_before\_analysis}. A defect that changes no number is
+still reported here, because whether it changed a number is not something a
+reader should have to take on trust.
 
 \subsection{Judge dependence}
 \label{sec:judge}
