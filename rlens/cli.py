@@ -1016,8 +1016,14 @@ def cmd_freeze_panel(args) -> None:
 # ---------------------------------------------------------------------------
 
 
-def _v2_readouts(model_name, cells_for_model, args):
-    """Top-10 readouts at the dataset-designated position. No position search."""
+def _v2_readouts(model_name, cells_for_model, args, top_k: int = 10):
+    """Top-k readouts at the dataset-designated position. No position search.
+
+    ``top_k`` defaults to 10, the frozen panel depth. Stage 3 asks for 100 so
+    that prompt-copied tokens can be filtered and the list refilled; the deeper
+    pass must reproduce the frozen first ten exactly, which is checked by the
+    caller rather than assumed.
+    """
     import pandas as pd
     import torch
 
@@ -1065,7 +1071,7 @@ def _v2_readouts(model_name, cells_for_model, args):
                     for lens_name, lens in lenses.items():
                         read = residual if lens is None else lens.transport(residual, layer)
                         logits = model.unembed(read).float()
-                        top = logits.topk(10)
+                        top = logits.topk(top_k)
                         for rank, (score, tid) in enumerate(
                                 zip(top.values.tolist(), top.indices.tolist()), start=1):
                             rows.append({
@@ -1074,6 +1080,7 @@ def _v2_readouts(model_name, cells_for_model, args):
                                 "token_id": tid, "token": tok.decode([tid]),
                                 "score": float(score),
                                 "prompt_tokens": prompt_tokens, "readout_pos": pos,
+                                "token_ids": seq,
                             })
     finally:
         restore()
@@ -2595,6 +2602,230 @@ def cmd_non_echo_analyse(args) -> None:
     print(f"\nresults -> {out_dir / 'non_echo_results.json'}")
 
 
+def cmd_small_sample(args) -> None:
+    """Stage 6: leave-one-prompt-out, leave-one-set-out, prompt-level spread.
+
+    Run across every scoring construct supplied, because a result that is
+    stable under one rubric and driven by a single prompt under another is a
+    different finding from one that is stable under both.
+    """
+    import json
+
+    import pandas as pd
+
+    from rlens.analysis_v2 import unblind_panel
+    from rlens.small_sample import (leave_one_prompt_out, leave_one_set_out,
+                                    prompt_level_effects, sign_test, summarise)
+
+    key_rows = [json.loads(l) for l in Path(args.key).read_text().splitlines() if l]
+    sample = json.loads(Path(args.sample).read_text())
+    out_dir = Path(args.out_dir).expanduser()
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    constructs = []
+    if args.standard:
+        constructs.append(("standard", args.standard, "contextual_coherence",
+                           ("contextual_coherence", "lexical_integrity", "prompt_echo")))
+    if args.non_echo:
+        constructs.append(("non_echo_norefill", args.non_echo, "non_echo_coherence",
+                           ("non_echo_coherence", "residual_substance")))
+    if args.refilled:
+        constructs.append(("non_echo_refilled", args.refilled, "non_echo_coherence",
+                           ("non_echo_coherence", "residual_substance")))
+    if not constructs:
+        raise SystemExit("supply at least one of --standard / --non-echo / --refilled "
+                         "(each a combined_scores.json)")
+
+    loo_rows, los_rows, prompt_rows, summary = [], [], [], {}
+    for name, path, dimension, dims in constructs:
+        combined = json.loads(Path(path).expanduser().read_text())
+        df = unblind_panel(combined, key_rows, sample, dimensions=dims, primary=dimension)
+        if df.empty:
+            print(f"  {name}: no rows after unblinding, skipped")
+            continue
+        summary[name] = {}
+        for model_key, sub in df.groupby("model_key"):
+            loo = leave_one_prompt_out(sub, "released-R", "released-J", dimension)
+            los = leave_one_set_out(sub, "released-R", "released-J", dimension)
+            per_prompt = prompt_level_effects(sub, "released-R", "released-J", dimension)
+            for frame, sink in ((loo, loo_rows), (los, los_rows), (per_prompt, prompt_rows)):
+                if not frame.empty:
+                    frame = frame.copy()
+                    frame.insert(0, "construct", name)
+                    frame.insert(1, "model", model_key)
+                    sink.append(frame)
+            summary[name][model_key] = {
+                "leave_one_prompt_out": summarise(loo),
+                "leave_one_set_out": summarise(los, "delta"),
+                "prompt_level_sign_test": sign_test(per_prompt["delta"])
+                if not per_prompt.empty else {},
+            }
+
+    def dump(frames, stem):
+        if not frames:
+            return None
+        table = pd.concat(frames, ignore_index=True)
+        table.to_csv(out_dir / f"{stem}.csv", index=False)
+        return table
+
+    loo_t = dump(loo_rows, "leave_one_prompt_out")
+    los_t = dump(los_rows, "leave_one_set_out")
+    dump(prompt_rows, "prompt_level_effects")
+    (out_dir / "small_sample_report.json").write_text(json.dumps(summary, indent=2),
+                                                      encoding="utf-8")
+
+    lines = ["# Small-sample stability (Stage 6)", "",
+             "The inferential unit is the PROMPT: 20 per model, each contributing five",
+             "depths and three arms. Deleting a prompt deletes all of its cells. The five",
+             "depths are repeated measurements of one prompt, not independent observations.",
+             ""]
+    for name, per_model in summary.items():
+        lines += [f"## {name}", ""]
+        for model_key, entry in per_model.items():
+            loo = entry["leave_one_prompt_out"]
+            los = entry["leave_one_set_out"]
+            sign = entry["prompt_level_sign_test"]
+            if not loo:
+                continue
+            lines += [
+                f"**{model_key}**", "",
+                f"- leave-one-prompt-out: R-J ranges {loo['min']:.3f} to {loo['max']:.3f} "
+                f"across {loo['n']} deletions; positive in {loo['n_positive']}/{loo['n']}"
+                + ("  **(all positive)**" if loo["all_positive"] else ""),
+                f"- most influential prompt: `{loo['most_influential']}` "
+                f"(its removal gives the smallest estimate)",
+                f"- leave-one-set-out: R-J ranges {los['min']:.3f} to {los['max']:.3f} "
+                f"across {los['n']} deletions; positive in {los['n_positive']}/{los['n']}",
+                f"- prompt-level sign test: {sign.get('n_positive')} positive, "
+                f"{sign.get('n_negative')} negative, {sign.get('n_tied')} tied"
+                + (f", exact p={sign['p_value']:.4f}" if sign.get("p_value") is not None else "")
+                + " (descriptive; discards magnitude)", ""]
+    if loo_t is not None:
+        lines += ["## Leave-one-prompt-out, full table", "",
+                  loo_t.to_markdown(index=False, floatfmt=".3f"), ""]
+    if los_t is not None:
+        lines += ["## Leave-one-set-out, full table", "",
+                  los_t.to_markdown(index=False, floatfmt=".3f"), ""]
+    (out_dir / "small_sample_report.md").write_text("\n".join(lines), encoding="utf-8")
+    print("\n".join(lines[:60]))
+    print(f"\nreport -> {out_dir / 'small_sample_report.md'}")
+
+
+def cmd_refill_panel(args) -> None:
+    """Stage 3+4: recompute deeper rankings, filter prompt copies, refill to ten.
+
+    Requires the GPU only because the frozen panel stored top-10. Nothing is
+    refit and the sample is unchanged: the same prompts, layers, positions and
+    lens artifacts, read deeper. The first ten tokens must reproduce the frozen
+    readouts exactly or the run aborts -- otherwise the refilled panel would not
+    be comparable to the one it is meant to explain.
+    """
+    import json
+
+    import pandas as pd
+
+    from rlens.eligibility import canonical_hash
+    from rlens.panel_v2 import PanelCell, arm_permutation, panel_hash
+    from rlens.refill import (REFILL_K, causal_prefix_ids, normalise, refill,
+                              refill_report, verify_prefix_reproduces)
+
+    out_dir = Path(args.out_dir).expanduser()
+    key_dir = Path(args.key_dir).expanduser()
+    for d in (out_dir, key_dir):
+        if d.exists() and any(d.iterdir()):
+            raise SystemExit(f"{d} exists and is not empty; use a fresh versioned path")
+
+    frozen = pd.read_parquet(args.readouts)
+    cells = [json.loads(l) for l in Path(args.sample).read_text().splitlines() if l] \
+        if str(args.sample).endswith(".jsonl") else None
+    sample = json.loads(Path(args.sample).read_text()) if cells is None else None
+
+    if args.deep_readouts and Path(args.deep_readouts).exists():
+        deep = pd.read_parquet(args.deep_readouts)
+        print(f"reusing deep readouts: {args.deep_readouts}")
+    else:
+        wanted = frozen[["model_key", "set", "item_id", "layer"]].drop_duplicates()
+        frames = []
+        for model_key, sub in wanted.groupby("model_key"):
+            spec = [{"set": r.set, "item_id": r.item_id, "layer": int(r.layer)}
+                    for r in sub.itertuples()]
+            print(f"[{model_key}] recomputing top-{args.top_k} for {len(spec)} cells ...")
+            frames.append(_v2_readouts(model_key, spec, args, top_k=args.top_k))
+        deep = pd.concat(frames, ignore_index=True)
+        out_dir.mkdir(parents=True, exist_ok=True)
+        deep.to_parquet(out_dir / "deep_readouts.parquet")
+
+    keys = ["model_key", "set", "item_id", "layer", "lens"]
+    mismatches, refilled_rows, reports = [], [], []
+    for key, group in deep.groupby(keys):
+        original = frozen[(frozen[keys] == pd.Series(dict(zip(keys, key)))).all(axis=1)]
+        ranked = group.sort_values("rank").to_dict("records")
+        ok, detail = verify_prefix_reproduces(ranked, original.to_dict("records"))
+        if not ok:
+            mismatches.append({"cell": dict(zip(keys, key)), "detail": detail})
+            continue
+        seq = list(ranked[0].get("token_ids") or [])
+        pos = int(ranked[0]["readout_pos"])
+        prefix = causal_prefix_ids(seq, pos) if seq else set()
+        prefix_norms = {normalise(t) for t in ranked[0]["prompt_tokens"][:pos + 1]}
+        kept = refill(ranked, prefix, k=REFILL_K, prefix_norms=prefix_norms,
+                      use_normalised=args.normalised_overlap)
+        reports.append({**dict(zip(keys, key)),
+                        **refill_report(ranked, kept, k=REFILL_K)})
+        for entry in kept:
+            refilled_rows.append({**dict(zip(keys, key)),
+                                  "rank": entry["refilled_rank"],
+                                  "original_rank": entry["original_rank"],
+                                  "token": entry["token"], "token_id": entry["token_id"],
+                                  "filtered_before": entry["filtered_before"],
+                                  "was_in_original_top10": entry["was_in_original_top10"],
+                                  "prompt_tokens": ranked[0]["prompt_tokens"],
+                                  "readout_pos": pos})
+    if mismatches:
+        (out_dir / "refill_mismatches.json").write_text(json.dumps(mismatches, indent=2))
+        raise SystemExit(
+            f"{len(mismatches)} cells did not reproduce their frozen top-10; the deeper "
+            f"pass is not the same measurement. See {out_dir / 'refill_mismatches.json'}")
+
+    report = pd.DataFrame(reports)
+    incomplete = report[~report["complete"]] if len(report) else report
+    if len(incomplete):
+        raise SystemExit(
+            f"{len(incomplete)} cells could not reach {REFILL_K} non-echo tokens within "
+            f"top-{args.top_k}; raise --top-k rather than padding the list")
+
+    refilled = pd.DataFrame(refilled_rows)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    refilled.to_parquet(out_dir / "refilled_readouts.parquet")
+    report.to_csv(out_dir / "refill_report.csv", index=False)
+    print(f"\nrefilled {len(report)} cells; median copies removed from top-10: "
+          f"{report['n_copied_removed_from_top10'].median():.1f}; "
+          f"deepest rank used: {int(report['deepest_rank_used'].max())}")
+
+    from rlens.panel_v2 import build_cells, validate_panel
+    cells_out, key_out = build_cells(refilled, salt=args.salt)
+    problems = validate_panel(cells_out, key_out)
+    blocking = [c for c in problems if c.get("status") == "FAIL"]
+    if blocking:
+        for c in blocking:
+            print(f"  [FAIL] {c['name']}: {c['detail']}")
+        raise SystemExit("refilled panel failed validation")
+
+    key_dir.mkdir(parents=True, exist_ok=True)
+    (out_dir / "panel_public.jsonl").write_text(
+        "\n".join(json.dumps(c.public(), ensure_ascii=False) for c in cells_out),
+        encoding="utf-8")
+    (key_dir / "panel_key.jsonl").write_text(
+        "\n".join(json.dumps(k) for k in key_out), encoding="utf-8")
+    (out_dir / "panel_manifest.json").write_text(json.dumps({
+        "salt": args.salt, "n_cells": len(cells_out), "top_k": args.top_k,
+        "refill_k": REFILL_K, "panel_hash": panel_hash(cells_out),
+        "overlap_rule": "normalised" if args.normalised_overlap else "exact token id",
+        "source_readouts": str(args.readouts),
+    }, indent=2), encoding="utf-8")
+    print(f"panel -> {out_dir / 'panel_public.jsonl'}  key -> {key_dir}")
+
+
 # ---------------------------------------------------------------------------
 # recombine  (no API: rebuild combined scores from the frozen raw responses)
 # ---------------------------------------------------------------------------
@@ -3021,6 +3252,30 @@ def main() -> None:
     p.add_argument("--n-perm", type=int, default=10000)
     p.add_argument("--seed", type=int, default=20260827)
     p.set_defaults(func=cmd_non_echo_analyse)
+
+    p = sub.add_parser("small-sample", help="Stage 6: leave-one-out stability")
+    p.add_argument("--key", required=True)
+    p.add_argument("--sample", required=True)
+    p.add_argument("--out-dir", required=True)
+    p.add_argument("--standard", help="combined_scores.json, standard rubric")
+    p.add_argument("--non-echo", help="combined_scores.json, no-refill non-echo rubric")
+    p.add_argument("--refilled", help="combined_scores.json, refilled non-echo rubric")
+    p.set_defaults(func=cmd_small_sample)
+
+    p = sub.add_parser("refill-panel", help="Stage 3: deeper rankings, prompt copies filtered")
+    p.add_argument("--readouts", required=True, help="frozen readouts.parquet (top-10)")
+    p.add_argument("--sample", required=True)
+    p.add_argument("--out-dir", required=True)
+    p.add_argument("--key-dir", required=True)
+    p.add_argument("--deep-readouts", help="reuse an existing deep parquet, skipping the GPU")
+    p.add_argument("--top-k", type=int, default=100)
+    p.add_argument("--salt", default="non-echo-refill-2026-08-27")
+    p.add_argument("--normalised-overlap", action="store_true",
+                   help="secondary rule: also treat NFKC-casefolded matches as copies")
+    p.add_argument("--dtype", default="bfloat16")
+    p.add_argument("--device", default="auto")
+    p.add_argument("--lens-device", default="gpu")
+    p.set_defaults(func=cmd_refill_panel)
 
     p = sub.add_parser("recombine", help="rebuild combined scores from frozen raw responses (no API)")
     p.add_argument("--ratings-dir", required=True)

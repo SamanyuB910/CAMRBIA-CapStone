@@ -17,7 +17,7 @@
 \captionsetup{font=small,labelfont=bf}
 \setlist{itemsep=2pt,parsep=0pt,topsep=3pt}
 \pagestyle{fancy}\fancyhf{}
-\fancyhead[L]{\small CAMBRIA capstone --- R-Lens coherence replication}
+\fancyhead[L]{\small CAMBRIA capstone --- contextual coherence and prompt echo}
 \fancyhead[R]{\small\thepage}
 \renewcommand{\headrulewidth}{0.4pt}
 
@@ -25,10 +25,11 @@
 \definecolor{flagged}{HTML}{B34700}
 \newcommand{\flag}[1]{\textcolor{flagged}{#1}}
 
-\title{\vspace{-2em}\bfseries Does R-Lens Produce More Contextually Coherent\\
-Early-Layer Readouts? A Blinded Two-Model Evaluation}
+\title{\vspace{-2em}\bfseries Disentangling Contextual Coherence and\\
+Prompt Echo in Early R-Lens Readouts}
 \author{Ashay Srivastava\\[2pt]
-\small CAMBRIA capstone --- replication of the R-Lens coherence claim}
+\small CAMBRIA capstone --- a blinded two-model independent evaluation and\\
+\small methodological extension of the R-Lens early-layer coherence claim}
 \date{\small 27 August 2026}
 
 \begin{document}
@@ -40,29 +41,44 @@ Early-Layer Readouts? A Blinded Two-Model Evaluation}
 R-Lens is a variant of J-Lens that fits its layer-to-final-layer transport with
 LRP stop-gradients. Its authors report, qualitatively and without a released
 scorer, that R-Lens readouts at early layers are more coherent than J-Lens
-readouts. We test that claim directly on two 27B models with a blinded,
+readouts. We evaluate that claim on two 27B models with a blinded,
 pre-specified and frozen rating panel of 200 three-arm cells, scored by two
-independently validated LLM autoraters. R-Lens is rated more contextually
-coherent than J-Lens on both models: $+0.690$, 95\%~CI \ci{0.515}{0.855} on
-Qwen3.5-27B and $+1.010$, \ci{0.780}{1.240} on Gemma-3-27B-it, on a 0--4 scale. The direction holds under
-every one of four scoring rules and under restriction to cells where both
-lenses echo the prompt equally, which retains roughly two thirds of the pooled
-effect. Three findings qualify this. R-Lens also scores significantly higher on
-prompt echo, and echo coincides with about a third of the measured gap.
-Comparisons against the logit-lens baseline are \emph{not} stable across
-judges---on Qwen the two primary judges disagree in sign about whether J-Lens
-beats the logit lens at all. And all three lenses score low in absolute terms:
-the best arm averages 1.99 (Qwen) and 2.57 (Gemma) out of 4, and on Qwen J-Lens
-is indistinguishable from the logit lens. We replicate the ordering, not a claim
-that early-layer R-Lens readouts are coherent.
+independently validated LLM autoraters.
+
+Under a standard prompt-aware coherence rubric, R-Lens is rated more coherent
+than J-Lens on both models: $+0.690$, 95\%~CI \ci{0.520}{0.855} on Qwen3.5-27B
+and $+1.010$, \ci{0.785}{1.235} on Gemma-3-27B-it, on a 0--4 scale. R-Lens also
+surfaces significantly more prompt-overlapping content than J-Lens.
+
+We therefore built a second, separately validated rubric that instructs judges
+to discard tokens copied from the prompt and score only what remains. Under it
+the R--J gap attenuates by 53\% on Qwen, to $+0.325$ \ci{0.165}{0.480}, and by
+89\% on Gemma, to $+0.110$ \ci{-0.045}{0.255}, which no longer excludes zero.
+Both Jacobian-based lenses nevertheless remain clearly better than the logit
+lens on non-copied content.
+
+The contribution is therefore not a simple confirmation. R-Lens's advantage
+under conventional contextual scoring is real and reproduces on both models,
+but it is substantially prompt-local, and on Gemma we cannot detect an advantage
+in novel non-copied content at all. We also show that restricting to cells with
+equal observed echo --- the natural first response to this confound --- gives a
+markedly more reassuring answer than direct measurement does, because it
+conditions on a variable the lens itself affects.
 \end{abstract}
 
 \section{What this document does and does not claim}
 
-This is the coherence replication only. It asks one question: when a human-like
-rater is shown three unlabelled early-layer readouts of the same prompt, one
-from the logit lens, one from J-Lens and one from R-Lens, does the R-Lens arm
-receive a higher contextual-coherence score?
+This is an independent evaluation of the coherence claim, and a methodological
+extension of it. It is \emph{not} an exact replication: the source post released
+no scorer, so the rubric, panel and statistics here are ours, and the released
+lens artifacts we evaluate were fit with a lighter recipe than the one the post
+describes (\S2).
+
+It asks two questions. First, when a rater is shown three unlabelled
+early-layer readouts of the same prompt --- one from the logit lens, one from
+J-Lens, one from R-Lens --- does the R-Lens arm receive a higher
+contextual-coherence score? Second, does any advantage survive when the rater is
+forbidden from crediting content copied from the prompt?
 
 It makes \textbf{no} claim about concept specificity, causal onset, ablation,
 necessity, sufficiency, answer smuggling, or whether any lens recovers a
@@ -189,7 +205,7 @@ sits in the lower half of the scale.}
 
 R-Lens is rated more contextually coherent than J-Lens on both models
 (Table~\ref{tab:primary}). Both intervals exclude zero in the positive
-direction, so the ordering claim replicates on both models.
+direction, so the ordering holds on both models under this rubric.
 
 \begin{table}[h]
 \centering
@@ -350,10 +366,22 @@ separate the adjudicator from a judge already in use.
 
 \flag{We therefore treated the unresolved gate as a failure and demoted the
 adjudicator}, rather than admitting an instrument the battery could not clear or
-loosening the threshold to fit it. The primary estimate is the mean of the two
-validated judges. The adjudicated estimate is retained below as a sensitivity
+loosening the threshold to fit it. We do \emph{not} claim to have shown the
+adjudicator is order-biased: the correct statement is that it did not satisfy a
+pre-specified validation gate, and the data cannot establish that its true rate
+is either acceptable or unacceptable. The primary estimate is the mean of the
+two validated judges. The adjudicated estimate is retained as a sensitivity
 analysis, and the adjudicator's ratings are preserved rather than deleted, since
 they are evidence about the panel even when not used to score it.
+
+\paragraph{Disclosure of timing.} The battery and its 15\% ceiling were fixed in
+the frozen protocol before any judge was run. The \emph{consequence} of
+excluding the adjudicator, however, was already visible: the judge-dependence
+sensitivity analysis (\S\ref{sec:judge}), which reports the mean-of-two estimate
+at $+0.850$ against the adjudicated $+0.778$, was computed before the
+adjudicator's battery was run. We therefore describe the demotion as a
+transparent post-validation analysis amendment against a pre-specified gate,
+not as a fully blind fail-closed decision. Both estimates appear throughout.
 
 \subsection{Judge dependence}
 \label{sec:judge}
@@ -464,10 +492,88 @@ models, while DeepSeek's is $0.29$ \ci{-0.16}{0.80} and $0.35$
 \ci{-0.03}{0.63}, both covering zero. GPT-5 sees echo and coherence tightly
 coupled; DeepSeek sees almost no coupling. Both still rate R above J.
 
-\paragraph{What would settle it.} A rubric that scores coherence
-\emph{excluding} copied spans, validated against controls in which a pure
-prompt-copy arm must not win, would test this directly rather than by
-restriction. That instrument is specified but not yet run.
+\paragraph{Read this analysis as a caution, not as reassurance.} Restricting to
+cells with equal observed echo selects on a variable that lens identity itself
+affects. Conditioning on a post-treatment variable can distort a comparison and
+does not estimate the effect with echo removed. The following section measures
+the quantity directly, and gives a substantially less reassuring answer than
+this restriction does --- which is the point of reporting both.
+
+\subsection{Non-echo coherence: direct measurement}
+\label{sec:nonecho}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth]{fig6_non_echo.pdf}
+\caption{\textbf{Standard versus non-echo scoring.} (a) Mean score by lens under
+each rubric, same 0--4 scale. (b) R $-$ J under each rubric; a filled marker
+denotes $p<0.05$ on the pre-specified permutation test. The R-Lens bar falls
+sharply under non-echo scoring on both models while the J-Lens bar barely moves.}
+\label{fig:nonecho}
+\end{figure}
+
+A second rubric was written, hashed and frozen under its own salt. It instructs
+the judge to discard every token that repeats a word visible in the prompt,
+including trivial variants, and to score only the remainder on the same 0--4
+scale; a readout that is entirely repetition has nothing left and scores 0.
+
+\paragraph{The rubric was validated before it was used.} Ten control cells
+pitted a pure prompt-copy arm --- the prompt's own final tokens --- against real
+late-layer readouts. Both judges scored the copied arm \textbf{0.00 out of 4} and
+it won \textbf{0 of 10} cells. All 200 panel cells were then rated by both
+judges with zero parse failures. Rating was blocked in software until that
+control passed, and the control is keyed to the rubric's hash, so editing the
+rubric text invalidates its validation.
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{llrrr}
+\toprule
+Model & Contrast & $\Delta$ & 95\% CI & $p$ \\
+\midrule
+Qwen3.5-27B & R $-$ J     & $0.325$ & \ci{0.165}{0.480} & $0.0042$ \\
+Qwen3.5-27B & R $-$ logit & $0.575$ & \ci{0.415}{0.715} & $<10^{-4}$ \\
+Qwen3.5-27B & J $-$ logit & $0.250$ & \ci{0.025}{0.465} & $0.070$ \\
+\addlinespace
+Gemma-3-27B-it & R $-$ J     & $0.110$ & \ci{-0.045}{0.255} & $0.450$ \\
+Gemma-3-27B-it & R $-$ logit & $0.985$ & \ci{0.805}{1.180} & $<10^{-4}$ \\
+Gemma-3-27B-it & J $-$ logit & $0.875$ & \ci{0.685}{1.065} & $<10^{-4}$ \\
+\bottomrule
+\end{tabular}
+\caption{Non-echo coherence. Same estimand, estimator, bootstrap and permutation
+test as Table~\ref{tab:primary}; a different scoring construct.}
+\label{tab:nonecho}
+\end{table}
+
+\flag{On Gemma the R-Lens advantage over J-Lens does not survive.} The estimate
+falls from $+1.010$ to $+0.110$, the interval includes zero, and the paired
+win/tie/loss is 46/27/27 --- a coin flip. On Qwen an advantage survives at less
+than half its size, $+0.690 \to +0.325$, still excluding zero.
+
+We state these as \emph{attenuations of the measured gap}, not as causal
+decompositions: the R $-$ J gap attenuates by 53\% on Qwen and 89\% on Gemma
+under a rubric that excludes prompt-overlapping content. It does not follow that
+53\% or 89\% of the original effect \emph{is caused by} echo. The two rubrics
+measure different constructs, and the non-echo rubric additionally penalises a
+lens whose copied tokens occupy slots in a fixed-length top-10 list --- an
+effect we could separate only by refilling the list from deeper rankings, which
+we did not do (\S\ref{sec:limits}).
+
+\paragraph{What strengthens under non-echo scoring.} Both Jacobian lenses beat
+the logit lens on both models, and J $-$ logit is \emph{larger} here than under
+standard scoring on Gemma ($+0.875$, $p<10^{-4}$, against $+0.430$, $p=0.112$).
+J-Lens echoes less than R-Lens, so standard scoring was penalising it for
+content the non-echo rubric ignores. The cross-model, cross-rubric result with
+the strongest support is therefore about the Jacobian transport in general, not
+about the LRP variant specifically.
+
+\paragraph{The two echo analyses disagree, and the direct one should be
+believed.} Restriction (\S\ref{sec:echo}) retained 74\% of the effect on Qwen
+and 102\% on Gemma. Direct measurement retains 47\% and 11\%. Conditioning on
+equal observed echo and excluding echoed content answer different questions: the
+former selects on a lens-affected variable, the latter changes the scoring
+construct. Neither identifies a formal mediation fraction.
 
 \subsection{Judge behaviour}
 
@@ -532,7 +638,57 @@ ours. Token-form statistics are not a substitute for rating the readouts.
       quoted as single numbers.
 \item \textbf{Depth-localisation does not replicate across models.}
 \item \textbf{Ordering, not quality.} Nothing here shows early-layer R-Lens
-      readouts are coherent in absolute terms; they average roughly 2 of 4.
+      readouts are coherent in absolute terms; they average roughly 2 of 4, and
+      under non-echo scoring less than that.
+\item \textbf{The non-echo rubric penalises crowd-out as well as copying.}
+      \label{sec:limits}
+      Copied tokens both earn no credit \emph{and} occupy slots in a
+      fixed-length top-10 list that novel tokens could have filled. Separating
+      those would require refilling each list from deeper rankings; the frozen
+      panel stored only the top 10, so we did not. The attenuations are
+      therefore upper bounds on the loss of novel content, not clean estimates
+      of it.
+\item \textbf{Four prompts per evaluation set.} Per-set results are descriptive
+      and none survives Holm correction.
+\item \textbf{One rubric, one panel per construct.} We did not test whether a
+      differently-worded non-echo rubric gives the same attenuation.
+\end{enumerate}
+
+\section{Supported and unsupported claims}
+\label{sec:claims}
+
+\paragraph{Supported by these data.}
+\begin{enumerate}[leftmargin=*,itemsep=1pt]
+\item Under the standard contextual rubric, R-Lens receives higher coherence
+      scores than J-Lens on both models, and the direction holds for each
+      validated judge separately.
+\item R-Lens surfaces significantly more prompt-overlapping content than J-Lens
+      on both models.
+\item The R $-$ J gap is substantially smaller under a rubric that excludes
+      prompt-overlapping content.
+\item On Qwen a smaller non-echo advantage survives; on Gemma the non-echo
+      estimate is inconclusive.
+\item Both Jacobian-based lenses outperform the logit lens on non-copied
+      content, on both models. This is the most robust cross-model result here.
+\end{enumerate}
+
+\paragraph{NOT supported, and not claimed.}
+\begin{enumerate}[leftmargin=*,itemsep=1pt]
+\item That R-Lens is universally more semantically informative than J-Lens.
+\item That a specific percentage of the standard R $-$ J effect \emph{is caused
+      by} prompt echo. The attenuations are construct changes, not mediation
+      fractions.
+\item That restricting to equal observed echo identifies the direct effect of
+      lens type. It conditions on a lens-affected variable.
+\item That the source post's $n{=}1000$ fitting recipe was replicated. We
+      evaluate the released $n{=}25$ light-recipe artifacts.
+\item That autorater scores equal human judgement. No human rated anything here.
+\item That J-Lens consistently beats the logit lens under the standard rubric.
+      That contrast is judge-dependent and reverses in sign between judges.
+\item That the excluded adjudicator was shown to be order-biased.
+\item That a non-significant result establishes equality.
+\item That five depths per prompt constitute independent observations. The
+      inferential unit is the prompt: 20 per model.
 \end{enumerate}
 
 \section{What would change the conclusion}
@@ -541,9 +697,12 @@ ours. Token-form statistics are not a substitute for rating the readouts.
 \item The adjudicator failing its validation battery would not overturn the
       direction, but would demote the adjudicated estimate and promote the
       mean-of-two.
-\item A non-echo rubric---coherence scored excluding copied spans---returning a
-      null would move the reading from ``R-Lens reads out more coherently'' to
-      ``R-Lens copies the prompt more, and raters reward that''.
+\item A refilled non-echo analysis --- filtering prompt copies from a deeper
+      ranking and topping the list back up to ten --- would separate loss of
+      novel content from top-10 crowd-out. If the Gemma null persisted after
+      refilling, the reading would firm up to ``R-Lens has no detectable
+      advantage in novel content on Gemma''. If it became positive, the
+      attenuation would be largely a presentation effect.
 \item A human panel disagreeing with the autoraters at scale would invalidate
       the instrument, not merely widen the intervals.
 \item Refitting both lenses at $n = 1000$ and finding the gap disappears would
