@@ -307,3 +307,60 @@ def test_rate_and_validate_both_use_the_progress_bar():
         src = inspect.getsource(fn)
         assert "Progress(" in src and "bar.emit(" in src
         assert "% 25 == 0" not in src, "no silent batching"
+
+
+# --- crash safety ---------------------------------------------------------
+
+def test_ratings_are_written_before_the_next_call(tmp_path):
+    """A 200-cell run killed at cell 190 must not lose 190 paid-for ratings."""
+    from rlens.non_echo import RatingLog
+
+    log = RatingLog(tmp_path / "raw.jsonl")
+    log.append({"cell_id": "c0", "status": "ok", "scores": {}})
+    # readable immediately, without any close/finalise step
+    assert set(RatingLog(tmp_path / "raw.jsonl").completed()) == {"c0"}
+
+
+def test_a_truncated_tail_from_a_killed_process_is_discarded(tmp_path):
+    from rlens.non_echo import RatingLog
+
+    log = RatingLog(tmp_path / "raw.jsonl")
+    log.append({"cell_id": "c0", "status": "ok"})
+    with (tmp_path / "raw.jsonl").open("a") as fh:
+        fh.write('{"cell_id": "c1", "stat')
+    assert set(log.completed()) == {"c0"}
+
+
+def test_resume_skips_completed_cells_and_retries_failures(tmp_path):
+    """A transient provider error must not be frozen into the panel by a
+    resume, so FAILED cells are re-called while ok cells are reused."""
+    from rlens.non_echo import RatingLog, resume_plan
+
+    log = RatingLog(tmp_path / "raw.jsonl")
+    log.append({"cell_id": "c0", "status": "ok"})
+    log.append({"cell_id": "c1", "status": "FAILED"})
+    panel = [{"cell_id": f"c{i}"} for i in range(4)]
+    todo, reused = resume_plan(panel, log)
+    assert sorted(reused) == ["c0"]
+    assert [c["cell_id"] for c in todo] == ["c1", "c2", "c3"]
+
+
+def test_resume_of_a_complete_run_makes_no_calls(tmp_path):
+    from rlens.non_echo import RatingLog, resume_plan
+
+    log = RatingLog(tmp_path / "raw.jsonl")
+    panel = [{"cell_id": f"c{i}"} for i in range(3)]
+    for cell in panel:
+        log.append({"cell_id": cell["cell_id"], "status": "ok"})
+    assert resume_plan(panel, log)[0] == []
+
+
+def test_existing_ratings_are_never_silently_overwritten():
+    import inspect
+
+    from rlens import cli
+
+    src = inspect.getsource(cli.cmd_non_echo_rate)
+    assert "already holds ratings" in src
+    assert "Pass --resume" in src
+    assert "never silently overwritten" in src

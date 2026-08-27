@@ -2336,7 +2336,7 @@ def cmd_non_echo_rate(args) -> None:
     import json
 
     from rlens.autorate import call_judge
-    from rlens.non_echo import NON_ECHO_SPEC, Progress
+    from rlens.non_echo import NON_ECHO_SPEC, Progress, RatingLog, resume_plan
 
     api_key = os.environ.get("OPENROUTER_API_KEY")
     if not api_key:
@@ -2362,31 +2362,43 @@ def cmd_non_echo_rate(args) -> None:
     panel = [json.loads(l) for l
              in Path(args.panel).expanduser().read_text().splitlines() if l]
     out_dir = Path(args.out_dir).expanduser()
-    if out_dir.exists() and any(out_dir.glob("raw_*.jsonl")):
-        raise SystemExit(f"{out_dir} already holds ratings; use a fresh --out-dir")
+    existing = sorted(out_dir.glob("raw_*.jsonl")) if out_dir.exists() else []
+    if existing and not args.resume:
+        raise SystemExit(
+            f"{out_dir} already holds ratings ({', '.join(p.name for p in existing)}). "
+            "Pass --resume to continue that run, reusing every cell already on disk, "
+            "or choose a fresh --out-dir. Ratings are never silently overwritten.")
     out_dir.mkdir(parents=True, exist_ok=True)
 
     _non_echo_projection(args, len(panel) * len(args.judges))
 
     all_scores = {}
     for judge_id in args.judges:
-        results, raw = {}, []
-        bar = Progress(len(panel), judge_id)
-        print(f"\nrating {len(panel)} cells with {judge_id}")
-        for cell in panel:
+        slug = judge_id.replace("/", "_")
+        log = RatingLog(out_dir / f"raw_{slug}.jsonl")
+        todo, reused = resume_plan(panel, log)
+        if reused:
+            print(f"\n{judge_id}: reusing {len(reused)} cells already on disk")
+        if not todo:
+            print(f"{judge_id}: already complete, no calls needed")
+        else:
+            print(f"\nrating {len(todo)} cells with {judge_id}"
+                  + (f" ({len(panel) - len(todo)} already done)" if reused else ""))
+        bar = Progress(len(todo), judge_id) if todo else None
+        for cell in todo:
             call = call_judge(cell, judge_id=judge_id, api_key=api_key,
                               spec=NON_ECHO_SPEC)
-            raw.append({"cell_id": call.cell_id, "status": call.status,
+            # Written and fsynced BEFORE the next call, so a killed run keeps
+            # everything it paid for.
+            log.append({"cell_id": call.cell_id, "status": call.status,
                         "scores": call.scores, "error": call.error,
                         "usage": call.usage, "timestamp": call.timestamp})
-            if call.status == "ok":
-                results[call.cell_id] = call.scores
             bar.emit(call.status == "ok")
-        slug = judge_id.replace("/", "_")
-        (out_dir / f"raw_{slug}.jsonl").write_text(
-            "\n".join(json.dumps(r) for r in raw), encoding="utf-8")
+
+        records = log.completed()
+        results = {cid: r["scores"] for cid, r in records.items() if r.get("status") == "ok"}
         all_scores[judge_id] = results
-        n_failed = sum(1 for r in raw if r["status"] != "ok")
+        n_failed = sum(1 for r in records.values() if r.get("status") != "ok")
         print(f"  {judge_id}: {len(results)}/{len(panel)} scored, {n_failed} FAILED")
 
     # Mean of the validated judges -- the same rule the primary v2 estimate uses
@@ -2936,6 +2948,9 @@ def main() -> None:
     p.add_argument("--cost-report")
     p.add_argument("--rubric-ratio", type=float, default=1.0)
     p.add_argument("--budget-usd", type=float, default=25.0)
+    p.add_argument("--resume", action="store_true",
+                   help="continue an interrupted run, reusing every cell already "
+                        "written and re-calling only what is missing")
     p.set_defaults(func=cmd_non_echo_rate)
 
     p = sub.add_parser("non-echo-analyse", help="Stage 5: analyse the non-echo ratings")

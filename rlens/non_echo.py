@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 from pathlib import Path
 
 from rlens.autorate import RubricSpec
@@ -315,3 +316,61 @@ def fmt_duration(seconds: float) -> str:
     if seconds < 3600:
         return f"{seconds // 60}m{seconds % 60:02d}s"
     return f"{seconds // 3600}h{(seconds % 3600) // 60:02d}m"
+
+
+# ---------------------------------------------------------------------------
+# crash-safe incremental rating
+# ---------------------------------------------------------------------------
+
+
+class RatingLog:
+    """Append-only JSONL of judge calls, flushed after every cell.
+
+    Writing the whole file after a 200-cell loop means a run killed at cell 190
+    loses two hours and every dollar spent on it. Appending as we go turns that
+    into a resume: the cells already on disk are read back and skipped.
+
+    Append-and-flush per line is the right granularity here. Each record is well
+    under the pipe-buffer size, so a process killed mid-run leaves complete
+    lines plus at most one truncated tail, and ``completed`` discards anything
+    that does not parse rather than trusting a partial record.
+    """
+
+    def __init__(self, path):
+        self.path = Path(path)
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+
+    def completed(self) -> dict:
+        """Cell id -> record, for every intact line already written."""
+        if not self.path.exists():
+            return {}
+        out = {}
+        for line in self.path.read_text(encoding="utf-8").splitlines():
+            if not line.strip():
+                continue
+            try:
+                row = json.loads(line)
+            except json.JSONDecodeError:
+                continue          # truncated tail from a killed process
+            if row.get("cell_id"):
+                out[row["cell_id"]] = row
+        return out
+
+    def append(self, record: dict) -> None:
+        with self.path.open("a", encoding="utf-8") as fh:
+            fh.write(json.dumps(record, ensure_ascii=False) + "\n")
+            fh.flush()
+            os.fsync(fh.fileno())
+
+
+def resume_plan(panel: list, log: RatingLog, *, retry_failed: bool = True) -> tuple:
+    """``(todo, done)`` -- which cells still need a call.
+
+    A cell recorded as FAILED is retried by default: a transient provider error
+    should not be frozen into the panel by a resume.
+    """
+    done = log.completed()
+    reusable = {cid: row for cid, row in done.items()
+                if row.get("status") == "ok" or not retry_failed}
+    todo = [c for c in panel if c["cell_id"] not in reusable]
+    return todo, reusable
