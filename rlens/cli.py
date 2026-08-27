@@ -2392,10 +2392,15 @@ def cmd_non_echo_validate(args) -> None:
         json.dumps(reports, indent=2), encoding="utf-8")
     print(f"\nreport -> {out_dir / 'copy_control_report.json'}")
     if not all(r["passed"] for r in reports):
+        failed = {c["name"] for r in reports for c in r["checks"]
+                  if c["status"] != "PASS"}
         raise SystemExit(
-            "\nThe non-echo rubric did not clear its copy control. Do NOT rate the "
-            "main panel with it: a rubric that rewards prompt copying cannot answer "
-            "the question it was written for. Revise the rubric and re-validate.")
+            f"\nThe non-echo rubric did not clear: {', '.join(sorted(failed))}. "
+            "Do NOT rate the main panel with it. `pure_copy_does_not_win` failing "
+            "means the rubric rewards outright copying; `mixture_invariance` "
+            "failing means it penalises a fixed core as prompt-local padding is "
+            "added, so its scores confound content quality with padding volume. "
+            "Naming the failed check matters: they imply different repairs.")
     print("\nAll judges cleared the copy control. Safe to rate the main panel.")
 
 
