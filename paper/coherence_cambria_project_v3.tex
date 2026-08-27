@@ -74,9 +74,10 @@ The contribution is therefore neither a confirmation nor a refutation. R-Lens is
 rated more coherent under a standard rubric, robustly and on both models. It also
 receives more credit for prompt-local content --- which includes orthographic
 normalisation such as \emph{poeple}\,$\to$\,\emph{people}, plausibly genuine
-computation rather than copying. A single hand-selected cell shows the two
-rubrics ranking the same three arms in opposite orders, which demonstrates the
-construct distinction without needing any instrument to be reliable. We also show
+computation rather than copying. A post-hoc, rule-selected cell shows the two rubrics ranking
+the same three arms in opposite orders. The token lists themselves make the
+construct distinction visible; the numerical reversal that accompanies them
+still depends on the instrument. We also show
 that restricting to cells with equal observed echo --- the natural first response
 to this confound --- gives a markedly more reassuring answer than rubric-based
 exclusion, because it conditions on a variable the lens itself affects. Neither
@@ -653,12 +654,14 @@ retain the pooled figures for comparability with the primary rule and state thei
 per-judge range wherever they appear. The Qwen range (38--73\%) is wide but at
 least sign-consistent.
 
-\flag{On Gemma the R-Lens advantage over J-Lens does not survive.} The estimate
+\flag{On Gemma the pooled estimate includes zero while the judges disagree in
+sign; the result is unresolved rather than evidence of equality.} The estimate
 falls from $+1.010$ to $+0.110$ and the interval includes zero. The pooled
 cell-level win/tie/loss is nearly balanced at 46/27/27 --- but the per-judge
 analysis below shows this masks a sign reversal between judges, not shared
-evidence of equivalence. On Qwen an advantage survives at less
-than half its size, $+0.690 \to +0.325$, still excluding zero.
+evidence of equivalence. The pooled Qwen estimate remains
+positive, $+0.690 \to +0.325$, although the instrument that produced it failed
+validation.
 
 We state these as \emph{attenuations of the measured gap}, not as causal
 decompositions: the R $-$ J gap attenuates by 53\% on Qwen and 89\% on Gemma
@@ -683,12 +686,14 @@ zero ($p=0.070$).}
 \begin{figure}[h]
 \centering
 \includegraphics[width=\textwidth]{fig9_attenuation.pdf}
-\caption{\textbf{Attenuation is systematic, not driven by a few prompts.} Each
-point is one prompt's R $-$ J averaged over its five depths, standard scoring on
-the $x$ axis against non-echo scoring on the $y$. A prompt on the dashed
-$y{=}x$ line loses nothing when copied tokens are excluded. On Qwen most prompts
-sit modestly below the line; on Gemma they sit much further below it and more
-variably, with several large standard effects collapsing to zero or negative.}
+\caption{\textbf{Most prompt-level estimates are smaller under non-echo
+scoring.} Each point is one prompt's R $-$ J averaged over its five depths,
+standard scoring on the $x$ axis against the exploratory non-echo rubric on the
+$y$; below the diagonal indicates a smaller estimated difference under that
+rubric. On Qwen most prompts sit modestly below the line; on Gemma further below
+and more variably. Because the non-echo rubric failed validation
+(\S\ref{sec:mixture}), this figure is descriptive and does not identify an effect
+attributable to prompt-local content.}
 \label{fig:attenuation}
 \end{figure}
 
@@ -813,15 +818,15 @@ adding more of them to a readout whose meaningful content is unchanged must not
 move the score. That is a testable property, and it is the property the panel
 actually depends on.
 
-We built 20 families. Each holds a \textbf{fixed ten-token coherent core} ---
-drawn only from arms that had already scored $\ge 2$ on this rubric, so every
-family has something to lose --- and varies only the number of prompt-local
-distractors mixed in: 0, 3 or 6, at \textbf{constant list length ten}. Varying
-length would confound length with padding. Three padding kinds are tested
-separately: literal repetition, case variants, and near-miss spellings of prompt
-words. Acceptance criteria were frozen in code before any rating: median
-within-family spread $\le 1.0$ on the 0--4 scale, and at most 34\% of families
-declining monotonically as padding increases.
+We built 20 families from arms that had already scored $\ge 2$ on this rubric,
+so every family had something to lose. Within a family, 0, 3 or 6 positions of a
+ten-token list were replaced by prompt-local distractors; every list contained
+exactly ten tokens, so adding a distractor \emph{displaced} one core token. Three
+distractor kinds were tested separately: literal repetition, case variants, and
+near-miss spellings of prompt words. Acceptance criteria were frozen in code
+before any rating: median within-family spread $\le 1.0$ on the 0--4 scale, and
+at most 34\% of families declining monotonically as padding increases. That
+displacement is the design flaw discussed below.
 
 \begin{center}\small
 \begin{tabular}{lccc}
@@ -834,17 +839,31 @@ DeepSeek-v3.1 & \flag{$2.00$} & \flag{10/20 = 50\%} & \flag{FAIL} \\
 \end{tabular}
 \end{center}
 
-\flag{One judge follows the instruction and the other does not.} DeepSeek's
-scores fall monotonically with padding in half of all families, on cores it had
-itself rated as coherent. Its per-padding-kind spreads are 1.00 for literal
-repetition, 1.00 for case variants and 1.67 for near-miss spellings --- so the
-effect is largest exactly where ``prompt-local'' is most a matter of judgement.
-GPT-5 passes, but sits precisely on the ceiling at 1.00.
+\paragraph{\flag{This control is confounded by construction, and we report it as
+uninformative.}} The specification above is impossible: a candidate list cannot
+simultaneously hold the core fixed at ten tokens, hold total length at ten, and
+add padding. Our implementation resolved this by letting padding \emph{displace}
+core tokens, so the arms carry 10, 7 and 4 core tokens respectively.
 
-\paragraph{We do not drop DeepSeek and keep GPT-5.} Selecting the judge that
-passes, after seeing which one passes, is outcome-dependent instrument
-selection, and it would be the most attackable decision in this document. Both
-judges were admitted on the same pre-specified battery and both are retained.
+That breaks the test. After the judge discards prompt-local tokens, the 6-pad arm
+genuinely has less coherent material left --- four tokens rather than ten --- so
+a judge scoring it lower may be \emph{correct} rather than padding-sensitive.
+\flag{DeepSeek's monotone decline is therefore consistent with correct behaviour,
+and GPT-5's flatness is as easily read as the anomaly.} The control cannot
+distinguish the two, and we do not use it as evidence about either judge.
+
+We report it because the design error is instructive. Any mixture-invariance test
+must sacrifice one of the three constraints: hold the core fixed and let list
+length grow (confounding length with padding), hold length fixed and let the core
+shrink (what we did, confounding content volume with padding), or vary padding
+identity at fixed count (testing something narrower). We specified all three and
+did not notice the contradiction until after the ratings were collected.
+
+\paragraph{What still stands without it.} The non-echo instrument's problems do
+not depend on this control. Inter-judge agreement is $\kappa = 0.19$ against
+$0.51$ for the standard rubric, and on Gemma the two judges produce
+opposite-signed estimates with disjoint intervals. Those two facts are measured
+directly on the panel itself and are sufficient for the conclusion below.
 
 \paragraph{An earlier version of this control was weaker than it looked.} Our
 first attempt did not require the core to be coherent, and drew it from whichever
@@ -1085,7 +1104,9 @@ ours. Token-form statistics are not a substitute for rating the readouts.
 \item \textbf{Released lenses use the 25-prompt light recipe}, not the
       1000-prompt recipe of the source post. Effect sizes are not comparable to
       the authors'. R-Lens and J-Lens may also differ in sample efficiency, so
-      matching both arms at $n{=}25$ makes the comparison internally fair
+      both artifacts use the same fitting-sample size, which removes one source of
+      asymmetry, though we did not verify that the fitting prompts or procedures
+      were otherwise matched
       without making it equivalent to the full-recipe comparison.
 \item \textbf{Model choice was fixed by the capstone brief}: Qwen3.5-27B and
       Gemma-3-27B-it. We did not verify that these are the exact revisions used
@@ -1148,7 +1169,8 @@ its scores declining monotonically as ignorable padding was added to a fixed
 core; and R-Lens is rated as leaving less material to score in the first place.
 We therefore report it as an exploratory measurement study whose result is
 negative: \flag{explicitly excluding prompt-local content did not produce a
-measure two validated judges agree on.}
+measure the two judges --- both admitted under the standard protocol, neither
+validated for this construct --- agree on.}
 
 The conclusion is neither a clean confirmation nor a refutation. R-Lens's
 advantage under ordinary coherence scoring is real and reproducible, but ordinary
@@ -1178,15 +1200,18 @@ one you mean.
       on both models.
 \item The R $-$ J gap is substantially smaller under a rubric that excludes
       prompt-overlapping content.
-\item Excluding prompt-local content did not produce a measure two validated
-      judges agree on: $\kappa = 0.19$, a sign disagreement on Gemma, and one
-      judge failing mixture invariance. This is reported as a negative result
-      about the construct, and no lens comparison rests on it.
-\item On non-copied content, R-Lens outperforms the logit lens on both models,
-      and J-Lens does so clearly on Gemma with positive but inconclusive
-      evidence on Qwen ($p=0.070$). R $-$ logit is consistently positive on both
-      models; J $-$ logit is strong only on Gemma under non-echo scoring and is
-      inconclusive or judge-dependent everywhere else.
+\item Descriptively, the pooled R $-$ J difference was smaller under the
+      exploratory non-echo rubric. Because that rubric achieved only slight
+      inter-judge agreement ($\kappa = 0.19$) and produced opposite-signed
+      estimates on Gemma, we do \emph{not} interpret the attenuation as evidence
+      about relative lens quality.
+\item Excluding prompt-local content did not produce a measure the two judges
+      agree on. This is a negative result about the construct; no lens
+      comparison in this list rests on non-echo estimates.
+\item Under the standard rubric, R $-$ logit is positive and significant on
+      both models. The corresponding non-echo estimates are reported in
+      \S\ref{sec:nonecho} as exploratory and are not offered as inferential
+      conclusions.
 \item The standard-rubric R $-$ J difference survives deletion of any single
       prompt and any single evaluation set, on both models
       (\S\ref{sec:smallsample}).
@@ -1236,10 +1261,10 @@ one you mean.
       refilling, the reading would firm up to ``R-Lens has no detectable
       advantage in novel content on Gemma''. If it became positive, the
       attenuation would be largely a presentation effect.
-\item A mixture-invariance control --- holding the non-copied tokens fixed
-      while varying the number of copied tokens at constant list length ---
-      failing would show the non-echo rubric is presentation-sensitive, and its
-      attenuations could not be read as clean exclusions of echo.
+\item Reviving comparative non-echo claims would require a redesigned
+      instrument: one achieving acceptable inter-rater agreement, and a
+      mixture-invariance test whose three constraints are not mutually
+      contradictory (\S\ref{sec:mixture}), passing for both judges.
 \item Refitting both lenses at $n = 1000$ and finding the gap disappears would
       indicate the effect is a property of the light recipe.
 \end{itemize}

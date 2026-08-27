@@ -617,8 +617,8 @@ def fig_attenuation(prompt_effects, out_dir: Path) -> list[str]:
     # Descriptive wording only: "loses to echo" asserted a mechanism the paper
     # explicitly declines to claim.
     axes[0].text(0.03, 0.97,
-                 "on the dashed line = same under both rubrics\n"
-                 "below it = smaller under non-echo scoring",
+                 "on the diagonal = same under both rubrics\n"
+                 "below = smaller under the exploratory non-echo rubric",
                  transform=axes[0].transAxes, va="top", fontsize=6.5, color=MUTED)
     fig.tight_layout()
     return save(fig, out_dir, "fig9_attenuation")

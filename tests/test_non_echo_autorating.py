@@ -417,4 +417,4 @@ def test_figure_nine_annotation_is_descriptive_not_causal():
     # check the rendered strings, not the comments explaining the change
     code = "\n".join(l for l in src.splitlines() if not l.strip().startswith("#"))
     assert "loses to echo" not in code
-    assert "smaller under non-echo scoring" in code
+    assert "smaller under the exploratory non-echo rubric" in code
