@@ -19,7 +19,8 @@ from pathlib import Path
 # reported as MISSING rather than skipped, so an incomplete run is visible.
 EXPECTED = {
     "panel": ["panel_public.jsonl", "panel_manifest.json",
-              "judge_validation_report.json", "leakage_audit.json"],
+              "judge_validation/judge_validation_report.json",
+              "leakage_audit.json"],
     "analysis": ["statistical_results.json", "report.md"],
     "ratings": ["combined_scores.json", "scores_blinded.csv", "completeness.json"],
     "robustness": ["judge_sensitivity.csv", "judge_sensitivity.md",

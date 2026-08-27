@@ -17,7 +17,9 @@ def _populate(tmp_path, roles=("panel", "analysis", "ratings", "robustness",
         d = tmp_path / role
         d.mkdir()
         for name in EXPECTED[role]:
-            (d / name).write_text(f"content of {role}/{name}")
+            target = d / name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(f"content of {role}/{name}")
         dirs[role] = str(d)
     return dirs
 
@@ -114,7 +116,8 @@ def test_expected_filenames_match_what_the_commands_write():
         for name in EXPECTED[role]:
             if role == "figures":
                 continue  # written by rlens/figures.py via a format string
-            assert f'"{name}"' in source, f"{role}/{name} is not written by any command"
+            leaf = name.rsplit("/", 1)[-1]  # some artifacts sit in a subdirectory
+            assert f'"{leaf}"' in source, f"{role}/{name} is not written by any command"
 
 
 def test_advisory_failure_alone_does_not_fail_the_audit(tmp_path):
