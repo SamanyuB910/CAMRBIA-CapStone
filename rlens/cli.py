@@ -2279,8 +2279,9 @@ def cmd_non_echo_validate(args) -> None:
     import json
 
     from rlens.autorate import call_judge, probe_judge
-    from rlens.non_echo import (NON_ECHO_SPEC, Progress, build_copy_controls,
-                                copy_control_report)
+    from rlens.non_echo import (MIXTURE_CRITERIA, NON_ECHO_SPEC, Progress,
+                                build_copy_controls, build_mixture_controls,
+                                copy_control_report, mixture_report)
 
     api_key = os.environ.get("OPENROUTER_API_KEY")
     if not api_key:
@@ -2299,6 +2300,23 @@ def cmd_non_echo_validate(args) -> None:
             "synthesising them would make the control test nothing real.")
 
     controls, control_key = build_copy_controls(late, n=args.n_controls)
+    if args.mixture:
+        # Families holding a coherent non-prompt-local core FIXED at ten tokens
+        # while only the prompt-local padding varies. The copy control shows
+        # judges reject a pure copy; this shows whether they can ignore padding
+        # mixed with real content, which is what the panel actually contains.
+        panel_cells = [json.loads(l) for l
+                       in Path(args.mixture).expanduser().read_text().splitlines() if l]
+        mix, mix_key = build_mixture_controls(panel_cells, n_families=args.n_mixture)
+        if len(mix) < args.n_mixture:
+            raise SystemExit(
+                f"only {len(mix)} of {args.n_mixture} mixture families could be built "
+                "(a family needs a ten-token core); supply more panel cells rather "
+                "than shortening the lists, which would confound length with padding")
+        controls = controls + mix
+        control_key = control_key + mix_key
+        print(f"mixture-invariance families: {len(mix)} "
+              f"(pad counts {', '.join(str(n) for n in (0, 3, 6))}, constant length 10)")
     out_dir = Path(args.out_dir).expanduser()
     if out_dir.exists() and (out_dir / "copy_control_report.json").exists():
         raise SystemExit(f"{out_dir} already holds a copy-control report; "
@@ -2334,16 +2352,22 @@ def cmd_non_echo_validate(args) -> None:
         (out_dir / f"raw_copy_{slug}.jsonl").write_text(
             "\n".join(json.dumps(r) for r in raw), encoding="utf-8")
 
-        check = copy_control_report(results, control_key)
+        checks = [copy_control_report(results, control_key)]
+        if args.mixture:
+            checks.append(mixture_report(results, control_key,
+                                         primary=NON_ECHO_SPEC.primary))
         n_failed = sum(1 for r in raw if r["status"] != "ok")
         report = {"judge_id": judge_id, "rubric_hash": NON_ECHO_SPEC.hash(),
                   "salt": NON_ECHO_SPEC.salt, "n_scored": len(results),
-                  "n_failed": n_failed, "checks": [check],
-                  "passed": check["status"] == "PASS" and n_failed == 0}
+                  "n_failed": n_failed, "checks": checks,
+                  "criteria": MIXTURE_CRITERIA if args.mixture else None,
+                  "passed": all(c["status"] == "PASS" for c in checks) and n_failed == 0}
+        check = checks[0]
         reports.append(report)
         print(f"\n=== {judge_id} — {'PASS' if report['passed'] else 'FAIL'} "
               f"({len(results)}/{len(controls)} scored) ===")
-        print(f"  [{check['status']}] {check['name']}: {check['detail']}")
+        for c in checks:
+            print(f"  [{c['status']:4s}] {c['name']}: {c['detail']}")
         if n_failed:
             print(f"  [FAIL] response_completeness: {n_failed} cells returned no rating")
 
@@ -3404,6 +3428,11 @@ def main() -> None:
     p.add_argument("--out-dir", required=True)
     p.add_argument("--judges", nargs="+", required=True)
     p.add_argument("--n-controls", type=int, default=10)
+    p.add_argument("--mixture", metavar="PANEL_JSONL",
+                   help="also run mixture-invariance families built from this panel: "
+                        "a fixed ten-token non-prompt-local core with 0/3/6 "
+                        "prompt-local distractors at constant list length")
+    p.add_argument("--n-mixture", type=int, default=20)
     p.add_argument("--cost-report", help="a previous cost_report.json, for the projection")
     p.add_argument("--rubric-ratio", type=float, default=1.0,
                    help="expected completion-token multiplier vs the measured rubric")

@@ -54,17 +54,21 @@ than J-Lens on both models: $+0.690$, 95\%~CI \ci{0.520}{0.855} on Qwen3.5-27B
 and $+1.010$, \ci{0.785}{1.235} on Gemma-3-27B-it, on a 0--4 scale. R-Lens also
 surfaces significantly more prompt-overlapping content than J-Lens.
 
-We therefore built a second, separately validated rubric that instructs judges
-to discard prompt-local tokens and score only what remains. Under it the R--J gap
-attenuates by 53\% on Qwen, to $+0.325$ \ci{0.165}{0.480}, and by 89\% on Gemma,
-to $+0.110$ \ci{-0.045}{0.255}, which no longer excludes zero.
+We therefore built a second rubric, which passed a pre-rating pure-copy
+rejection control, instructing judges to discard prompt-local tokens and score
+only what remains. Under it the R--J gap
+attenuates to $+0.325$ \ci{0.165}{0.480} on Qwen and $+0.110$
+\ci{-0.045}{0.255} on Gemma, the latter no longer excluding zero. Expressed as
+proportional attenuation those are 53\% and 89\%, but both figures are
+judge-dependent (38--73\% and 57\% to a sign reversal), so we do not treat them
+as estimates of a quantity.
 
 That second instrument is however much noisier than the first ($\kappa = 0.19$
 against $0.51$), and on Gemma its two judges disagree in sign with disjoint
 intervals, so the Gemma result is better described as \emph{unresolved} than as
-absent. R-Lens also has significantly less non-copied material left to be judged,
-so part of the attenuation reflects having less to score rather than scoring
-worse.
+absent. Judges also report significantly lower residual substance for R-Lens than
+J-Lens on both models, so the attenuation conflates the coherence of what remains
+with how much the judges perceive as remaining.
 
 The contribution is therefore not a simple confirmation, and not a refutation
 either. R-Lens's advantage under conventional contextual scoring is real and
@@ -92,7 +96,8 @@ It asks two questions. First, when a rater is shown three unlabelled
 early-layer readouts of the same prompt --- one from the logit lens, one from
 J-Lens, one from R-Lens --- does the R-Lens arm receive a higher
 contextual-coherence score? Second, does any advantage survive when the rater is
-forbidden from crediting content copied from the prompt?
+forbidden from crediting content that is \emph{prompt-local} --- direct
+repetition together with trivial and normalised lexical variants?
 
 It makes \textbf{no} claim about concept specificity, causal onset, ablation,
 necessity, sufficiency, answer smuggling, or whether any lens recovers a
@@ -596,16 +601,44 @@ Gemma-3-27B-it & 0.71 & 1.58 & \textbf{1.69} & \textbf{1.81} & \textbf{1.81} & 1
 \bottomrule
 \end{tabular}
 \caption{Mean non-echo coherence and mean residual substance by lens. Residual
-substance is the judge's report of \emph{how much} non-copied material there was
-to score, not a quality judgement. R-Lens is lowest on both models --- it leaves
-less behind once prompt-local tokens are discarded --- which is why the
-attenuation cannot be read as loss of novel-content quality alone.}
+substance is the judge's \emph{report} of how much non-copied material there was
+to score, not a quality judgement and not a direct count. R-Lens is reported
+lower than J-Lens on both models; on Qwen the logit lens is lower still, and on
+Gemma R-Lens is the lowest of the three. This is why the attenuation cannot be
+read as loss of novel-content quality alone.}
 \label{tab:nonechomeans}
 \end{table}
 
+\paragraph{\flag{The attenuation percentages are not stable quantities.}} We
+quote 53\% (Qwen) and 89\% (Gemma) because they are computed from the pooled
+primary estimates, but they are ratios of two noisy numbers and on Gemma the
+denominator and numerator disagree between judges. Recomputing each judge's
+attenuation from that judge's own two estimates:
+
+\begin{center}\small
+\begin{tabular}{lccc}
+\toprule
+Model & GPT-5 alone & DeepSeek alone & Pooled (quoted) \\
+\midrule
+Qwen3.5-27B & $0.790 \to 0.490$ = 38\% & $0.590 \to 0.160$ = 73\% & 53\% \\
+Gemma-3-27B-it & $1.160 \to 0.500$ = 57\% & \flag{$0.860 \to -0.280$ = 133\%} & 89\% \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent DeepSeek's Gemma attenuation exceeds 100\% because its non-echo
+estimate is negative: the ``attenuation'' there is a sign reversal, not a
+shrinkage. \flag{The 89\% figure should therefore be read as ``somewhere between
+57\% and a reversal, depending on which judge you ask'', not as an estimate.} We
+retain the pooled figures for comparability with the primary rule and state their
+per-judge range wherever they appear. The Qwen range (38--73\%) is wide but at
+least sign-consistent.
+
 \flag{On Gemma the R-Lens advantage over J-Lens does not survive.} The estimate
-falls from $+1.010$ to $+0.110$, the interval includes zero, and the paired
-win/tie/loss is 46/27/27 --- a coin flip. On Qwen an advantage survives at less
+falls from $+1.010$ to $+0.110$ and the interval includes zero. The pooled
+cell-level win/tie/loss is nearly balanced at 46/27/27 --- but the per-judge
+analysis below shows this masks a sign reversal between judges, not shared
+evidence of equivalence. On Qwen an advantage survives at less
 than half its size, $+0.690 \to +0.325$, still excluding zero.
 
 We state these as \emph{attenuations of the measured gap}, not as causal
@@ -664,8 +697,9 @@ Gemma-3-27B-it & $+0.500$ \ci{0.30}{0.69} & \flag{$-0.280$ \ci{-0.44}{-0.12}} & 
 \flag{On Gemma the two judges disagree in sign, with disjoint intervals.} GPT-5
 puts R-Lens half a point ahead; DeepSeek puts it more than a quarter of a point
 behind. The pooled $+0.110$ is the average of a disagreement, not a shared
-finding of no effect --- and those are very different things. On Qwen both judges
-are positive, though neither reaches $p<0.05$ alone.
+finding of no effect --- and those are very different things. On Qwen both judges are
+positive: GPT-5's estimate reaches $p = 0.016$ while DeepSeek's does not reach
+the pre-specified threshold ($p = 0.075$).
 
 \flag{The non-echo instrument is markedly less reliable than the standard one.}
 Quadratic-weighted $\kappa = 0.19$ against $0.51$ for the standard rubric, exact
@@ -675,18 +709,32 @@ non-echo number in this section inherits that, and we did not anticipate it: the
 copy control established that judges reject a pure copy, which turns out to be a
 much easier task than scoring what remains after partial copying.
 
-\paragraph{\flag{R-Lens has less residual material to be judged on.}} The
+\flag{The non-echo intervals understate their own uncertainty.} The bootstrap
+resamples \emph{prompts}, which is correct for the estimand, but the score
+entering each cell is the mean of two judges whose agreement is slight. The
+intervals therefore propagate prompt-level variation and \emph{not} judge
+disagreement. The per-judge rows above are the honest expression of that second
+source, and they lie much further apart than any single interval implies. We also
+computed no agreement statistic for \emph{residual substance} itself; the
+$\kappa$ above is for the primary non-echo dimension only.
+
+\paragraph{\flag{Judges report less residual material for R-Lens.}} The
 non-echo rubric also asks each judge how much non-copied material was there to
-score (\emph{residual substance}, 0--2). R-Lens scores \emph{lower} than J-Lens
-on both models: $-0.330$ \ci{-0.395}{-0.265} on Gemma and $-0.150$
+score (\emph{residual substance}, 0--2). R-Lens is rated \emph{lower} than
+J-Lens on both models: $-0.330$ \ci{-0.395}{-0.265} on Gemma and $-0.150$
 \ci{-0.195}{-0.105} on Qwen, both excluding zero.
 
-This is direct evidence for the crowd-out concern in \S\ref{sec:limits}. Part of
-the attenuation is R-Lens having less material left after the judge discards
-prompt-local tokens --- not a judgement that what remains is less coherent. The
-two cannot be separated without refilling the list from deeper rankings. It also
-means the attenuation should not be read as a measurement of novel-content
-quality alone.
+This is \emph{judge-reported} evidence consistent with the crowd-out concern in
+\S\ref{sec:limits}: the non-echo comparison varies both the apparent quality and
+the apparent quantity of remaining content. The attenuation therefore conflates
+the coherence of the remaining content with the amount of content the judges
+perceive as remaining, and the present design cannot apportion the two. Doing so
+would require refilling each list from deeper rankings, which we did not do.
+
+We report residual substance as a rating, not as a measurement. With
+$\kappa = 0.19$ on the primary non-echo dimension, and no agreement statistic
+computed for residual substance itself, it should not be objectified as a count
+of tokens.
 
 \paragraph{What strengthens under non-echo scoring.} R-Lens beats the logit
 lens on both models; J-Lens clearly does so on Gemma ($+0.875$, $p<10^{-4}$,
@@ -916,10 +964,12 @@ instrument --- but the Qwen non-echo advantage rests more on the size of the
 differences than on a clear majority of prompts, and should be described that
 way.
 
-Taken together: the standard-rubric ordering is robust, and the non-echo
-findings are directionally consistent but fragile. That fragility is itself
-informative, since the non-echo construct is the one on which the headline claim
-was already weakest.
+Taken together: the standard-rubric ordering is robust, and the pooled non-echo
+estimates are positive but fragile. On Gemma that positive pooled estimate masks
+opposite-signed judge estimates; on Qwen both judges are positive but only GPT-5
+reaches $p<0.05$. The non-echo findings are therefore not directionally
+consistent across judges, and the fragility is compounded rather than merely
+observed.
 
 \section{The earlier no-prompt panel}
 
@@ -1018,9 +1068,11 @@ Gemma its two judges disagree in \emph{sign} with disjoint intervals, so the
 pooled null there reflects disagreement rather than shared evidence of absence;
 and R-Lens leaves significantly less non-copied material to be scored at all, so
 some of the attenuation is having less to judge rather than being judged worse.
-The attenuation is therefore strong evidence that the standard-rubric advantage
-depends heavily on prompt-local content, and a poor estimate of how much novel
-content R-Lens adds.
+The attenuation shows that the \emph{estimated} standard-rubric advantage is
+highly sensitive to whether prompt-local content receives credit. Because the
+non-echo instrument has only slight inter-judge agreement and simultaneously
+changes the amount of content available for scoring, it does not identify how
+much of the original advantage is attributable to prompt-local content.
 
 The conclusion is neither a clean confirmation nor a refutation. R-Lens's
 advantage under ordinary coherence scoring is real and reproducible, but ordinary
@@ -1058,8 +1110,9 @@ one you mean.
       J-Lens on both models (residual substance $-0.330$ Gemma, $-0.150$ Qwen).
 \item On non-copied content, R-Lens outperforms the logit lens on both models,
       and J-Lens does so clearly on Gemma with positive but inconclusive
-      evidence on Qwen ($p=0.070$). The lens-versus-baseline comparison is the
-      most robust family of results here; the R-over-J increment is not.
+      evidence on Qwen ($p=0.070$). R $-$ logit is consistently positive on both
+      models; J $-$ logit is strong only on Gemma under non-echo scoring and is
+      inconclusive or judge-dependent everywhere else.
 \item The standard-rubric R $-$ J difference survives deletion of any single
       prompt and any single evaluation set, on both models
       (\S\ref{sec:smallsample}).

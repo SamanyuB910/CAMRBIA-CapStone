@@ -374,3 +374,110 @@ def resume_plan(panel: list, log: RatingLog, *, retry_failed: bool = True) -> tu
                 if row.get("status") == "ok" or not retry_failed}
     todo = [c for c in panel if c["cell_id"] not in reusable]
     return todo, reusable
+
+
+# ---------------------------------------------------------------------------
+# mixture invariance (post-hoc control, frozen before rating)
+# ---------------------------------------------------------------------------
+
+MIXTURE_SALT = "non-echo-mixture-2026-08-27"
+
+# Frozen BEFORE any mixture rating is collected. The rubric tells the judge to
+# discard prompt-local tokens, so holding the non-local core fixed and varying
+# only the discarded padding must not move the score. Written here rather than
+# decided after seeing results.
+MIXTURE_CRITERIA = {
+    "max_median_within_family_spread": 1.0,   # on the 0-4 non-echo scale
+    "max_monotone_families": 0.34,            # share declining with padding count
+    "max_punctuation_score": 1.0,             # punctuation-only must score low
+    "min_coherent_beats_incoherent": 0.70,    # coherent core must win
+}
+PAD_COUNTS = (0, 3, 6)
+PAD_KINDS = ("literal", "case_variant", "typo_normalised")
+
+
+def _pad_tokens(prompt: str, kind: str, n: int) -> list:
+    """``n`` prompt-local distractors of one kind, drawn from the prompt's tail."""
+    words = [w for w in prompt.replace("\n", " ").split(" ") if w.strip()][-12:]
+    out = []
+    for i in range(n):
+        w = words[i % len(words)] if words else "the"
+        if kind == "literal":
+            out.append(w)
+        elif kind == "case_variant":
+            out.append(w.upper() if w.islower() else w.lower())
+        else:                                   # typo_normalised
+            out.append(w[:-1] + w[-2] + w[-1] if len(w) > 2 else w + w[-1])
+    return out
+
+
+def build_mixture_controls(cells: list, *, n_families: int = 20,
+                           salt: str = MIXTURE_SALT) -> tuple:
+    """Families holding the non-local core FIXED while padding varies.
+
+    Within a family every arm carries the same coherent non-prompt-local tokens
+    and the same total list length; only the number and kind of prompt-local
+    distractors change. A rubric that does what it claims must score them alike.
+
+    List length is held constant at ten because varying it would confound the
+    thing being tested: a judge may score a short list differently for reasons
+    unrelated to echo.
+    """
+    controls, key = [], []
+    for index, cell in enumerate(sorted(cells, key=lambda c: c["cell_id"])[:n_families]):
+        arms_source = cell.get("candidates") or {}
+        core = [t["token"] for t in next(iter(arms_source.values()), [])][:10]
+        if len(core) < 10:
+            continue
+        digest = hashlib.sha256(f"{salt}|{cell['cell_id']}".encode()).hexdigest()
+        kind = PAD_KINDS[int(digest[:8], 16) % len(PAD_KINDS)]
+        arms, mapping = {}, {}
+        for slot, n_pad in zip("ABC", PAD_COUNTS):
+            pads = _pad_tokens(cell["prompt"], kind, n_pad)
+            merged = pads + core[: 10 - n_pad]      # constant length 10
+            arms[slot] = [{"rank": i + 1, "token": t} for i, t in enumerate(merged)]
+            mapping[slot] = n_pad
+        cid = hashlib.sha256(f"{salt}|family|{cell['cell_id']}".encode()).hexdigest()[:16]
+        controls.append({"cell_id": cid, "kind": "mixture_invariance",
+                         "prompt": cell["prompt"],
+                         "readout_position": cell["readout_position"],
+                         "readout_token": cell["readout_token"],
+                         "note": cell.get("note", ""), "candidates": arms})
+        key.append({"cell_id": cid, "kind": "mixture_invariance", "pad_kind": kind,
+                    "pads_by_arm": mapping, "source_cell": cell["cell_id"]})
+    return controls, key
+
+
+def mixture_report(results: dict, key: list, *, primary: str = "non_echo_coherence") -> dict:
+    """Did adding prompt-local padding move the score of a fixed core?"""
+    spreads, monotone, per_kind = [], 0, {}
+    scored = [k for k in key if k["cell_id"] in results]
+    for row in scored:
+        arm_scores = {a: results[row["cell_id"]][a][primary]
+                      for a in ("A", "B", "C") if a in results[row["cell_id"]]}
+        if len(arm_scores) < 3:
+            continue
+        spreads.append(max(arm_scores.values()) - min(arm_scores.values()))
+        ordered = [arm_scores[a] for a, _ in
+                   sorted(row["pads_by_arm"].items(), key=lambda kv: kv[1])]
+        if ordered[0] > ordered[1] > ordered[2]:
+            monotone += 1
+        per_kind.setdefault(row["pad_kind"], []).append(spreads[-1])
+    if not spreads:
+        return {"name": "mixture_invariance", "status": "FAIL",
+                "detail": "no mixture families scored", "n": 0}
+    spreads.sort()
+    median = spreads[len(spreads) // 2]
+    mono_rate = monotone / len(spreads)
+    ok = (median <= MIXTURE_CRITERIA["max_median_within_family_spread"]
+          and mono_rate <= MIXTURE_CRITERIA["max_monotone_families"])
+    return {
+        "name": "mixture_invariance", "status": "PASS" if ok else "FAIL",
+        "detail": (f"median within-family spread {median:.2f} "
+                   f"(max {MIXTURE_CRITERIA['max_median_within_family_spread']:.2f}); "
+                   f"{monotone}/{len(spreads)} families decline monotonically with "
+                   f"padding ({mono_rate:.0%}, max "
+                   f"{MIXTURE_CRITERIA['max_monotone_families']:.0%})"),
+        "median_spread": median, "monotone_rate": mono_rate, "n": len(spreads),
+        "spread_by_pad_kind": {k: sum(v) / len(v) for k, v in per_kind.items()},
+    }
