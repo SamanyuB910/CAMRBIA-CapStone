@@ -223,10 +223,12 @@ def test_val_dir_defaults_to_out_dir_subdirectory():
 
     src = inspect.getsource(cli.cmd_judge_validate)
     assert 'Path(args.val_dir).expanduser() if args.val_dir else out_dir / "judge_validation"' in src
-    # the overwrite refusal must stay: an existing battery is never overwritten
-    assert "exists and is not empty" in src
-    assert "raise SystemExit" in src
-    # and there must be no escape hatch that overwrites one
+    # the refusal protects EVIDENCE (a report, or paid-for raw responses),
+    # not scaffolding a crashed run left behind
+    assert 'val_dir.glob("judge_validation_report.json")' in src
+    assert 'val_dir.glob("raw_*.jsonl")' in src
+    assert "already holds judge evidence" in src
+    # and there must be no escape hatch that overwrites it
     assert "args.force" not in src
 
 
@@ -238,3 +240,34 @@ def test_judge_validate_parser_exposes_val_dir():
 
     src = inspect.getsource(cli.main) if hasattr(cli, "main") else ""
     assert '"--val-dir"' in (src or open(cli.__file__).read())
+
+
+def test_scaffolding_only_directory_is_reusable(tmp_path):
+    """A run that dies at the judge probe leaves controls.jsonl behind. Blocking
+    the retry on that strands the user and protects nothing that was paid for."""
+    import inspect
+
+    from rlens import cli
+
+    src = inspect.getsource(cli.cmd_judge_validate)
+    body = src[src.index("val_dir ="):src.index("val_dir.mkdir")]
+    # Assert on the guard's condition, not on prose: the SystemExit must be
+    # driven by `evidence`, and a merely non-empty directory must only warn.
+    code = "\n".join(l for l in body.splitlines() if not l.strip().startswith("#"))
+    assert "if evidence:" in code
+    raising = code[code.index("if evidence:"):]
+    assert "raise SystemExit" in raising
+    after = code[code.index("if val_dir.exists() and any(val_dir.iterdir()):"):]
+    assert "raise" not in after and "print(" in after
+
+
+def test_evidence_names_are_what_the_command_actually_writes():
+    """Regression guard: if the report or raw-response filenames change, the
+    protection silently stops protecting anything."""
+    import inspect
+
+    from rlens import cli
+
+    src = inspect.getsource(cli.cmd_judge_validate)
+    assert '"judge_validation_report.json"' in src
+    assert 'f"raw_{slug}.jsonl"' in src

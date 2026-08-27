@@ -1269,11 +1269,20 @@ def cmd_judge_validate(args) -> None:
     # write destination. An existing battery is never overwritten: it is the
     # evidence that admitted a judge already in use.
     val_dir = Path(args.val_dir).expanduser() if args.val_dir else out_dir / "judge_validation"
-    if val_dir.exists() and any(val_dir.iterdir()):
+    # What must never be overwritten is EVIDENCE: a report, or raw judge
+    # responses that were paid for. `controls.jsonl` and `control_key.jsonl` are
+    # scaffolding, rebuilt deterministically from the panel on every run, and a
+    # directory holding only those is the residue of a run that died before
+    # calling anyone. Refusing to reuse it strands the retry and buys nothing.
+    evidence = sorted([*val_dir.glob("judge_validation_report.json"),
+                       *val_dir.glob("raw_*.jsonl")]) if val_dir.exists() else []
+    if evidence:
         raise SystemExit(
-            f"{val_dir} exists and is not empty; pass --val-dir <fresh path> "
-            "(e.g. .../judge_validation_adjudicator) rather than overwriting the "
-            "battery that admitted an existing judge")
+            f"{val_dir} already holds judge evidence "
+            f"({', '.join(p.name for p in evidence)}); pass --val-dir <fresh path> "
+            "rather than overwriting the battery that admitted an existing judge")
+    if val_dir.exists() and any(val_dir.iterdir()):
+        print(f"  reusing {val_dir}: scaffolding only, no ratings present")
     val_dir.mkdir(parents=True, exist_ok=True)
     (val_dir / "controls.jsonl").write_text(
         "\n".join(json.dumps(c.public(), ensure_ascii=False) for c in controls), encoding="utf-8")
