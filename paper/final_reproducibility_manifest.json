@@ -1,0 +1,134 @@
+{
+  "protocol": {
+    "name": "coherence-v2",
+    "salt": "coherence-v2-2026-08-26",
+    "relative_depths": [
+      0.0,
+      0.1,
+      0.2,
+      0.3,
+      0.4
+    ],
+    "terminology": "pre-specified and frozen; not deposited with a registry"
+  },
+  "instrument": {
+    "primary_judges": [
+      "openai/gpt-5",
+      "deepseek/deepseek-chat-v3.1"
+    ],
+    "adjudicator": "meta-llama/llama-3.1-70b-instruct",
+    "combination_rule": "mean of two primaries; median of three when the primaries disagree"
+  },
+  "seeds": {
+    "analysis_bootstrap_permutation": 20260826,
+    "robustness_bootstrap_permutation": 20260827
+  },
+  "audit": {
+    "status": "PASS",
+    "n_checks": 20,
+    "n_failed": 0,
+    "failed_conditions": [],
+    "advisory_failures": [],
+    "source": "results/coherence_v2/robustness/audit_report.json"
+  },
+  "artifacts": {
+    "panel/panel_public.jsonl": {
+      "sha256": "47ee00c3abb77fed367a66b313c300f811c80a373a02195e456a8b47506a6002",
+      "bytes": 279637
+    },
+    "panel/panel_manifest.json": {
+      "sha256": "1e595c6889b20652d131e80dcdf9d5b8be79f14018b3c51280b926db35100fb2",
+      "bytes": 3678
+    },
+    "panel/judge_validation/judge_validation_report.json": {
+      "sha256": "b5a6c4b85cb929d67087c597d87ef09af0a81e7e42d5d32de507840421e5c14c",
+      "bytes": 4469
+    },
+    "panel/leakage_audit.json": {
+      "sha256": "adbc5e0ef4b9882d8028c532b8f755d6bc72e969518a0c1ae6db47e645b06687",
+      "bytes": 70
+    },
+    "analysis/statistical_results.json": {
+      "sha256": "c79704520eaf272f97d7293265f38d4a2d1932727a9c69ba775a51e3709d8f22",
+      "bytes": 14018
+    },
+    "analysis/report.md": {
+      "sha256": "8bd48b88f8661b81971c77072828a26ddeb09130f2aa31e3f30e13b726509908",
+      "bytes": 5503
+    },
+    "ratings/combined_scores.json": {
+      "sha256": "c34b6174c45e3807881ed927174ebff7849ba9d793320c0c724525778e5ce56e",
+      "bytes": 87268
+    },
+    "ratings/scores_blinded.csv": {
+      "sha256": "9b087e1123e951718c5d78c2ff45c3a2de560b6277ac199374da7c9dd0f346db",
+      "bytes": 220751
+    },
+    "ratings/completeness.json": {
+      "sha256": "cf501b849983b5de0d5a616163174a85ae0a7cb6d8538c6da858707a82bdec80",
+      "bytes": 354
+    },
+    "robustness/judge_sensitivity.csv": {
+      "sha256": "b5791e8024f696d951e439ef36a2c48f9285d75908ac51a9831f039e14324857",
+      "bytes": 5974
+    },
+    "robustness/judge_sensitivity.md": {
+      "sha256": "2566d6024778bcb53dc634f779dad78175f22449ca9c59ac987f9ae7faff0516",
+      "bytes": 13483
+    },
+    "robustness/echo_existing_scores.csv": {
+      "sha256": "b455c57018666078a6c62bba57b0bd43b78024ca2371648cb95b15142be74995",
+      "bytes": 3236
+    },
+    "robustness/echo_existing_scores.json": {
+      "sha256": "713e4650062ceb7cdb01ae2918cc813a8dc48bb54d1f59c1b4c4e74ee1db4d0a",
+      "bytes": 16829
+    },
+    "robustness/echo_existing_scores.md": {
+      "sha256": "dd34d4084843097d252fc55191212d320e08542ad88cd990003455c2815ea239",
+      "bytes": 11358
+    },
+    "audit/audit_report.json": {
+      "sha256": "c5e137e48e0a237b45efabf6a7af0e0c328a12913f3d80ca3420be00a4867727",
+      "bytes": 10282
+    },
+    "audit/audit_report.md": {
+      "sha256": "ff4bfafeb8b046bb507f42258d4e5f69a0ca6a856b894e7ee21e9be9cb1dcdae",
+      "bytes": 7046
+    },
+    "audit/artifact_manifest.json": {
+      "sha256": "e15d12041cb700bd7a7d4fdbee3b21ef231a4324f97a57b9137dbc66b3d2b7bf",
+      "bytes": 3863
+    },
+    "figures/fig1_primary_result.pdf": {
+      "sha256": "b90791e5bed6ccaf815a857b850bc23fffd23adc7f8bd8ed06848abb09f67288",
+      "bytes": 20253
+    },
+    "figures/fig2_depth_profile.pdf": {
+      "sha256": "4e28faa55f0ee9ef392b71a474b5260b78dcfdc599510fd2758a3faf0d44963c",
+      "bytes": 14786
+    },
+    "figures/fig3_judge_sensitivity.pdf": {
+      "sha256": "ac86e19cb84a6adf123383c5e2a72391c5841cc6b49fa5fcffb072ba317b8e2b",
+      "bytes": 16584
+    },
+    "figures/fig4_echo_sensitivity.pdf": {
+      "sha256": "a32e8d31a80a86e4396c3eed3dc08a6d0e25280513c5ae39b6030225656e8a66",
+      "bytes": 23082
+    },
+    "figures/fig5_judge_agreement.pdf": {
+      "sha256": "5e4adeb4b6736639157c82d96c2a79303b42812098cfd28899c2443e22e81c81",
+      "bytes": 15706
+    },
+    "figures/figure_manifest.json": {
+      "sha256": "c680b529e1e82fb42027f215314fa791e304c805743dc1777cd61857fd688380",
+      "bytes": 1358
+    }
+  },
+  "missing_artifacts": [],
+  "outstanding_validation_gates": [
+    "non-echo coherence rubric (Stage 5)"
+  ],
+  "complete": false,
+  "notes": {}
+}
