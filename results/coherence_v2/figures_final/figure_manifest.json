@@ -29,6 +29,16 @@
       "results/coherence_v2/figures_final/fig6_non_echo.pdf",
       "results/coherence_v2/figures_final/fig6_non_echo.svg",
       "results/coherence_v2/figures_final/fig6_non_echo.png"
+    ],
+    "fig7_stability": [
+      "results/coherence_v2/figures_final/fig7_stability.pdf",
+      "results/coherence_v2/figures_final/fig7_stability.svg",
+      "results/coherence_v2/figures_final/fig7_stability.png"
+    ],
+    "fig8_non_echo_contrasts": [
+      "results/coherence_v2/figures_final/fig8_non_echo_contrasts.pdf",
+      "results/coherence_v2/figures_final/fig8_non_echo_contrasts.svg",
+      "results/coherence_v2/figures_final/fig8_non_echo_contrasts.png"
     ]
   },
   "skipped": {}
