@@ -1264,9 +1264,16 @@ def cmd_judge_validate(args) -> None:
     controls, meta = build_validation_panel(cells, key, n_each=args.n_each,
                                             n_order=args.n_order,
                                             late_cells=late, identity_cells=identity)
-    val_dir = out_dir / "judge_validation"
+    # --out-dir is where the panel is READ from, so validating an additional
+    # judge later cannot simply be pointed elsewhere. --val-dir separates the
+    # write destination. An existing battery is never overwritten: it is the
+    # evidence that admitted a judge already in use.
+    val_dir = Path(args.val_dir).expanduser() if args.val_dir else out_dir / "judge_validation"
     if val_dir.exists() and any(val_dir.iterdir()):
-        raise SystemExit(f"{val_dir} exists; use a fresh versioned destination")
+        raise SystemExit(
+            f"{val_dir} exists and is not empty; pass --val-dir <fresh path> "
+            "(e.g. .../judge_validation_adjudicator) rather than overwriting the "
+            "battery that admitted an existing judge")
     val_dir.mkdir(parents=True, exist_ok=True)
     (val_dir / "controls.jsonl").write_text(
         "\n".join(json.dumps(c.public(), ensure_ascii=False) for c in controls), encoding="utf-8")
@@ -2459,6 +2466,10 @@ def main() -> None:
                    help="control_cells.jsonl from panel-v2 (default: alongside the panel)")
     p.add_argument("--control-key", default=None,
                    help="control_key.jsonl (default: alongside the panel key)")
+    p.add_argument("--val-dir", default=None,
+                   help="write destination; defaults to <out-dir>/judge_validation. "
+                        "Use a fresh path to validate an additional judge without "
+                        "touching the battery that admitted an existing one.")
     p.add_argument("--n-each", type=int, default=10)
     p.add_argument("--n-order", type=int, default=24,
                    help="order-invariance PAIRS; ties are not comparable, so this must "

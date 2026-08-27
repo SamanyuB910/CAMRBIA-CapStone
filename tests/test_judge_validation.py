@@ -211,3 +211,30 @@ def test_audit_raw_dir_flag_is_documented():
     source = inspect.getsource(cli.main)
     assert "--raw-dir" in source
     assert "recombine` does not copy them" in source
+
+
+def test_val_dir_defaults_to_out_dir_subdirectory():
+    """--val-dir separates the write destination from the panel read location,
+    so a second judge can be validated without overwriting the battery that
+    admitted the first. Default behaviour is unchanged."""
+    import inspect
+
+    from rlens import cli
+
+    src = inspect.getsource(cli.cmd_judge_validate)
+    assert 'Path(args.val_dir).expanduser() if args.val_dir else out_dir / "judge_validation"' in src
+    # the overwrite refusal must stay: an existing battery is never overwritten
+    assert "exists and is not empty" in src
+    assert "raise SystemExit" in src
+    # and there must be no escape hatch that overwrites one
+    assert "args.force" not in src
+
+
+def test_judge_validate_parser_exposes_val_dir():
+    import argparse
+    import inspect
+
+    from rlens import cli
+
+    src = inspect.getsource(cli.main) if hasattr(cli, "main") else ""
+    assert '"--val-dir"' in (src or open(cli.__file__).read())
