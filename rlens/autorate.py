@@ -241,9 +241,17 @@ def combine(scores: list) -> dict:
             values = [s[label][field_name] for s in scores]
             out[label][field_name] = (statistics.median(values) if len(values) >= 3
                                       else statistics.mean(values))
-    winners = [s["contextual_winner"] for s in scores]
-    top = max(set(winners), key=winners.count)
-    out["contextual_winner"] = top if winners.count(top) > len(winners) / 2 else "tie"
+    # The combined winner is DERIVED FROM THE COMBINED SCORES, not voted on.
+    # Voting on the judges' winners while averaging their scores lets the two
+    # disagree: judge 1 (A=3,B=2) and judge 2 (A=1,B=4) vote a tie, but the mean
+    # (A=2,B=3) has B uniquely leading. That produced 18/200 winner/score
+    # inconsistencies in the frozen run. The combined score IS the estimate, so
+    # the winner must follow it.
+    contextual = {l: out[l]["contextual_coherence"] for l in ("A", "B", "C")}
+    best = max(contextual.values())
+    leaders = sorted(l for l, v in contextual.items() if v == best)
+    out["contextual_winner"] = leaders[0] if len(leaders) == 1 else "tie"
+    out["judge_winner_votes"] = [s["contextual_winner"] for s in scores]
     return out
 
 

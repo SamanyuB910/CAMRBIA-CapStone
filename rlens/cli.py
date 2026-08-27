@@ -2000,6 +2000,94 @@ def _robustness_markdown(table, echo_table, echo_detail, args):
 
 
 # ---------------------------------------------------------------------------
+# recombine  (no API: rebuild combined scores from the frozen raw responses)
+# ---------------------------------------------------------------------------
+
+
+def cmd_recombine(args) -> None:
+    """Recompute combined_scores.json from the frozen raw judge responses.
+
+    Makes no API calls and does not touch the panel, the key, or the raw logs:
+    it re-applies the label translation and the combination rule to responses
+    that are already on disk. Used to repair a combination defect without
+    re-rating, which would otherwise cost a full panel and change the data.
+    """
+    import json
+
+    import pandas as pd
+
+    from rlens.autorate import combine, needs_adjudication
+
+    ratings = Path(args.ratings_dir).expanduser()
+    out_dir = Path(args.out_dir).expanduser()
+    if out_dir.exists() and any(out_dir.iterdir()) and not args.in_place:
+        raise SystemExit(f"{out_dir} exists and is not empty; choose a fresh destination")
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    def jsonl(path):
+        return [json.loads(l) for l in Path(path).read_text(encoding="utf-8").splitlines() if l]
+
+    from rlens.autorate import parse_scores
+
+    all_scores, all_mappings = {}, {}
+    for judge in (*args.judges, args.adjudicator):
+        rows = jsonl(ratings / f"raw_{judge.replace('/', '_')}.jsonl")
+        scores, mappings = {}, {}
+        for row in rows:
+            if row.get("status") != "ok":
+                continue
+            try:
+                scores[row["cell_id"]] = parse_scores(row["raw"])
+            except Exception as exc:  # noqa: BLE001
+                print(f"  unparseable stored response {row['cell_id']} ({judge}): {exc}")
+                continue
+            mappings[row["cell_id"]] = row["arm_mapping"]
+        all_scores[judge], all_mappings[judge] = scores, mappings
+        print(f"  {judge}: {len(scores)} responses re-parsed")
+
+    cell_ids = sorted(set(all_scores[args.judges[0]]) | set(all_scores[args.judges[1]]))
+    combined, rows = {}, []
+    for cid in cell_ids:
+        parts = [_to_panel_labels(all_scores[j][cid], all_mappings[j][cid])
+                 for j in (*args.judges, args.adjudicator)
+                 if cid in all_scores.get(j, {})]
+        if not parts:
+            continue
+        combined[cid] = combine(parts)
+        for judge in (*args.judges, args.adjudicator):
+            if cid not in all_scores.get(judge, {}):
+                continue
+            panel_scores = _to_panel_labels(all_scores[judge][cid], all_mappings[judge][cid])
+            for label in ("A", "B", "C"):
+                rows.append({"cell_id": cid, "judge_id": judge, "panel_arm": label,
+                             **panel_scores[label]})
+            rows[-1]["contextual_winner"] = panel_scores["contextual_winner"]
+
+    (out_dir / "combined_scores.json").write_text(json.dumps(combined, indent=2),
+                                                  encoding="utf-8")
+    pd.DataFrame(rows).to_csv(out_dir / "scores_blinded.csv", index=False)
+    for name in ("adjudication.json", "completeness.json", "cost_report.json"):
+        src = ratings / name
+        if src.exists() and src.resolve() != (out_dir / name).resolve():
+            (out_dir / name).write_text(src.read_text(encoding="utf-8"), encoding="utf-8")
+
+    inconsistent = 0
+    for scores in combined.values():
+        contextual = {l: scores[l]["contextual_coherence"] for l in ("A", "B", "C")}
+        best = max(contextual.values())
+        leaders = [l for l, v in contextual.items() if v == best]
+        winner = scores["contextual_winner"]
+        if (winner == "tie" and len(leaders) < 2) or (winner != "tie"
+                                                      and contextual[winner] != best):
+            inconsistent += 1
+    print(f"\n{len(combined)} cells recombined; winner/score inconsistencies: {inconsistent}")
+    print(f"combined -> {out_dir / 'combined_scores.json'}")
+    if inconsistent:
+        raise SystemExit(2)
+
+
+
+# ---------------------------------------------------------------------------
 # entry point
 # ---------------------------------------------------------------------------
 
@@ -2249,6 +2337,14 @@ def main() -> None:
     p.add_argument("--n-perm", type=int, default=10000)
     p.add_argument("--seed", type=int, default=20260827)
     p.set_defaults(func=cmd_robustness)
+
+    p = sub.add_parser("recombine", help="rebuild combined scores from frozen raw responses (no API)")
+    p.add_argument("--ratings-dir", required=True)
+    p.add_argument("--out-dir", required=True)
+    p.add_argument("--judges", nargs=2, required=True)
+    p.add_argument("--adjudicator", required=True)
+    p.add_argument("--in-place", action="store_true")
+    p.set_defaults(func=cmd_recombine)
 
     args = parser.parse_args()
     args.func(args)

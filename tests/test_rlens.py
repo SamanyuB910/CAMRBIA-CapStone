@@ -2393,10 +2393,21 @@ def test_combine_uses_mean_of_two_and_median_of_three():
     assert combine([s1, s2, s3])["A"]["contextual_coherence"] == 2, "median, not mean"
 
 
-def test_combine_returns_tie_without_a_majority_winner():
+def test_combined_winner_follows_the_combined_scores_not_the_votes():
+    """AMENDED: the winner is derived from the combined scores. Three judges
+    voting A/B/C on identical scores (A=4, B=1, C=2) previously produced a vote
+    'tie' that contradicted its own numbers -- 18/200 such cells appeared in the
+    frozen run and the integrity audit flagged them."""
     votes = [json.loads(_valid(winner=w)) for w in ("A", "B", "C")]
-    assert combine(votes)["contextual_winner"] == "tie"
-    assert combine([json.loads(_valid(winner="A"))] * 2)["contextual_winner"] == "A"
+    combined = combine(votes)
+    assert combined["A"]["contextual_coherence"] == 4, "median of identical scores"
+    assert combined["contextual_winner"] == "A", "A uniquely leads, so it is not a tie"
+    assert combined["judge_winner_votes"] == ["A", "B", "C"], "votes retained for audit"
+
+    # a genuine tie in the COMBINED scores still yields "tie"
+    tied = combine([json.loads(_valid(a=3, b=3, c=1, winner="A")),
+                    json.loads(_valid(a=3, b=3, c=1, winner="B"))])
+    assert tied["contextual_winner"] == "tie"
 
 
 def test_panel_hash_is_stable_and_content_sensitive():
