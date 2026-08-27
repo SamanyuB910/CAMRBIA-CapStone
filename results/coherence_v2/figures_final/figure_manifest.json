@@ -1,0 +1,35 @@
+{
+  "figures": {
+    "fig1_primary_result": [
+      "results/coherence_v2/figures_final/fig1_primary_result.pdf",
+      "results/coherence_v2/figures_final/fig1_primary_result.svg",
+      "results/coherence_v2/figures_final/fig1_primary_result.png"
+    ],
+    "fig2_depth_profile": [
+      "results/coherence_v2/figures_final/fig2_depth_profile.pdf",
+      "results/coherence_v2/figures_final/fig2_depth_profile.svg",
+      "results/coherence_v2/figures_final/fig2_depth_profile.png"
+    ],
+    "fig3_judge_sensitivity": [
+      "results/coherence_v2/figures_final/fig3_judge_sensitivity.pdf",
+      "results/coherence_v2/figures_final/fig3_judge_sensitivity.svg",
+      "results/coherence_v2/figures_final/fig3_judge_sensitivity.png"
+    ],
+    "fig4_echo_sensitivity": [
+      "results/coherence_v2/figures_final/fig4_echo_sensitivity.pdf",
+      "results/coherence_v2/figures_final/fig4_echo_sensitivity.svg",
+      "results/coherence_v2/figures_final/fig4_echo_sensitivity.png"
+    ],
+    "fig5_judge_agreement": [
+      "results/coherence_v2/figures_final/fig5_judge_agreement.pdf",
+      "results/coherence_v2/figures_final/fig5_judge_agreement.svg",
+      "results/coherence_v2/figures_final/fig5_judge_agreement.png"
+    ],
+    "fig6_non_echo": [
+      "results/coherence_v2/figures_final/fig6_non_echo.pdf",
+      "results/coherence_v2/figures_final/fig6_non_echo.svg",
+      "results/coherence_v2/figures_final/fig6_non_echo.png"
+    ]
+  },
+  "skipped": {}
+}
