@@ -1,0 +1,30 @@
+{"cell_id": "04616b5bf72bdb86", "kind": "pure_copy_vs_meaningful", "copied_arm": "A", "source_cell": "0205e56ce25bcdab"}
+{"cell_id": "43bc7773a069a389", "kind": "pure_copy_vs_meaningful", "copied_arm": "A", "source_cell": "0588b44b1a688aa5"}
+{"cell_id": "4e0f6799e90b851f", "kind": "pure_copy_vs_meaningful", "copied_arm": "C", "source_cell": "498307acaeff49f6"}
+{"cell_id": "75e770787d646766", "kind": "pure_copy_vs_meaningful", "copied_arm": "A", "source_cell": "56c82fe9c93e1d53"}
+{"cell_id": "01d84af1a8b1e09c", "kind": "pure_copy_vs_meaningful", "copied_arm": "C", "source_cell": "7eeb98659f9187d6"}
+{"cell_id": "04a8a6eb8fc03995", "kind": "pure_copy_vs_meaningful", "copied_arm": "B", "source_cell": "9841427b18cbcd87"}
+{"cell_id": "4b574aa0201ba03c", "kind": "pure_copy_vs_meaningful", "copied_arm": "B", "source_cell": "c2eb2dcbea697492"}
+{"cell_id": "8ff9ba109aa888d3", "kind": "pure_copy_vs_meaningful", "copied_arm": "B", "source_cell": "df80248fce1dac4a"}
+{"cell_id": "9af8267810006fff", "kind": "pure_copy_vs_meaningful", "copied_arm": "C", "source_cell": "e681d397ab9e0634"}
+{"cell_id": "b0d83b26c5bfc348", "kind": "pure_copy_vs_meaningful", "copied_arm": "B", "source_cell": "ec0ae8dd2b9659d3"}
+{"cell_id": "f51341836d1975f0", "kind": "mixture_invariance", "pad_kind": "case_variant", "pads_by_arm": {"A": 0, "B": 3, "C": 6}, "source_cell": "02b63bb7dc1752e4"}
+{"cell_id": "2d738eb12c92c59c", "kind": "mixture_invariance", "pad_kind": "case_variant", "pads_by_arm": {"A": 0, "B": 3, "C": 6}, "source_cell": "04e653268beb8df0"}
+{"cell_id": "347971da555a338b", "kind": "mixture_invariance", "pad_kind": "literal", "pads_by_arm": {"A": 0, "B": 3, "C": 6}, "source_cell": "053340e8f8752d9c"}
+{"cell_id": "0874e3758d573a7d", "kind": "mixture_invariance", "pad_kind": "misspelled_variant", "pads_by_arm": {"A": 0, "B": 3, "C": 6}, "source_cell": "076ff80aa9bc6058"}
+{"cell_id": "a0c5cf40076202dd", "kind": "mixture_invariance", "pad_kind": "misspelled_variant", "pads_by_arm": {"A": 0, "B": 3, "C": 6}, "source_cell": "10ef8276864ef484"}
+{"cell_id": "670da3a825ad26d3", "kind": "mixture_invariance", "pad_kind": "misspelled_variant", "pads_by_arm": {"A": 0, "B": 3, "C": 6}, "source_cell": "12b3ab6eedb5a43f"}
+{"cell_id": "79aec746bd74b58b", "kind": "mixture_invariance", "pad_kind": "literal", "pads_by_arm": {"A": 0, "B": 3, "C": 6}, "source_cell": "1322cd8a426a9b1b"}
+{"cell_id": "b483d3a8dabb4811", "kind": "mixture_invariance", "pad_kind": "literal", "pads_by_arm": {"A": 0, "B": 3, "C": 6}, "source_cell": "1cba798447c0730b"}
+{"cell_id": "18dba9fd8595b581", "kind": "mixture_invariance", "pad_kind": "misspelled_variant", "pads_by_arm": {"A": 0, "B": 3, "C": 6}, "source_cell": "1daaf763c87993e1"}
+{"cell_id": "84da7c9b62d991a7", "kind": "mixture_invariance", "pad_kind": "literal", "pads_by_arm": {"A": 0, "B": 3, "C": 6}, "source_cell": "242a11a053a20ad4"}
+{"cell_id": "c054d0e5b2a08fda", "kind": "mixture_invariance", "pad_kind": "case_variant", "pads_by_arm": {"A": 0, "B": 3, "C": 6}, "source_cell": "24b454859c75eb9e"}
+{"cell_id": "eea889641f28b0e0", "kind": "mixture_invariance", "pad_kind": "case_variant", "pads_by_arm": {"A": 0, "B": 3, "C": 6}, "source_cell": "2647c82b2819dcc6"}
+{"cell_id": "a88dfd4077f76978", "kind": "mixture_invariance", "pad_kind": "misspelled_variant", "pads_by_arm": {"A": 0, "B": 3, "C": 6}, "source_cell": "266212f6a3ceb10c"}
+{"cell_id": "78a35a0313670f5c", "kind": "mixture_invariance", "pad_kind": "misspelled_variant", "pads_by_arm": {"A": 0, "B": 3, "C": 6}, "source_cell": "2b2847f631355539"}
+{"cell_id": "e837bd09a7d35f2f", "kind": "mixture_invariance", "pad_kind": "misspelled_variant", "pads_by_arm": {"A": 0, "B": 3, "C": 6}, "source_cell": "2cacf99c44db5e5d"}
+{"cell_id": "c7e9f81f1fb9941e", "kind": "mixture_invariance", "pad_kind": "literal", "pads_by_arm": {"A": 0, "B": 3, "C": 6}, "source_cell": "2f278a0ffa31c427"}
+{"cell_id": "3f0669c4db8ceafe", "kind": "mixture_invariance", "pad_kind": "case_variant", "pads_by_arm": {"A": 0, "B": 3, "C": 6}, "source_cell": "300b6c0a76ee9d3a"}
+{"cell_id": "594d9134ca1c9a67", "kind": "mixture_invariance", "pad_kind": "misspelled_variant", "pads_by_arm": {"A": 0, "B": 3, "C": 6}, "source_cell": "36d6aa51b316cfb8"}
+{"cell_id": "70d98464b3b57ebc", "kind": "mixture_invariance", "pad_kind": "case_variant", "pads_by_arm": {"A": 0, "B": 3, "C": 6}, "source_cell": "37db3ce459b32623"}
+{"cell_id": "eb2b9a1692b3e7c9", "kind": "mixture_invariance", "pad_kind": "misspelled_variant", "pads_by_arm": {"A": 0, "B": 3, "C": 6}, "source_cell": "382bab2dd87c08cc"}
