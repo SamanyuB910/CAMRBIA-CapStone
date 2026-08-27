@@ -137,175 +137,175 @@
   "per_model": {
     "gemma-3-27b-it": {
       "released-R - released-J": {
-        "delta": 0.9,
-        "ci_lo": 0.6250000000000001,
-        "ci_hi": 1.17,
+        "delta": 1.0099999999999998,
+        "ci_lo": 0.7849999999999999,
+        "ci_hi": 1.2349999999999999,
         "n_prompts": 20,
         "n_cells": 100,
-        "observed": 0.9,
-        "p_value": 0.00039996000399960006,
-        "n_permutations": 10000,
-        "p_display": "0.0004",
-        "win_rates": {
-          "win": 0.63,
-          "tie": 0.24,
-          "loss": 0.13,
-          "win_adjusted": 0.75,
-          "n": 100
-        }
-      },
-      "released-R - logit": {
-        "delta": 1.2850000000000001,
-        "ci_lo": 1.0350000000000001,
-        "ci_hi": 1.53,
-        "n_prompts": 20,
-        "n_cells": 100,
-        "observed": 1.2850000000000001,
+        "observed": 1.0099999999999998,
         "p_value": 9.999000099990002e-05,
         "n_permutations": 10000,
         "p_display": "< 1e-04",
         "win_rates": {
-          "win": 0.75,
-          "tie": 0.08,
-          "loss": 0.17,
-          "win_adjusted": 0.79,
-          "n": 100
-        }
-      },
-      "released-J - logit": {
-        "delta": 0.38499999999999995,
-        "ci_lo": -0.004999999999999982,
-        "ci_hi": 0.7550000000000001,
-        "n_prompts": 20,
-        "n_cells": 100,
-        "observed": 0.38499999999999995,
-        "p_value": 0.12568743125687432,
-        "n_permutations": 10000,
-        "p_display": "0.1257",
-        "win_rates": {
-          "win": 0.53,
-          "tie": 0.11,
-          "loss": 0.36,
-          "win_adjusted": 0.585,
-          "n": 100
-        }
-      },
-      "lexical_integrity: released-R - released-J": {
-        "delta": 0.16499999999999998,
-        "ci_lo": 0.034999999999999996,
-        "ci_hi": 0.30500000000000005,
-        "n_prompts": 20,
-        "n_cells": 100
-      },
-      "prompt_echo: released-R - released-J": {
-        "delta": 0.305,
-        "ci_lo": 0.21000000000000002,
-        "ci_hi": 0.395,
-        "n_prompts": 20,
-        "n_cells": 100
-      },
-      "means": {
-        "contextual_coherence": {
-          "logit": 1.105,
-          "released-J": 1.49,
-          "released-R": 2.39
-        },
-        "lexical_integrity": {
-          "logit": 1.29,
-          "released-J": 1.575,
-          "released-R": 1.74
-        },
-        "prompt_echo": {
-          "logit": 0.325,
-          "released-J": 0.11,
-          "released-R": 0.415
-        }
-      }
-    },
-    "qwen3.5-27b": {
-      "released-R - released-J": {
-        "delta": 0.655,
-        "ci_lo": 0.4800000000000001,
-        "ci_hi": 0.835,
-        "n_prompts": 20,
-        "n_cells": 100,
-        "observed": 0.655,
-        "p_value": 9.999000099990002e-05,
-        "n_permutations": 10000,
-        "p_display": "< 1e-04",
-        "win_rates": {
-          "win": 0.61,
-          "tie": 0.27,
-          "loss": 0.12,
-          "win_adjusted": 0.745,
+          "win": 0.76,
+          "tie": 0.1,
+          "loss": 0.14,
+          "win_adjusted": 0.81,
           "n": 100
         }
       },
       "released-R - logit": {
-        "delta": 1.295,
-        "ci_lo": 0.9950000000000001,
-        "ci_hi": 1.605,
+        "delta": 1.44,
+        "ci_lo": 1.17,
+        "ci_hi": 1.675,
         "n_prompts": 20,
         "n_cells": 100,
-        "observed": 1.295,
+        "observed": 1.44,
         "p_value": 9.999000099990002e-05,
         "n_permutations": 10000,
         "p_display": "< 1e-04",
         "win_rates": {
           "win": 0.8,
-          "tie": 0.09,
-          "loss": 0.11,
-          "win_adjusted": 0.845,
+          "tie": 0.03,
+          "loss": 0.17,
+          "win_adjusted": 0.815,
           "n": 100
         }
       },
       "released-J - logit": {
-        "delta": 0.64,
-        "ci_lo": 0.40499999999999997,
-        "ci_hi": 0.875,
+        "delta": 0.43,
+        "ci_lo": 0.05499999999999996,
+        "ci_hi": 0.7900000000000001,
         "n_prompts": 20,
         "n_cells": 100,
-        "observed": 0.64,
-        "p_value": 0.00029997000299970003,
+        "observed": 0.43,
+        "p_value": 0.1116888311168883,
         "n_permutations": 10000,
-        "p_display": "0.0003",
+        "p_display": "0.1117",
         "win_rates": {
-          "win": 0.61,
-          "tie": 0.22,
-          "loss": 0.17,
-          "win_adjusted": 0.72,
+          "win": 0.54,
+          "tie": 0.06,
+          "loss": 0.4,
+          "win_adjusted": 0.57,
           "n": 100
         }
       },
       "lexical_integrity: released-R - released-J": {
-        "delta": 0.125,
-        "ci_lo": 0.059999999999999984,
-        "ci_hi": 0.19000000000000003,
+        "delta": 0.24499999999999997,
+        "ci_lo": 0.15,
+        "ci_hi": 0.345,
         "n_prompts": 20,
         "n_cells": 100
       },
       "prompt_echo: released-R - released-J": {
-        "delta": 0.225,
-        "ci_lo": 0.135,
-        "ci_hi": 0.3,
+        "delta": 0.32999999999999996,
+        "ci_lo": 0.24,
+        "ci_hi": 0.41000000000000003,
         "n_prompts": 20,
         "n_cells": 100
       },
       "means": {
         "contextual_coherence": {
-          "logit": 0.775,
-          "released-J": 1.415,
-          "released-R": 2.07
+          "logit": 1.13,
+          "released-J": 1.56,
+          "released-R": 2.57
         },
         "lexical_integrity": {
-          "logit": 0.76,
-          "released-J": 1.63,
-          "released-R": 1.755
+          "logit": 1.245,
+          "released-J": 1.555,
+          "released-R": 1.8
         },
         "prompt_echo": {
-          "logit": 0.105,
-          "released-J": 0.05,
-          "released-R": 0.275
+          "logit": 0.365,
+          "released-J": 0.175,
+          "released-R": 0.505
+        }
+      }
+    },
+    "qwen3.5-27b": {
+      "released-R - released-J": {
+        "delta": 0.69,
+        "ci_lo": 0.52,
+        "ci_hi": 0.8550000000000001,
+        "n_prompts": 20,
+        "n_cells": 100,
+        "observed": 0.69,
+        "p_value": 9.999000099990002e-05,
+        "n_permutations": 10000,
+        "p_display": "< 1e-04",
+        "win_rates": {
+          "win": 0.69,
+          "tie": 0.2,
+          "loss": 0.11,
+          "win_adjusted": 0.79,
+          "n": 100
+        }
+      },
+      "released-R - logit": {
+        "delta": 0.7350000000000001,
+        "ci_lo": 0.4800000000000001,
+        "ci_hi": 1.0,
+        "n_prompts": 20,
+        "n_cells": 100,
+        "observed": 0.7350000000000001,
+        "p_value": 9.999000099990002e-05,
+        "n_permutations": 10000,
+        "p_display": "< 1e-04",
+        "win_rates": {
+          "win": 0.64,
+          "tie": 0.12,
+          "loss": 0.24,
+          "win_adjusted": 0.7,
+          "n": 100
+        }
+      },
+      "released-J - logit": {
+        "delta": 0.045000000000000005,
+        "ci_lo": -0.195,
+        "ci_hi": 0.275,
+        "n_prompts": 20,
+        "n_cells": 100,
+        "observed": 0.045000000000000005,
+        "p_value": 0.7762223777622238,
+        "n_permutations": 10000,
+        "p_display": "0.7762",
+        "win_rates": {
+          "win": 0.4,
+          "tie": 0.19,
+          "loss": 0.41,
+          "win_adjusted": 0.495,
+          "n": 100
+        }
+      },
+      "lexical_integrity: released-R - released-J": {
+        "delta": 0.20500000000000002,
+        "ci_lo": 0.12500000000000003,
+        "ci_hi": 0.275,
+        "n_prompts": 20,
+        "n_cells": 100
+      },
+      "prompt_echo: released-R - released-J": {
+        "delta": 0.24500000000000002,
+        "ci_lo": 0.16,
+        "ci_hi": 0.32,
+        "n_prompts": 20,
+        "n_cells": 100
+      },
+      "means": {
+        "contextual_coherence": {
+          "logit": 1.25,
+          "released-J": 1.295,
+          "released-R": 1.985
+        },
+        "lexical_integrity": {
+          "logit": 0.935,
+          "released-J": 1.535,
+          "released-R": 1.74
+        },
+        "prompt_echo": {
+          "logit": 0.185,
+          "released-J": 0.075,
+          "released-R": 0.32
         }
       }
     }
@@ -313,221 +313,221 @@
   "by_depth": {
     "gemma-3-27b-it": {
       "0.0": {
-        "delta": 0.55,
-        "ci_lo": 0.125,
-        "ci_hi": 0.975,
+        "delta": 0.825,
+        "ci_lo": 0.55,
+        "ci_hi": 1.1,
         "n_prompts": 20,
         "n_cells": 20,
-        "observed": 0.55,
-        "p_value": 0.09199080091990801,
+        "observed": 0.825,
+        "p_value": 0.0038996100389961006,
         "n_permutations": 10000,
-        "p_display": "0.0920",
-        "p_holm": 0.09199080091990801
+        "p_display": "0.0039",
+        "p_holm": 0.010198980101989802
       },
       "0.1": {
-        "delta": 1.175,
-        "ci_lo": 0.85,
-        "ci_hi": 1.5,
+        "delta": 1.325,
+        "ci_lo": 0.95,
+        "ci_hi": 1.7,
         "n_prompts": 20,
         "n_cells": 20,
-        "observed": 1.175,
-        "p_value": 0.0011998800119988001,
+        "observed": 1.325,
+        "p_value": 0.0004999500049995,
         "n_permutations": 10000,
-        "p_display": "0.0012",
-        "p_holm": 0.0047995200479952005
+        "p_display": "0.0005",
+        "p_holm": 0.001999800019998
       },
       "0.2": {
         "delta": 1.1,
-        "ci_lo": 0.7,
-        "ci_hi": 1.525,
+        "ci_lo": 0.8,
+        "ci_hi": 1.45,
         "n_prompts": 20,
         "n_cells": 20,
         "observed": 1.1,
-        "p_value": 0.0058994100589941,
+        "p_value": 0.0038996100389961006,
         "n_permutations": 10000,
-        "p_display": "0.0059",
-        "p_holm": 0.0176982301769823
+        "p_display": "0.0039",
+        "p_holm": 0.010198980101989802
       },
       "0.3": {
-        "delta": 0.775,
-        "ci_lo": 0.425,
-        "ci_hi": 1.15,
-        "n_prompts": 20,
-        "n_cells": 20,
-        "observed": 0.775,
-        "p_value": 0.016698330166983303,
-        "n_permutations": 10000,
-        "p_display": "0.0167",
-        "p_holm": 0.033396660333966606
-      },
-      "0.4": {
-        "delta": 0.9,
-        "ci_lo": 0.625,
-        "ci_hi": 1.2,
-        "n_prompts": 20,
-        "n_cells": 20,
-        "observed": 0.9,
-        "p_value": 0.0008999100089991,
-        "n_permutations": 10000,
-        "p_display": "0.0009",
-        "p_holm": 0.0044995500449955
-      }
-    },
-    "qwen3.5-27b": {
-      "0.0": {
-        "delta": 0.85,
-        "ci_lo": 0.425,
-        "ci_hi": 1.3,
-        "n_prompts": 20,
-        "n_cells": 20,
-        "observed": 0.85,
-        "p_value": 0.009999000099990002,
-        "n_permutations": 10000,
-        "p_display": "0.0100",
-        "p_holm": 0.039996000399960006
-      },
-      "0.1": {
-        "delta": 0.525,
-        "ci_lo": 0.05,
-        "ci_hi": 0.975,
-        "n_prompts": 20,
-        "n_cells": 20,
-        "observed": 0.525,
-        "p_value": 0.07649235076492351,
-        "n_permutations": 10000,
-        "p_display": "0.0765",
-        "p_holm": 0.10018998100189981
-      },
-      "0.2": {
         "delta": 0.925,
         "ci_lo": 0.575,
         "ci_hi": 1.275,
         "n_prompts": 20,
         "n_cells": 20,
         "observed": 0.925,
-        "p_value": 0.000999900009999,
+        "p_value": 0.0033996600339966003,
         "n_permutations": 10000,
-        "p_display": "0.0010",
-        "p_holm": 0.004999500049995
+        "p_display": "0.0034",
+        "p_holm": 0.010198980101989802
       },
-      "0.3": {
+      "0.4": {
+        "delta": 0.875,
+        "ci_lo": 0.625,
+        "ci_hi": 1.15,
+        "n_prompts": 20,
+        "n_cells": 20,
+        "observed": 0.875,
+        "p_value": 0.00029997000299970003,
+        "n_permutations": 10000,
+        "p_display": "0.0003",
+        "p_holm": 0.0014998500149985001
+      }
+    },
+    "qwen3.5-27b": {
+      "0.0": {
+        "delta": 1.0,
+        "ci_lo": 0.6,
+        "ci_hi": 1.4,
+        "n_prompts": 20,
+        "n_cells": 20,
+        "observed": 1.0,
+        "p_value": 0.0013998600139986002,
+        "n_permutations": 10000,
+        "p_display": "0.0014",
+        "p_holm": 0.005599440055994401
+      },
+      "0.1": {
         "delta": 0.55,
-        "ci_lo": 0.2,
-        "ci_hi": 0.9,
+        "ci_lo": 0.15,
+        "ci_hi": 0.925,
         "n_prompts": 20,
         "n_cells": 20,
         "observed": 0.55,
-        "p_value": 0.025197480251974803,
+        "p_value": 0.030596940305969402,
         "n_permutations": 10000,
-        "p_display": "0.0252",
-        "p_holm": 0.07559244075592442
+        "p_display": "0.0306",
+        "p_holm": 0.06119388061193881
       },
-      "0.4": {
-        "delta": 0.425,
-        "ci_lo": 0.075,
-        "ci_hi": 0.75,
+      "0.2": {
+        "delta": 1.0,
+        "ci_lo": 0.75,
+        "ci_hi": 1.25,
         "n_prompts": 20,
         "n_cells": 20,
-        "observed": 0.425,
-        "p_value": 0.050094990500949906,
+        "observed": 1.0,
+        "p_value": 0.00029997000299970003,
         "n_permutations": 10000,
-        "p_display": "0.0501",
-        "p_holm": 0.10018998100189981
+        "p_display": "0.0003",
+        "p_holm": 0.0014998500149985001
+      },
+      "0.3": {
+        "delta": 0.55,
+        "ci_lo": 0.175,
+        "ci_hi": 0.875,
+        "n_prompts": 20,
+        "n_cells": 20,
+        "observed": 0.55,
+        "p_value": 0.020397960203979604,
+        "n_permutations": 10000,
+        "p_display": "0.0204",
+        "p_holm": 0.06119388061193881
+      },
+      "0.4": {
+        "delta": 0.35,
+        "ci_lo": 0.025,
+        "ci_hi": 0.625,
+        "n_prompts": 20,
+        "n_cells": 20,
+        "observed": 0.35,
+        "p_value": 0.07989201079892011,
+        "n_permutations": 10000,
+        "p_display": "0.0799",
+        "p_holm": 0.07989201079892011
       }
     }
   },
   "by_set": {
     "gemma-3-27b-it": {
       "association": {
-        "delta": 0.9,
+        "delta": 1.0499999999999998,
         "n_cells": 20,
-        "observed": 0.9,
+        "observed": 1.0499999999999998,
         "p_value": 0.1282871712828717,
         "n_permutations": 10000,
         "p_display": "0.1283",
-        "p_holm": 0.6364363563643636
+        "p_holm": 0.6414358564143585
       },
       "multihop": {
-        "delta": 0.7250000000000001,
+        "delta": 0.7,
         "n_cells": 20,
-        "observed": 0.7250000000000001,
-        "p_value": 0.1272872712728727,
+        "observed": 0.7,
+        "p_value": 0.25547445255474455,
         "n_permutations": 10000,
-        "p_display": "0.1273",
-        "p_holm": 0.6364363563643636
+        "p_display": "0.2555",
+        "p_holm": 0.6414358564143585
       },
       "multilingual": {
-        "delta": 0.475,
+        "delta": 0.425,
         "n_cells": 20,
-        "observed": 0.475,
-        "p_value": 0.5027497250274973,
-        "n_permutations": 10000,
-        "p_display": "0.5027",
-        "p_holm": 0.6364363563643636
-      },
-      "poetry": {
-        "delta": 1.9,
-        "n_cells": 20,
-        "observed": 1.9,
+        "observed": 0.425,
         "p_value": 0.1282871712828717,
         "n_permutations": 10000,
         "p_display": "0.1283",
-        "p_holm": 0.6364363563643636
+        "p_holm": 0.6414358564143585
+      },
+      "poetry": {
+        "delta": 2.15,
+        "n_cells": 20,
+        "observed": 2.15,
+        "p_value": 0.1282871712828717,
+        "n_permutations": 10000,
+        "p_display": "0.1283",
+        "p_holm": 0.6414358564143585
       },
       "typo": {
-        "delta": 0.5,
+        "delta": 0.725,
         "n_cells": 20,
-        "observed": 0.5,
-        "p_value": 0.2525747425257474,
+        "observed": 0.725,
+        "p_value": 0.25547445255474455,
         "n_permutations": 10000,
-        "p_display": "0.2526",
-        "p_holm": 0.6364363563643636
+        "p_display": "0.2555",
+        "p_holm": 0.6414358564143585
       }
     },
     "qwen3.5-27b": {
       "association": {
-        "delta": 0.575,
+        "delta": 0.5,
         "n_cells": 20,
-        "observed": 0.575,
+        "observed": 0.5,
         "p_value": 0.2538746125387461,
         "n_permutations": 10000,
         "p_display": "0.2539",
         "p_holm": 0.6414358564143585
       },
       "multihop": {
-        "delta": 0.575,
+        "delta": 0.55,
         "n_cells": 20,
-        "observed": 0.575,
+        "observed": 0.55,
         "p_value": 0.1282871712828717,
         "n_permutations": 10000,
         "p_display": "0.1283",
         "p_holm": 0.6414358564143585
       },
       "multilingual": {
-        "delta": 1.05,
+        "delta": 1.125,
         "n_cells": 20,
-        "observed": 1.05,
+        "observed": 1.125,
         "p_value": 0.1282871712828717,
         "n_permutations": 10000,
         "p_display": "0.1283",
         "p_holm": 0.6414358564143585
       },
       "poetry": {
-        "delta": 0.625,
+        "delta": 0.8500000000000001,
         "n_cells": 20,
-        "observed": 0.625,
+        "observed": 0.8500000000000001,
         "p_value": 0.1282871712828717,
         "n_permutations": 10000,
         "p_display": "0.1283",
         "p_holm": 0.6414358564143585
       },
       "typo": {
-        "delta": 0.45000000000000007,
+        "delta": 0.425,
         "n_cells": 20,
-        "observed": 0.45000000000000007,
-        "p_value": 0.2588741125887411,
+        "observed": 0.425,
+        "p_value": 0.13068693130686931,
         "n_permutations": 10000,
-        "p_display": "0.2589",
+        "p_display": "0.1307",
         "p_holm": 0.6414358564143585
       }
     }
