@@ -631,6 +631,85 @@ R-Lens wins 69\% (Qwen) and 76\% (Gemma) of R $-$ J cells and loses 11\% and
 of extreme cells --- so it is not the product of a few outlier readouts that a
 different rubric might score differently.
 
+\section{What the readouts actually look like}
+\label{sec:examples}
+
+Scores alone ask a reader to take the instrument on trust. Three cells are shown
+below, selected by rule from the frozen panel rather than by eye: the largest
+combined standard-and-non-echo R-Lens gain, the largest gap between a standard
+gain and its non-echo counterpart, and the cell where all three arms score
+lowest. Tokens are shown exactly as the judges saw them.
+
+\newcommand{\tok}[1]{{\ttfamily\footnotesize #1}}
+
+\paragraph{A genuine gain.} Qwen, \texttt{association}, $z = 0$. Prompt:
+\emph{``They shook hands for the cameras and held it a beat too long, each
+waiting for the other to let go first\,\textbf{.}''}, read at the final period.
+
+\begin{center}\small
+\begin{tabular}{llccc}
+\toprule
+Lens & Top-10 readout & Contextual & Echo & Non-echo \\
+\midrule
+Logit & \tok{· , ( - . \ldots\ / : ?} & 1.0 & 0.0 & 1.5 \\
+J-Lens & \tok{--and -- \textbullet\ **-- tossed .hm izon} & 0.0 & 0.0 & 1.0 \\
+R-Lens & \tok{\ldots\ though \ldots\ they seperate there wanting needing} & \textbf{3.0} & 0.0 & \textbf{3.5} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+R-Lens surfaces \emph{wanting}, \emph{needing}, \emph{though}, \emph{they} --- a
+coherent reading of a standoff --- with no prompt copying at all. Its non-echo
+score is \emph{higher} than its standard score. This is what the claim looks
+like when it holds.
+
+\paragraph{An echo-driven gain, where the two rubrics disagree about the winner.}
+Gemma, \texttt{typo}, $z = 0.2$. Prompt: \emph{``The stadium was packed with
+nearly forty thousand po\textbf{eple}''} --- a misspelling --- read at
+\tok{eple}.
+
+\begin{center}\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{llccc}
+\toprule
+Lens & Top-10 readout & Contextual & Echo & Non-echo \\
+\midrule
+Logit & \tok{ized ed an al Than - fromi Tourist Min} & 0.5 & 0.0 & 1.0 \\
+J-Lens & \tok{recieve seperate succesfully wouldnt couldnt havent} & 0.5 & 0.0 & \textbf{2.0} \\
+R-Lens & \tok{, and people in ' seperate ( to " '} & \textbf{3.0} & 0.5 & 0.5 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\flag{The two rubrics rank these arms in opposite orders.} R-Lens recovers
+\emph{people} --- the intended word, which is prompt-local --- and the standard
+rubric scores it 3.0 against J-Lens's 0.5. J-Lens instead surfaces a cluster of
+\emph{other common misspellings} (\emph{recieve}, \emph{seperate},
+\emph{succesfully}, \emph{wouldnt}), which is not prompt-local at all, and the
+non-echo rubric scores it 2.0 against R-Lens's 0.5.
+
+Both readouts are defensible interpretability outputs, and which one is
+``better'' depends on the question. If the question is what the model is
+computing at a typo, an abstract misspelling cluster is arguably more
+informative than a reconstruction of the word already on the page. This single
+cell contains the whole finding in miniature: the standard rubric rewards
+prompt-local recovery, and R-Lens does more of it.
+
+\paragraph{Where nothing works.} Qwen, \texttt{poetry}, $z = 0.1$, read at the
+newline ending line one. Every arm scores 0.0 on contextual coherence; J-Lens
+and R-Lens both return multilingual fragments (\tok{но ся zeitig jenigen},
+\tok{beau alak edal ISTR}). Roughly a fifth of R $-$ J cells are ties, and this
+is what they look like.
+
+\flag{One anomaly worth recording.} In this cell the logit lens scored 0.0 on
+contextual coherence but 2.0 on non-echo coherence, for a readout consisting
+entirely of punctuation and whitespace. That ordering is hard to defend and is
+an instance of judge noise on degenerate inputs. It is not systematic --- the
+logit lens's mean non-echo score is \emph{below} its mean standard score on both
+models (1.04 against 1.25 on Qwen, 0.71 against 1.13 on Gemma) --- but it is the
+kind of inconsistency a $\kappa$ of 0.51 implies, and it is visible here rather
+than only in the aggregate.
+
 \section{Small-sample stability}
 \label{sec:smallsample}
 

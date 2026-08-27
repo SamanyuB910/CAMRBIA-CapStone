@@ -5,7 +5,8 @@
 *Scope: the coherence experiment only. Causal-onset, ablation and pass@10 results are
 separately pre-specified experiments and are deliberately excluded. All numbers come from
 frozen artifacts; commands and SHA-256 hashes are in `final_reproducibility_manifest.json`
-(39 artifacts, integrity audit 20/20 PASS, 389 tests passing).*
+(39 artifacts, integrity audit 20/20 PASS, 393 tests passing). 18-page paper,
+9 figures, zero LaTeX warnings, every page visually inspected.*
 
 ---
 
@@ -82,11 +83,13 @@ Under non-echo scoring, **both** Jacobian lenses beat the logit lens on both mod
 
 | model | R − logit | J − logit |
 |---|---|---|
-| Qwen | +0.575 [0.415, 0.715], p<1e-4 | +0.250 [0.025, 0.465], p=0.070 |
+| Qwen | +0.575 [0.415, 0.715], p<1e-4 | +0.250 [0.025, 0.465], **p=0.070** |
 | Gemma | +0.985 [0.805, 1.180], p<1e-4 | +0.875 [0.685, 1.065], p<1e-4 |
 
-That survives both rubrics, both models and both judges. **It is the most robust result
-in the project** — and it is a statement about J-Lens's premise, not R-Lens's increment.
+R-Lens beats the logit lens on both models. J-Lens does so clearly on Gemma and
+**suggestively but inconclusively on Qwen** — its interval excludes zero while the
+pre-specified permutation test does not reject. The lens-versus-baseline family is the most
+robust set of results here; the R-over-J increment is not.
 
 **→ Look at Figure 8.**
 
@@ -191,7 +194,70 @@ The in-prompt inversion is directly relevant here: *more* prompt overlap correla
 neutralise, showing up in human data. It is also a warning that any automatic coherence
 proxy built on prompt overlap will reward echo rather than control for it.
 
-## 5. Instrument quality, stated plainly
+## 5. What the readouts actually look like — the finding in one cell
+
+Three cells, selected by rule from the frozen panel, not by eye.
+
+**A genuine gain.** Qwen, `association`, z=0. Prompt: *"They shook hands for the cameras
+and held it a beat too long, each waiting for the other to let go first**.**"*, read at the
+final period.
+
+| lens | top-10 | contextual | echo | non-echo |
+|---|---|---|---|---|
+| logit | `· , ( - . … / : ?` | 1.0 | 0.0 | 1.5 |
+| J-Lens | `–and – ▪ **– tossed .hm izon` | 0.0 | 0.0 | 1.0 |
+| **R-Lens** | `… though … they seperate there **wanting needing**` | **3.0** | 0.0 | **3.5** |
+
+R-Lens surfaces *wanting*, *needing*, *though*, *they* — a coherent reading of a standoff
+— with **zero prompt copying**. Its non-echo score is *higher* than its standard score.
+This is the claim holding cleanly.
+
+**An echo-driven gain — where the two rubrics rank the arms in OPPOSITE orders.**
+Gemma, `typo`, z=0.2. Prompt: *"The stadium was packed with nearly forty thousand
+po**eple**"* (a misspelling), read at `eple`.
+
+| lens | top-10 | contextual | echo | non-echo |
+|---|---|---|---|---|
+| logit | `ized ed an al Than - fromi Tourist Min` | 0.5 | 0.0 | 1.0 |
+| **J-Lens** | `recieve seperate succesfully wouldnt couldnt havent` | 0.5 | 0.0 | **2.0** |
+| **R-Lens** | `, and **people** in ' seperate ( to " '` | **3.0** | 0.5 | 0.5 |
+
+**This is the whole finding in miniature.** R-Lens recovers *people* — the intended word,
+which is prompt-local. The standard rubric scores it 3.0 against J-Lens's 0.5. J-Lens
+instead surfaces a cluster of *other common misspellings* (`recieve`, `seperate`,
+`succesfully`, `wouldnt`) — not prompt-local at all — and the non-echo rubric scores it
+2.0 against R-Lens's 0.5.
+
+Both are defensible interpretability outputs. Arguably J-Lens's abstract "misspelling"
+cluster says more about what the model is computing at a typo than a reconstruction of the
+word already on the page. The standard rubric rewards prompt-local recovery; R-Lens does
+more of it.
+
+**Where nothing works.** Qwen, `poetry`, z=0.1. All three arms score 0.0 contextual; J and
+R both return multilingual fragments (`но ся zeitig jenigen`, `beau alak edal ISTR`). About
+a fifth of R−J cells are ties and this is what they look like.
+
+*One anomaly recorded rather than smoothed:* in that cell the logit lens scored **0.0
+contextual but 2.0 non-echo** for a readout of pure punctuation. That ordering is hard to
+defend. It is not systematic — the logit lens's mean non-echo is *below* its mean standard
+score on both models (1.04 vs 1.25 Qwen; 0.71 vs 1.13 Gemma) — but it is the kind of
+inconsistency κ=0.51 implies, surfaced rather than left in the aggregate.
+
+---
+
+## 6. Attenuation is systematic, not outlier-driven
+
+Plotting each prompt's standard R−J against its non-echo R−J (each averaged over five
+depths), Qwen's prompts sit **modestly below** the y=x line and Gemma's sit **much further
+below and more variably**, with several large standard effects (+1.5 to +2.5) collapsing to
+zero or negative.
+
+So the pooled attenuation is not a few prompts collapsing while the rest hold. It is a
+broad shift, larger and noisier on Gemma. **→ Figure 9.**
+
+---
+
+## 7. Instrument quality, stated plainly
 
 - **No human raters.** All coherence claims are autorater-defined.
 - **Quadratic-weighted κ = 0.514**, exact agreement 39.3%, mean |difference| 0.91 points
@@ -217,7 +283,7 @@ proxy built on prompt overlap will reward echo rather than control for it.
 
 ---
 
-## 6. Methodological finding worth its own line
+## 8. Methodological finding worth its own line
 
 We ran the prompt-echo confound two ways and they disagree:
 
@@ -233,7 +299,7 @@ the one a researcher would naturally reach for first.
 
 ---
 
-## 7. What we claim, and what we don't
+## 9. What we claim, and what we don't
 
 **Supported.** (1) Under a standard contextual rubric R-Lens is rated more coherent than
 J-Lens on both models, direction holding for each judge separately. (2) R-Lens surfaces
@@ -251,7 +317,34 @@ independent observations.
 
 ---
 
-## 8. Questions for the reviewer
+## 10. Corrections applied after external review
+
+- **Figure 1a** regenerated from the frozen primary artifact; a test now asserts plotted
+  means come from the same source as the tables, and that bar labels come from the same
+  dict as bar heights.
+- **R-Lens definition corrected**: it replaces ordinary-gradient transport with LRP-derived
+  relevance coefficients under modified backward rules for normalisation and gated MLP
+  components, forward pass unchanged — not "J-Lens with stop-gradients".
+- **Overclaim removed**: "both Jacobian lenses clearly beat logit on both models" →
+  R-Lens on both; J-Lens clearly on Gemma, inconclusive on Qwen (p=0.070).
+- **Human-rating contradiction resolved**: no human ratings in the primary experiment; the
+  150 human judgements belong to a superseded panel and are historical context only.
+- **Adjudicator gate restated** as an *observed-rate operational rule* (≤15%), not an
+  inferential non-inferiority test. GPT-5 passed at 1/15; the adjudicator failed at 10/53;
+  both intervals are wide and neither true rate is established.
+- **Hedging added** where mechanisms were asserted: the floor-effect explanation is one
+  plausible reading; judge disagreement may reflect readout ambiguity, judge calibration,
+  or rubric underdetermination.
+- **"The direct one should be believed"** softened to "the more relevant instrument for
+  this question, measuring a narrower construct, subject to crowd-out".
+- **Conclusion and References added** — 10 citations including Montgomery/Nyhan/Torres for
+  the post-treatment argument, which had been an uncited methodological assertion.
+- **Two figures added**: qualitative readouts (§5) and the per-prompt attenuation
+  scatter (§6).
+
+---
+
+## 11. Questions for the reviewer
 
 1. **Construct validity of the non-echo rubric.** It penalises top-10 crowd-out as well
    as copying: a lens whose copies occupy slots loses the novel tokens those slots could
