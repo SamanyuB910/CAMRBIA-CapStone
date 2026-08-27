@@ -1,0 +1,154 @@
+[
+  {
+    "judge_id": "openai/gpt-5",
+    "rubric_hash": "1dc1ea6e00f88593",
+    "checks": [
+      {
+        "name": "prefers_coherent_over_corrupted",
+        "status": "PASS",
+        "detail": "0/10 cells preferred the corrupted arm (0%, threshold 10%)",
+        "measured": 0.0
+      },
+      {
+        "name": "identical_candidates_score_alike",
+        "status": "PASS",
+        "detail": "max gap 0 across 10 duplicate-arm cells (threshold 1)",
+        "measured": 0
+      },
+      {
+        "name": "winner_survives_permutation",
+        "status": "PASS",
+        "detail": "1/15 non-tied cells flipped (7%, threshold 15%, exact binomial p=0.913)",
+        "measured": 0.06666666666666667
+      },
+      {
+        "name": "no_position_bias",
+        "status": "PASS",
+        "detail": "winner counts {'A': 13, 'B': 16, 'C': 16}, chi2=0.40 (2 df, reject above 5.991)",
+        "measured": 0.39999999999999997
+      },
+      {
+        "name": "identity_layer_arms_score_alike",
+        "status": "PASS",
+        "detail": "max spread 0 across 5 identity-layer cells",
+        "measured": 0
+      },
+      {
+        "name": "late_positive_has_dynamic_range",
+        "status": "PASS",
+        "detail": "late-layer mean 3.73 (min 2.0), margin over corrupted arms 3.23 (min 1.0)",
+        "measured": 3.7333333333333334
+      },
+      {
+        "name": "identity_layer_returns_tie",
+        "status": "PASS",
+        "detail": "5/5 identity-layer cells returned 'tie' (100%, min 50%)",
+        "measured": 1.0
+      },
+      {
+        "name": "no_identity_speculation",
+        "status": "PASS",
+        "detail": "none",
+        "measured": 0
+      },
+      {
+        "name": "response_completeness",
+        "status": "PASS",
+        "detail": "0/78 cells returned no parseable rating (0.0%, max 2%). Every other check here is computed only over cells that parsed.",
+        "measured": 0.0
+      }
+    ],
+    "detail": {
+      "winner_counts": {
+        "A": 13,
+        "B": 16,
+        "C": 16
+      },
+      "late_positive_mean": 3.7333333333333334,
+      "corrupted_arm_mean": 0.5,
+      "n_attempted": 78,
+      "n_failed": 0
+    },
+    "passed": true,
+    "underpowered": [],
+    "failed": [],
+    "n_scored": 78,
+    "n_failed": 0
+  },
+  {
+    "judge_id": "deepseek/deepseek-chat-v3.1",
+    "rubric_hash": "1dc1ea6e00f88593",
+    "checks": [
+      {
+        "name": "prefers_coherent_over_corrupted",
+        "status": "PASS",
+        "detail": "0/10 cells preferred the corrupted arm (0%, threshold 10%)",
+        "measured": 0.0
+      },
+      {
+        "name": "identical_candidates_score_alike",
+        "status": "PASS",
+        "detail": "max gap 0 across 10 duplicate-arm cells (threshold 1)",
+        "measured": 0
+      },
+      {
+        "name": "winner_survives_permutation",
+        "status": "PASS",
+        "detail": "0/16 non-tied cells flipped (0%, threshold 15%, exact binomial p=1.000)",
+        "measured": 0.0
+      },
+      {
+        "name": "no_position_bias",
+        "status": "PASS",
+        "detail": "winner counts {'A': 14, 'B': 16, 'C': 17}, chi2=0.30 (2 df, reject above 5.991)",
+        "measured": 0.29787234042553196
+      },
+      {
+        "name": "identity_layer_arms_score_alike",
+        "status": "PASS",
+        "detail": "max spread 0 across 5 identity-layer cells",
+        "measured": 0
+      },
+      {
+        "name": "late_positive_has_dynamic_range",
+        "status": "PASS",
+        "detail": "late-layer mean 3.00 (min 2.0), margin over corrupted arms 3.00 (min 1.0)",
+        "measured": 3.0
+      },
+      {
+        "name": "identity_layer_returns_tie",
+        "status": "PASS",
+        "detail": "5/5 identity-layer cells returned 'tie' (100%, min 50%)",
+        "measured": 1.0
+      },
+      {
+        "name": "no_identity_speculation",
+        "status": "PASS",
+        "detail": "none",
+        "measured": 0
+      },
+      {
+        "name": "response_completeness",
+        "status": "PASS",
+        "detail": "0/78 cells returned no parseable rating (0.0%, max 2%). Every other check here is computed only over cells that parsed.",
+        "measured": 0.0
+      }
+    ],
+    "detail": {
+      "winner_counts": {
+        "A": 14,
+        "B": 16,
+        "C": 17
+      },
+      "late_positive_mean": 3.0,
+      "corrupted_arm_mean": 0.0,
+      "n_attempted": 78,
+      "n_failed": 0
+    },
+    "passed": true,
+    "underpowered": [],
+    "failed": [],
+    "n_scored": 78,
+    "n_failed": 0
+  }
+]

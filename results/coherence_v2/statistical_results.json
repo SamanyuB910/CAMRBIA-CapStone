@@ -1,0 +1,545 @@
+{
+  "n_cells": 200,
+  "n_prompts": 20,
+  "adjudication": {
+    "n_cells": 200,
+    "n_disputed": 126,
+    "disputed_cell_ids": [
+      "c106bcfa1632a74e",
+      "e9daf7e76858a0e3",
+      "f531c73afb95f82a",
+      "b0cf2ed25ffff59f",
+      "a57911a24630d932",
+      "4a543620e61ebb2c",
+      "04e653268beb8df0",
+      "d721affb1d522364",
+      "37db3ce459b32623",
+      "d5a3273bb1ab992c",
+      "7cf34c4265a45071",
+      "85379eb46e6a02fc",
+      "b90aba46fff948b0",
+      "6a647e80509027a8",
+      "404625677e54f731",
+      "906121b993c16f55",
+      "8f060ad15a522281",
+      "c694dc7d4435c7b0",
+      "ae4e67e5cc0795b5",
+      "5cd65bc701736ed2",
+      "76d2dd865daee97f",
+      "caafd8b481a9c048",
+      "e6bd0afb2899090f",
+      "7344e24917cea3eb",
+      "c74825eb474f9b71",
+      "ebf9e2236776091c",
+      "f487e16c84f2422a",
+      "02b63bb7dc1752e4",
+      "6d32689d597e2181",
+      "ddae7db1cad815eb",
+      "d2153c64019ebcd5",
+      "3acf7fb9b8053de5",
+      "4c7d01ca6edf08ae",
+      "5d0918ba23b2af4c",
+      "8df52e3aff3b925d",
+      "aca3aafca98f2c46",
+      "908fcba6bb9132e7",
+      "b8946f0158117ee7",
+      "ccd195853cab74b0",
+      "e7a72b8096f34cf9",
+      "0170bee2809765cd",
+      "0e9394e82562e0de",
+      "19359a4b179ec734",
+      "d18254c899ecd066",
+      "f94864caeb4a5073",
+      "9fa0a7fbde21b7a6",
+      "e6e6009493625129",
+      "7fd5c7b2e29b5b3e",
+      "5c3e87c5fafff3dc",
+      "f4357208e5ef7245",
+      "e33539952cbf4a3a",
+      "f7605d1fb3d1bcf7",
+      "c6a4d1a313da9078",
+      "b44b883868ce5cdf",
+      "7543ad012e5fef19",
+      "3c0bbe0758050805",
+      "2b2847f631355539",
+      "e554af40468b927a",
+      "b161400189247ef0",
+      "dcc10901163e19bf",
+      "99fc1081c2298666",
+      "b3e7ef253d2dbf79",
+      "6f9c3253826f1d57",
+      "266212f6a3ceb10c",
+      "7aea9a93a477576a",
+      "5d44b0d010f94486",
+      "1cba798447c0730b",
+      "52ab1e4bb74c8b27",
+      "1322cd8a426a9b1b",
+      "da75ecd7e5659b28",
+      "e57a6422a7fa8747",
+      "35a940d59a767861",
+      "4f61bb6314f5fe1d",
+      "17e9cd3b16ae160e",
+      "fefeb1ac61195c37",
+      "076ff80aa9bc6058",
+      "51c08ad2f8f11cfd",
+      "5a4448bc8e4cf335",
+      "3b1bb4da06b5f4b1",
+      "07eb5d3d72e377cb",
+      "77a67215457bfad1",
+      "63cf6e17abc3f11c",
+      "242a11a053a20ad4",
+      "5c0cd39009399716",
+      "19aa10cf9e06b712",
+      "1daaf763c87993e1",
+      "892bb3ea2fecccf8",
+      "54827a994cf8bfbc",
+      "579af3e6526d5aef",
+      "6de35ed6c087e0e3",
+      "7e00cd21b429935a",
+      "4e5aebb32d1c7709",
+      "a4a2e74ff5ba65fc",
+      "0ee8d59b12bcad40",
+      "d199c55bda825fad",
+      "d628f00afb5edb10",
+      "eb995dcbf3df28d9",
+      "98eacc77d8c62fcb",
+      "1431ccd9a9f4ea8a",
+      "75303d290cf3f889",
+      "12b3ab6eedb5a43f",
+      "e3f19853b79499ca",
+      "86804556c0964cc8",
+      "5c5736d05351d97a",
+      "8af067e5d4373e18",
+      "b5aebba2f6e8c8e8",
+      "33dfd0025cfdeaa7",
+      "93376b7012c4d6e3",
+      "b162ef4a19bf5f2b",
+      "6356c8b0a7251106",
+      "69346a5685db0b8c",
+      "bbf402421c86f303",
+      "cb39244f398dbe73",
+      "5e968225b3df9bb8",
+      "c730cc25e9359615",
+      "6e570f3c89a82e15",
+      "1d4bdf4e62c25d02",
+      "1f5e30e47d3d611c",
+      "c2e7c0ab1e624f27",
+      "40359df0a7e20496",
+      "5089264b3df9997a",
+      "5dc07dbcfd04aa47",
+      "24b61f4f3ccc33ee",
+      "a9edd50cc2b945a5",
+      "5c79abf4d4ba76a8",
+      "6bae6019d445244a"
+    ],
+    "adjudicator": "meta-llama/llama-3.1-70b-instruct"
+  },
+  "per_model": {
+    "gemma-3-27b-it": {
+      "released-R - released-J": {
+        "delta": 0.9,
+        "ci_lo": 0.6250000000000001,
+        "ci_hi": 1.17,
+        "n_prompts": 20,
+        "n_cells": 100,
+        "observed": 0.9,
+        "p_value": 0.00039996000399960006,
+        "n_permutations": 10000,
+        "p_display": "0.0004",
+        "win_rates": {
+          "win": 0.63,
+          "tie": 0.24,
+          "loss": 0.13,
+          "win_adjusted": 0.75,
+          "n": 100
+        }
+      },
+      "released-R - logit": {
+        "delta": 1.2850000000000001,
+        "ci_lo": 1.0350000000000001,
+        "ci_hi": 1.53,
+        "n_prompts": 20,
+        "n_cells": 100,
+        "observed": 1.2850000000000001,
+        "p_value": 9.999000099990002e-05,
+        "n_permutations": 10000,
+        "p_display": "< 1e-04",
+        "win_rates": {
+          "win": 0.75,
+          "tie": 0.08,
+          "loss": 0.17,
+          "win_adjusted": 0.79,
+          "n": 100
+        }
+      },
+      "released-J - logit": {
+        "delta": 0.38499999999999995,
+        "ci_lo": -0.004999999999999982,
+        "ci_hi": 0.7550000000000001,
+        "n_prompts": 20,
+        "n_cells": 100,
+        "observed": 0.38499999999999995,
+        "p_value": 0.12568743125687432,
+        "n_permutations": 10000,
+        "p_display": "0.1257",
+        "win_rates": {
+          "win": 0.53,
+          "tie": 0.11,
+          "loss": 0.36,
+          "win_adjusted": 0.585,
+          "n": 100
+        }
+      },
+      "lexical_integrity: released-R - released-J": {
+        "delta": 0.16499999999999998,
+        "ci_lo": 0.034999999999999996,
+        "ci_hi": 0.30500000000000005,
+        "n_prompts": 20,
+        "n_cells": 100
+      },
+      "prompt_echo: released-R - released-J": {
+        "delta": 0.305,
+        "ci_lo": 0.21000000000000002,
+        "ci_hi": 0.395,
+        "n_prompts": 20,
+        "n_cells": 100
+      },
+      "means": {
+        "contextual_coherence": {
+          "logit": 1.105,
+          "released-J": 1.49,
+          "released-R": 2.39
+        },
+        "lexical_integrity": {
+          "logit": 1.29,
+          "released-J": 1.575,
+          "released-R": 1.74
+        },
+        "prompt_echo": {
+          "logit": 0.325,
+          "released-J": 0.11,
+          "released-R": 0.415
+        }
+      }
+    },
+    "qwen3.5-27b": {
+      "released-R - released-J": {
+        "delta": 0.655,
+        "ci_lo": 0.4800000000000001,
+        "ci_hi": 0.835,
+        "n_prompts": 20,
+        "n_cells": 100,
+        "observed": 0.655,
+        "p_value": 9.999000099990002e-05,
+        "n_permutations": 10000,
+        "p_display": "< 1e-04",
+        "win_rates": {
+          "win": 0.61,
+          "tie": 0.27,
+          "loss": 0.12,
+          "win_adjusted": 0.745,
+          "n": 100
+        }
+      },
+      "released-R - logit": {
+        "delta": 1.295,
+        "ci_lo": 0.9950000000000001,
+        "ci_hi": 1.605,
+        "n_prompts": 20,
+        "n_cells": 100,
+        "observed": 1.295,
+        "p_value": 9.999000099990002e-05,
+        "n_permutations": 10000,
+        "p_display": "< 1e-04",
+        "win_rates": {
+          "win": 0.8,
+          "tie": 0.09,
+          "loss": 0.11,
+          "win_adjusted": 0.845,
+          "n": 100
+        }
+      },
+      "released-J - logit": {
+        "delta": 0.64,
+        "ci_lo": 0.40499999999999997,
+        "ci_hi": 0.875,
+        "n_prompts": 20,
+        "n_cells": 100,
+        "observed": 0.64,
+        "p_value": 0.00029997000299970003,
+        "n_permutations": 10000,
+        "p_display": "0.0003",
+        "win_rates": {
+          "win": 0.61,
+          "tie": 0.22,
+          "loss": 0.17,
+          "win_adjusted": 0.72,
+          "n": 100
+        }
+      },
+      "lexical_integrity: released-R - released-J": {
+        "delta": 0.125,
+        "ci_lo": 0.059999999999999984,
+        "ci_hi": 0.19000000000000003,
+        "n_prompts": 20,
+        "n_cells": 100
+      },
+      "prompt_echo: released-R - released-J": {
+        "delta": 0.225,
+        "ci_lo": 0.135,
+        "ci_hi": 0.3,
+        "n_prompts": 20,
+        "n_cells": 100
+      },
+      "means": {
+        "contextual_coherence": {
+          "logit": 0.775,
+          "released-J": 1.415,
+          "released-R": 2.07
+        },
+        "lexical_integrity": {
+          "logit": 0.76,
+          "released-J": 1.63,
+          "released-R": 1.755
+        },
+        "prompt_echo": {
+          "logit": 0.105,
+          "released-J": 0.05,
+          "released-R": 0.275
+        }
+      }
+    }
+  },
+  "by_depth": {
+    "gemma-3-27b-it": {
+      "0.0": {
+        "delta": 0.55,
+        "ci_lo": 0.125,
+        "ci_hi": 0.975,
+        "n_prompts": 20,
+        "n_cells": 20,
+        "observed": 0.55,
+        "p_value": 0.09199080091990801,
+        "n_permutations": 10000,
+        "p_display": "0.0920",
+        "p_holm": 0.09199080091990801
+      },
+      "0.1": {
+        "delta": 1.175,
+        "ci_lo": 0.85,
+        "ci_hi": 1.5,
+        "n_prompts": 20,
+        "n_cells": 20,
+        "observed": 1.175,
+        "p_value": 0.0011998800119988001,
+        "n_permutations": 10000,
+        "p_display": "0.0012",
+        "p_holm": 0.0047995200479952005
+      },
+      "0.2": {
+        "delta": 1.1,
+        "ci_lo": 0.7,
+        "ci_hi": 1.525,
+        "n_prompts": 20,
+        "n_cells": 20,
+        "observed": 1.1,
+        "p_value": 0.0058994100589941,
+        "n_permutations": 10000,
+        "p_display": "0.0059",
+        "p_holm": 0.0176982301769823
+      },
+      "0.3": {
+        "delta": 0.775,
+        "ci_lo": 0.425,
+        "ci_hi": 1.15,
+        "n_prompts": 20,
+        "n_cells": 20,
+        "observed": 0.775,
+        "p_value": 0.016698330166983303,
+        "n_permutations": 10000,
+        "p_display": "0.0167",
+        "p_holm": 0.033396660333966606
+      },
+      "0.4": {
+        "delta": 0.9,
+        "ci_lo": 0.625,
+        "ci_hi": 1.2,
+        "n_prompts": 20,
+        "n_cells": 20,
+        "observed": 0.9,
+        "p_value": 0.0008999100089991,
+        "n_permutations": 10000,
+        "p_display": "0.0009",
+        "p_holm": 0.0044995500449955
+      }
+    },
+    "qwen3.5-27b": {
+      "0.0": {
+        "delta": 0.85,
+        "ci_lo": 0.425,
+        "ci_hi": 1.3,
+        "n_prompts": 20,
+        "n_cells": 20,
+        "observed": 0.85,
+        "p_value": 0.009999000099990002,
+        "n_permutations": 10000,
+        "p_display": "0.0100",
+        "p_holm": 0.039996000399960006
+      },
+      "0.1": {
+        "delta": 0.525,
+        "ci_lo": 0.05,
+        "ci_hi": 0.975,
+        "n_prompts": 20,
+        "n_cells": 20,
+        "observed": 0.525,
+        "p_value": 0.07649235076492351,
+        "n_permutations": 10000,
+        "p_display": "0.0765",
+        "p_holm": 0.10018998100189981
+      },
+      "0.2": {
+        "delta": 0.925,
+        "ci_lo": 0.575,
+        "ci_hi": 1.275,
+        "n_prompts": 20,
+        "n_cells": 20,
+        "observed": 0.925,
+        "p_value": 0.000999900009999,
+        "n_permutations": 10000,
+        "p_display": "0.0010",
+        "p_holm": 0.004999500049995
+      },
+      "0.3": {
+        "delta": 0.55,
+        "ci_lo": 0.2,
+        "ci_hi": 0.9,
+        "n_prompts": 20,
+        "n_cells": 20,
+        "observed": 0.55,
+        "p_value": 0.025197480251974803,
+        "n_permutations": 10000,
+        "p_display": "0.0252",
+        "p_holm": 0.07559244075592442
+      },
+      "0.4": {
+        "delta": 0.425,
+        "ci_lo": 0.075,
+        "ci_hi": 0.75,
+        "n_prompts": 20,
+        "n_cells": 20,
+        "observed": 0.425,
+        "p_value": 0.050094990500949906,
+        "n_permutations": 10000,
+        "p_display": "0.0501",
+        "p_holm": 0.10018998100189981
+      }
+    }
+  },
+  "by_set": {
+    "gemma-3-27b-it": {
+      "association": {
+        "delta": 0.9,
+        "n_cells": 20,
+        "observed": 0.9,
+        "p_value": 0.1282871712828717,
+        "n_permutations": 10000,
+        "p_display": "0.1283",
+        "p_holm": 0.6364363563643636
+      },
+      "multihop": {
+        "delta": 0.7250000000000001,
+        "n_cells": 20,
+        "observed": 0.7250000000000001,
+        "p_value": 0.1272872712728727,
+        "n_permutations": 10000,
+        "p_display": "0.1273",
+        "p_holm": 0.6364363563643636
+      },
+      "multilingual": {
+        "delta": 0.475,
+        "n_cells": 20,
+        "observed": 0.475,
+        "p_value": 0.5027497250274973,
+        "n_permutations": 10000,
+        "p_display": "0.5027",
+        "p_holm": 0.6364363563643636
+      },
+      "poetry": {
+        "delta": 1.9,
+        "n_cells": 20,
+        "observed": 1.9,
+        "p_value": 0.1282871712828717,
+        "n_permutations": 10000,
+        "p_display": "0.1283",
+        "p_holm": 0.6364363563643636
+      },
+      "typo": {
+        "delta": 0.5,
+        "n_cells": 20,
+        "observed": 0.5,
+        "p_value": 0.2525747425257474,
+        "n_permutations": 10000,
+        "p_display": "0.2526",
+        "p_holm": 0.6364363563643636
+      }
+    },
+    "qwen3.5-27b": {
+      "association": {
+        "delta": 0.575,
+        "n_cells": 20,
+        "observed": 0.575,
+        "p_value": 0.2538746125387461,
+        "n_permutations": 10000,
+        "p_display": "0.2539",
+        "p_holm": 0.6414358564143585
+      },
+      "multihop": {
+        "delta": 0.575,
+        "n_cells": 20,
+        "observed": 0.575,
+        "p_value": 0.1282871712828717,
+        "n_permutations": 10000,
+        "p_display": "0.1283",
+        "p_holm": 0.6414358564143585
+      },
+      "multilingual": {
+        "delta": 1.05,
+        "n_cells": 20,
+        "observed": 1.05,
+        "p_value": 0.1282871712828717,
+        "n_permutations": 10000,
+        "p_display": "0.1283",
+        "p_holm": 0.6414358564143585
+      },
+      "poetry": {
+        "delta": 0.625,
+        "n_cells": 20,
+        "observed": 0.625,
+        "p_value": 0.1282871712828717,
+        "n_permutations": 10000,
+        "p_display": "0.1283",
+        "p_holm": 0.6414358564143585
+      },
+      "typo": {
+        "delta": 0.45000000000000007,
+        "n_cells": 20,
+        "observed": 0.45000000000000007,
+        "p_value": 0.2588741125887411,
+        "n_permutations": 10000,
+        "p_display": "0.2589",
+        "p_holm": 0.6414358564143585
+      }
+    }
+  },
+  "judge_agreement": {
+    "judges": [
+      "deepseek/deepseek-chat-v3.1",
+      "openai/gpt-5"
+    ],
+    "n_paired_scores": 600,
+    "quadratic_weighted_kappa": 0.5136246850140818,
+    "exact_agreement": 0.3933333333333333,
+    "mean_abs_difference": 0.9066666666666666
+  }
+}
