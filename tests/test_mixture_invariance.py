@@ -121,3 +121,45 @@ def test_validate_command_refuses_a_short_family_set():
     src = inspect.getsource(cli.cmd_non_echo_validate)
     assert "than shortening the lists" in src
     assert "build_mixture_controls" in src
+
+
+def test_each_report_selects_only_its_own_control_kind():
+    """Regression: running copy and mixture controls in one batch merged their
+    keys, and copy_control_report then hit a mixture row that has no
+    `copied_arm` — crashing AFTER a judge's ratings had been paid for."""
+    from rlens.non_echo import build_copy_controls, copy_control_report
+
+    late = [{"cell_id": f"L{i}", "prompt": "a b c d e f g h i j k l",
+             "readout_position": 5, "readout_token": "f", "note": "",
+             "candidates": {a: [{"rank": 1, "token": f" {a}{i}"}] for a in "ABC"}}
+            for i in range(10)]
+    copy_cells, copy_key = build_copy_controls(late)
+    mix_cells, mix_key = build_mixture_controls(_cells())
+    merged_key = copy_key + mix_key
+
+    results = {}
+    for row in copy_key:
+        results[row["cell_id"]] = {
+            **{a: {"non_echo_coherence": 0 if a == row["copied_arm"] else 3}
+               for a in "ABC"},
+            "non_echo_winner": "A" if row["copied_arm"] != "A" else "B"}
+    for row in mix_key:
+        results[row["cell_id"]] = {a: {"non_echo_coherence": 3} for a in "ABC"}
+
+    # neither report may raise on the other's rows
+    copy_out = copy_control_report(results, merged_key)
+    mix_out = mixture_report(results, merged_key)
+    assert copy_out["status"] == "PASS" and copy_out["n"] == len(copy_key)
+    assert mix_out["status"] == "PASS" and mix_out["n"] == len(mix_key)
+
+
+def test_validate_resumes_rather_than_re_paying_for_a_completed_judge():
+    """A crash in the reporting step stranded 30 completed GPT-5 ratings worth
+    ~$1.20. The ratings are now appended per cell and reused on re-run."""
+    import inspect
+
+    from rlens import cli
+
+    src = inspect.getsource(cli.cmd_non_echo_validate)
+    assert "RatingLog(" in src and "resume_plan(controls, log)" in src
+    assert "reusing" in src

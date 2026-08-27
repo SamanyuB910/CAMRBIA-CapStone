@@ -2280,8 +2280,9 @@ def cmd_non_echo_validate(args) -> None:
 
     from rlens.autorate import call_judge, probe_judge
     from rlens.non_echo import (MIXTURE_CRITERIA, NON_ECHO_SPEC, Progress,
-                                build_copy_controls, build_mixture_controls,
-                                copy_control_report, mixture_report)
+                                RatingLog, build_copy_controls,
+                                build_mixture_controls, copy_control_report,
+                                mixture_report, resume_plan)
 
     api_key = os.environ.get("OPENROUTER_API_KEY")
     if not api_key:
@@ -2319,8 +2320,9 @@ def cmd_non_echo_validate(args) -> None:
               f"(pad counts {', '.join(str(n) for n in (0, 3, 6))}, constant length 10)")
     out_dir = Path(args.out_dir).expanduser()
     if out_dir.exists() and (out_dir / "copy_control_report.json").exists():
-        raise SystemExit(f"{out_dir} already holds a copy-control report; "
-                         "use a fresh --out-dir rather than overwriting evidence")
+        raise SystemExit(f"{out_dir} already holds a completed copy-control report; "
+                         "use a fresh --out-dir rather than overwriting evidence. "
+                         "A directory holding only raw logs is resumed, not blocked.")
     out_dir.mkdir(parents=True, exist_ok=True)
 
     _non_echo_projection(args, len(controls) * len(args.judges))
@@ -2337,20 +2339,25 @@ def cmd_non_echo_validate(args) -> None:
         if not ok:
             raise SystemExit(f"judge {judge_id!r} unreachable; not spending a panel on it")
 
-        results, raw = {}, []
-        bar = Progress(len(controls), judge_id, every=5)
-        for cell in controls:
+        slug = judge_id.replace("/", "_")
+        # Append-and-fsync per cell, and reuse anything already on disk. A crash
+        # in the reporting step used to strand a completed judge's ratings.
+        log = RatingLog(out_dir / f"raw_copy_{slug}.jsonl")
+        todo, reused = resume_plan(controls, log)
+        if reused:
+            print(f"  {judge_id}: reusing {len(reused)} control cells already rated")
+        results = {cid: r["scores"] for cid, r in reused.items() if r.get("status") == "ok"}
+        bar = Progress(len(todo), judge_id, every=5) if todo else None
+        for cell in todo:
             call = call_judge(cell, judge_id=judge_id, api_key=api_key,
                               spec=NON_ECHO_SPEC)
-            raw.append({"cell_id": call.cell_id, "status": call.status,
+            log.append({"cell_id": call.cell_id, "status": call.status,
                         "scores": call.scores, "error": call.error,
                         "usage": call.usage, "timestamp": call.timestamp})
             if call.status == "ok":
                 results[call.cell_id] = call.scores
             bar.emit(call.status == "ok")
-        slug = judge_id.replace("/", "_")
-        (out_dir / f"raw_copy_{slug}.jsonl").write_text(
-            "\n".join(json.dumps(r) for r in raw), encoding="utf-8")
+        raw = list(log.completed().values())
 
         checks = [copy_control_report(results, control_key)]
         if args.mixture:

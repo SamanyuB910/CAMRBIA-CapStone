@@ -234,7 +234,7 @@ def test_validate_refuses_to_overwrite_an_existing_copy_control_report():
     from rlens import cli
 
     src = inspect.getsource(cli.cmd_non_echo_validate)
-    assert "already holds a copy-control report" in src
+    assert "already holds a completed copy-control report" in src
     assert "args.force" not in src
 
 

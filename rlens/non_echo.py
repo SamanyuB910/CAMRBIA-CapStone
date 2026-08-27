@@ -144,7 +144,10 @@ def build_copy_controls(late_cells: list, *, n: int = N_COPY_CONTROLS,
 
 def copy_control_report(results: dict, key: list) -> dict:
     """Did the rubric reward pure prompt copying? The Stage 5 admission gate."""
-    scored = [k for k in key if k["cell_id"] in results]
+    # The key may carry several control kinds; select ours by kind rather than
+    # assuming every row has a copied_arm.
+    scored = [k for k in key if k["cell_id"] in results
+              and k.get("kind", "pure_copy_vs_meaningful") == "pure_copy_vs_meaningful"]
     if not scored:
         return {"name": "pure_copy_does_not_win", "status": "FAIL",
                 "detail": "no copy-control cells were scored", "n": 0}
@@ -451,7 +454,10 @@ def build_mixture_controls(cells: list, *, n_families: int = 20,
 def mixture_report(results: dict, key: list, *, primary: str = "non_echo_coherence") -> dict:
     """Did adding prompt-local padding move the score of a fixed core?"""
     spreads, monotone, per_kind = [], 0, {}
-    scored = [k for k in key if k["cell_id"] in results]
+    # The key may carry several control kinds; select ours by kind rather than
+    # assuming every row has a copied_arm.
+    scored = [k for k in key if k["cell_id"] in results
+              and k.get("kind") == "mixture_invariance"]
     for row in scored:
         arm_scores = {a: results[row["cell_id"]][a][primary]
                       for a in ("A", "B", "C") if a in results[row["cell_id"]]}
