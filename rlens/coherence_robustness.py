@@ -78,7 +78,6 @@ def echo_matched(paired_c: pd.DataFrame, paired_e: pd.DataFrame, *,
     if rule == "equal":
         return merged[merged["diff_e"] == 0]
     if rule == "both_zero":
-        r, j = [c for c in merged.columns if c.endswith("_e") and c.startswith("released")], None
         cols = [c for c in merged.columns if c.endswith("_e")]
         zero = merged
         for col in cols:
@@ -211,3 +210,104 @@ def contrast_stability(table: pd.DataFrame, *, left: str = "gpt5_only",
             "stability": label,
         })
     return pd.DataFrame(rows)
+
+
+def echo_regression_table(echo_detail: dict) -> pd.DataFrame:
+    """Flatten the per-(variant, model) regressions into one comparable table.
+
+    The markdown previously inlined ``echo_detail`` as pretty-printed JSON and
+    truncated it at 6000 characters, which silently cut the report off partway
+    through the second of four variants -- the adjudicated (primary) regression
+    was not in the file at all. The full object is still written to
+    ``echo_existing_scores.json``; this is what the reader actually needs.
+    """
+    rows = []
+    for variant, per_model in echo_detail.items():
+        for model, detail in per_model.items():
+            reg = detail.get("regression", {})
+            if "slope" not in reg:
+                rows.append({"variant": variant, "model": model,
+                             "note": reg.get("note", "no regression"),
+                             "n_cells": reg.get("n_cells")})
+                continue
+            ci_i, ci_s = reg.get("intercept_ci"), reg.get("slope_ci")
+            rows.append({
+                "variant": variant, "model": model,
+                "intercept": reg["intercept"],
+                "intercept_ci": f"[{ci_i[0]:.2f}, {ci_i[1]:.2f}]" if ci_i else "",
+                "slope": reg["slope"],
+                "slope_ci": f"[{ci_s[0]:.2f}, {ci_s[1]:.2f}]" if ci_s else "",
+                "slope_excludes_zero": bool(ci_s and (ci_s[0] > 0 or ci_s[1] < 0)),
+                "n_cells": reg.get("n_cells"), "n_prompts": reg.get("n_prompts"),
+            })
+    return pd.DataFrame(rows)
+
+
+def thin_echo_strata(echo_detail: dict, *, min_cells: int = 5) -> pd.DataFrame:
+    """Echo-difference strata too small to interpret, listed so they are not read.
+
+    The D^E distribution is heavily concentrated at zero; the tails can hold a
+    single cell, whose mean coherence difference is then one judge's one score.
+    Those cells still enter the regression, where they are one point among many,
+    but their stratum means must not be quoted.
+    """
+    rows = []
+    for variant, per_model in echo_detail.items():
+        for model, detail in per_model.items():
+            for stratum in detail.get("by_echo_delta", []):
+                if stratum["n_cells"] < min_cells:
+                    rows.append({"variant": variant, "model": model, **stratum})
+    return pd.DataFrame(rows)
+
+
+def echo_verdict(echo_table: pd.DataFrame, *, primary_variant: str = "adjudicated") -> tuple:
+    """Does R - J survive restriction to echo-matched cells?
+
+    Returns ``(verdict, attenuation)``. The verdict is decided on the matched
+    subsets only: a positive point estimate that no longer excludes zero is not
+    a surviving effect. Attenuation is reported for the primary variant as the
+    proportional drop from all cells to the matched subset -- a description of
+    how much of the measured gap coincides with an echo difference, NOT a causal
+    decomposition, since echo is measured on the same readouts as coherence.
+    """
+    matched = echo_table[echo_table["subset"] != "all_cells"]
+    if matched.empty:
+        return "**NO ECHO-MATCHED CELLS.** The sensitivity analysis is empty.", pd.DataFrame()
+
+    all_positive = bool((matched["ci_lo"] > 0).all())
+    primary = matched[matched["variant"] == primary_variant]
+    primary_positive = bool((primary["ci_lo"] > 0).all()) if len(primary) else False
+
+    if all_positive:
+        verdict = ("**SURVIVES ECHO MATCHING.** In every scoring variant, on both models, "
+                   f"the R-J contextual-coherence advantage remains positive with a "
+                   f"confidence interval excluding zero when restricted to cells where the "
+                   f"two lenses received the same prompt-echo score ({len(matched)}/{len(matched)} "
+                   "subset estimates). Prompt echo does not account for the effect.")
+    elif primary_positive:
+        verdict = ("**SURVIVES UNDER THE PRIMARY RULE ONLY.** The R-J advantage still excludes "
+                   "zero on echo-matched cells under the frozen adjudicated scoring, but at "
+                   "least one other scoring variant loses significance once echo is matched.")
+    else:
+        verdict = ("**DOES NOT SURVIVE ECHO MATCHING.** Under the primary scoring rule the "
+                   "R-J advantage no longer excludes zero once the two lenses are required "
+                   "to echo the prompt equally. The headline effect cannot be separated from "
+                   "prompt echo in this panel.")
+
+    rows = []
+    for model, group in echo_table[echo_table["variant"] == primary_variant].groupby("model", sort=False):
+        base = group[group["subset"] == "all_cells"]
+        if base.empty:
+            continue
+        b = float(base["delta"].iloc[0])
+        row = {"model": model, "all_cells": b}
+        for subset in ("echo_equal", "echo_both_zero"):
+            sub = group[group["subset"] == subset]
+            if sub.empty:
+                continue
+            d = float(sub["delta"].iloc[0])
+            row[subset] = d
+            row[f"{subset}_retained_pct"] = 100.0 * (d / b) if b else float("nan")
+            row[f"{subset}_n_cells"] = int(sub["n_cells"].iloc[0])
+        rows.append(row)
+    return verdict, pd.DataFrame(rows)

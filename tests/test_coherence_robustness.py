@@ -288,3 +288,89 @@ def test_contrast_stability_skips_contrasts_missing_a_judge():
 
     table = pd.DataFrame([_stability_row("g", "released-R - logit", "gpt5_only", 1.0, 0.5, 1.5)])
     assert contrast_stability(table).empty
+
+
+def _echo_row(variant, model, subset, n_cells, delta, lo, hi):
+    return {"variant": variant, "model": model, "subset": subset, "n_cells": n_cells,
+            "n_prompts": 20, "delta": delta, "ci_lo": lo, "ci_hi": hi}
+
+
+def test_echo_verdict_survives_when_every_matched_interval_excludes_zero():
+    import pandas as pd
+
+    from rlens.coherence_robustness import echo_verdict
+
+    table = pd.DataFrame([
+        _echo_row("adjudicated", "qwen", "all_cells", 100, 0.655, 0.480, 0.830),
+        _echo_row("adjudicated", "qwen", "echo_equal", 74, 0.467, 0.246, 0.696),
+        _echo_row("adjudicated", "qwen", "echo_both_zero", 71, 0.453, 0.206, 0.703),
+    ])
+    verdict, atten = echo_verdict(table)
+    assert "SURVIVES ECHO MATCHING" in verdict
+    row = atten.iloc[0]
+    # 0.467 / 0.655 -- roughly 71% of the all-cells estimate is retained
+    assert 70.0 < row["echo_equal_retained_pct"] < 72.0
+    assert row["echo_equal_n_cells"] == 74
+
+
+def test_echo_verdict_fails_when_the_primary_interval_covers_zero():
+    import pandas as pd
+
+    from rlens.coherence_robustness import echo_verdict
+
+    table = pd.DataFrame([
+        _echo_row("adjudicated", "qwen", "all_cells", 100, 0.655, 0.480, 0.830),
+        _echo_row("adjudicated", "qwen", "echo_equal", 74, 0.120, -0.210, 0.460),
+    ])
+    verdict, _ = echo_verdict(table)
+    assert "DOES NOT SURVIVE" in verdict
+
+
+def test_echo_verdict_is_not_fooled_by_a_positive_point_estimate():
+    """A positive delta whose interval covers zero is not a surviving effect."""
+    import pandas as pd
+
+    from rlens.coherence_robustness import echo_verdict
+
+    table = pd.DataFrame([
+        _echo_row("adjudicated", "q", "all_cells", 100, 0.7, 0.5, 0.9),
+        _echo_row("adjudicated", "q", "echo_equal", 40, 0.6, -0.1, 1.3),
+    ])
+    assert "DOES NOT SURVIVE" in echo_verdict(table)[0]
+
+
+def test_echo_regression_table_keeps_every_variant():
+    """Regression: the markdown used to truncate the JSON dump at 6000 chars,
+    which dropped the adjudicated (primary) regression out of the report."""
+    from rlens.coherence_robustness import echo_regression_table
+
+    detail = {v: {m: {"regression": {"intercept": 0.5, "intercept_ci": [0.3, 0.7],
+                                     "slope": 1.0, "slope_ci": [0.6, 1.4],
+                                     "n_cells": 100, "n_prompts": 20}}
+                  for m in ("qwen", "gemma", "POOLED")}
+              for v in ("gpt5_only", "deepseek_only", "primary_mean", "adjudicated")}
+    out = echo_regression_table(detail)
+    assert len(out) == 12
+    assert set(out["variant"]) == {"gpt5_only", "deepseek_only", "primary_mean", "adjudicated"}
+    assert out["slope_excludes_zero"].all()
+
+
+def test_echo_regression_table_marks_a_null_slope():
+    from rlens.coherence_robustness import echo_regression_table
+
+    detail = {"deepseek_only": {"qwen": {"regression": {
+        "intercept": 0.49, "intercept_ci": [0.34, 0.65],
+        "slope": 0.346, "slope_ci": [-0.03, 0.63], "n_cells": 100, "n_prompts": 20}}}}
+    assert not echo_regression_table(detail)["slope_excludes_zero"].iloc[0]
+
+
+def test_thin_echo_strata_flags_single_cell_strata():
+    from rlens.coherence_robustness import thin_echo_strata
+
+    detail = {"gpt5_only": {"gemma": {"by_echo_delta": [
+        {"echo_delta": -1.0, "n_cells": 1, "n_prompts": 1, "mean_coherence_delta": -2.0},
+        {"echo_delta": 0.0, "n_cells": 65, "n_prompts": 19, "mean_coherence_delta": 0.85},
+        {"echo_delta": 1.0, "n_cells": 34, "n_prompts": 14, "mean_coherence_delta": 1.85},
+    ]}}}
+    out = thin_echo_strata(detail)
+    assert len(out) == 1 and out["echo_delta"].iloc[0] == -1.0

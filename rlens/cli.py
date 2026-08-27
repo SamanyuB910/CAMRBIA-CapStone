@@ -2020,6 +2020,12 @@ def _robustness_markdown(table, echo_table, echo_detail, args):
          "subset and not others, the flat ones are the contrasts that were genuinely",
          "hard to call, and that is worth reporting alongside the headline.", ""]
 
+    from rlens.coherence_robustness import (echo_regression_table, echo_verdict,
+                                              thin_echo_strata)
+    echo_v, attenuation = echo_verdict(echo_table)
+    reg_table = echo_regression_table(echo_detail)
+    thin = thin_echo_strata(echo_detail)
+
     e = ["# Prompt-echo sensitivity on the frozen scores (Stage 4)", "",
          "R-lens scores higher on prompt echo as well as on contextual coherence. The two",
          "use different scales (0-4 and 0-2), so comparing their magnitudes is not",
@@ -2033,8 +2039,25 @@ def _robustness_markdown(table, echo_table, echo_detail, args):
          echo_table.to_markdown(index=False, floatfmt=".3f"), "",
          "Retained cell and prompt counts are shown for every subset; a subset with few",
          "prompts cannot support inference regardless of its point estimate.", "",
-         "## Stratified by the echo difference, and regression", "", "```json",
-         __import__("json").dumps(echo_detail, indent=2, default=str)[:6000], "```", ""]
+         "## Verdict", "", echo_v, "",
+         (attenuation.to_markdown(index=False, floatfmt=".3f") if len(attenuation)
+          else "_no attenuation table_"), "",
+         "`*_retained_pct` is the echo-matched estimate as a percentage of the all-cells",
+         "estimate under the primary rule. It describes how much of the measured gap",
+         "coincides with an echo difference; it is not a causal decomposition.", "",
+         "## Regression of the coherence difference on the echo difference", "",
+         (reg_table.to_markdown(index=False, floatfmt=".3f") if len(reg_table)
+          else "_no regression available_"), "",
+         "A positive slope means the coherence advantage is larger where R also echoes the",
+         "prompt more. The intercept is the fitted difference at EQUAL echo. Full per-model",
+         "strata and bootstrap detail are in `echo_existing_scores.json`; this table",
+         "replaces an inline JSON dump that was truncated mid-object.", ""]
+    if len(thin):
+        e += ["## Echo strata too small to interpret", "",
+              f"Strata with fewer than 5 cells. They contribute to the regression as",
+              "individual points but their stratum means are single judgements and must",
+              "not be quoted.", "",
+              thin.to_markdown(index=False, floatfmt=".3f"), ""]
     return j, e
 
 
