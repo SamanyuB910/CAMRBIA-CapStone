@@ -2552,6 +2552,47 @@ def cmd_non_echo_analyse(args) -> None:
     results["mean_scores"] = {m: {l: float(v) for l, v in row.items() if v == v}
                               for m, row in means.iterrows()}
 
+    # Judge robustness. The standard result is reported under four scoring rules;
+    # the non-echo result needs the same, because the two judges already reverse
+    # in sign on J - logit under the standard rubric. Without this, the central
+    # extension rests on a mean whose components were never inspected.
+    blinded_path = ratings / "scores_blinded.csv"
+    if blinded_path.exists() and args.judges:
+        from rlens.analysis_v2 import judge_agreement
+        blinded = pd.read_csv(blinded_path)
+        per_judge = {}
+        for judge in args.judges:
+            sub = blinded[blinded["judge_id"] == judge]
+            if sub.empty:
+                continue
+            solo = {}
+            for cid, group in sub.groupby("cell_id"):
+                entry = {r["panel_arm"]: {d: float(r[d]) for d, _ in
+                                          NON_ECHO_SPEC.dimensions if d in r}
+                         for _, r in group.iterrows()}
+                scores = {a: v.get(primary, float("nan")) for a, v in entry.items()}
+                best = max(scores.values()) if scores else float("nan")
+                leaders = sorted(a for a, v in scores.items() if v == best)
+                entry["contextual_winner"] = leaders[0] if len(leaders) == 1 else "tie"
+                solo[cid] = entry
+            solo_df = unblind_panel(solo, key_rows, sample,
+                                    dimensions=dims, primary=primary)
+            if solo_df.empty:
+                continue
+            out = {}
+            for model_key, chunk in solo_df.groupby("model_key"):
+                paired = _paired_cells(chunk, "released-R", "released-J", primary)
+                if paired.empty:
+                    continue
+                out[model_key] = {
+                    "delta": equal_weight_delta(paired),
+                    **prompt_cluster_bootstrap(paired, n_boot=args.n_boot, seed=args.seed),
+                    **signflip_permutation_p(paired, n_perm=args.n_perm, seed=args.seed)}
+            per_judge[judge] = out
+        results["per_judge"] = per_judge
+        results["judge_agreement"] = judge_agreement(blinded, list(args.judges),
+                                                     dimension=primary)
+
     # Residual substance is the mechanism. If R-Lens loses its advantage under
     # non-echo scoring because it had LESS non-copied material to begin with,
     # that is a different finding from the judge simply scoring it lower, and
@@ -2591,6 +2632,21 @@ def cmd_non_echo_analyse(args) -> None:
              "## Contrasts", "", table.to_markdown(index=False, floatfmt=".3f"), "",
              "## Mean non-echo coherence by lens", "",
              means.to_markdown(floatfmt=".3f"), ""]
+    if results.get("per_judge"):
+        lines += ["## R - J by judge (non-echo)", ""]
+        rows_j = [{"judge": j, "model": m, "delta": v["delta"],
+                   "ci_lo": v["ci_lo"], "ci_hi": v["ci_hi"], "p": v["p_display"]}
+                  for j, per in results["per_judge"].items() for m, v in per.items()]
+        lines += [pd.DataFrame(rows_j).to_markdown(index=False, floatfmt=".3f"), "",
+                  "The standard result is reported under four scoring rules; this is the",
+                  "same check for the non-echo result. If only one judge produces the",
+                  "attenuation, the extension is judge-dependent and must be called so.", ""]
+        agree = results.get("judge_agreement") or {}
+        if agree:
+            lines += [f"Non-echo quadratic-weighted kappa: "
+                      f"**{agree.get('quadratic_weighted_kappa', float('nan')):.3f}**, "
+                      f"exact agreement "
+                      f"{agree.get('exact_agreement', float('nan')):.1%}.", ""]
     for dim, table in (results.get("secondary_means") or {}).items():
         frame = pd.DataFrame(table).T
         lines += [f"## Mean {dim.replace('_', ' ')} by lens", "",
@@ -3371,6 +3427,8 @@ def main() -> None:
 
     p = sub.add_parser("non-echo-analyse", help="Stage 5: analyse the non-echo ratings")
     p.add_argument("--ratings-dir", required=True)
+    p.add_argument("--judges", nargs="+", default=None,
+                   help="judge ids, for per-judge R-J and non-echo agreement")
     p.add_argument("--key", required=True)
     p.add_argument("--sample", required=True)
     p.add_argument("--out-dir", required=True)

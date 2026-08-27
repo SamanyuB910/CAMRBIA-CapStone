@@ -5,7 +5,10 @@
 \usepackage{graphicx}
 % Figures live with the analysis outputs, not beside the source, so the
 % document cannot be compiled against a stale hand-copied set.
-\graphicspath{{../results/coherence_v2/figures_primary_mean/}{figures/}}
+% ONE source of figures. A second search path silently won the lookup once and
+% rendered a stale Figure 1 for several drafts; `make check` now re-reads the
+% built PDF rather than trusting this line.
+\graphicspath{{../results/coherence_v2/figures_final/}}
 \usepackage{amsmath}
 \usepackage{microtype}
 \usepackage[colorlinks=true,linkcolor=black,urlcolor=blue,citecolor=black]{hyperref}
@@ -93,6 +96,17 @@ rating was collected, but it was not deposited with a third-party registry. We
 therefore say \emph{pre-specified and frozen} throughout, never
 \emph{preregistered}.
 
+\paragraph{\flag{The two stages were not specified at the same time.}} The
+standard-rubric panel, rubric and analysis were frozen before any rating. The
+non-echo analysis was \emph{not}: it was motivated after inspecting the
+prompt-echo result from the standard rubric. Its rubric, salt, controls and
+analysis procedure were then frozen and hashed before any non-echo rating was
+collected, and its copy control was run and passed before the panel was scored.
+It is therefore a \emph{staged methodological extension}, not part of the
+original pre-specified endpoint, and readers should weight it accordingly. The
+same applies to the small-sample analyses in \S\ref{sec:smallsample} and the
+qualitative examples in \S\ref{sec:examples}, both of which are post-hoc.
+
 \section{Artifacts and provenance}
 
 Both lenses are the authors' released artifacts, not refits, taken at a pinned
@@ -123,8 +137,14 @@ Twenty prompts---four from each of the five official evaluation sets
 of a fixed salt, the set name and a stable item identifier, so selection is
 reproducible and independent of any result. For the two sets carrying a target
 (multihop, multilingual) only items the model itself answers correctly were
-eligible, matching the source protocol's correctness filter. Prompts are shared
-between models: both models are read on the same 20 items.
+eligible, matching the source protocol's correctness filter.
+
+\textbf{The eligible pool is the intersection}
+$\mathcal{E}_{\text{Qwen}} \cap \mathcal{E}_{\text{Gemma}}$: an item is eligible
+only if \emph{both} models answer it correctly, and the four prompts per set are
+drawn from that shared pool by hash. Both models are therefore read on the same
+20 items, and no item enters for one model on the strength of the other's
+correctness alone.
 
 Each prompt is read at five pre-specified relative depths
 $z = \ell / \ell^{*} \in \{0, 0.1, 0.2, 0.3, 0.4\}$, giving
@@ -589,15 +609,42 @@ variably, with several large standard effects collapsing to zero or negative.}
 \label{fig:attenuation}
 \end{figure}
 
+\paragraph{\flag{Judge robustness of the non-echo result.}} The standard result
+is reported under four scoring rules (\S\ref{sec:judge}); the non-echo result
+needs the same treatment, since the two judges already reverse in sign on
+J $-$ logit under the standard rubric. Recomputing R $-$ J from each judge's
+non-echo ratings alone:
+
+\begin{center}\small
+\begin{tabular}{lccc}
+\toprule
+Model & GPT-5 alone & DeepSeek alone & Mean of two (primary) \\
+\midrule
+Qwen3.5-27B & \textsc{[gpt5-qwen]} & \textsc{[ds-qwen]} & $+0.325$ \ci{0.165}{0.480} \\
+Gemma-3-27B-it & \textsc{[gpt5-gemma]} & \textsc{[ds-gemma]} & $+0.110$ \ci{-0.045}{0.255} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent Non-echo agreement: quadratic-weighted $\kappa =$ \textsc{[kappa]},
+exact agreement \textsc{[exact]}.
+
 \paragraph{What strengthens under non-echo scoring.} R-Lens beats the logit
 lens on both models; J-Lens clearly does so on Gemma ($+0.875$, $p<10^{-4}$,
 against $+0.430$ under standard scoring) and suggestively on Qwen ($+0.250$,
 \ci{0.025}{0.465}, $p=0.070$ --- the interval excludes zero but the
 pre-specified permutation test does not reject).
 J-Lens echoes less than R-Lens, so standard scoring was penalising it for
-content the non-echo rubric ignores. The cross-model, cross-rubric result with
-the strongest support is therefore about the Jacobian transport in general, not
-about the LRP variant specifically.
+content the non-echo rubric ignores.
+
+We stop short of concluding that the strongest evidence is about Jacobian
+transport in general. Across both rubrics: R $-$ logit is strong on both models;
+J $-$ logit is strong on Gemma under non-echo scoring, inconclusive on Qwen
+under non-echo scoring ($p=0.070$), and non-significant on both models under
+standard scoring, where it also reverses in sign between judges.
+\flag{The data do not support a uniform cross-model attribution to the Jacobian
+transport alone.} What they support is narrower: on Gemma both Jacobian methods
+beat the logit lens on non-copied content, and on Qwen only R-Lens clearly does.
 
 \paragraph{The two echo analyses disagree.} Restriction (\S\ref{sec:echo})
 retained 74\% of the effect on Qwen and 102\% on Gemma. Direct measurement
@@ -635,7 +682,8 @@ different rubric might score differently.
 \label{sec:examples}
 
 Scores alone ask a reader to take the instrument on trust. Three cells are shown
-below, selected by rule from the frozen panel rather than by eye: the largest
+below, chosen by \emph{post-hoc illustrative} rules applied to the frozen panel
+rather than by eye --- illustrative, not confirmatory: the largest
 combined standard-and-non-echo R-Lens gain, the largest gap between a standard
 gain and its non-echo counterpart, and the cell where all three arms score
 lowest. Tokens are shown exactly as the judges saw them.
@@ -658,10 +706,13 @@ R-Lens & \tok{\ldots\ though \ldots\ they seperate there wanting needing} & \tex
 \end{tabular}
 \end{center}
 
-R-Lens surfaces \emph{wanting}, \emph{needing}, \emph{though}, \emph{they} --- a
-coherent reading of a standoff --- with no prompt copying at all. Its non-echo
-score is \emph{higher} than its standard score. This is what the claim looks
-like when it holds.
+R-Lens surfaces \emph{wanting}, \emph{needing} and \emph{though} --- a coherent
+reading of a standoff --- alongside the prompt-overlapping pronoun \emph{they},
+which does appear in the prompt (``\emph{They} shook hands''). The judges
+nonetheless assigned this arm an echo score of 0.0, defensible for a single
+function word but not literally zero overlap; we report it as scored rather than
+adjust it. Its non-echo score (3.5) is \emph{higher} than its standard score
+(3.0). This is what the claim looks like when it holds.
 
 \paragraph{An echo-driven gain, where the two rubrics disagree about the winner.}
 Gemma, \texttt{typo}, $z = 0.2$. Prompt: \emph{``The stadium was packed with
@@ -688,12 +739,39 @@ rubric scores it 3.0 against J-Lens's 0.5. J-Lens instead surfaces a cluster of
 \emph{succesfully}, \emph{wouldnt}), which is not prompt-local at all, and the
 non-echo rubric scores it 2.0 against R-Lens's 0.5.
 
-Both readouts are defensible interpretability outputs, and which one is
-``better'' depends on the question. If the question is what the model is
-computing at a typo, an abstract misspelling cluster is arguably more
-informative than a reconstruction of the word already on the page. This single
-cell contains the whole finding in miniature: the standard rubric rewards
-prompt-local recovery, and R-Lens does more of it.
+\paragraph{This is why ``prompt echo'' is too narrow a name.} \emph{people} is
+not a copy: the prompt contains \emph{poeple}. R-Lens is performing
+\emph{orthographic normalisation} --- reconstructing the intended word from a
+corrupted one --- which is plausibly real computation, and on the \texttt{typo}
+set is arguably the task itself. Our rubric nonetheless discounts it, because it
+asks the judge to discard anything recoverable from the prompt. The standard
+rubric conflates four distinguishable things:
+
+\begin{center}\small
+\begin{tabular}{ll}
+\toprule
+Construct & Example from this cell \\
+\midrule
+Literal echo & repeating \emph{stadium}, \emph{thousand} \\
+Prompt-local normalisation & \emph{poeple} $\to$ \emph{people} \\
+Abstract contextual representation & other common misspellings \\
+Novel downstream content & anything not locally recoverable \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\flag{Our non-echo rubric removes credit for the first two together.} That is
+defensible when the question is ``what is here beyond prompt-local content'',
+but it is not the same as measuring copying, and the attenuations in
+\S\ref{sec:nonecho} should be read as loss of \emph{prompt-local content},
+literal and normalised together. The source post explicitly treats readouts
+representing the current or similar tokens as evidence of early-layer structure
+rather than as a confound, so on its own framing R-Lens's behaviour here is a
+success rather than an artefact.
+
+This cell illustrates the central construct distinction: a one-dimensional
+coherence score silently chooses between prompt-local reconstruction and
+abstract contextual representation, and that choice determines which lens wins.
 
 \paragraph{Where nothing works.} Qwen, \texttt{poetry}, $z = 0.1$, read at the
 newline ending line one. Every arm scores 0.0 on contextual coherence; J-Lens
@@ -704,11 +782,13 @@ is what they look like.
 \flag{One anomaly worth recording.} In this cell the logit lens scored 0.0 on
 contextual coherence but 2.0 on non-echo coherence, for a readout consisting
 entirely of punctuation and whitespace. That ordering is hard to defend and is
-an instance of judge noise on degenerate inputs. It is not systematic --- the
-logit lens's mean non-echo score is \emph{below} its mean standard score on both
-models (1.04 against 1.25 on Qwen, 0.71 against 1.13 on Gemma) --- but it is the
-kind of inconsistency a $\kappa$ of 0.51 implies, and it is visible here rather
-than only in the aggregate.
+an instance of judge noise on degenerate inputs. This is \emph{cross-rubric} instability on a
+degenerate input, distinct from the between-judge disagreement summarised by
+$\kappa = 0.51$, which measures agreement between two raters on one rubric. In
+aggregate the logit lens's mean non-echo score is \emph{below} its mean standard
+score on both models (1.04 against 1.25 on Qwen, 0.71 against 1.13 on Gemma), so
+this is not the general pattern --- but we observed one such case and did not
+estimate its frequency among punctuation-dominated readouts.
 
 \section{Small-sample stability}
 \label{sec:smallsample}
@@ -846,9 +926,10 @@ ours. Token-form statistics are not a substitute for rating the readouts.
       Copied tokens both earn no credit \emph{and} occupy slots in a
       fixed-length top-10 list that novel tokens could have filled. Separating
       those would require refilling each list from deeper rankings; the frozen
-      panel stored only the top 10, so we did not. The attenuations are
-      therefore upper bounds on the loss of novel content, not clean estimates
-      of it.
+      panel stored only the top 10, so we did not. Crowd-out may cause this
+      analysis to overstate the loss of novel content, but adding lower-ranked
+      tokens can move an autorater's score non-monotonically, so the attenuation
+      is not a formal bound.
 \item \textbf{Four prompts per evaluation set.} Per-set results are descriptive
       and none survives Holm correction.
 \item \textbf{One rubric, one panel per construct.} We did not test whether a
@@ -864,9 +945,9 @@ ours. Token-form statistics are not a substitute for rating the readouts.
 We evaluate R-Lens's early-layer contextual-coherence claim on Qwen3.5-27B and
 Gemma-3-27B-it using a blinded, pre-specified and frozen 200-cell panel scored by
 two independently validated LLM autoraters. Under a standard prompt-aware rubric
-the claimed advantage reproduces on both models and is robust: it survives every
-scoring rule we tried, the deletion of any single prompt, and the deletion of any
-single evaluation set.
+the claimed advantage reproduces on both models and is robust: under that rubric
+the R $-$ J direction survives every judge-aggregation rule we examined, the
+deletion of any single prompt, and the deletion of any single evaluation set.
 
 R-Lens, however, also surfaces significantly more prompt-overlapping content.
 When copied tokens are excluded before scoring, the R $-$ J advantage falls by
@@ -875,13 +956,20 @@ lens-versus-baseline comparisons largely persist.
 
 The conclusion is therefore neither a clean confirmation nor a refutation.
 R-Lens's advantage under ordinary coherence scoring is real and reproducible, but
-ordinary coherence conflates novel coherent content with prompt echo. Once the
-two are separated, the residual advantage is substantial on one model, minimal on
-the other, and less statistically stable than the headline number suggests. We
-read this as a caution about the construct rather than about the method: a
-qualitative judgement that a readout ``looks coherent'' cannot distinguish
-between recovering intermediate computation and reproducing nearby prompt tokens,
-and the difference matters for what an early-layer lens is claimed to show.
+ordinary coherence conflates novel content with \emph{prompt-local} content ---
+literal repetition and normalised reconstruction alike. Under the narrower
+non-echo rubric the residual advantage is substantial on one model, minimal on
+the other, and less statistically stable than the headline number suggests.
+
+We read this as a finding about the construct rather than about the method. A
+one-dimensional coherence score silently chooses between prompt-local
+reconstruction and abstract contextual representation, and \S\ref{sec:examples}
+shows a single cell where that choice reverses which lens wins. Neither choice is
+obviously wrong; the source post treats current-token representation as evidence
+of early-layer structure, and on that framing R-Lens's behaviour is a success.
+What we can say is that ``coherence'', measured one-dimensionally, does not
+separate these, and that the ranking of these lenses is not invariant to which
+one you mean.
 
 \section{Supported and unsupported claims}
 \label{sec:claims}
@@ -994,6 +1082,113 @@ protocol salts, all seeds and the audit verdicts are recorded in
 deliberately absent from the repository and from this document's source tree.
 \end{sloppypar}
 
+
+\appendix
+\section{The two rubrics, in full}
+\label{sec:rubrics}
+
+Hashes establish immutability, not validity. Both system prompts are reproduced
+verbatim so a reader can judge what the raters were actually asked. Each was
+presented as the system message; the user message carried the prompt with the
+readout position marked \texttt{[[>>token<<]]}, the position index, and the three
+candidate arms as ranked token lists labelled A, B and C.
+
+\subsection*{Standard rubric (salt \texttt{coherence-v2-2026-08-26})}
+\begin{quote}\ttfamily\scriptsize\raggedright
+You are rating three anonymous readouts of the SAME internal state of a
+language model, taken at the SAME highlighted position in the prompt below. Each
+candidate was produced by a different decoding method. You do not know which is which,
+and you must not speculate about their identity.
+
+Treat each readout as a BAG OF TOKEN-LEVEL CONCEPTS, not as a grammatical sentence.
+Token fragments may jointly express a meaningful word. Do NOT penalise valid
+non-English words, transliterations, or non-Latin scripts merely for not being English.
+Whitespace or punctuation may be contextually appropriate — judge it in context.
+
+Score each candidate on three scales.
+
+CONTEXTUAL COHERENCE (0-4) — the primary measure. Does the readout form a meaningful
+interpretation of the model's state at the highlighted position?
+  0: Predominantly malformed, uninterpretable, or semantically unrelated.
+  1: Mostly incoherent; at most one weak or plausibly accidental contextual connection.
+  2: Partially coherent; at least one clear relevant concept or theme, but substantial
+     noise or ambiguity remains.
+  3: Mostly coherent; multiple tokens support a meaningful theme related to the prompt
+     at the highlighted position.
+  4: Strongly coherent; a clear, semantically unified, contextually appropriate
+     representation.
+Prompt copying alone CAN be coherent, but must not automatically earn a high score.
+Score whether the readout forms a meaningful contextual representation.
+
+LEXICAL INTEGRITY (0-2) — are the outputs interpretable units, regardless of relevance?
+  0: Mostly malformed fragments, special tokens, punctuation runs, or meaningless
+     repetitions.
+  1: A mixture of interpretable lexical items and malformed/noisy items.
+  2: Mostly recognisable words or meaningful token fragments.
+
+PROMPT ECHO (0-2) — how much is direct repetition of visible input? Neither good nor bad.
+  0: Little or no direct copying of nearby prompt tokens.
+  1: Some copying, alongside additional content.
+  2: Dominated by direct prompt copying or trivial lexical variants.
+
+Also return the contextual winner: "A", "B", "C", or "tie", and for each candidate an
+evidence statement of at most 25 words. Do not emit hidden reasoning.
+
+Return STRICT JSON only, exactly this shape:
+\{"A": \{"contextual\_coherence": 0, "lexical\_integrity": 0, "prompt\_echo": 0, "evidence": ""\},
+ "B": \{"contextual\_coherence": 0, "lexical\_integrity": 0, "prompt\_echo": 0, "evidence": ""\},
+ "C": \{"contextual\_coherence": 0, "lexical\_integrity": 0, "prompt\_echo": 0, "evidence": ""\},
+ "contextual\_winner": "A|B|C|tie"\}
+\end{quote}
+
+\subsection*{Non-echo rubric (salt \texttt{non-echo-2026-08-27})}
+\begin{quote}\ttfamily\scriptsize\raggedright
+You are rating three anonymous readouts of the SAME internal state of a
+language model, taken at the SAME highlighted position in the prompt below. Each
+candidate was produced by a different decoding method. You do not know which is which,
+and you must not speculate about their identity.
+
+Treat each readout as a BAG OF TOKEN-LEVEL CONCEPTS, not as a grammatical sentence.
+Token fragments may jointly express a meaningful word. Do NOT penalise valid
+non-English words, transliterations, or non-Latin scripts merely for not being English.
+
+THE CENTRAL INSTRUCTION. Some readouts repeat words that already appear in the prompt.
+Before scoring, mentally DISCARD every token that merely repeats a word visible in the
+prompt above, including trivial variants (case, leading space, plural, a shared word
+stem). Score only what REMAINS after discarding those. A readout that is entirely
+prompt repetition has nothing remaining and scores 0, however fluent it looks.
+
+NON-ECHO COHERENCE (0-4) — the primary measure. Of the tokens that are NOT copied from
+the prompt, do they form a meaningful interpretation of the model's state at the
+highlighted position?
+  0: Nothing remains after discarding copied tokens, or what remains is malformed,
+     uninterpretable, or semantically unrelated.
+  1: What remains is mostly incoherent; at most one weak or plausibly accidental
+     contextual connection.
+  2: What remains is partially coherent; at least one clear relevant concept or theme,
+     but substantial noise or ambiguity.
+  3: What remains is mostly coherent; multiple non-copied tokens support a meaningful
+     theme related to the prompt at the highlighted position.
+  4: What remains is strongly coherent; a clear, semantically unified, contextually
+     appropriate representation built from non-copied tokens.
+
+RESIDUAL SUBSTANCE (0-2) — how much non-copied material was there to judge?
+  0: Essentially nothing; the readout is dominated by prompt repetition.
+  1: Some non-copied material alongside substantial repetition.
+  2: Mostly non-copied material.
+Report this honestly. It is a description of the readout, not a quality score, and a
+low value does NOT justify raising or lowering non-echo coherence.
+
+Also return the non-echo winner: "A", "B", "C", or "tie", and for each candidate an
+evidence statement of at most 25 words naming which tokens you discarded as copied.
+Do not emit hidden reasoning.
+
+Return STRICT JSON only, exactly this shape:
+\{"A": \{"non\_echo\_coherence": 0, "residual\_substance": 0, "evidence": ""\},
+ "B": \{"non\_echo\_coherence": 0, "residual\_substance": 0, "evidence": ""\},
+ "C": \{"non\_echo\_coherence": 0, "residual\_substance": 0, "evidence": ""\},
+ "non\_echo\_winner": "A|B|C|tie"\}
+\end{quote}
 
 \section*{References}
 \small

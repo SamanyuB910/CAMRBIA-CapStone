@@ -614,7 +614,11 @@ def fig_attenuation(prompt_effects, out_dir: Path) -> list[str]:
         ax.set_xlabel("Standard R − J")
         ax.set_title(MODEL_LABEL.get(model, model), loc="left")
     axes[0].set_ylabel("Non-echo R − J")
-    axes[0].text(0.03, 0.97, "on the dashed line = no loss\nbelow it = loses to echo",
+    # Descriptive wording only: "loses to echo" asserted a mechanism the paper
+    # explicitly declines to claim.
+    axes[0].text(0.03, 0.97,
+                 "on the dashed line = same under both rubrics\n"
+                 "below it = smaller under non-echo scoring",
                  transform=axes[0].transAxes, va="top", fontsize=6.5, color=MUTED)
     fig.tight_layout()
     return save(fig, out_dir, "fig9_attenuation")

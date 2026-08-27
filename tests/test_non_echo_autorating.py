@@ -377,3 +377,44 @@ def test_analysis_reports_residual_substance_not_only_the_primary():
     src = inspect.getsource(cli.cmd_non_echo_analyse)
     assert "secondary_means" in src and "secondary_contrasts" in src
     assert "d != primary" in src, "must derive the secondary set, not hardcode it"
+
+
+def test_non_echo_analysis_reports_per_judge_results():
+    """The standard result is reported under four scoring rules. The non-echo
+    result is the paper's central extension and had none — while the two judges
+    already reverse in sign on J - logit under the standard rubric."""
+    import inspect
+
+    from rlens import cli
+
+    src = inspect.getsource(cli.cmd_non_echo_analyse)
+    assert 'results["per_judge"] = per_judge' in src
+    assert 'judge_agreement(blinded, list(args.judges)' in src
+    assert 'dimension=primary' in src, "agreement must be on the non-echo dimension"
+
+
+def test_per_judge_winner_is_derived_from_that_judge_alone():
+    """A single-judge estimate that reused the combined winner would not be a
+    single-judge estimate."""
+    import inspect
+
+    from rlens import cli
+
+    src = inspect.getsource(cli.cmd_non_echo_analyse)
+    block = src[src.index("for judge in args.judges:"):src.index('results["per_judge"]')]
+    assert 'blinded["judge_id"] == judge' in block
+    assert 'entry["contextual_winner"] = leaders[0]' in block
+
+
+def test_figure_nine_annotation_is_descriptive_not_causal():
+    """'below it = loses to echo' asserted a mechanism the paper declines to
+    claim."""
+    import inspect
+
+    from rlens import figures
+
+    src = inspect.getsource(figures.fig_attenuation)
+    # check the rendered strings, not the comments explaining the change
+    code = "\n".join(l for l in src.splitlines() if not l.strip().startswith("#"))
+    assert "loses to echo" not in code
+    assert "smaller under non-echo scoring" in code
