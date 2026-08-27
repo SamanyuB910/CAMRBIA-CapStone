@@ -295,6 +295,54 @@ def _winner_scores(scores: dict) -> dict:
     return {l: scores[l]["contextual_coherence"] for l in ("A", "B", "C")}
 
 
+
+def clopper_pearson(k: int, n: int, conf: float = 0.95) -> tuple[float, float]:
+    """Exact binomial confidence interval, by bisection on the tail sums.
+
+    Reported alongside every rate the validation gates act on: "10/53 flipped"
+    and "10/53 flipped, 95% CI [9%, 32%]" support very different decisions.
+    """
+    if n == 0:
+        return 0.0, 1.0
+    a = (1.0 - conf) / 2.0
+
+    def solve(fn):
+        lo, hi = 0.0, 1.0
+        for _ in range(60):
+            mid = (lo + hi) / 2.0
+            if fn(mid):
+                lo = mid
+            else:
+                hi = mid
+        return (lo + hi) / 2.0
+
+    low = 0.0 if k == 0 else solve(lambda p: binomial_tail_ge(k, n, p) < a)
+    high = 1.0 if k == n else solve(lambda p: 1.0 - binomial_tail_ge(k + 1, n, p) > a)
+    return low, high
+
+
+def pairs_to_resolve(rate: float, threshold: float, *, alpha: float = 0.05,
+                     power: float = 0.90, cap: int = 150) -> int | None:
+    """Comparable pairs needed to reject ``threshold`` at ``power`` if the true
+    rate is ``rate``. ``None`` when no battery under ``cap`` suffices.
+
+    ``cap`` is a practical bound, not a statistical one. Each order pair costs
+    two rated cells, so 150 pairs is already a 300-cell battery -- larger than
+    the 200-cell experiment it exists to validate. Past that point the honest
+    answer is that this control cannot settle the question, and saying "collect
+    more pairs" sends the operator on a treadmill instead.
+    """
+    if rate <= threshold:
+        return 0
+    for n in range(10, cap + 1, 10):
+        critical = next((k for k in range(n + 1)
+                         if binomial_tail_ge(k, n, threshold) < alpha), None)
+        if critical is None:
+            continue
+        if binomial_tail_ge(critical, n, rate) >= power:
+            return n
+    return None
+
 def judge_validation_report(results: dict, meta: list, *, judge_id: str,
                             n_attempted: int | None = None,
                             n_failed: int = 0) -> dict:
@@ -374,15 +422,30 @@ def judge_validation_report(results: dict, meta: list, *, judge_id: str,
             # n=10, while 1/6 is not conclusive at any alpha.
             add("winner_survives_permutation", False, detail, rate)
         else:
-            achievable = ", ".join(f"{i / comparable:.0%}" for i in range(3))
+            # Escalating --n-order only helps if a feasible sample could
+            # resolve the observed rate against the threshold. When the
+            # estimate sits just above it, the required n explodes, and
+            # telling the operator to collect more pairs sends them on a
+            # treadmill that burns credits and never converges.
+            need = pairs_to_resolve(rate, threshold, alpha=THRESHOLDS["alpha"])
+            lo, hi = clopper_pearson(flips, comparable)
+            detail += f", 95% CI [{lo:.0%}, {hi:.0%}]"
+            if need is None:
+                advice = (f"No feasible battery resolves {rate:.0%} against a "
+                          f"{threshold:.0%} threshold: the gap is too small. This "
+                          "control cannot admit or reject this judge, and raising "
+                          "--n-order will not change that. Decide explicitly whether "
+                          "to admit the judge with this rate on record, or to treat "
+                          "the unresolved gate as a failure and drop it.")
+            else:
+                advice = (f"About {need} comparable pairs would resolve this at 90% "
+                          f"power; you have {comparable}. Raise --n-order (roughly "
+                          f"{need * 3 // 2} requested, since ties are not comparable).")
             report["checks"].append({
                 "name": "winner_survives_permutation", "status": "UNDERPOWERED",
                 "detail": detail + f" — above the threshold but not significantly "
-                          f"(p={pvalue:.3f} >= {THRESHOLDS['alpha']}). With {comparable} "
-                          f"comparable pairs the achievable rates are {achievable}..., so the "
-                          f"threshold is not resolvable. Raise --n-order rather than "
-                          "changing judge.",
-                "measured": rate})
+                          f"(p={pvalue:.3f} >= {THRESHOLDS['alpha']}). {advice}",
+                "measured": rate, "ci": [lo, hi], "pairs_to_resolve": need})
     else:
         n_rot = len(by_kind.get("order_invariance", []))
         n_orig = len(by_kind.get("order_invariance_original", []))

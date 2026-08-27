@@ -131,3 +131,39 @@ def test_pdf_output_is_actually_vector(tmp_path):
     data = (tmp_path / "fig2_depth_profile.pdf").read_bytes()
     assert data[:5] == b"%PDF-"
     assert b"/Subtype /Image" not in data
+
+
+def test_echo_figure_follows_the_chosen_scoring_variant(tmp_path):
+    """Figure 4 must be drawn from the same rule as the headline. Hardcoding
+    'adjudicated' would silently pair a mean-of-two primary table with an
+    adjudicated echo panel."""
+    pd = pytest.importorskip("pandas")
+
+    table = pd.DataFrame([
+        {"variant": v, "model": "qwen3.5-27b", "subset": subset, "n_cells": n,
+         "delta": d, "ci_lo": d - 0.2, "ci_hi": d + 0.2, "n_prompts": 20}
+        for v, d in (("adjudicated", 0.655), ("primary_mean", 0.690))
+        for subset, n in (("all_cells", 100), ("echo_equal", 70))
+    ])
+    assert figures.fig_echo(table, {}, tmp_path, variant="primary_mean")
+    # a variant absent from the table must produce nothing, not an empty axis
+    assert figures.fig_echo(table, {}, tmp_path, variant="gpt5_only") == []
+
+
+def test_build_all_threads_scoring_through(tmp_path):
+    import inspect
+
+    src = inspect.getsource(figures.build_all)
+    assert "variant=scoring" in src
+
+
+def test_primary_label_follows_the_rule_in_force(tmp_path):
+    """When the adjudicator failed validation the primary rule became
+    mean-of-two. A figure that still labelled 'Adjudicated (primary)' would
+    contradict the table beside it."""
+    import inspect
+
+    src = inspect.getsource(figures.fig_judge_sensitivity)
+    assert '"adjudicated": "Adjudicated"' in src, "no variant is primary by default"
+    assert 'names[primary] += " (primary)"' in src
+    assert figures.fig_judge_sensitivity(_judge_table(), tmp_path, primary="primary_mean")

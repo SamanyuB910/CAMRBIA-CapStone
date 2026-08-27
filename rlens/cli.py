@@ -1554,7 +1554,25 @@ def cmd_analyse_v2(args) -> None:
     sample = json.loads(Path(args.sample).read_text())
     blinded = pd.read_csv(ratings / "scores_blinded.csv")
 
-    df = unblind_panel(combined, key_rows, sample)
+    if args.scoring == "adjudicated":
+        df = unblind_panel(combined, key_rows, sample)
+    else:
+        # Reconstruct the panel under a different scoring rule. `build_variant`
+        # enforces that each variant reads ONLY its permitted ratings, so
+        # `primary_mean` cannot see the adjudicator's scores at all -- which is
+        # the whole point of demoting an instrument that failed validation.
+        import pandas as _pd
+
+        from rlens.coherence_robustness import build_variant
+        blinded = _pd.read_csv(ratings / "scores_blinded.csv")
+        df = build_variant(blinded, combined, key_rows, sample, args.scoring,
+                           judges=tuple(args.judges), adjudicator=args.adjudicator)
+        if df.empty:
+            raise SystemExit(f"scoring variant {args.scoring!r} produced no rows; "
+                             "check --judges and --adjudicator match the ratings")
+        print(f"scoring rule: {args.scoring} "
+              f"(judges {', '.join(args.judges)}; adjudicator excluded)"
+              if args.scoring == "primary_mean" else f"scoring rule: {args.scoring}")
     out_dir = Path(args.out_dir).expanduser()
     if out_dir.exists() and any(out_dir.iterdir()):
         raise SystemExit(f"{out_dir} exists and is not empty; use a fresh destination")
@@ -2133,6 +2151,7 @@ def cmd_figures(args) -> None:
         echo_table=maybe_csv(args.echo_table),
         echo_detail=maybe_json(args.echo_detail),
         out_dir=Path(args.out_dir).expanduser(),
+        scoring=args.scoring,
     )
     for stem, files in result["figures"].items():
         print(f"  {stem}: " + ", ".join(Path(f).name for f in files))
@@ -2500,6 +2519,13 @@ def main() -> None:
     p.add_argument("--sample", required=True)
     p.add_argument("--out-dir", required=True)
     p.add_argument("--judges", nargs=2, default=None)
+    p.add_argument("--adjudicator", default=None,
+                   help="needed only with --scoring; identifies whose ratings a "
+                        "variant must exclude")
+    p.add_argument("--scoring", default="adjudicated",
+                   choices=["adjudicated", "primary_mean", "gpt5_only", "deepseek_only"],
+                   help="scoring rule for the primary estimate. Use primary_mean to "
+                        "exclude an adjudicator that did not clear validation.")
     p.add_argument("--n-boot", type=int, default=10000)
     p.add_argument("--n-perm", type=int, default=10000)
     p.add_argument("--seed", type=int, default=20260826)
@@ -2543,6 +2569,9 @@ def main() -> None:
     p.add_argument("--judge-sensitivity", help="judge_sensitivity.csv from `rlens robustness`")
     p.add_argument("--echo-table", help="echo_existing_scores.csv from `rlens robustness`")
     p.add_argument("--echo-detail", help="echo_existing_scores.json from `rlens robustness`")
+    p.add_argument("--scoring", default="adjudicated",
+                   help="scoring variant to draw as primary in figure 4; must match "
+                        "the rule that produced --statistical-results")
     p.set_defaults(func=cmd_figures)
 
     p = sub.add_parser("manifest", help="Stage 9: final reproducibility manifest")

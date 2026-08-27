@@ -271,3 +271,54 @@ def test_evidence_names_are_what_the_command_actually_writes():
     src = inspect.getsource(cli.cmd_judge_validate)
     assert '"judge_validation_report.json"' in src
     assert 'f"raw_{slug}.jsonl"' in src
+
+
+def test_clopper_pearson_brackets_the_point_estimate():
+    from rlens.autorate import clopper_pearson
+
+    lo, hi = clopper_pearson(10, 53)
+    assert lo < 10 / 53 < hi
+    assert 0.09 < lo < 0.10 and 0.31 < hi < 0.33
+
+
+def test_clopper_pearson_handles_the_degenerate_ends():
+    from rlens.autorate import clopper_pearson
+
+    assert clopper_pearson(0, 20)[0] == 0.0
+    assert clopper_pearson(20, 20)[1] == 1.0
+    assert clopper_pearson(0, 0) == (0.0, 1.0)
+
+
+def test_a_rate_at_or_below_threshold_needs_no_more_pairs():
+    from rlens.autorate import pairs_to_resolve
+
+    assert pairs_to_resolve(0.07, 0.15) == 0
+    assert pairs_to_resolve(0.15, 0.15) == 0
+
+
+def test_a_clearly_excessive_rate_resolves_cheaply():
+    from rlens.autorate import pairs_to_resolve
+
+    need = pairs_to_resolve(0.40, 0.15)
+    assert need is not None and need <= 40
+
+
+def test_a_rate_just_above_threshold_is_declared_unresolvable():
+    """The real case: the adjudicator flipped 10/53 (19%) against a 15%
+    threshold. Resolving that needs ~810 pairs — a battery four times the
+    experiment. Telling the operator to raise --n-order would be a treadmill."""
+    from rlens.autorate import pairs_to_resolve
+
+    assert pairs_to_resolve(10 / 53, 0.15) is None
+
+
+def test_escalation_advice_is_only_given_when_escalation_helps():
+    import inspect
+
+    from rlens import autorate
+
+    src = inspect.getsource(autorate.judge_validation_report)
+    block = src[src.index("pairs_to_resolve("):]
+    assert "if need is None:" in block
+    assert "No feasible battery resolves" in block
+    assert "cannot admit or reject this judge" in block

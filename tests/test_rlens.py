@@ -2927,17 +2927,24 @@ def _order_results(meta, flips, comparable):
 
 
 def test_one_flip_in_six_pairs_is_underpowered_not_a_failure():
-    """The real run: 1/6 = 17% against a 15% threshold. At n=6 the achievable
-    rates are 0%, 17%, 33% — the threshold is not resolvable, so the control
-    cannot support OR refute it."""
+    """The real run: 1/6 = 17% against a 15% threshold. A rate that close to the
+    threshold cannot be resolved by any battery worth running, so the control
+    can neither support nor refute it and must say so rather than asking for
+    more pairs."""
     _, meta = build_validation_panel(_cells(60), [], n_each=10, n_order=24,
                                      late_cells=_cells(4, "late"))
     report = judge_validation_report(_order_results(meta, flips=1, comparable=6),
                                      meta, judge_id="j")
     check = next(c for c in report["checks"] if c["name"] == "winner_survives_permutation")
     assert check["status"] == "UNDERPOWERED"
-    assert "not resolvable" in check["detail"] and "not significantly" in check["detail"]
-    assert "--n-order" in check["detail"], "must name the fix"
+    assert "not significantly" in check["detail"]
+    assert check["pairs_to_resolve"] is None, "17% vs 15% is not resolvable at any sane n"
+    assert "No feasible battery resolves" in check["detail"]
+    assert "will not change that" in check["detail"], \
+        "must say escalation cannot help, not merely omit the suggestion"
+    assert "would resolve this" not in check["detail"], \
+        "must not ask for more pairs when no feasible battery resolves it"
+    assert check["ci"][0] <= check["measured"] <= check["ci"][1]
     assert "winner_survives_permutation" in report["underpowered"]
     assert "winner_survives_permutation" not in report["failed"], \
         "an underpowered control is not a judge failure"

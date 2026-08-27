@@ -170,7 +170,8 @@ def fig_depth(stats: dict, out_dir: Path) -> list[str]:
     return save(fig, out_dir, "fig2_depth_profile")
 
 
-def fig_judge_sensitivity(table, out_dir: Path) -> list[str]:
+def fig_judge_sensitivity(table, out_dir: Path,
+                          *, primary: str = "adjudicated") -> list[str]:
     """Figure 3 -- R - J under every scoring variant (Stage 3).
 
     The adjudicator-only diagnostic is drawn in a separate, visually demoted
@@ -182,8 +183,13 @@ def fig_judge_sensitivity(table, out_dir: Path) -> list[str]:
         return []
     order = ["gpt5_only", "deepseek_only", "primary_mean", "adjudicated"]
     names = {"gpt5_only": "GPT-5 only", "deepseek_only": "DeepSeek only",
-             "primary_mean": "Mean of two", "adjudicated": "Adjudicated (primary)",
+             "primary_mean": "Mean of two", "adjudicated": "Adjudicated",
              "adjudicator_only": "Adjudicator only\n(disagreement cells)"}
+    # The "(primary)" annotation follows the rule actually in force. Hardcoding
+    # it onto one variant would mislabel the figure whenever the primary rule
+    # changes -- which it did, when the adjudicator failed validation.
+    if primary in names:
+        names[primary] += " (primary)"
     rj = table[table["contrast"] == "released-R - released-J"]
     models = [m for m in ("qwen3.5-27b", "gemma-3-27b-it") if m in set(rj["model"])]
     if not models:
@@ -214,7 +220,8 @@ def fig_judge_sensitivity(table, out_dir: Path) -> list[str]:
     return save(fig, out_dir, "fig3_judge_sensitivity")
 
 
-def fig_echo(echo_table, echo_detail: dict, out_dir: Path) -> list[str]:
+def fig_echo(echo_table, echo_detail: dict, out_dir: Path,
+             *, variant: str = "adjudicated") -> list[str]:
     """Figure 4 -- prompt-echo sensitivity (Stage 4).
 
     Both panels print their cell counts on the figure, so a shrinking sample
@@ -225,7 +232,7 @@ def fig_echo(echo_table, echo_detail: dict, out_dir: Path) -> list[str]:
     plt = _style()
     if echo_table is None or not len(echo_table):
         return []
-    primary = echo_table[echo_table["variant"] == "adjudicated"]
+    primary = echo_table[echo_table["variant"] == variant]
     models = [m for m in ("qwen3.5-27b", "gemma-3-27b-it", "POOLED") if m in set(primary["model"])]
     if not models:
         return []
@@ -266,7 +273,7 @@ def fig_echo(echo_table, echo_detail: dict, out_dir: Path) -> list[str]:
     ax.grid(axis="x", visible=False)
 
     ax = axes[1]
-    detail = (echo_detail or {}).get("adjudicated", {})
+    detail = (echo_detail or {}).get(variant, {})
     handles = []
     for model, color in (("qwen3.5-27b", "#D55E00"), ("gemma-3-27b-it", "#CC79A7")):
         strata = detail.get(model, {}).get("by_echo_delta", [])
@@ -351,16 +358,19 @@ def fig_agreement(stats: dict, out_dir: Path) -> list[str]:
 
 
 def build_all(*, stats: dict, judge_table=None, echo_table=None,
-              echo_detail: dict | None = None, out_dir: Path) -> dict:
+              echo_detail: dict | None = None, out_dir: Path,
+              scoring: str = "adjudicated") -> dict:
     """Draw every figure whose inputs are present; name the ones that are not."""
     out_dir = Path(out_dir)
     made, skipped = {}, {}
     plan = [
         ("fig1_primary_result", lambda: fig_primary(stats, out_dir), bool(stats.get("per_model"))),
         ("fig2_depth_profile", lambda: fig_depth(stats, out_dir), bool(stats.get("by_depth"))),
-        ("fig3_judge_sensitivity", lambda: fig_judge_sensitivity(judge_table, out_dir),
+        ("fig3_judge_sensitivity",
+         lambda: fig_judge_sensitivity(judge_table, out_dir, primary=scoring),
          judge_table is not None and len(judge_table) > 0),
-        ("fig4_echo_sensitivity", lambda: fig_echo(echo_table, echo_detail or {}, out_dir),
+        ("fig4_echo_sensitivity",
+         lambda: fig_echo(echo_table, echo_detail or {}, out_dir, variant=scoring),
          echo_table is not None and len(echo_table) > 0),
         ("fig5_judge_agreement", lambda: fig_agreement(stats, out_dir),
          bool(stats.get("per_model"))),

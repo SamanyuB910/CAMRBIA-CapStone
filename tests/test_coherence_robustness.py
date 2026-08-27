@@ -374,3 +374,43 @@ def test_thin_echo_strata_flags_single_cell_strata():
     ]}}}
     out = thin_echo_strata(detail)
     assert len(out) == 1 and out["echo_delta"].iloc[0] == -1.0
+
+
+def test_primary_mean_variant_cannot_see_the_adjudicator():
+    """The adjudicator did not clear validation, so demoting to mean-of-two is
+    only meaningful if the demoted analysis genuinely excludes its ratings."""
+    import pandas as pd
+
+    from rlens.coherence_robustness import build_variant
+
+    rows = []
+    for cell in ("c1", "c2"):
+        for judge, base in (("gpt5", 1.0), ("deepseek", 3.0), ("adj", 4.0)):
+            for i, arm in enumerate("ABC"):
+                rows.append({"cell_id": cell, "judge_id": judge, "panel_arm": arm,
+                             "contextual_coherence": base + i,
+                             "lexical_integrity": 1.0, "prompt_echo": 0.0})
+    blinded = pd.DataFrame(rows)
+    key = [{"cell_id": c, "model_key": "m", "set": "s", "item_id": c, "layer": 0,
+            "arms": {"A": "logit", "B": "released-J", "C": "released-R"}}
+           for c in ("c1", "c2")]
+    sample = {"depths_by_model": {"m": [{"layer": 0, "requested_depth": 0.0,
+                                         "actual_depth": 0.0}]}}
+
+    out = build_variant(blinded, {}, key, sample, "primary_mean",
+                        judges=("gpt5", "deepseek"), adjudicator="adj")
+    # mean of 1.0 and 3.0 for arm A -> 2.0. Including the adjudicator's 4.0
+    # would give 2.67, so the value proves the exclusion.
+    got = out[(out["cell_id"] == "c1") & (out["lens"] == "logit")]
+    assert float(got["contextual_coherence"].iloc[0]) == 2.0
+
+
+def test_analyse_v2_scoring_flag_routes_through_build_variant():
+    import inspect
+
+    from rlens import cli
+
+    src = inspect.getsource(cli.cmd_analyse_v2)
+    assert 'if args.scoring == "adjudicated":' in src
+    assert "build_variant(" in src
+    assert "raise SystemExit" in src, "an empty variant must not analyse silently"

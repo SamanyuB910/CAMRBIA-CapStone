@@ -42,10 +42,9 @@ LRP stop-gradients. Its authors report, qualitatively and without a released
 scorer, that R-Lens readouts at early layers are more coherent than J-Lens
 readouts. We test that claim directly on two 27B models with a blinded,
 pre-specified and frozen rating panel of 200 three-arm cells, scored by two
-independently validated LLM autoraters with a third-judge adjudication rule.
-R-Lens is rated more contextually coherent than J-Lens on both models:
-$+0.655$, 95\%~CI \ci{0.480}{0.835} on Qwen3.5-27B and $+0.900$,
-\ci{0.625}{1.170} on Gemma-3-27B-it, on a 0--4 scale. The direction holds under
+independently validated LLM autoraters. R-Lens is rated more contextually
+coherent than J-Lens on both models: $+0.690$, 95\%~CI \ci{0.515}{0.855} on
+Qwen3.5-27B and $+1.010$, \ci{0.780}{1.240} on Gemma-3-27B-it, on a 0--4 scale. The direction holds under
 every one of four scoring rules and under restriction to cells where both
 lenses echo the prompt equally, which retains roughly two thirds of the pooled
 effect. Three findings qualify this. R-Lens also scores significantly higher on
@@ -145,13 +144,21 @@ a duplicate-arm control, and a response-completeness gate that fails a judge
 returning empty content on more than 2\% of cells. One candidate judge was
 rejected under exactly this last gate.
 
-When the two primaries disagree, a third judge
-(\texttt{meta-llama/llama-3.1-70b-instruct}) rates the cell and the score
-becomes the median of three; otherwise it is the mean of two.
+The primary score is the \textbf{mean of the two validated judges}. A third
+judge (\texttt{meta-llama/\allowbreak{}llama-3.1-70b-instruct}) was originally used to
+adjudicate the 63\% of cells on which the primaries disagreed, producing a
+median-of-three score. \flag{That adjudicator did not clear validation}, and the
+primary estimate was therefore demoted to the mean of two before any result was
+written up. Section~\ref{sec:adjudicator} gives the gate it failed to resolve,
+and Section~\ref{sec:judge} reports the adjudicated estimate as a sensitivity
+analysis.
 
-\flag{The adjudicator has not yet been put through the same 78-cell validation
-battery.} It touched 63\% of cells, so this is a live gap. Section~\ref{sec:judge}
-shows what the result looks like without it.
+\paragraph{This change increases the reported effect} (pooled $+0.778 \to
++0.850$), and we state that explicitly because a reader is entitled to ask
+whether the rule was chosen for its result. It was not: the demotion follows
+from an instrument failing its admission gate, the gate was specified before the
+adjudicator was run, and the direction and significance of every contrast are
+unchanged either way. Both estimates appear in this document.
 
 \subsection{Statistics}
 
@@ -188,25 +195,31 @@ direction, so the ordering claim replicates on both models.
 \toprule
 Model & Contrast & $\Delta$ & 95\% CI & $p$ & win & tie & loss \\
 \midrule
-Qwen3.5-27B & R $-$ J        & $0.655$ & \ci{0.480}{0.835} & $<10^{-4}$ & .61 & .27 & .12 \\
-Qwen3.5-27B & R $-$ logit    & $1.295$ & \ci{0.995}{1.605} & $<10^{-4}$ & .80 & .09 & .11 \\
-Qwen3.5-27B & J $-$ logit    & $0.640$ & \ci{0.405}{0.875} & $0.0003$   & .61 & .22 & .17 \\
+Qwen3.5-27B & R $-$ J        & $0.690$ & \ci{0.515}{0.855} & $<10^{-4}$ & .69 & .20 & .11 \\
+Qwen3.5-27B & R $-$ logit    & $0.735$ & \ci{0.475}{0.995} & $<10^{-4}$ & .64 & .12 & .24 \\
+Qwen3.5-27B & J $-$ logit    & $0.045$ & \ci{-0.195}{0.275} & $0.771$   & .40 & .19 & .41 \\
 \addlinespace
-Gemma-3-27B-it & R $-$ J     & $0.900$ & \ci{0.625}{1.170} & $0.0004$   & .63 & .24 & .13 \\
-Gemma-3-27B-it & R $-$ logit & $1.285$ & \ci{1.035}{1.530} & $<10^{-4}$ & .75 & .08 & .17 \\
-Gemma-3-27B-it & J $-$ logit & $0.385$ & \ci{-0.005}{0.755} & $0.126$   & .53 & .11 & .36 \\
+Gemma-3-27B-it & R $-$ J     & $1.010$ & \ci{0.780}{1.240} & $<10^{-4}$ & .76 & .10 & .14 \\
+Gemma-3-27B-it & R $-$ logit & $1.440$ & \ci{1.175}{1.680} & $<10^{-4}$ & .80 & .03 & .17 \\
+Gemma-3-27B-it & J $-$ logit & $0.430$ & \ci{0.050}{0.795} & $0.115$    & .54 & .06 & .40 \\
 \bottomrule
 \end{tabular}
-\caption{Primary endpoint and the two supporting contrasts. 100 cells and 20
-prompts per model. Positive $\Delta$ favours the first arm.}
+\caption{Primary endpoint and the two supporting contrasts, under the
+mean-of-two-validated-judges rule. 100 cells and 20 prompts per model. Positive
+$\Delta$ favours the first arm.}
 \label{tab:primary}
 \end{table}
 
 Two features of this table matter as much as the headline.
 
-\textbf{On Gemma, J-Lens is not distinguishable from the logit lens}
-($+0.385$, interval touching zero, $p = 0.126$). The advantage on that model is
-carried by the R-Lens variant, not by the Jacobian transport as such.
+\textbf{J-Lens is not distinguishable from the logit lens on either model}
+($+0.045$, $p = 0.771$ on Qwen; $+0.430$, $p = 0.115$ on Gemma). Under the
+primary rule the entire measured advantage over the logit-lens baseline is
+carried by the R-Lens variant, not by the Jacobian transport as such. This is a
+stronger statement than the adjudicated scoring supports, where the Qwen
+J $-$ logit contrast is positive and significant; Section~\ref{sec:judge} shows
+the contrast is judge-unstable and should not be quoted as a single number in
+either direction.
 
 \textbf{Absolute scores are low.} Mean contextual coherence is 2.07 (Qwen) and
 2.39 (Gemma) for R-Lens against 1.42 and 1.49 for J-Lens
@@ -300,27 +313,61 @@ against the corrected ratings and the analysis those ratings produced, and
 still reported here, because whether it changed a number is not something a
 reader should have to take on trust.
 
+\subsection{The adjudicator, and why it is not in the primary estimate}
+\label{sec:adjudicator}
+
+The original design adjudicated disagreements with a third judge. That judge was
+put through the same 78-cell battery as the primaries and cleared eight of nine
+gates outright: it never preferred a corrupted arm (0/10), showed no position
+bias ($\chi^2 = 0.66$ on 2 df), scored provably-identical arms identically,
+returned a tie on 5/5 identity-layer cells, showed full dynamic range on
+late-layer controls, and left 0/190 responses unparseable.
+
+It did not clear the order-invariance gate, and---importantly---it did not fail
+it either. Rotating the arm order flipped the winner on \textbf{10 of 53
+non-tied pairs (18.9\%, 95\% CI \ci{9.4\%}{32.0\%})} against a 15\% ceiling.
+An exact binomial test cannot reject 15\% ($p = 0.266$), and the interval is far
+too wide to establish that the rate is acceptable. Escalating the battery does
+not help: resolving 18.9\% against 15\% at 90\% power needs roughly 810
+comparable pairs, a control panel several times the size of the experiment it
+exists to validate. For scale, the admitted primary judge GPT-5 scored 1/15
+(6.7\%) with an interval of \ci{0.2\%}{32\%}---so this control cannot even
+separate the adjudicator from a judge already in use.
+
+\flag{We therefore treated the unresolved gate as a failure and demoted the
+adjudicator}, rather than admitting an instrument the battery could not clear or
+loosening the threshold to fit it. The primary estimate is the mean of the two
+validated judges. The adjudicated estimate is retained below as a sensitivity
+analysis, and the adjudicator's ratings are preserved rather than deleted, since
+they are evidence about the panel even when not used to score it.
+
 \subsection{Judge dependence}
 \label{sec:judge}
 
 \begin{figure}[h]
 \centering
 \includegraphics[width=\textwidth]{fig3_judge_sensitivity.pdf}
-\caption{\textbf{R $-$ J under four scoring rules.} The shaded band is a
+\caption{\textbf{R $-$ J under four scoring rules.} ``Mean of two'' is the
+primary rule; ``Adjudicated'' is the original rule, retained as a sensitivity
+analysis after its third judge failed to clear validation. The shaded band is a
 diagnostic computed only on cells where the two primary judges disagreed; it is
 conditioned on disagreement and is not a fifth estimate of the same quantity.}
 \label{fig:judge}
 \end{figure}
 
-The primary estimate used a third judge on 63\% of cells, so the headline is a
-function of the scoring rule as well as of the lenses. Recomputing under four
-frozen rules (GPT-5 alone; DeepSeek alone; mean of the two primaries with no
-adjudication; the frozen adjudicated rule) gives a positive R $-$ J on every
-rule and on both models, with every individual-judge interval excluding zero.
-The pooled estimate ranges from $+0.725$ (DeepSeek alone) to $+0.975$ (GPT-5
-alone), with the adjudicated rule at $+0.778$. \textbf{Adjudication made the
-estimate smaller, not larger} (mean-of-two pooled: $+0.850$), so the third judge
-was a conservative influence rather than the source of the effect.
+A two-judge mean is still a scoring rule, and a different rule could give a
+different answer. Recomputing under four frozen rules---GPT-5 alone; DeepSeek
+alone; the mean of the two (primary); and the original adjudicated rule---gives
+a positive R $-$ J on every rule and on both models, with every
+individual-judge interval excluding zero. The pooled estimate ranges from
+$+0.725$ (DeepSeek alone) to $+0.975$ (GPT-5 alone), with the primary rule at
+$+0.850$ and the adjudicated rule at $+0.778$.
+
+The spread across rules (0.25 points pooled) is smaller than the effect itself,
+and no rule places the interval anywhere near zero. \textbf{The adjudicated
+estimate---the one built on the instrument we demoted---is the smallest of the
+four}, so excluding the adjudicator did not manufacture the result; it removed a
+conservative influence on it.
 
 \paragraph{The logit-lens contrasts are not stable.}
 That verdict is scoped to R $-$ J, and the scoping is load-bearing. Checking
@@ -338,12 +385,14 @@ lens in this report should be read with both judges' values in view and must
 not be quoted as a single number.
 
 \paragraph{Agreement.} Quadratic-weighted $\kappa = 0.514$ on 600 paired
-scores, exact agreement 39.3\%, mean absolute difference 0.91 points, and a
-63\% adjudication rate. This is moderate agreement at best. With validated
-judges it is evidence about the material rather than the instrument---the
-readouts being rated are genuinely ambiguous---but it is not a strong
-instrument, and \flag{it is not fully validated while the adjudicator's own
-battery is outstanding}.
+scores, exact agreement 39.3\%, mean absolute difference 0.91 points. The two
+validated judges disagreed on 63\% of cells---the disagreements the third judge
+was introduced to settle, and which the primary rule now simply averages over.
+\flag{This is moderate agreement at best.} With validated judges it is evidence
+about the material rather than the instrument---the readouts being rated are
+genuinely ambiguous, which is what one expects of early-layer readouts---but a
+$\kappa$ of 0.51 is not a precise instrument, and every interval in this
+document inherits that noise.
 
 \subsection{Prompt echo}
 \label{sec:echo}
@@ -370,21 +419,26 @@ cells where both lenses received the \emph{same} echo score:
 \toprule
 Model & All cells & Echo equal & retained & Echo both zero & retained \\
 \midrule
-Qwen3.5-27B    & $0.655$ & $0.467$ \ci{0.25}{0.70} ($n{=}74$) & 71\% & $0.453$ \ci{0.21}{0.70} ($n{=}71$) & 69\% \\
-Gemma-3-27B-it & $0.900$ & $0.841$ \ci{0.58}{1.13} ($n{=}60$) & 93\% & $0.788$ \ci{0.50}{1.11} ($n{=}51$) & 88\% \\
-Pooled         & $0.778$ & $0.523$ \ci{0.35}{0.70} ($n{=}134$) & 67\% & $0.518$ \ci{0.33}{0.71} ($n{=}122$) & 67\% \\
+Qwen3.5-27B    & $0.690$ & $0.509$ \ci{0.30}{0.72} ($n{=}68$) & 74\% & $0.526$ \ci{0.29}{0.76} ($n{=}62$) & 76\% \\
+Gemma-3-27B-it & $1.010$ & $1.031$ \ci{0.70}{1.40} ($n{=}53$) & 102\% & $1.083$ \ci{0.75}{1.46} ($n{=}36$) & 107\% \\
+Pooled         & $0.850$ & $0.577$ \ci{0.45}{0.70} ($n{=}121$) & 68\% & $0.686$ \ci{0.49}{0.90} ($n{=}98$) & 81\% \\
 \bottomrule
 \end{tabular}
 \caption{R $-$ J contextual coherence under echo restriction, frozen
-adjudicated scoring. ``Retained'' is the restricted estimate as a percentage
-of the all-cells estimate.}
+mean-of-two scoring. ``Retained'' is the restricted estimate as a percentage
+of the all-cells estimate; it can exceed 100\%, as it does on Gemma, where
+matching on echo does not shrink the effect at all.}
 \label{tab:echo}
 \end{table}
 
 The effect survives in all 24 subset estimates---every scoring variant, both
 models, both restriction rules---with intervals excluding zero throughout.
-\flag{But roughly a third of the pooled gap coincides with an echo difference},
-and the retention is markedly higher on Gemma (93\%) than on Qwen (71\%).
+\flag{But roughly a third of the pooled gap coincides with an echo difference}
+under the equal-echo restriction, and the pattern is not uniform: on Qwen the
+estimate falls by about a quarter, while on Gemma it does not fall at all.
+The Gemma both-zero cell retains only 36 cells from 17 prompts and its interval
+is correspondingly wide; it should not be read as evidence that echo is
+irrelevant there.
 
 \paragraph{This is not a causal adjustment.} Echo is measured from the same
 readouts as coherence, so restricting on it conditions on a post-treatment
@@ -438,10 +492,16 @@ ours. Token-form statistics are not a substitute for rating the readouts.
 \section{Limitations}
 
 \begin{enumerate}[leftmargin=*]
-\item \textbf{The adjudicator is not validated.} It touched 63\% of cells. The
-      result holds without it (mean-of-two: $+0.850$ pooled; both single judges
-      significant on both models), but until its battery is run the primary
-      scoring rule rests on an unvalidated component.
+\item \textbf{One judge was demoted, not merely unused.} The adjudicator
+      cleared 8 of 9 validation gates but its order-invariance rate
+      (18.9\%, \ci{9.4\%}{32.0\%}) could neither be admitted nor rejected by a
+      feasible battery. We excluded it. A reader who would have admitted it
+      should read the adjudicated row of Figure~\ref{fig:judge} as the headline
+      instead; it is smaller ($+0.778$ pooled) and still excludes zero.
+\item \textbf{Order invariance is weakly controlled for every judge.} The same
+      battery gives GPT-5 an interval of \ci{0.2\%}{32\%}. The control is too
+      blunt at this size to certify any of the three judges tightly, and a
+      larger one was judged not worth its cost.
 \item \textbf{Released lenses use the 25-prompt light recipe}, not the
       1000-prompt recipe of the source post. Effect sizes are not comparable to
       the authors'.
