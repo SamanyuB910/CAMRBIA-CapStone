@@ -639,6 +639,67 @@ def cmd_onset(args) -> None:
 
 
 # ---------------------------------------------------------------------------
+# ablate (core experiment 3: band ablation scored by accuracy loss)
+# ---------------------------------------------------------------------------
+
+
+def cmd_ablate(args) -> None:
+    import pandas as pd
+
+    from jlens.lens import JacobianLens
+    from rlens import ablation
+
+    records_path = REPO_ROOT / "results" / f"ablation_records_{args.model}.parquet"
+    if not args.analyze_only:
+        hf, tok = _onset_model(args.model, args.dtype, args.device)
+        items, log = ablation.build_items(tok, limit=args.limit)
+        ablation.save_items(items, log, REPO_ROOT / "data" / f"ablation_items_{args.model}.json")
+        lens_dir = REPO_ROOT / "lenses" / "released" / args.model
+        lenses = {"R": JacobianLens.load(str(lens_dir / "r-lens" / "lens.pt")),
+                  "J": JacobianLens.load(str(lens_dir / "j-lens" / "lens.pt"))}
+        n_layers = hf.config.get_text_config().num_hidden_layers
+        arms = ablation.bands(n_layers)
+        print(f"{len(items)} items ({sum(not e['kept'] for e in log)} dropped); "
+              f"arms: first_half=L0-{arms['first_half'][-1]}, all_layers=L0-{arms['all_layers'][-1]}; "
+              f"{args.samples} samples/condition at the penultimate token")
+        df = ablation.run_ablation_study(hf, tok, lenses, items, n_samples=args.samples)
+        df.to_parquet(records_path)
+        print(f"{len(df)} sampled generations -> {records_path}")
+
+    df = pd.read_parquet(records_path)
+    res = ablation.analyze(df)
+    t = res["table"]
+    lines = [f"# Core experiment 3 — band ablation of lens directions ({args.model})\n"]
+    lines.append("Protocol (R-lens post): ablate the intermediate's lens direction at the **penultimate**")
+    lines.append("prompt token across a band of layers, sample each prompt 8x before and after, and report")
+    lines.append("**relative accuracy loss** = (acc_clean - acc_ablated) / acc_clean.\n")
+    lines.append(f"n = {res['n_items']} multihop items (single-token intermediate, clean accuracy >= 50%; "
+                 f"{res['n_dropped_by_filter']} dropped by that filter).\n")
+    lines.append("## Relative accuracy loss (higher = the direction matters more)\n")
+    show = t[["clean_acc", "ablated_acc", "rel_acc_loss", "ci_low", "ci_high", "n"]]
+    lines.append(show.to_markdown(floatfmt=".3f"))
+    lines.append("\n## Primary comparison: R vs J (paired over items)\n")
+    for arm, c in res["contrasts"].items():
+        lines.append(f"- **{arm}**: R − J = {c['R_minus_J']:+.3f} "
+                     f"(95% CI {c['ci'][0]:+.3f}, {c['ci'][1]:+.3f}; P(R>J) = {c['p_R_gt_J']:.1%})")
+    lines.append("\n## Deviations from the published protocol\n")
+    lines.append("- **Grader**: deterministic normalized matcher (whole-word target match, with digit<->word")
+    lines.append("  synonyms) instead of the post's GPT-5.4-nano autorater — no API key configured here.")
+    lines.append("  Every per-sample decision is in the records, so disputed items can be checked by hand.")
+    lines.append(f"- **Items**: all {res['n_items']} qualifying multihop items rather than exactly 30 (more power).")
+    lines.append(f"- **Sampling**: temperature {ablation.TEMPERATURE}, max_new_tokens {ablation.MAX_NEW_TOKENS} "
+                 "(the post does not specify these).")
+    lines.append("- **Added control**: norm-matched random-direction ablation, which the post does not report;")
+    lines.append("  without it, 'this direction matters' cannot be separated from 'any displacement this large hurts'.")
+    out = REPO_ROOT / "results" / f"ablation_core3_{args.model}.md"
+    out.write_text("\n".join(lines), encoding="utf-8")
+    print(f"\n{show.to_string(float_format='%.3f')}")
+    for arm, c in res["contrasts"].items():
+        print(f"{arm}: R-J = {c['R_minus_J']:+.3f} CI ({c['ci'][0]:+.3f}, {c['ci'][1]:+.3f}) P(R>J)={c['p_R_gt_J']:.1%}")
+    print(f"report -> {out}")
+
+
+# ---------------------------------------------------------------------------
 # figures (no GPU: reads the committed records)
 # ---------------------------------------------------------------------------
 
@@ -737,6 +798,15 @@ def main() -> None:
     p.add_argument("--device", default=default_device)
     p.add_argument("--dtype", choices=["bf16", "fp32"], default="bf16")
     p.set_defaults(func=cmd_onset)
+
+    p = sub.add_parser("ablate", help="core experiment 3: band ablation scored by accuracy loss")
+    p.add_argument("--model", choices=["qwen3.5-4b", "qwen3.5-27b"], default="qwen3.5-27b")
+    p.add_argument("--samples", type=int, default=8, help="samples per prompt per condition (post uses 8)")
+    p.add_argument("--limit", type=int, default=None, help="max items (smoke runs)")
+    p.add_argument("--analyze-only", action="store_true", help="re-analyze existing records, no GPU")
+    p.add_argument("--device", default=default_device)
+    p.add_argument("--dtype", choices=["bf16", "fp32"], default="bf16")
+    p.set_defaults(func=cmd_ablate)
 
     p = sub.add_parser("figures", help="interactive plots + comparison tables from the records (no GPU)")
     p.add_argument("--model", choices=["qwen3.5-4b", "qwen3.5-27b"], default="qwen3.5-27b")
