@@ -255,6 +255,66 @@
       "released-R": 1.615
     }
   },
+  "per_judge": {
+    "openai/gpt-5": {
+      "gemma-3-27b-it": {
+        "delta": 0.5,
+        "ci_lo": 0.3,
+        "ci_hi": 0.6900000000000001,
+        "n_prompts": 20,
+        "n_cells": 100,
+        "observed": 0.5,
+        "p_value": 0.006099390060993901,
+        "n_permutations": 10000,
+        "p_display": "0.0061"
+      },
+      "qwen3.5-27b": {
+        "delta": 0.49000000000000005,
+        "ci_lo": 0.21000000000000002,
+        "ci_hi": 0.76,
+        "n_prompts": 20,
+        "n_cells": 100,
+        "observed": 0.49000000000000005,
+        "p_value": 0.015998400159984,
+        "n_permutations": 10000,
+        "p_display": "0.0160"
+      }
+    },
+    "deepseek/deepseek-chat-v3.1": {
+      "gemma-3-27b-it": {
+        "delta": -0.27999999999999997,
+        "ci_lo": -0.43999999999999995,
+        "ci_hi": -0.12,
+        "n_prompts": 20,
+        "n_cells": 100,
+        "observed": -0.27999999999999997,
+        "p_value": 0.08489151084891511,
+        "n_permutations": 10000,
+        "p_display": "0.0849"
+      },
+      "qwen3.5-27b": {
+        "delta": 0.16,
+        "ci_lo": 0.03,
+        "ci_hi": 0.29,
+        "n_prompts": 20,
+        "n_cells": 100,
+        "observed": 0.16,
+        "p_value": 0.07529247075292471,
+        "n_permutations": 10000,
+        "p_display": "0.0753"
+      }
+    }
+  },
+  "judge_agreement": {
+    "judges": [
+      "openai/gpt-5",
+      "deepseek/deepseek-chat-v3.1"
+    ],
+    "n_paired_scores": 600,
+    "quadratic_weighted_kappa": 0.1903201547715292,
+    "exact_agreement": 0.25833333333333336,
+    "mean_abs_difference": 1.4366666666666668
+  },
   "secondary_means": {
     "residual_substance": {
       "gemma-3-27b-it": {
