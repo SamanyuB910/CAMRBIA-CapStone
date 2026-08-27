@@ -242,3 +242,49 @@ def test_regression_is_fast_enough_to_run_at_full_replicates():
     assert elapsed < 10.0, f"{elapsed:.1f}s for 10k replicates is too slow"
     assert out["slope"] == pytest.approx(0.5, abs=0.15)
     assert out["n_bootstrap_used"] > 9000
+
+
+def _stability_row(model, contrast, variant, delta, lo, hi):
+    return {"variant": variant, "primary": True, "model": model, "contrast": contrast,
+            "delta": delta, "ci_lo": lo, "ci_hi": hi, "p": "0.01",
+            "win": 0.5, "tie": 0.2, "loss": 0.3, "n_prompts": 20, "n_cells": 100}
+
+
+def test_contrast_stability_flags_a_sign_reversal():
+    """The real Stage 3 run has J - logit at -0.68 under GPT-5 and +0.77 under
+    DeepSeek on qwen: both intervals exclude zero and they point opposite ways."""
+    import pandas as pd
+
+    from rlens.coherence_robustness import contrast_stability
+
+    table = pd.DataFrame([
+        _stability_row("qwen", "released-J - logit", "gpt5_only", -0.680, -1.060, -0.330),
+        _stability_row("qwen", "released-J - logit", "deepseek_only", 0.770, 0.570, 0.970),
+        _stability_row("qwen", "released-R - released-J", "gpt5_only", 0.790, 0.520, 1.020),
+        _stability_row("qwen", "released-R - released-J", "deepseek_only", 0.590, 0.430, 0.750),
+    ])
+    out = contrast_stability(table).set_index("contrast")["stability"]
+    assert out["released-J - logit"] == "SIGN REVERSAL"
+    assert out["released-R - released-J"] == "STABLE"
+
+
+def test_contrast_stability_labels_one_sided_significance():
+    import pandas as pd
+
+    from rlens.coherence_robustness import contrast_stability
+
+    table = pd.DataFrame([
+        _stability_row("g", "released-R - logit", "gpt5_only", 0.110, -0.220, 0.420),
+        _stability_row("g", "released-R - logit", "deepseek_only", 1.360, 1.120, 1.610),
+    ])
+    # intervals do not overlap at all, which is the stronger statement
+    assert contrast_stability(table)["stability"].iloc[0] == "DISJOINT"
+
+
+def test_contrast_stability_skips_contrasts_missing_a_judge():
+    import pandas as pd
+
+    from rlens.coherence_robustness import contrast_stability
+
+    table = pd.DataFrame([_stability_row("g", "released-R - logit", "gpt5_only", 1.0, 0.5, 1.5)])
+    assert contrast_stability(table).empty

@@ -1981,6 +1981,24 @@ def _robustness_markdown(table, echo_table, echo_detail, args):
                    "headline estimate is a function of the scoring rule as well as of the "
                    "lenses, and must be reported as such.")
 
+    from rlens.coherence_robustness import contrast_stability
+    stab = contrast_stability(table[table["primary"]])
+    flagged = stab[stab["stability"] != "STABLE"] if len(stab) else stab
+    stability_section = [
+        "## Contrast stability across the two primary judges", "",
+        "The verdict above is scoped to R - J. Judge disagreement need not be uniform",
+        "across contrasts, so every contrast is checked against the same two single-judge",
+        "intervals. Labels are computed from the intervals, not assigned by hand.", "",
+        (stab.to_markdown(index=False, floatfmt=".3f") if len(stab)
+         else "_no contrast had both single-judge variants available_"), "",
+    ]
+    if len(flagged):
+        stability_section += [
+            f"**{len(flagged)} of {len(stab)} contrasts are not stable across the two",
+            "primary judges.** Any such contrast must be reported with both judges' values",
+            "shown, and must not be quoted as a single number.", "",
+        ]
+
     j = ["# Judge-dependence sensitivity (Stage 3)", "",
          "The adjudicated primary estimate used a third judge on ~63% of cells, so the",
          "headline number depends on the scoring rule as well as on the lenses. The same",
@@ -1991,7 +2009,16 @@ def _robustness_markdown(table, echo_table, echo_detail, args):
          rj.to_markdown(index=False, floatfmt=".3f"), "",
          "## All contrasts", "",
          table.to_markdown(index=False, floatfmt=".3f"), "",
-         "`adjudicator_only` is a DIAGNOSTIC, not a primary estimator.", ""]
+         *stability_section, "",
+         "## The adjudicator-only diagnostic", "",
+         "`adjudicator_only` is a DIAGNOSTIC, not a primary estimator. It is computed",
+         "only on the cells the adjudicator was asked to rate, i.e. exactly those where",
+         "the two primary judges disagreed. Conditioning on disagreement removes the",
+         "cells the primary judges found easy and attenuates any true contrast, so a",
+         "null there is NOT evidence against the primary estimate. It is informative in",
+         "one specific way: if the adjudicator resolves some contrasts sharply on this",
+         "subset and not others, the flat ones are the contrasts that were genuinely",
+         "hard to call, and that is worth reporting alongside the headline.", ""]
 
     e = ["# Prompt-echo sensitivity on the frozen scores (Stage 4)", "",
          "R-lens scores higher on prompt echo as well as on contextual coherence. The two",

@@ -166,3 +166,48 @@ def regress_coherence_on_echo(paired_c: pd.DataFrame, paired_e: pd.DataFrame, *,
                            "coherence advantage; the intercept is the fitted coherence "
                            "difference at EQUAL echo, not an echo-adjusted causal effect"),
     }
+
+
+def contrast_stability(table: pd.DataFrame, *, left: str = "gpt5_only",
+                       right: str = "deepseek_only") -> pd.DataFrame:
+    """Per-(model, contrast) agreement between the two primary judges.
+
+    The Stage 3 verdict is scoped to R-J. That scoping is deliberate but it
+    leaves the other reported contrasts unaudited, and judge disagreement does
+    not have to be uniform across contrasts: two judges can rank R above J
+    identically while disagreeing about whether J beats the logit lens at all.
+    A reader should not have to scan a 45-row table to find that.
+
+    Labels, from the two single-judge intervals only:
+      SIGN REVERSAL  both exclude zero, opposite signs -- the judges contradict
+      DISJOINT       intervals do not overlap, same sign -- magnitude disputed
+      SIGN UNSETTLED exactly one excludes zero -- one judge sees no effect
+      STABLE         neither of the above
+    """
+    rows = []
+    for (model, contrast), group in table.groupby(["model", "contrast"], sort=False):
+        got = {v: group[group["variant"] == v] for v in (left, right)}
+        if any(len(g) != 1 for g in got.values()):
+            continue
+        a, b = (got[left].iloc[0], got[right].iloc[0])
+        a_sig = a["ci_lo"] > 0 or a["ci_hi"] < 0
+        b_sig = b["ci_lo"] > 0 or b["ci_hi"] < 0
+        overlap = (a["ci_lo"] <= b["ci_hi"]) and (b["ci_lo"] <= a["ci_hi"])
+        if a_sig and b_sig and (a["delta"] > 0) != (b["delta"] > 0):
+            label = "SIGN REVERSAL"
+        elif not overlap:
+            label = "DISJOINT"
+        elif a_sig != b_sig:
+            label = "SIGN UNSETTLED"
+        else:
+            label = "STABLE"
+        rows.append({
+            "model": model, "contrast": contrast,
+            f"{left}_delta": float(a["delta"]),
+            f"{left}_ci": f"[{a['ci_lo']:.2f}, {a['ci_hi']:.2f}]",
+            f"{right}_delta": float(b["delta"]),
+            f"{right}_ci": f"[{b['ci_lo']:.2f}, {b['ci_hi']:.2f}]",
+            "gap": float(a["delta"] - b["delta"]),
+            "stability": label,
+        })
+    return pd.DataFrame(rows)
