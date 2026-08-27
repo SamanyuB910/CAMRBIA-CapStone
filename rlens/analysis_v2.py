@@ -105,19 +105,23 @@ def prompt_cluster_bootstrap(paired: pd.DataFrame, *, n_boot: int = 10000,
     """
     if paired.empty:
         return {}
-    prompts_by_set = {s: sorted(g["item_id"].unique())
-                      for s, g in paired.groupby("set")}
-    lookup = {(s, i): g for (s, i), g in paired.groupby(["set", "item_id"])}
+    # Collapse to one number per prompt ONCE. Calling a pandas .mean() per prompt
+    # inside a 10k-replicate loop was ~4 million pandas ops per contrast; the
+    # per-prompt mean does not change between replicates, so it is precomputed
+    # and the loop becomes numpy indexing.
+    per_prompt = paired.groupby(["set", "item_id"])["diff"].mean()
+    set_names = np.array([s for s, _ in per_prompt.index])
+    values = per_prompt.to_numpy(dtype=float)
+    blocks = [np.flatnonzero(set_names == s) for s in np.unique(set_names)]
     rng = np.random.default_rng(seed)
 
-    estimates = []
-    for _ in range(n_boot):
-        chosen = _bootstrap_indices(prompts_by_set, rng)
-        per_set: dict = {}
-        for set_name, item in chosen:
-            per_set.setdefault(set_name, []).append(lookup[(set_name, item)]["diff"].mean())
-        estimates.append(float(np.mean([np.mean(v) for v in per_set.values()])))
-    estimates = np.sort(np.array(estimates))
+    estimates = np.empty(n_boot, dtype=float)
+    for r in range(n_boot):
+        # resample prompt ids WITH replacement, within each evaluation set
+        estimates[r] = np.mean([
+            values[block[rng.integers(0, block.size, size=block.size)]].mean()
+            for block in blocks])
+    estimates = np.sort(estimates)
     return {
         "delta": equal_weight_delta(paired),
         "ci_lo": float(estimates[int(0.025 * n_boot)]),
@@ -139,17 +143,15 @@ def signflip_permutation_p(paired: pd.DataFrame, *, n_perm: int = 10000,
     per_prompt = (paired.groupby(["set", "item_id"])["diff"].mean().reset_index())
     observed = float(per_prompt.groupby("set")["diff"].mean().mean())
     rng = np.random.default_rng(seed)
-    values = per_prompt["diff"].to_numpy()
+    values = per_prompt["diff"].to_numpy(dtype=float)
     sets = per_prompt["set"].to_numpy()
-    unique_sets = np.unique(sets)
+    # Precompute the block masks once rather than re-deriving them 10k times.
+    blocks = [np.flatnonzero(sets == s) for s in np.unique(sets)]
 
-    at_least = 0
-    for _ in range(n_perm):
-        signs = rng.choice([-1.0, 1.0], size=values.size)
-        flipped = values * signs
-        stat = np.mean([flipped[sets == s].mean() for s in unique_sets])
-        if abs(stat) >= abs(observed):
-            at_least += 1
+    signs = rng.choice([-1.0, 1.0], size=(n_perm, values.size))
+    flipped = values * signs                                  # [n_perm, n_prompts]
+    stats = np.mean([flipped[:, block].mean(axis=1) for block in blocks], axis=0)
+    at_least = int((np.abs(stats) >= abs(observed)).sum())
     p = (at_least + 1) / (n_perm + 1)          # never zero; lower bound 1/(B+1)
     return {"observed": observed, "p_value": p, "n_permutations": n_perm,
             "p_display": f"< {1 / (n_perm + 1):.0e}" if at_least == 0 else f"{p:.4f}"}
