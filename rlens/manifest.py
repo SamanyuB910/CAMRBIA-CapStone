@@ -29,7 +29,19 @@ EXPECTED = {
     "audit": ["audit_report.json", "audit_report.md", "artifact_manifest.json"],
     "figures": ["fig1_primary_result.pdf", "fig2_depth_profile.pdf",
                 "fig3_judge_sensitivity.pdf", "fig4_echo_sensitivity.pdf",
-                "fig5_judge_agreement.pdf", "figure_manifest.json"],
+                "fig5_judge_agreement.pdf", "fig6_non_echo.pdf",
+                "figure_manifest.json"],
+    # Stage 5 measures a different construct under its own rubric and salt, so
+    # its artifacts are listed separately rather than folded into "ratings".
+    "non_echo_validation": ["copy_control_report.json", "copy_controls.jsonl",
+                            "copy_control_key.jsonl", "non_echo_cost_projection.json"],
+    "non_echo_ratings": ["combined_scores.json", "scores_blinded.csv",
+                         "completeness.json"],
+    "non_echo_analysis": ["non_echo_results.json", "non_echo_report.md",
+                          "non_echo_contrasts.csv"],
+    "small_sample": ["leave_one_prompt_out.csv", "leave_one_set_out.csv",
+                     "prompt_level_effects.csv", "small_sample_report.json",
+                     "small_sample_report.md"],
 }
 
 # Files that must NEVER appear in a manifest: recording a key's hash alongside

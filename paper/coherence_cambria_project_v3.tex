@@ -581,9 +581,9 @@ construct. Neither identifies a formal mediation fraction.
 \centering
 \includegraphics[width=\textwidth]{fig5_judge_agreement.pdf}
 \caption{\textbf{What the judges did.} (a) Win/tie/loss composition per
-contrast. (b) Agreement statistics. A mean difference of 0.78 points is
-compatible with very different underlying distributions; the composition shows
-which.}
+contrast under the primary rule. (b) Agreement statistics. A pooled mean
+difference of 0.85 points is compatible with very different underlying
+distributions; the composition shows which.}
 \label{fig:agreement}
 \end{figure}
 
@@ -591,6 +591,67 @@ R-Lens wins 69\% (Qwen) and 76\% (Gemma) of R $-$ J cells and loses 11\% and
 14\% respectively. The effect is a broad shift across the panel, not a handful
 of extreme cells --- so it is not the product of a few outlier readouts that a
 different rubric might score differently.
+
+\section{Small-sample stability}
+\label{sec:smallsample}
+
+The inferential unit is the prompt, not the cell: 20 prompts per model, each
+contributing five depths and three arms. One hundred cells can conceal a result
+that rests on one unusual prompt, so each prompt --- and then each evaluation
+set --- was deleted in turn and the estimate recomputed. Deleting a prompt
+deletes all of its cells, because the prompt is the bootstrap cluster.
+
+\begin{table}[h]
+\centering
+\small
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{llccc}
+\toprule
+Construct & Model & Leave-one-prompt-out & Leave-one-set-out & Prompt sign test \\
+\midrule
+Standard & Qwen  & $0.600$--$0.700$ \;(20/20 $>$0) & $0.556$--$0.706$ \;(5/5) & 18$+$/2$-$, $p=0.0004$ \\
+Standard & Gemma & $0.820$--$0.973$ \;(20/20 $>$0) & $0.650$--$1.006$ \;(5/5) & 16$+$/2$-$, $p=0.0013$ \\
+\addlinespace
+Non-echo & Qwen  & $0.273$--$0.380$ \;(20/20 $>$0) & $0.263$--$0.394$ \;(5/5) & 14$+$/5$-$, $p=0.064$ \\
+Non-echo & Gemma & $0.052$--$0.172$ \;(20/20 $>$0) & \flag{$-0.081$--$0.281$ \;(4/5)} & 11$+$/5$-$, $p=0.210$ \\
+\bottomrule
+\end{tabular}
+\caption{R $-$ J under exhaustive single deletions. The sign test is a
+two-sided exact binomial over per-prompt effects, each averaged across that
+prompt's five depths; it is descriptive and discards magnitude, so it is less
+powerful than the primary estimator and is reported beside it, not instead.}
+\label{tab:smallsample}
+\end{table}
+
+\paragraph{The standard result is not driven by any one prompt or set.} On both
+models R $-$ J stays positive after deleting any single prompt and after
+deleting any single evaluation set, and the prompt-level sign test is
+significant on both. The n${=}20$ objection does not undermine the standard
+finding.
+
+\paragraph{The non-echo results are not equally stable, in two specific ways.}
+
+First, \flag{poetry carries a disproportionate share of the Gemma effect}.
+Removing it drops the standard Gemma estimate to $+0.650$, the lowest of the
+five deletions, and takes the non-echo Gemma estimate \emph{negative}
+($-0.081$). Poetry is also the set with the largest per-set difference on both
+models (Table in \S4.4) and the only set read at a different position --- the
+newline ending line one, per the source protocol, rather than the final prompt
+token. We do not have the prompts to determine whether that position, or the
+genre, is responsible.
+
+Second, \flag{the prompt-level sign test does not confirm the Qwen non-echo
+result} ($p=0.064$, 14 of 19 non-tied prompts positive), even though the primary
+estimate excludes zero ($+0.325$, \ci{0.165}{0.480}, $p=0.0042$). The two are
+not in contradiction --- the sign test discards magnitude and is the weaker
+instrument --- but the Qwen non-echo advantage rests more on the size of the
+differences than on a clear majority of prompts, and should be described that
+way.
+
+Taken together: the standard-rubric ordering is robust, and the non-echo
+findings are directionally consistent but fragile. That fragility is itself
+informative, since the non-echo construct is the one on which the headline claim
+was already weakest.
 
 \section{The earlier no-prompt panel}
 
@@ -652,6 +713,10 @@ ours. Token-form statistics are not a substitute for rating the readouts.
       and none survives Holm correction.
 \item \textbf{One rubric, one panel per construct.} We did not test whether a
       differently-worded non-echo rubric gives the same attenuation.
+\item \textbf{Poetry is influential on Gemma.} It is the largest per-set
+      difference on both models and the only set read at a different position.
+      Removing it takes the Gemma non-echo estimate negative. Four prompts is
+      too few to say whether the position, the genre, or chance is responsible.
 \end{enumerate}
 
 \section{Supported and unsupported claims}
@@ -670,6 +735,9 @@ ours. Token-form statistics are not a substitute for rating the readouts.
       estimate is inconclusive.
 \item Both Jacobian-based lenses outperform the logit lens on non-copied
       content, on both models. This is the most robust cross-model result here.
+\item The standard-rubric R $-$ J difference survives deletion of any single
+      prompt and any single evaluation set, on both models
+      (\S\ref{sec:smallsample}).
 \end{enumerate}
 
 \paragraph{NOT supported, and not claimed.}
@@ -689,6 +757,10 @@ ours. Token-form statistics are not a substitute for rating the readouts.
 \item That a non-significant result establishes equality.
 \item That five depths per prompt constitute independent observations. The
       inferential unit is the prompt: 20 per model.
+\item That the non-echo findings are as stable as the standard ones. On Gemma
+      the non-echo estimate turns negative when the poetry set is removed, and
+      neither model's non-echo effect is confirmed by a prompt-level sign test
+      at $\alpha = 0.05$.
 \end{enumerate}
 
 \section{What would change the conclusion}

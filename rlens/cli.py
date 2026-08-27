@@ -2199,11 +2199,16 @@ def cmd_manifest(args) -> None:
 
     dirs = {"panel": args.panel_dir, "analysis": args.analysis_dir,
             "ratings": args.ratings_dir, "robustness": args.robustness_dir,
-            "audit": args.audit_dir, "figures": args.figures_dir}
+            "audit": args.audit_dir, "figures": args.figures_dir,
+            "non_echo_validation": args.non_echo_validation_dir,
+            "non_echo_ratings": args.non_echo_ratings_dir,
+            "non_echo_analysis": args.non_echo_analysis_dir,
+            "small_sample": args.small_sample_dir}
     manifest = build(
         dirs=dirs,
         seeds={"analysis_bootstrap_permutation": args.analysis_seed,
-               "robustness_bootstrap_permutation": args.robustness_seed},
+               "robustness_bootstrap_permutation": args.robustness_seed,
+               "non_echo_bootstrap_permutation": args.robustness_seed},
         salt=args.salt, judges=list(args.judges), adjudicator=args.adjudicator,
         outstanding_gates=list(args.outstanding_gate or []),
     )
@@ -3205,6 +3210,10 @@ def main() -> None:
     p.add_argument("--robustness-dir")
     p.add_argument("--audit-dir")
     p.add_argument("--figures-dir")
+    p.add_argument("--non-echo-validation-dir")
+    p.add_argument("--non-echo-ratings-dir")
+    p.add_argument("--non-echo-analysis-dir")
+    p.add_argument("--small-sample-dir")
     p.add_argument("--judges", nargs=2, required=True)
     p.add_argument("--adjudicator", required=True)
     p.add_argument("--salt", default="coherence-v2-2026-08-26")

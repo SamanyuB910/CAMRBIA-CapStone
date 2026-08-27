@@ -10,8 +10,10 @@ import json
 from rlens.manifest import EXPECTED, build, collect, sha256_file
 
 
-def _populate(tmp_path, roles=("panel", "analysis", "ratings", "robustness",
-                               "audit", "figures")):
+def _populate(tmp_path, roles=None):
+    """Derived from EXPECTED, so a newly added artifact role is covered by
+    every test here rather than silently escaping them."""
+    roles = roles if roles is not None else tuple(EXPECTED)
     dirs = {}
     for role in roles:
         d = tmp_path / role
@@ -22,6 +24,13 @@ def _populate(tmp_path, roles=("panel", "analysis", "ratings", "robustness",
             target.write_text(f"content of {role}/{name}")
         dirs[role] = str(d)
     return dirs
+
+
+def test_populate_covers_every_declared_role():
+    assert set(_populate.__defaults__[0] or EXPECTED) or True
+    # the fixture must not drift from EXPECTED
+    import inspect
+    assert "tuple(EXPECTED)" in inspect.getsource(_populate)
 
 
 def test_every_expected_artifact_is_hashed(tmp_path):
@@ -45,6 +54,7 @@ def test_a_role_with_no_directory_is_missing_not_silent(tmp_path):
     dirs = _populate(tmp_path, roles=("panel",))
     _, missing = collect(dirs)
     assert any("no --analysis-dir given" in m for m in missing)
+    assert any("no --non-echo-ratings-dir given" in m for m in missing)
     assert len(missing) == sum(len(v) for k, v in EXPECTED.items() if k != "panel")
 
 
@@ -65,12 +75,28 @@ def test_complete_is_true_only_with_nothing_missing_and_no_gates(tmp_path):
 
 
 def test_the_unblinding_key_is_never_hashed(tmp_path):
-    """Recording the key's hash beside the panel is a step towards recording
-    the key. It must not appear even if someone adds it to a scanned directory."""
+    """Recording the panel key's hash beside the panel is a step towards
+    recording the key. It must not appear even if someone drops it into a
+    scanned directory.
+
+    The copy-control key is deliberately NOT covered by this: it names which arm
+    of an already-rated validation control was the pure prompt copy, which
+    unblinds nothing in the experimental panel and is needed to reproduce the
+    Stage 5 admission gate."""
+    from rlens.manifest import FORBIDDEN
+
     dirs = _populate(tmp_path)
-    (tmp_path / "panel" / "panel_key.jsonl").write_text("secret")
+    for name in FORBIDDEN:
+        (tmp_path / "panel" / name).write_text("secret")
     found, _ = collect(dirs)
-    assert not any("key" in name for name in found)
+    assert not any(f in name for name in found for f in FORBIDDEN)
+    assert "panel/panel_key.jsonl" not in found
+
+
+def test_copy_control_key_is_hashed_because_it_unblinds_nothing(tmp_path):
+    dirs = _populate(tmp_path)
+    found, _ = collect(dirs)
+    assert "non_echo_validation/copy_control_key.jsonl" in found
 
 
 def test_audit_failure_is_surfaced(tmp_path):
