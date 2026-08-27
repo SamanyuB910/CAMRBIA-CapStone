@@ -114,38 +114,48 @@ def regress_coherence_on_echo(paired_c: pd.DataFrame, paired_e: pd.DataFrame, *,
     if merged.empty or merged["diff_e"].nunique() < 2:
         return {"n_cells": int(len(merged)), "note": "insufficient variation in D^E"}
 
-    def fit(frame):
-        x = frame["diff_e"].to_numpy(dtype=float)
-        y = frame["diff_c"].to_numpy(dtype=float)
+    # Precompute once. Rebuilding a DataFrame with pd.concat inside a 10k loop
+    # was the dominant cost: the design matrix does not change between
+    # replicates, only which rows are selected, so the loop is numpy indexing.
+    x_all = merged["diff_e"].to_numpy(dtype=float)
+    y_all = merged["diff_c"].to_numpy(dtype=float)
+
+    def fit_idx(idx):
+        x, y = x_all[idx], y_all[idx]
+        if np.unique(x).size < 2:
+            return None
         design = np.column_stack([np.ones_like(x), x])
         beta, *_ = np.linalg.lstsq(design, y, rcond=None)
         return float(beta[0]), float(beta[1])
 
-    intercept, slope = fit(merged)
-    prompts = merged[["set", "item_id"]].drop_duplicates().to_records(index=False)
-    blocks = {(s, i): merged[(merged["set"] == s) & (merged["item_id"] == i)]
-              for s, i in prompts}
-    by_set: dict = {}
-    for s, i in prompts:
-        by_set.setdefault(s, []).append((s, i))
+    fitted = fit_idx(np.arange(x_all.size))
+    intercept, slope = fitted
+
+    set_arr = merged["set"].to_numpy()
+    item_arr = merged["item_id"].to_numpy()
+    prompt_rows, by_set = {}, {}
+    for key in sorted({(s_, i_) for s_, i_ in zip(set_arr, item_arr)}):
+        rows = np.flatnonzero((set_arr == key[0]) & (item_arr == key[1]))
+        prompt_rows[key] = rows
+        by_set.setdefault(key[0], []).append(key)
 
     rng = np.random.default_rng(seed)
     draws = []
     for _ in range(n_boot):
-        chunks = []
-        for set_name, members in by_set.items():
-            idx = rng.integers(0, len(members), size=len(members))
-            chunks += [blocks[members[k]] for k in idx]
-        sample_frame = pd.concat(chunks, ignore_index=True)
-        if sample_frame["diff_e"].nunique() < 2:
-            continue
-        draws.append(fit(sample_frame))
+        picked = []
+        for members in by_set.values():
+            draw = rng.integers(0, len(members), size=len(members))
+            picked += [prompt_rows[members[k]] for k in draw]
+        out = fit_idx(np.concatenate(picked))
+        if out is not None:
+            draws.append(out)
     if not draws:
         return {"intercept": intercept, "slope": slope, "n_cells": int(len(merged)),
                 "note": "bootstrap degenerate"}
     arr = np.array(draws)
     lo_i, hi_i = np.percentile(arr[:, 0], [2.5, 97.5])
     lo_s, hi_s = np.percentile(arr[:, 1], [2.5, 97.5])
+    prompts = list(prompt_rows)
     return {
         "intercept": intercept, "intercept_ci": [float(lo_i), float(hi_i)],
         "slope": slope, "slope_ci": [float(lo_s), float(hi_s)],

@@ -197,3 +197,48 @@ def test_regression_reports_insufficient_variation_rather_than_a_fake_fit():
     out = regress_coherence_on_echo(pc, pe, n_boot=50)
     assert "insufficient variation" in out.get("note", ""), \
         "constant D^E cannot support a regression"
+
+
+def test_no_resampling_loop_rebuilds_a_dataframe():
+    """Guard against a mistake made three times in this project: a pandas
+    operation inside a 10k-replicate loop. The bootstrap and the clustered
+    regression must index precomputed numpy arrays, not rebuild frames."""
+    import inspect
+    import re
+
+    from rlens import analysis_v2, coherence_robustness
+
+    hot = [analysis_v2.prompt_cluster_bootstrap,
+           analysis_v2.signflip_permutation_p,
+           coherence_robustness.regress_coherence_on_echo]
+    for fn in hot:
+        source = inspect.getsource(fn)
+        body = source[source.index("def "):]
+        for banned in ("pd.concat", ".groupby(", ".pivot_table("):
+            # allowed only BEFORE the resampling loop
+            loop = re.search(r"for .* in range\(n_(boot|perm)\)", body)
+            if loop and banned in body[loop.start():]:
+                raise AssertionError(
+                    f"{fn.__name__}: {banned} appears inside the resampling loop")
+
+
+def test_regression_is_fast_enough_to_run_at_full_replicates():
+    """A 10k-replicate clustered regression must complete in seconds, not
+    minutes -- otherwise the full robustness sweep is unusable."""
+    import time
+
+    rng = np.random.default_rng(0)
+    rows = [{"model_key": "m", "set": f"s{k}", "item_id": f"i{i}",
+             "requested_depth": z, "diff": 0.0}
+            for k in range(5) for i in range(4) for z in (0, .1, .2, .3, .4)]
+    pc = pd.DataFrame(rows)
+    pe = pc.copy()
+    pe["diff"] = rng.integers(0, 3, size=len(pe)).astype(float)
+    pc["diff"] = 1.0 + 0.5 * pe["diff"] + rng.normal(0, 0.3, len(pc))
+
+    start = time.perf_counter()
+    out = regress_coherence_on_echo(pc, pe, n_boot=10000, seed=0)
+    elapsed = time.perf_counter() - start
+    assert elapsed < 10.0, f"{elapsed:.1f}s for 10k replicates is too slow"
+    assert out["slope"] == pytest.approx(0.5, abs=0.15)
+    assert out["n_bootstrap_used"] > 9000
