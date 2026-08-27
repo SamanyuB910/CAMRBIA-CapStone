@@ -39,6 +39,11 @@
       "results/coherence_v2/figures_final/fig8_non_echo_contrasts.pdf",
       "results/coherence_v2/figures_final/fig8_non_echo_contrasts.svg",
       "results/coherence_v2/figures_final/fig8_non_echo_contrasts.png"
+    ],
+    "fig9_attenuation": [
+      "results/coherence_v2/figures_final/fig9_attenuation.pdf",
+      "results/coherence_v2/figures_final/fig9_attenuation.svg",
+      "results/coherence_v2/figures_final/fig9_attenuation.png"
     ]
   },
   "skipped": {}

@@ -1,0 +1,10 @@
+example,cell_id,model,set,item_id,depth,lens,tokens,n_copied,contextual,echo,non_echo
+genuine_gain,1cba798447c0730b,qwen3.5-27b,association,rivals,0.0,logit,"« » | «,» | « (» | «-» | «.» | «...» | «\n» | «/» | «:» | «?»",0,1.0,0.0,1.5
+genuine_gain,1cba798447c0730b,qwen3.5-27b,association,rivals,0.0,released-J,«–and» | «–» | «�» | «**–» | « tossed» | «.hm» | «izon» | «�» | «籲» | «lsa»,0,0.0,0.0,1.0
+genuine_gain,1cba798447c0730b,qwen3.5-27b,association,rivals,0.0,released-R,«…..» | « though» | «….» | « ….» | « they» | « seperate» | « …» | « there» | « wanting» | « needing»,0,3.0,0.0,3.5
+echo_driven,83638514f83b53ce,gemma-3-27b-it,typo,typo-people,0.2,logit,«ized» | «ed» | «an» | «al» | «Than» | «-» | «fromi» | « Tourist» | « Min» | «em»,0,0.5,0.0,1.0
+echo_driven,83638514f83b53ce,gemma-3-27b-it,typo,typo-people,0.2,released-J,« recieve» | « seperate» | « succesfully» | « wouldnt» | « recieved» | « seper» | « couldnt» | « havent» | « arent» | « doesnt»,0,0.5,0.0,2.0
+echo_driven,83638514f83b53ce,gemma-3-27b-it,typo,typo-people,0.2,released-R,"«,» | « and» | « people» | « in» | «'» | « seperate» | « (» | « to» | « ""» | « '»",0,3.0,0.5,0.5
+all_poor,eb995dcbf3df28d9,qwen3.5-27b,poetry,couplet-crack-black,0.1,logit,« » | «...» | «-» | «.» | « (» | «(» | «/» | «\u00a0» | «\n» | «!»,0,0.0,0.0,2.0
+all_poor,eb995dcbf3df28d9,qwen3.5-27b,poetry,couplet-crack-black,0.1,released-J,«ly» | «но» | «ся» | «zeitig» | «raries» | «imately» | «써» | «ا» | «jenigen» | «lich»,0,0.0,0.0,0.5
+all_poor,eb995dcbf3df28d9,qwen3.5-27b,poetry,couplet-crack-black,0.1,released-R,«beau» | «alak» | «ly» | «edal» | «加拿大» | « gotta» | «ISTR» | «繫» | «zeitig» | « Nessa»,0,0.0,0.0,0.5
