@@ -73,14 +73,18 @@ def test_the_unblinding_key_is_never_hashed(tmp_path):
 
 def test_audit_failure_is_surfaced(tmp_path):
     dirs = _populate(tmp_path)
-    (tmp_path / "audit" / "audit_v2.json").write_text(json.dumps({"conditions": [
-        {"name": "panel_hash_reproduces", "result": True},
-        {"name": "combine_rule_consistent", "result": False},
-    ]}))
+    (tmp_path / "audit" / "audit_report.json").write_text(json.dumps({
+        "status": "FAIL", "n_checks": 3, "n_failed": 1, "checks": [
+            {"name": "panel_hash_reproduces", "status": "PASS", "fatal": True},
+            {"name": "combine_rule_consistent", "status": "FAIL", "fatal": True},
+            {"name": "cost_within_budget", "status": "FAIL", "fatal": False},
+        ]}))
     m = build(dirs=dirs, seeds={}, salt="s", judges=["a", "b"], adjudicator="c",
               outstanding_gates=[])
     assert m["audit"]["status"] == "FAIL"
     assert m["audit"]["failed_conditions"] == ["combine_rule_consistent"]
+    # a non-fatal check is informational; it must not be reported as a blocker
+    assert m["audit"]["advisory_failures"] == ["cost_within_budget"]
 
 
 def test_audit_not_run_is_distinct_from_audit_passed(tmp_path):
@@ -96,3 +100,30 @@ def test_hash_is_content_sensitive(tmp_path):
     first = sha256_file(a)
     a.write_text("two")
     assert sha256_file(a) != first
+
+
+def test_expected_filenames_match_what_the_commands_write():
+    """Regression: the first version of this module invented `panel_v2.jsonl`
+    and `audit_v2.json`, so the manifest reported real artifacts as MISSING.
+    The names are pinned against the CLI source that writes them."""
+    from pathlib import Path
+
+    cli = Path(__file__).resolve().parents[1] / "rlens" / "cli.py"
+    source = cli.read_text(encoding="utf-8")
+    for role in ("panel", "analysis", "ratings", "robustness", "audit", "figures"):
+        for name in EXPECTED[role]:
+            if role == "figures":
+                continue  # written by rlens/figures.py via a format string
+            assert f'"{name}"' in source, f"{role}/{name} is not written by any command"
+
+
+def test_advisory_failure_alone_does_not_fail_the_audit(tmp_path):
+    dirs = _populate(tmp_path)
+    (tmp_path / "audit" / "audit_report.json").write_text(json.dumps({
+        "n_checks": 2, "n_failed": 0, "checks": [
+            {"name": "a", "status": "PASS", "fatal": True},
+            {"name": "b", "status": "FAIL", "fatal": False}]}))
+    m = build(dirs=dirs, seeds={}, salt="s", judges=["a", "b"], adjudicator="c",
+              outstanding_gates=[])
+    assert m["audit"]["status"] == "PASS"
+    assert m["audit"]["advisory_failures"] == ["b"]

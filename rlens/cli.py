@@ -2154,11 +2154,16 @@ def cmd_manifest(args) -> None:
 
     print(f"artifacts hashed: {len(manifest['artifacts'])}")
     audit = manifest["audit"]
-    print(f"audit: {audit.get('status')} "
-          f"({audit.get('n_failed', '?')} failed of {audit.get('n_conditions', '?')})")
-    if audit.get("failed_conditions"):
-        for name in audit["failed_conditions"]:
-            print(f"  FAILED: {name}")
+    if "n_checks" in audit:
+        print(f"audit: {audit['status']} "
+              f"({audit.get('n_failed', 0)} failed of {audit['n_checks']})")
+    else:
+        print(f"audit: {audit['status']}"
+              + (f" -- {audit['reason']}" if audit.get("reason") else ""))
+    for name in audit.get("failed_conditions", []):
+        print(f"  AUDIT FAILED: {name}")
+    for name in audit.get("advisory_failures", []):
+        print(f"  audit advisory: {name}")
     for name in manifest["missing_artifacts"]:
         print(f"  MISSING: {name}")
     for gate in manifest["outstanding_validation_gates"]:
