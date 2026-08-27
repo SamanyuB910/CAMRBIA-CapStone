@@ -1,0 +1,199 @@
+"""Stage 3/4 robustness: scoring variants and prompt-echo sensitivity."""
+
+import numpy as np
+import pandas as pd
+import pytest
+
+from rlens.analysis_v2 import _paired_cells, equal_weight_delta, prompt_cluster_bootstrap
+from rlens.coherence_robustness import (
+    DIAGNOSTIC_VARIANT,
+    SCORING_VARIANTS,
+    build_variant,
+    by_echo_delta,
+    echo_matched,
+    regress_coherence_on_echo,
+)
+
+GPT5, DEEPSEEK, ADJ = "openai/gpt-5", "deepseek/deepseek-chat-v3.1", "meta-llama/llama-3.1-70b-instruct"
+LENSES = ("released-R", "released-J", "logit")
+
+
+def _fixture(n_prompts=4, coherence=None, echo=None):
+    """Synthetic panel: 2 models x 5 sets x n_prompts x 5 depths x 3 arms."""
+    coherence = coherence or {GPT5: {"released-R": 3, "released-J": 2, "logit": 1},
+                              DEEPSEEK: {"released-R": 2, "released-J": 2, "logit": 0},
+                              ADJ: {"released-R": 4, "released-J": 1, "logit": 1}}
+    echo = echo or {"released-R": 1, "released-J": 0, "logit": 0}
+    key, blinded, combined, cells = [], [], {}, []
+    arms = dict(zip("ABC", LENSES))
+    for model in ("qwen3.5-27b", "gemma-3-27b-it"):
+        for set_name in ("multihop", "multilingual", "association", "typo", "poetry"):
+            for item in range(n_prompts):
+                for layer, z in zip((0, 6, 12, 18, 24), (0.0, 0.1, 0.2, 0.3, 0.4)):
+                    cid = f"{model}|{set_name}|i{item}|{layer}"
+                    cells.append(cid)
+                    key.append({"cell_id": cid, "model_key": model, "set": set_name,
+                                "item_id": f"i{item}", "layer": layer, "arms": dict(arms)})
+                    entry = {}
+                    for arm, lens in arms.items():
+                        entry[arm] = {"contextual_coherence": float(coherence[ADJ][lens]),
+                                      "lexical_integrity": 1.0,
+                                      "prompt_echo": float(echo[lens])}
+                        for judge in (GPT5, DEEPSEEK, ADJ):
+                            blinded.append({"cell_id": cid, "judge_id": judge,
+                                            "panel_arm": arm,
+                                            "contextual_coherence": float(coherence[judge][lens]),
+                                            "lexical_integrity": 1.0,
+                                            "prompt_echo": float(echo[lens])})
+                    entry["contextual_winner"] = "A"
+                    combined[cid] = entry
+    sample = {"depths_by_model": {m: [{"requested_depth": z, "layer": l, "actual_depth": z}
+                                      for l, z in zip((0, 6, 12, 18, 24),
+                                                      (0.0, 0.1, 0.2, 0.3, 0.4))]
+                                  for m in ("qwen3.5-27b", "gemma-3-27b-it")}}
+    return pd.DataFrame(blinded), combined, key, sample, cells
+
+
+def _delta(df, a="released-R", b="released-J", dim="contextual_coherence"):
+    return equal_weight_delta(_paired_cells(df, a, b, dim))
+
+
+def test_every_declared_variant_is_constructible():
+    blinded, combined, key, sample, _ = _fixture()
+    for variant in SCORING_VARIANTS:
+        df = build_variant(blinded, combined, key, sample, variant,
+                           judges=(GPT5, DEEPSEEK), adjudicator=ADJ)
+        assert not df.empty, variant
+        assert set(df["lens"]) == set(LENSES)
+
+
+def test_each_variant_uses_only_its_permitted_ratings():
+    """gpt5_only must not be influenced by DeepSeek's scores, and vice versa."""
+    blinded, combined, key, sample, _ = _fixture()
+
+    gpt5 = build_variant(blinded, combined, key, sample, "gpt5_only",
+                         judges=(GPT5, DEEPSEEK), adjudicator=ADJ)
+    ds = build_variant(blinded, combined, key, sample, "deepseek_only",
+                       judges=(GPT5, DEEPSEEK), adjudicator=ADJ)
+    # fixture: GPT-5 says R-J = 1, DeepSeek says R-J = 0
+    assert _delta(gpt5) == pytest.approx(1.0)
+    assert _delta(ds) == pytest.approx(0.0)
+
+    # perturbing ONLY DeepSeek must leave gpt5_only untouched
+    perturbed = blinded.copy()
+    mask = perturbed["judge_id"] == DEEPSEEK
+    perturbed.loc[mask, "contextual_coherence"] += 3.0
+    gpt5_again = build_variant(perturbed, combined, key, sample, "gpt5_only",
+                              judges=(GPT5, DEEPSEEK), adjudicator=ADJ)
+    assert _delta(gpt5_again) == pytest.approx(_delta(gpt5))
+
+
+def test_primary_mean_excludes_the_adjudicator():
+    blinded, combined, key, sample, _ = _fixture()
+    mean_df = build_variant(blinded, combined, key, sample, "primary_mean",
+                            judges=(GPT5, DEEPSEEK), adjudicator=ADJ)
+    # (1 + 0) / 2 = 0.5, NOT pulled toward the adjudicator's 3.0
+    assert _delta(mean_df) == pytest.approx(0.5)
+
+    perturbed = blinded.copy()
+    perturbed.loc[perturbed["judge_id"] == ADJ, "contextual_coherence"] = 0.0
+    again = build_variant(perturbed, combined, key, sample, "primary_mean",
+                          judges=(GPT5, DEEPSEEK), adjudicator=ADJ)
+    assert _delta(again) == pytest.approx(0.5), "adjudicator must not leak in"
+
+
+def test_adjudicator_only_is_available_as_a_diagnostic():
+    blinded, combined, key, sample, _ = _fixture()
+    df = build_variant(blinded, combined, key, sample, DIAGNOSTIC_VARIANT,
+                       judges=(GPT5, DEEPSEEK), adjudicator=ADJ)
+    assert _delta(df) == pytest.approx(3.0)
+    assert DIAGNOSTIC_VARIANT not in SCORING_VARIANTS, "diagnostic, not a primary estimator"
+
+
+def test_blinded_labels_map_back_to_the_correct_lens():
+    """A permuted key must move the scores with it."""
+    blinded, combined, key, sample, _ = _fixture()
+    straight = build_variant(blinded, combined, key, sample, "adjudicated",
+                             judges=(GPT5, DEEPSEEK), adjudicator=ADJ)
+    assert _delta(straight) == pytest.approx(3.0)
+
+    swapped = [dict(r, arms={"A": "released-J", "B": "released-R", "C": "logit"})
+               for r in key]
+    flipped = build_variant(blinded, combined, swapped, sample, "adjudicated",
+                            judges=(GPT5, DEEPSEEK), adjudicator=ADJ)
+    assert _delta(flipped) == pytest.approx(-3.0), "swapping the key must flip the sign"
+
+
+def test_bootstrap_keeps_every_dependent_observation_with_its_prompt():
+    blinded, combined, key, sample, _ = _fixture()
+    df = build_variant(blinded, combined, key, sample, "adjudicated",
+                       judges=(GPT5, DEEPSEEK), adjudicator=ADJ)
+    paired = _paired_cells(df, "released-R", "released-J", "contextual_coherence")
+    out = prompt_cluster_bootstrap(paired, n_boot=400, seed=7)
+    assert out["n_prompts"] == 5 * 4, "5 sets x 4 prompts"
+    assert out["n_cells"] == 5 * 4 * 5 * 2, "prompts x depths x models travel together"
+    assert prompt_cluster_bootstrap(paired, n_boot=400, seed=7) == out, "seeded"
+
+
+def test_echo_matched_subsets_preserve_r_j_pairing():
+    """Restricting on the echo difference must not break the paired structure."""
+    blinded, combined, key, sample, _ = _fixture()
+    df = build_variant(blinded, combined, key, sample, "adjudicated",
+                       judges=(GPT5, DEEPSEEK), adjudicator=ADJ)
+    pc = _paired_cells(df, "released-R", "released-J", "contextual_coherence")
+    pe = _paired_cells(df, "released-R", "released-J", "prompt_echo")
+
+    # fixture has R echo 1, J echo 0 everywhere -> no echo-matched cells at all
+    assert len(echo_matched(pc, pe, rule="equal")) == 0
+
+    equal_echo = _fixture(echo={"released-R": 0, "released-J": 0, "logit": 0})
+    df2 = build_variant(*equal_echo[:4], "adjudicated",
+                        judges=(GPT5, DEEPSEEK), adjudicator=ADJ)
+    pc2 = _paired_cells(df2, "released-R", "released-J", "contextual_coherence")
+    pe2 = _paired_cells(df2, "released-R", "released-J", "prompt_echo")
+    matched = echo_matched(pc2, pe2, rule="equal")
+    assert len(matched) == len(pc2), "all cells retained when echo is equal"
+    assert matched["diff_c"].mean() == pytest.approx(3.0), "pairing intact"
+
+
+def test_by_echo_delta_reports_retained_counts():
+    blinded, combined, key, sample, _ = _fixture()
+    df = build_variant(blinded, combined, key, sample, "adjudicated",
+                       judges=(GPT5, DEEPSEEK), adjudicator=ADJ)
+    pc = _paired_cells(df, "released-R", "released-J", "contextual_coherence")
+    pe = _paired_cells(df, "released-R", "released-J", "prompt_echo")
+    table = by_echo_delta(pc, pe)
+    assert set(table.columns) == {"echo_delta", "n_cells", "n_prompts",
+                                  "mean_coherence_delta"}
+    assert (table["n_cells"] > 0).all() and (table["n_prompts"] > 0).all()
+
+
+def test_regression_recovers_a_planted_slope_and_labels_itself_descriptive():
+    blinded, combined, key, sample, _ = _fixture()
+    df = build_variant(blinded, combined, key, sample, "adjudicated",
+                       judges=(GPT5, DEEPSEEK), adjudicator=ADJ)
+    pc = _paired_cells(df, "released-R", "released-J", "contextual_coherence")
+    pe = _paired_cells(df, "released-R", "released-J", "prompt_echo")
+
+    rng = np.random.default_rng(0)
+    pe = pe.copy()
+    pe["diff"] = rng.integers(0, 3, size=len(pe)).astype(float)
+    pc = pc.copy()
+    pc["diff"] = 1.0 + 0.5 * pe["diff"].to_numpy()
+
+    out = regress_coherence_on_echo(pc, pe, n_boot=300, seed=1)
+    assert out["slope"] == pytest.approx(0.5, abs=1e-6)
+    assert out["intercept"] == pytest.approx(1.0, abs=1e-6)
+    assert out["slope_ci"][0] <= out["slope"] <= out["slope_ci"][1]
+    assert "not an echo-adjusted causal effect" in out["interpretation"]
+
+
+def test_regression_reports_insufficient_variation_rather_than_a_fake_fit():
+    blinded, combined, key, sample, _ = _fixture()
+    df = build_variant(blinded, combined, key, sample, "adjudicated",
+                       judges=(GPT5, DEEPSEEK), adjudicator=ADJ)
+    pc = _paired_cells(df, "released-R", "released-J", "contextual_coherence")
+    pe = _paired_cells(df, "released-R", "released-J", "prompt_echo")
+    out = regress_coherence_on_echo(pc, pe, n_boot=50)
+    assert "insufficient variation" in out.get("note", ""), \
+        "constant D^E cannot support a regression"
