@@ -12,7 +12,8 @@ deliberate copy.
 | Code (`rlens/`, `tests/`) | small | ✅ | ✅ | ✅ | — |
 | Results: reports, records (`.parquet`), figures | ~10 MB | ✅ | ✅ | ✅ | only by rerunning (hours of GPU) |
 | Dataset + filter logs (`data/onset_*.json`) | small | ✅ | ✅ | ✅ | yes, `rlens onset --stage data` (~5 min) |
-| **Our fitted lenses** (`lenses/ours/`, 4 files) | **4.5 GB** | ❌ gitignored | ✅ `backup_from_box/` | ✅ | yes but **~4 GPU-hours** |
+| **Our fitted lenses** (`lenses/ours/*/lens.pt`, 4 files) | **1.6 GB** | ❌ gitignored | ✅ `backup_from_box/` (md5-verified) | ✅ | yes but **~4 GPU-hours** |
+| Fit checkpoints (`fit.ckpt.pt`, 4 × 786 MB) | 3.1 GB | ❌ | ❌ (deliberate) | ✅ | they only exist to resume an interrupted fit; the `lens.pt` is the product |
 | Released lenses (`lenses/released/`) | 7 GB | ❌ gitignored | ❌ | ✅ | yes, `rlens download` (minutes) |
 | HF model cache (4B + 27B) | 126 GB | ❌ | ❌ | ✅ `/workspace/hf` | yes, `rlens download` (minutes) |
 
@@ -27,6 +28,28 @@ deliberate copy.
   volume is deleted, the box copy of everything goes with it — hence the laptop
   backup of the fitted lenses.
 - Backups of intermediate artifacts also sit in `/workspace/backup_*` on the box.
+
+### Verified backup (2026-08-27)
+
+The four fitted lenses in `backup_from_box/ours/qwen3.5-4b/` were checked
+**byte-for-byte against the box by md5**, not merely by file size:
+
+```
+0c48e627fb694649fbd5667f5da0a6bf  j-lens-nf1/lens.pt
+6c1ef7f42535c4e21380225eae346cf0  r-lens/lens.pt
+802b2127a7a46a4853d9c343e5901d76  j-lens-nf2/lens.pt
+ee634183160060ccd8e85cd949958b1b  j-lens/lens.pt
+```
+
+Transfer notes, learned the hard way: a backgrounded `scp` is killed when its
+parent shell exits (it silently produced a truncated file), and firing several
+`scp` connections in quick succession trips the box's SSH rate limiting
+("Permission denied" that clears on its own). Copy in **one** streamed
+connection and **verify by checksum**:
+
+```bash
+ssh <host> 'tar cf - --exclude=fit.ckpt.pt -C /workspace/CAMRBIA-CapStone/lenses ours' | tar xf - -C backup_from_box/
+```
 
 ## Recovery procedures
 
