@@ -6,6 +6,7 @@
     uv run rlens compare [--functional]           our fits vs released -> results/verification_report.md
     uv run rlens eval [--sets ...] [--limit N]    pass@10 battery: R vs J vs logit -> results/
     uv run rlens stats [--model ...]              C5 statistics over the rank parquet (CPU)
+    uv run rlens figures [--models ...]           C6 figures from the rank parquets (CPU)
 """
 
 from __future__ import annotations
@@ -25,6 +26,10 @@ DRAWS = {"primary": (0, 25), "nf1": (25, 50), "nf2": (50, 75)}  # pile-10k row r
 JACCARD_POSITIONS = [8, 24, 48, 72, 96, 120]
 NOISE_FLOOR_MARGIN = 1.5
 SMOKE_PROMPT = "Fact: The currency used in the country shaped like a boot is"
+# torch-free mirrors of rlens.evals constants, used only to build the argparse
+# help on a machine with no torch; tests/test_figures.py asserts they stay in sync.
+EVAL_SETS_FALLBACK = ["multihop", "multilingual", "association", "typo", "poetry"]
+UNEMBED_CHUNK_FALLBACK = 64
 
 
 def _pins() -> dict:
@@ -81,6 +86,31 @@ def _ranks_dir(explicit: str | None) -> Path:
         return Path(explicit)
     workspace = Path("/workspace/results/quantitative-evals")
     return workspace if workspace.parents[1].is_dir() else REPO_ROOT / "results"
+
+
+def find_ranks_parquet(model: str, explicit: str | None = None) -> Path:
+    """Locate ``passk_{model}.parquet``, searching the places it actually lives.
+
+    ``eval`` writes to the pod's network volume; the committed copies are filed
+    per model under ``results/quantitative-evals/{model}/``. Analysis commands
+    (C5, C6) should find either without the caller spelling out a path."""
+    name = f"passk_{model}.parquet"
+    candidates = [Path(explicit)] if explicit else []
+    candidates += [
+        Path("/workspace/results/quantitative-evals"),
+        REPO_ROOT / "results" / "quantitative-evals" / model,
+        REPO_ROOT / "results" / "quantitative-evals",
+        REPO_ROOT / "results" / model,
+        REPO_ROOT / "results",
+    ]
+    for d in candidates:
+        if (d / name).exists():
+            return d / name
+    searched = "\n  ".join(str(d) for d in candidates)
+    raise SystemExit(
+        f"{name} not found - run `rlens eval --model {model}` first, or pass "
+        f"--ranks-dir. Searched:\n  {searched}"
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -450,9 +480,7 @@ def cmd_stats(args) -> None:
 
     from rlens import stats
 
-    ranks_path = _ranks_dir(args.ranks_dir) / f"passk_{args.model}.parquet"
-    if not ranks_path.exists():
-        raise SystemExit(f"{ranks_path} not found - run `rlens eval --model {args.model}` first")
+    ranks_path = find_ranks_parquet(args.model, args.ranks_dir)
     raw = pd.read_parquet(ranks_path)
     df = raw.copy()
     df["hit"] = df["rank"] <= args.k
@@ -473,8 +501,10 @@ def cmd_stats(args) -> None:
     paired = {f"{a} vs {b}": stats.paired_diff_bootstrap(df, a, b, n_draws=args.draws, seed=args.seed)
               for a, b in pairs}
 
-    out_dir = REPO_ROOT / "results"
-    out_dir.mkdir(exist_ok=True)
+    # default: beside the parquet the numbers came from, so a re-run refreshes
+    # the committed report in place instead of scattering a second copy.
+    out_dir = Path(args.out_dir) if args.out_dir else ranks_path.parent
+    out_dir.mkdir(parents=True, exist_ok=True)
     wilson.to_csv(out_dir / f"stats_wilson_{args.model}.csv", index=False)
 
     items_path = ranks_path.with_name(ranks_path.stem + "_items.parquet")
@@ -513,7 +543,7 @@ def cmd_stats(args) -> None:
         "\nAny-layer pass@k integrated over log k and normalized so that always-rank-1 = 1."
         "\nCompanion to the table above, not to the post's headline.\n",
         filter_note,
-        f"\nPer-layer Wilson CIs -> results/stats_wilson_{args.model}.csv",
+        f"\nPer-layer Wilson CIs -> {out_dir.name}/stats_wilson_{args.model}.csv",
     ]
     report = out_dir / f"stats_{args.model}.md"
     report.write_text("\n".join(lines), encoding="utf-8")
@@ -524,17 +554,63 @@ def cmd_stats(args) -> None:
     print(f"report -> {report}")
 
 
+def cmd_figures(args) -> None:
+    from rlens.figures import FIGURES, make_figures
+
+    out_dir = Path(args.out_dir) if args.out_dir else REPO_ROOT / "results" / "quantitative-evals" / "figures"
+    print(f"models={args.models} figures={args.figures or list(FIGURES)} -> {out_dir}")
+    written = make_figures(
+        args.models, out_dir, which=args.figures, k=args.k, ranks_dir=args.ranks_dir,
+        draws=args.draws, band_draws=args.band_draws, seed=args.seed,
+        auc_kmax=args.auc_kmax, dpi=args.dpi, fmt=args.format,
+        csv_models=args.csv_models, with_control=args.with_control,
+    )
+    print(f"{len(written)} figure(s) written")
+
+
 # ---------------------------------------------------------------------------
 # entry point
 # ---------------------------------------------------------------------------
 
 
-def main() -> None:
-    import torch
+def _eval_defaults() -> tuple[list[str], int]:
+    """``EVAL_SETS``/``UNEMBED_CHUNK`` for the parser, without importing torch.
 
+    ``rlens.evals`` imports torch at module level; these two constants are pure
+    data, so fall back to their literal values when torch is missing (the eval
+    subcommand cannot run in that case anyway, and asserts the match in tests)."""
+    try:
+        from rlens.evals import EVAL_SETS, UNEMBED_CHUNK
+    except ModuleNotFoundError:
+        return EVAL_SETS_FALLBACK, UNEMBED_CHUNK_FALLBACK
+    return list(EVAL_SETS), int(UNEMBED_CHUNK)
+
+
+def _figure_names() -> list[str]:
+    """C6 figure keys for the parser. rlens.figures pulls in matplotlib, so keep
+    this import inside the call rather than at module scope."""
+    from rlens.figures import FIGURES
+
+    return list(FIGURES)
+
+
+def _default_device() -> str:
+    """"cuda" when available, else "cpu" - without making torch a hard import.
+
+    ``main`` builds every subparser up front, so an eager ``import torch`` here
+    would make even the CPU-only analysis commands (``stats``, ``figures``)
+    unusable on a machine with no torch installed."""
+    try:
+        import torch
+    except ModuleNotFoundError:
+        return "cpu"
+    return "cuda" if torch.cuda.is_available() else "cpu"
+
+
+def main() -> None:
     parser = argparse.ArgumentParser(prog="rlens", description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
-    default_device = "cuda" if torch.cuda.is_available() else "cpu"
+    default_device = _default_device()
 
     p = sub.add_parser("download", help="fetch model(s), released lenses, and data at pinned revisions")
     p.add_argument("--experiment-models", action="store_true",
@@ -565,7 +641,7 @@ def main() -> None:
     p.add_argument("--dtype", choices=["bf16", "fp32"], default="bf16")
     p.set_defaults(func=cmd_compare)
 
-    from rlens.evals import EVAL_SETS, UNEMBED_CHUNK
+    EVAL_SETS, UNEMBED_CHUNK = _eval_defaults()
 
     p = sub.add_parser("eval", help="pass@10 battery: R vs J vs logit lens -> results/")
     p.add_argument("--model", default=DEFAULT_MODEL,
@@ -601,7 +677,34 @@ def main() -> None:
                    help="right edge of the paper's pass@k AUC curve (SS A.6, Fig 52)")
     p.add_argument("--draws", type=int, default=2000)
     p.add_argument("--seed", type=int, default=0)
+    p.add_argument("--out-dir", default=None,
+                   help="where the report + Wilson CSV go (default: beside the rank parquet)")
     p.set_defaults(func=cmd_stats)
+
+    p = sub.add_parser("figures", help="C6: figures from the rank parquets (CPU)")
+    p.add_argument("--models", nargs="+", default=["qwen3.5-27b", "gemma-3-27b-it"],
+                   help="models with a passk_{model}.parquet, in panel order")
+    p.add_argument("--csv-models", nargs="+", default=["qwen3.5-4b"],
+                   help="extra models for the headline bars that only have a per-layer CSV "
+                        "(no parquet -> no CI; drawn hatched). Pass none to omit.")
+    p.add_argument("--figures", nargs="+", default=None,
+                   choices=sorted(_figure_names()),
+                   help="subset to render (default: all)")
+    p.add_argument("--ranks-dir", default=None, help="where the parquets live")
+    p.add_argument("--out-dir", default=None,
+                   help="default: results/quantitative-evals/figures/")
+    p.add_argument("--k", type=int, default=10)
+    p.add_argument("--draws", type=int, default=2000, help="bootstrap draws for CIs / p-values")
+    p.add_argument("--band-draws", type=int, default=500,
+                   help="draws for the per-layer bands; 0 disables the bands")
+    p.add_argument("--auc-kmax", type=int, default=100)
+    p.add_argument("--seed", type=int, default=0)
+    p.add_argument("--dpi", type=int, default=200)
+    p.add_argument("--format", default="png", choices=["png", "pdf", "svg"])
+    p.add_argument("--with-control", action="store_true",
+                   help="include our control arm in the post-replication bar charts "
+                        "(the post plots three lenses; the control is our addition)")
+    p.set_defaults(func=cmd_figures)
 
     args = parser.parse_args()
     args.func(args)

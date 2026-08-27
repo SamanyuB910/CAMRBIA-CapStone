@@ -100,13 +100,19 @@ def _set_balanced_mean(values: np.ndarray, sets: np.ndarray) -> float:
     return float(np.nanmean([np.nanmean(values[sets == s]) for s in np.unique(sets)]))
 
 
-def headline_bootstrap(
-    df: pd.DataFrame, *, n_draws: int = DEFAULT_DRAWS, seed: int = 0
+def window_bootstrap(
+    df: pd.DataFrame, layers: list[int] | None = None, *,
+    n_draws: int = DEFAULT_DRAWS, seed: int = 0,
 ) -> pd.DataFrame:
-    """First-half-of-layers mean per lens with an item-level bootstrap CI."""
-    layers = np.sort(df["layer"].unique())
-    half = list(_first_half_layers(layers))
-    mat, index, lens_names = _item_matrix(df, half)
+    """Mean over a layer window per lens, with an item-level bootstrap CI.
+
+    ``layers=None`` means every layer ("all layers" in the post's bar chart);
+    pass :func:`first_half_layers` for the headline window. Restrict ``df`` to
+    one set first for a per-set version - with a single set the set-balanced
+    mean is just that set's item mean."""
+    all_layers = np.sort(df["layer"].unique())
+    layers = list(all_layers) if layers is None else list(layers)
+    mat, index, lens_names = _item_matrix(df, layers)
     sets = index["set"].to_numpy()
     draws_idx = _bootstrap_indices(index["set"], n_draws, seed)
 
@@ -114,10 +120,23 @@ def headline_bootstrap(
     for j, name in enumerate(lens_names):
         col = mat[:, j]
         point = _set_balanced_mean(col, sets)
-        stats = np.array([_set_balanced_mean(col[d], sets[d]) for d in draws_idx])
-        lo, hi = np.percentile(stats, [2.5, 97.5])
-        rows[name] = {"mean_first_half": point, "ci_lo": lo, "ci_hi": hi}
+        draws = np.array([_set_balanced_mean(col[d], sets[d]) for d in draws_idx])
+        lo, hi = np.percentile(draws, [2.5, 97.5])
+        rows[name] = {"mean": point, "ci_lo": lo, "ci_hi": hi,
+                      "n_items": int(len(col)), "n_layers": len(layers)}
     return pd.DataFrame(rows).T
+
+
+def headline_bootstrap(
+    df: pd.DataFrame, *, n_draws: int = DEFAULT_DRAWS, seed: int = 0
+) -> pd.DataFrame:
+    """First-half-of-layers mean per lens with an item-level bootstrap CI.
+
+    Thin wrapper over :func:`window_bootstrap` - same resampling, same seed
+    stream, so the C5 report's numbers are unchanged."""
+    half = list(_first_half_layers(np.sort(df["layer"].unique())))
+    out = window_bootstrap(df, half, n_draws=n_draws, seed=seed)
+    return out.rename(columns={"mean": "mean_first_half"})[["mean_first_half", "ci_lo", "ci_hi"]]
 
 
 def paired_diff_bootstrap(
@@ -203,3 +222,69 @@ def k_sweep(df_raw: pd.DataFrame, ks: tuple[int, ...] = (1, 5, 10, 50)) -> pd.Da
             name: _set_balanced_mean(mat[:, j], sets) for j, name in enumerate(lens_names)
         }
     return pd.DataFrame(rows)
+
+
+# ---------------------------------------------------------------------------
+# per-layer curves (what C6 plots)
+#
+# These live here, not in figures.py, so a plotted curve and a reported table
+# can never disagree: both go through _item_layer_means -> per-set mean ->
+# set-balanced mean, the same path summarize_passk and headline_bootstrap take.
+# ---------------------------------------------------------------------------
+
+
+def per_layer_curve(df: pd.DataFrame) -> pd.DataFrame:
+    """Set-balanced per-layer hit rate: [layer x lens].
+
+    Mean over intermediates within an item, over items within a set, then over
+    sets - so a 102-item set does not outweigh a 40-item one, matching the
+    weighting of every other headline number."""
+    m = _item_layer_means(df)
+    per_set = m.groupby(["set", "lens", "layer"], sort=True)["hit"].mean()
+    return per_set.groupby(["lens", "layer"]).mean().unstack("lens")
+
+
+def per_layer_curve_by_set(df: pd.DataFrame) -> pd.DataFrame:
+    """Per-layer hit rate kept split by set: [(set, layer) x lens]. The small
+    multiples; `typo` and `poetry` both behave unlike the pooled mean."""
+    m = _item_layer_means(df)
+    return m.groupby(["set", "lens", "layer"], sort=True)["hit"].mean().unstack("lens")
+
+
+def _item_layer_tensor(df: pd.DataFrame) -> tuple[np.ndarray, np.ndarray, list[str], list[int]]:
+    """[n_items, n_lens, n_layers] of per-item mean hits, plus each item's set,
+    the lens order and the layer order."""
+    m = _item_layer_means(df)
+    piv = m.pivot_table(index=["set", "item_id"], columns=["lens", "layer"], values="hit")
+    lenses = list(piv.columns.levels[0])
+    layers = sorted(piv.columns.levels[1])
+    tensor = piv.to_numpy().reshape(len(piv), len(lenses), len(layers))
+    sets = piv.index.get_level_values("set").to_numpy()
+    return tensor, sets, lenses, layers
+
+
+def per_layer_band(
+    df: pd.DataFrame, *, n_draws: int = 500, seed: int = 0
+) -> dict[str, tuple[np.ndarray, np.ndarray]]:
+    """Item-bootstrap 95% band around :func:`per_layer_curve`, per lens.
+
+    Resamples items within set exactly as the headline bootstrap does, so the
+    band on a curve and the CI on the corresponding bar come from one procedure.
+    ``n_draws`` defaults lower than the headline's 2000: a band is read by eye
+    at ~1px resolution, and 500 draws already resolve that."""
+    tensor, sets, lenses, layers = _item_layer_tensor(df)
+    draws_idx = _bootstrap_indices(pd.Series(sets), n_draws, seed)
+    uniq = np.unique(sets)
+
+    stats_out = np.empty((n_draws, len(lenses), len(layers)))
+    for d, idx in enumerate(draws_idx):
+        vals, sets_d = tensor[idx], sets[idx]
+        per_set = np.stack([np.nanmean(vals[sets_d == s], axis=0) for s in uniq])
+        stats_out[d] = np.nanmean(per_set, axis=0)
+    lo, hi = np.percentile(stats_out, [2.5, 97.5], axis=0)
+    return {name: (lo[j], hi[j]) for j, name in enumerate(lenses)}
+
+
+def first_half_layers(df: pd.DataFrame) -> list[int]:
+    """Public wrapper: the layers the headline averages over."""
+    return list(_first_half_layers(np.sort(df["layer"].unique())))

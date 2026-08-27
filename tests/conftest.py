@@ -1,5 +1,8 @@
 import pytest
-import torch
+
+# NOTE: torch is imported inside the fixtures, not here. A module-level import
+# would fail collection of the whole tests/ directory on a torch-less machine,
+# taking the CPU-only C5/C6 tests (test_stats, test_figures) down with it.
 
 
 def tiny_qwen3_5_config():
@@ -28,6 +31,7 @@ def tiny_qwen3_5_config():
 @pytest.fixture(scope="session")
 def tiny_qwen():
     """Tiny fp32 Qwen3_5ForCausalLM with random weights, eval mode."""
+    import torch
     from transformers import Qwen3_5ForCausalLM
 
     torch.manual_seed(0)
@@ -39,5 +43,7 @@ def tiny_qwen():
 
 @pytest.fixture()
 def tiny_batch(tiny_qwen):
+    import torch
+
     torch.manual_seed(1)
     return torch.randint(0, tiny_qwen.config.vocab_size, (2, 24))
