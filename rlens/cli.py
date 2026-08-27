@@ -1727,17 +1727,29 @@ def cmd_audit_v2(args) -> None:
         "completeness": ratings / "completeness.json",
         "cost_report": ratings / "cost_report.json",
     }
+    # Raw logs are the immutable source and are NOT copied by `recombine`, so
+    # they may live in a different directory from a repaired scores set.
+    raw_dir = Path(args.raw_dir).expanduser() if args.raw_dir else ratings
     for judge in (*args.judges, args.adjudicator):
-        paths[f"raw[{judge}]"] = ratings / f"raw_{judge.replace('/', '_')}.jsonl"
+        paths[f"raw[{judge}]"] = raw_dir / f"raw_{judge.replace('/', '_')}.jsonl"
 
     report = audit(paths)
 
     def jsonl(path):
-        return [json.loads(l) for l in Path(path).read_text(encoding="utf-8").splitlines() if l]
+        """Missing files return [] so the audit reports a FAIL for every
+        condition at once rather than dying on the first absent artifact."""
+        path = Path(path)
+        if not path.is_file():
+            return []
+        return [json.loads(l) for l in path.read_text(encoding="utf-8").splitlines() if l]
+
+    def load_json(path, default):
+        path = Path(path)
+        return json.loads(path.read_text(encoding="utf-8")) if path.is_file() else default
 
     panel = {c["cell_id"]: c for c in jsonl(paths["panel_public"])}
-    combined = json.loads(paths["combined_scores"].read_text(encoding="utf-8"))
-    adjudication = json.loads(paths["adjudication"].read_text(encoding="utf-8"))
+    combined = load_json(paths["combined_scores"], {})
+    adjudication = load_json(paths["adjudication"], {})
     report.counts["disputed_cell_ids"] = adjudication.get("disputed_cell_ids", [])
     report.counts["n_disputed"] = adjudication.get("n_disputed")
 
@@ -1769,7 +1781,7 @@ def cmd_audit_v2(args) -> None:
     report.add("effective_model_ids_match_requested", not bad, f"{effective}")
 
     # (12) stored hashes reproduce
-    manifest = json.loads(paths["panel_manifest"].read_text(encoding="utf-8"))
+    manifest = load_json(paths["panel_manifest"], {})
     from rlens.panel_v2 import PanelCell, panel_hash
 
     cells = [PanelCell(cell_id=c["cell_id"], prompt_display=c["prompt"],
@@ -1781,8 +1793,9 @@ def cmd_audit_v2(args) -> None:
                f"recomputed {recomputed}, manifest {manifest.get('panel_sha256')}")
 
     # (14) ratings frozen before any primary result
-    rating_mtime = max(paths[f"raw[{j}]"].stat().st_mtime
-                       for j in args.judges if paths[f"raw[{j}]"].exists())
+    mtimes = [paths[f"raw[{j}]"].stat().st_mtime
+              for j in args.judges if paths[f"raw[{j}]"].is_file()]
+    rating_mtime = max(mtimes) if mtimes else 0.0
     stats = Path(args.statistical_results).expanduser() if args.statistical_results else None
     if stats and stats.exists():
         report.add("ratings_frozen_before_analysis", stats.stat().st_mtime >= rating_mtime,
@@ -2318,6 +2331,10 @@ def main() -> None:
     p = sub.add_parser("audit-v2", help="robustness Stage 1: fail-closed integrity audit")
     p.add_argument("--panel-dir", required=True)
     p.add_argument("--ratings-dir", required=True)
+    p.add_argument("--raw-dir", default=None,
+                   help="where raw_<judge>.jsonl live (default: --ratings-dir). "
+                        "`recombine` does not copy them, so a repaired scores set "
+                        "needs the original directory here.")
     p.add_argument("--key", required=True)
     p.add_argument("--sample", required=True)
     p.add_argument("--out-dir", required=True)

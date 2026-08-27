@@ -185,3 +185,29 @@ def test_an_unsupplied_artifact_is_not_reported_as_unreadable(tmp_path):
     assert not any(n.startswith("artifact_readable[") for n in names), \
         f"spurious readability failures: {sorted(n for n in names if 'readable' in n)}"
     assert report.blocking == []
+
+
+def test_audit_reports_missing_artifacts_instead_of_crashing(tmp_path):
+    """A repaired scores directory has no raw_*.jsonl (recombine does not copy
+    them). The audit must report that as a FAIL for every affected condition,
+    not die on the first absent file."""
+    import inspect
+
+    from rlens import cli
+
+    source = inspect.getsource(cli.cmd_audit_v2)
+    assert "--raw-dir" not in source  # the flag lives in the parser, not the body
+    assert "raw_dir = Path(args.raw_dir)" in source, "raw logs must be separately locatable"
+    assert "if not path.is_file():\n            return []" in source, \
+        "jsonl() must tolerate a missing file"
+    assert "def load_json(" in source, "json loads must tolerate a missing file"
+
+
+def test_audit_raw_dir_flag_is_documented():
+    import inspect
+
+    from rlens import cli
+
+    source = inspect.getsource(cli.main)
+    assert "--raw-dir" in source
+    assert "recombine` does not copy them" in source
