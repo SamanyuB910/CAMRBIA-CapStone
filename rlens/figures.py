@@ -163,6 +163,12 @@ def fig_sufficiency(df_cue: pd.DataFrame, onsets: dict) -> go.Figure:
         s = excess(df_cue, lens, "swap", "random_swap", "swap_effect")
         fig.add_trace(go.Scatter(x=list(s.index), y=list(s.values), name=f"{lens} · concept swap",
                                  mode="lines", line=dict(width=2.4, color=LENS_COLORS[lens])))
+        # clamped band swap: the repair-robust operator (a plain swap repeated
+        # across layers would cancel — it is an involution)
+        sb = excess(df_cue, lens, "swap_band", "random_swap", "swap_effect")
+        if len(sb.dropna()):
+            fig.add_trace(go.Scatter(x=list(sb.index), y=list(sb.values), name=f"{lens} · clamped band swap",
+                                     mode="lines", line=dict(width=2.4, color=LENS_COLORS[lens], dash="longdash")))
         for cond, dash, tag in (("swap_wrong", "dash", "wrong-concept"), ("swap_answer", "dot", "answer direction")):
             s2 = excess(df_cue, lens, cond, "random_swap", "swap_effect")
             fig.add_trace(go.Scatter(x=list(s2.index), y=list(s2.values), name=f"{lens} · {tag}",
@@ -208,6 +214,29 @@ def fig_geometry_and_norms(df_cue: pd.DataFrame) -> go.Figure:
     return _layout(fig, "Confound checks", "layer", "", height=400)
 
 
+def fig_write_strength(df_cue: pd.DataFrame, patch_df: pd.DataFrame | None) -> go.Figure:
+    """How good is each intervention at actually installing the counterfactual
+    answer? Absolute top-1 flip rate — no threshold-relative normalization, so
+    lens directions and whole-vector patching are directly comparable."""
+    fig = go.Figure()
+    for lens in ("R", "J"):
+        for cond, dash, tag in (("swap", None, "single-layer swap"),
+                                ("swap_band", "longdash", "clamped band swap")):
+            d = df_cue[(df_cue.lens == lens) & (df_cue.condition == cond) & (df_cue.alpha == 1.0)]
+            if not len(d):
+                continue
+            s = d.groupby("layer")["top1_is_yp"].mean()
+            fig.add_trace(go.Scatter(x=list(s.index), y=list(s.values), name=f"{lens} · {tag}",
+                                     mode="lines", line=dict(width=2.2, color=LENS_COLORS[lens], dash=dash)))
+    if patch_df is not None and len(patch_df):
+        s = patch_df[patch_df.condition == "patch"].groupby("layer")["top1_is_donor"].mean()
+        fig.add_trace(go.Scatter(x=list(s.index), y=list(s.values), name="whole-vector patch (lens-free)",
+                                 mode="lines", line=dict(width=3, color="#2F4858", dash="dot")))
+    fig.update_yaxes(tickformat=".0%")
+    return _layout(fig, "Write strength — does the intervention actually install the counterfactual answer?",
+                   "layer", "top-1 flip rate", height=430)
+
+
 def fig_passk(csv_path: Path, model: str) -> go.Figure | None:
     """Core experiment 1: pass@10 per category, per lens."""
     if not csv_path.exists():
@@ -246,11 +275,14 @@ def build(model: str = "qwen3.5-27b") -> tuple[list[tuple[str, go.Figure]], dict
         lr, lc = onsets[lens].get("L_R_cue"), onsets[lens].get("L_causal")
         gaps[lens] = (lc - lr) if (lr is not None and lc is not None) else float("nan")
 
+    patch_path = res_dir / f"patch_records_{model}_final.parquet"
+    patch_df = pd.read_parquet(patch_path) if patch_path.exists() else None
     figs = [
         ("readout", fig_readout(df_cue, onsets)),
         ("money", fig_money(onsets, gaps)),
         ("necessity", fig_necessity(df_t, df_cue)),
         ("sufficiency", fig_sufficiency(df_cue, onsets)),
+        ("write_strength", fig_write_strength(df_cue, patch_df)),
         ("controls", fig_controls(df_cue)),
         ("confounds", fig_geometry_and_norms(df_cue)),
     ]
