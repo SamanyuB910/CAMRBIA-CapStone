@@ -237,6 +237,30 @@ def fig_write_strength(df_cue: pd.DataFrame, patch_df: pd.DataFrame | None) -> g
                    "layer", "top-1 flip rate", height=430)
 
 
+def fig_band_arms(df_t: pd.DataFrame, df_cue: pd.DataFrame) -> go.Figure:
+    """The post's ablation arms as discrete bars: first half vs second half vs
+    all layers. These are single points on the necessity curves (band read at
+    the midpoint, persist read at the midpoint, band at the right edge), which
+    is easy to miss when they are drawn as continuous lines."""
+    n_layers = df_t["layer"].nunique()
+    mid, last = n_layers // 2, int(df_t["layer"].max())
+    fig = make_subplots(rows=1, cols=2, shared_yaxes=True, horizontal_spacing=0.06,
+                        subplot_titles=(f"ablate at the FINAL token", "ablate at the CUE token"))
+    arms = [(f"first half<br>(L0-{mid})", "ablate_band", mid),
+            (f"second half<br>(L{mid}-{last})", "ablate_persist", mid),
+            (f"all layers<br>(L0-{last})", "ablate_band", last)]
+    for col, df in ((1, df_t), (2, df_cue)):
+        for lens in LENSES:
+            vals = []
+            for _, cond, layer in arms:
+                d = df[(df.lens == lens) & (df.condition == cond) & (df.alpha == 1.0) & (df.layer == layer)]
+                vals.append(float(d["necessity"].mean()) if len(d) else float("nan"))
+            fig.add_trace(go.Bar(name=lens, x=[a[0] for a in arms], y=vals, legendgroup=lens,
+                                 showlegend=(col == 1), marker_color=LENS_COLORS[lens]), row=1, col=col)
+    return _layout(fig, "Ablation by layer band (the post's arms) — log-prob drop of the correct answer",
+                   "", "log-prob drop", height=420, barmode="group")
+
+
 def fig_passk(csv_path: Path, model: str) -> go.Figure | None:
     """Core experiment 1: pass@10 per category, per lens."""
     if not csv_path.exists():
@@ -281,6 +305,7 @@ def build(model: str = "qwen3.5-27b") -> tuple[list[tuple[str, go.Figure]], dict
         ("readout", fig_readout(df_cue, onsets)),
         ("money", fig_money(onsets, gaps)),
         ("necessity", fig_necessity(df_t, df_cue)),
+        ("band_arms", fig_band_arms(df_t, df_cue)),
         ("sufficiency", fig_sufficiency(df_cue, onsets)),
         ("write_strength", fig_write_strength(df_cue, patch_df)),
         ("controls", fig_controls(df_cue)),
