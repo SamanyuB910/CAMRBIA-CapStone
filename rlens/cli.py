@@ -2152,6 +2152,7 @@ def cmd_figures(args) -> None:
         echo_detail=maybe_json(args.echo_detail),
         out_dir=Path(args.out_dir).expanduser(),
         scoring=args.scoring,
+        non_echo=maybe_json(args.non_echo_results),
     )
     for stem, files in result["figures"].items():
         print(f"  {stem}: " + ", ".join(Path(f).name for f in files))
@@ -2905,6 +2906,9 @@ def main() -> None:
     p.add_argument("--scoring", default="adjudicated",
                    help="scoring variant to draw as primary in figure 4; must match "
                         "the rule that produced --statistical-results")
+    p.add_argument("--non-echo-results",
+                   help="non_echo_results.json from `rlens non-echo-analyse`; "
+                        "adds figure 6")
     p.set_defaults(func=cmd_figures)
 
     p = sub.add_parser("manifest", help="Stage 9: final reproducibility manifest")

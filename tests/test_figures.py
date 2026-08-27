@@ -63,13 +63,25 @@ ECHO_DETAIL = {"adjudicated": {"qwen3.5-27b": {"by_echo_delta": [
     {"echo_delta": 2.0, "n_cells": 1, "mean_coherence_delta": 4.0}]}}}
 
 
+def _non_echo(delta_r_minus_j=0.45):
+    return {
+        "dimension": "non_echo_coherence",
+        "per_model": {m: {"released-R - released-J": {
+            "delta": delta_r_minus_j, "ci_lo": delta_r_minus_j - 0.2,
+            "ci_hi": delta_r_minus_j + 0.2, "p_value": 0.001}}
+            for m in ("qwen3.5-27b", "gemma-3-27b-it")},
+        "mean_scores": {"qwen3.5-27b": {"logit": 0.6, "released-J": 0.9, "released-R": 1.4},
+                        "gemma-3-27b-it": {"logit": 0.7, "released-J": 1.0, "released-R": 1.8}},
+    }
+
+
 def test_build_all_writes_three_formats_per_figure(tmp_path):
     """PDF and SVG are vector (LaTeX, web); PNG exists so the built document can
     be rasterised and looked at."""
     out = figures.build_all(stats=_stats(), judge_table=_judge_table(),
                             echo_table=_echo_table(), echo_detail=ECHO_DETAIL,
-                            out_dir=tmp_path)
-    assert len(out["figures"]) == 5 and not out["skipped"]
+                            non_echo=_non_echo(), out_dir=tmp_path)
+    assert len(out["figures"]) == 6 and not out["skipped"]
     for stem, files in out["figures"].items():
         exts = sorted(f.rsplit(".", 1)[1] for f in files)
         assert exts == ["pdf", "png", "svg"], stem
@@ -82,14 +94,15 @@ def test_missing_inputs_are_named_not_faked(tmp_path):
     drawing defaults would put an invented number in a paper."""
     out = figures.build_all(stats=_stats(), judge_table=None, echo_table=None,
                             echo_detail=None, out_dir=tmp_path)
-    assert set(out["skipped"]) == {"fig3_judge_sensitivity", "fig4_echo_sensitivity"}
+    assert set(out["skipped"]) == {"fig3_judge_sensitivity", "fig4_echo_sensitivity",
+                                   "fig6_non_echo"}
     assert not (tmp_path / "fig3_judge_sensitivity.pdf").exists()
     assert len(out["figures"]) == 3
 
 
 def test_empty_stats_produces_no_figures(tmp_path):
     out = figures.build_all(stats={}, out_dir=tmp_path)
-    assert not out["figures"] and len(out["skipped"]) == 5
+    assert not out["figures"] and len(out["skipped"]) == 6
 
 
 def test_manifest_records_what_was_drawn(tmp_path):
@@ -99,6 +112,7 @@ def test_manifest_records_what_was_drawn(tmp_path):
     assert set(manifest["figures"]) == {
         "fig1_primary_result", "fig2_depth_profile", "fig3_judge_sensitivity",
         "fig4_echo_sensitivity", "fig5_judge_agreement"}
+    assert manifest["skipped"] == {"fig6_non_echo": "required input missing"}
 
 
 def test_lens_colours_are_fixed_and_distinct():
@@ -189,3 +203,25 @@ def test_forest_falls_back_to_the_interval_when_no_p_value(tmp_path):
     assert figures.fig_primary(stats, tmp_path)
     import inspect
     assert "(lo > 0 or hi < 0)" in inspect.getsource(figures._forest)
+
+
+def test_figure_six_compares_the_two_rubrics(tmp_path):
+    assert figures.fig_non_echo(_stats(), _non_echo(), tmp_path)
+    assert (tmp_path / "fig6_non_echo.pdf").exists()
+
+
+def test_figure_six_is_skipped_without_non_echo_results(tmp_path):
+    out = figures.build_all(stats=_stats(), out_dir=tmp_path)
+    assert out["skipped"]["fig6_non_echo"] == "required input missing"
+    assert not (tmp_path / "fig6_non_echo.pdf").exists()
+
+
+def test_figure_six_renders_a_null_result_too(tmp_path):
+    """The figure must work when the answer is unfavourable — a non-echo delta
+    at zero is exactly the case the stage exists to be able to show."""
+    assert figures.fig_non_echo(_stats(), _non_echo(delta_r_minus_j=0.0), tmp_path)
+
+
+def test_build_all_adds_figure_six_when_given_results(tmp_path):
+    out = figures.build_all(stats=_stats(), non_echo=_non_echo(), out_dir=tmp_path)
+    assert "fig6_non_echo" in out["figures"]

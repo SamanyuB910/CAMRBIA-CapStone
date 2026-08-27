@@ -368,9 +368,87 @@ def fig_agreement(stats: dict, out_dir: Path) -> list[str]:
     return save(fig, out_dir, "fig5_judge_agreement")
 
 
+def fig_non_echo(stats: dict, non_echo: dict, out_dir: Path) -> list[str]:
+    """Figure 6 -- does the advantage survive when copied tokens do not count?
+
+    Stage 4 answered the prompt-echo objection by restriction, which conditions
+    on a post-treatment variable. Stage 5 answers it by measurement: a separate
+    rubric, validated against a pure-prompt-copy control, that discards copied
+    tokens before scoring. This figure puts the two rubrics side by side, which
+    is the comparison a reader will want and the one that can falsify the claim.
+
+    Both panels are drawn on the same 0-4 scale so the drop from standard to
+    non-echo scoring is legible as a magnitude, not just an ordering.
+    """
+    plt = _style()
+    ne_per_model = (non_echo or {}).get("per_model") or {}
+    if not stats.get("per_model") or not ne_per_model:
+        return []
+    models = [m for m in ("qwen3.5-27b", "gemma-3-27b-it")
+              if m in stats["per_model"] and m in ne_per_model]
+    if not models:
+        return []
+
+    fig, axes = plt.subplots(1, 2, figsize=(7.4, 3.0), width_ratios=[1.1, 1])
+
+    ax = axes[0]
+    lenses = ["logit", "released-J", "released-R"]
+    std_means = stats.get("mean_scores") or {}
+    ne_means = non_echo.get("mean_scores") or {}
+    xs, width = [], 0.38
+    labels = []
+    for i, model in enumerate(models):
+        for j, lens in enumerate(lenses):
+            xs.append(i * (len(lenses) + 0.8) + j)
+            labels.append(lens)
+    for offset, (source, name, alpha) in enumerate(
+            ((std_means, "Standard coherence", 1.0),
+             (ne_means, "Non-echo coherence", 0.55))):
+        vals, pos = [], []
+        k = 0
+        for i, model in enumerate(models):
+            for j, lens in enumerate(lenses):
+                vals.append(source.get(model, {}).get(lens, float("nan")))
+                pos.append(xs[k] + (offset - 0.5) * width)
+                k += 1
+        ax.bar(pos, vals, width, label=name,
+               color=[LENS_COLOR[l] for l in labels], alpha=alpha,
+               edgecolor="white", linewidth=0.6)
+    ax.set_xticks([sum(xs[i * 3:(i + 1) * 3]) / 3 for i in range(len(models))])
+    ax.set_xticklabels([MODEL_LABEL.get(m, m) for m in models], fontsize=8)
+    ax.set_ylim(0, 4)
+    ax.set_ylabel("Score (0–4)")
+    ax.set_title("a  Mean score: standard vs non-echo", loc="left")
+    ax.grid(axis="x", visible=False)
+    handles = [plt.Rectangle((0, 0), 1, 1, fc="#555555", alpha=a)
+               for a in (1.0, 0.55)]
+    ax.legend(handles, ["Standard", "Non-echo"], fontsize=7.5, loc="upper left")
+    ax.text(0.99, 0.96, "bar colour = lens", transform=ax.transAxes,
+            ha="right", va="top", fontsize=6.5, color=MUTED)
+
+    rows = []
+    contrast = "released-R - released-J"
+    for model in models:
+        for source, tag in ((stats["per_model"], "standard"),
+                            (ne_per_model, "non-echo")):
+            r = source.get(model, {}).get(contrast)
+            if not r:
+                continue
+            pv = r.get("p_value")
+            rows.append((f"{SHORT_LABEL.get(model, model)}  {tag}",
+                         r["delta"], r["ci_lo"], r["ci_hi"],
+                         None if pv is None else pv < 0.05))
+    _forest(axes[1], rows, xlabel="R − J (points)",
+            title="b  R − J under each rubric")
+    axes[1].text(0.99, 0.02, "filled = p < 0.05", transform=axes[1].transAxes,
+                 ha="right", va="bottom", fontsize=7, color=MUTED)
+    fig.tight_layout()
+    return save(fig, out_dir, "fig6_non_echo")
+
+
 def build_all(*, stats: dict, judge_table=None, echo_table=None,
               echo_detail: dict | None = None, out_dir: Path,
-              scoring: str = "adjudicated") -> dict:
+              scoring: str = "adjudicated", non_echo: dict | None = None) -> dict:
     """Draw every figure whose inputs are present; name the ones that are not."""
     out_dir = Path(out_dir)
     made, skipped = {}, {}
@@ -385,6 +463,8 @@ def build_all(*, stats: dict, judge_table=None, echo_table=None,
          echo_table is not None and len(echo_table) > 0),
         ("fig5_judge_agreement", lambda: fig_agreement(stats, out_dir),
          bool(stats.get("per_model"))),
+        ("fig6_non_echo", lambda: fig_non_echo(stats, non_echo or {}, out_dir),
+         bool(non_echo and non_echo.get("per_model"))),
     ]
     for stem, fn, ok in plan:
         if not ok:
