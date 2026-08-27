@@ -1507,6 +1507,191 @@ def _to_panel_labels(scores: dict, mapping: dict) -> dict:
 
 
 # ---------------------------------------------------------------------------
+# analyse-v2  (Coherence v2, Stage 6)
+# ---------------------------------------------------------------------------
+
+
+def cmd_analyse_v2(args) -> None:
+    """Unblind and compute the preregistered estimands (§11, §12)."""
+    import json
+
+    import pandas as pd
+
+    from rlens.analysis_v2 import (
+        _paired_cells, equal_weight_delta, holm, judge_agreement,
+        prompt_cluster_bootstrap, signflip_permutation_p, unblind_panel, win_rates,
+    )
+    from rlens.coherence_v2 import INCOMPLETE_NOTICE
+
+    ratings = Path(args.ratings_dir).expanduser()
+    completeness = json.loads((ratings / "completeness.json").read_text())
+    if not completeness.get("complete"):
+        raise SystemExit(f"ratings incomplete ({completeness.get('blocking_reason')}); "
+                         "§10 blocks unblinding until every cell is rated")
+
+    combined = json.loads((ratings / "combined_scores.json").read_text())
+    key_rows = [json.loads(l) for l in Path(args.key).read_text().splitlines() if l]
+    sample = json.loads(Path(args.sample).read_text())
+    blinded = pd.read_csv(ratings / "scores_blinded.csv")
+
+    df = unblind_panel(combined, key_rows, sample)
+    out_dir = Path(args.out_dir).expanduser()
+    if out_dir.exists() and any(out_dir.iterdir()):
+        raise SystemExit(f"{out_dir} exists and is not empty; use a fresh destination")
+    out_dir.mkdir(parents=True, exist_ok=True)
+    df.to_parquet(out_dir / "unblinded_scores.parquet")
+
+    results = {"n_cells": int(df["cell_id"].nunique()),
+               "n_prompts": int(df[["set", "item_id"]].drop_duplicates().shape[0]),
+               "adjudication": json.loads((ratings / "adjudication.json").read_text()),
+               "per_model": {}, "by_depth": {}, "by_set": {}}
+
+    contrasts = [("released-R", "released-J"), ("released-R", "logit"),
+                 ("released-J", "logit")]
+
+    for model_key in sorted(df["model_key"].unique()):
+        sub = df[df["model_key"] == model_key]
+        entry = {}
+        for a, b in contrasts:
+            paired = _paired_cells(sub, a, b, "contextual_coherence")
+            stats = prompt_cluster_bootstrap(paired, n_boot=args.n_boot, seed=args.seed)
+            stats.update(signflip_permutation_p(paired, n_perm=args.n_perm, seed=args.seed))
+            stats["win_rates"] = win_rates(sub, a, b)
+            entry[f"{a} - {b}"] = stats
+        for dimension in ("lexical_integrity", "prompt_echo"):
+            paired = _paired_cells(sub, "released-R", "released-J", dimension)
+            entry[f"{dimension}: released-R - released-J"] = prompt_cluster_bootstrap(
+                paired, n_boot=args.n_boot, seed=args.seed)
+        entry["means"] = (sub.groupby("lens")[list(("contextual_coherence",
+                          "lexical_integrity", "prompt_echo"))].mean().to_dict())
+        results["per_model"][model_key] = entry
+
+        # secondary: by normalized depth and by evaluation set
+        depth_p = {}
+        for z, group in sub.groupby("requested_depth"):
+            paired = _paired_cells(group, "released-R", "released-J", "contextual_coherence")
+            row = prompt_cluster_bootstrap(paired, n_boot=args.n_boot, seed=args.seed)
+            perm = signflip_permutation_p(paired, n_perm=args.n_perm, seed=args.seed)
+            row.update(perm)
+            results["by_depth"].setdefault(model_key, {})[str(z)] = row
+            depth_p[str(z)] = perm.get("p_value", 1.0)
+        for name, adj in holm(depth_p).items():
+            results["by_depth"][model_key][name]["p_holm"] = adj
+
+        set_p = {}
+        for set_name, group in sub.groupby("set"):
+            paired = _paired_cells(group, "released-R", "released-J", "contextual_coherence")
+            row = {"delta": equal_weight_delta(paired), "n_cells": int(len(paired))}
+            perm = signflip_permutation_p(paired, n_perm=args.n_perm, seed=args.seed)
+            row.update(perm)
+            results["by_set"].setdefault(model_key, {})[set_name] = row
+            set_p[set_name] = perm.get("p_value", 1.0)
+        for name, adj in holm(set_p).items():
+            results["by_set"][model_key][name]["p_holm"] = adj
+
+    judges = sorted(blinded["judge_id"].unique())
+    primary = [j for j in judges if j == args.judges[0] or j == args.judges[1]] \
+        if args.judges else judges[:2]
+    results["judge_agreement"] = judge_agreement(blinded, primary)
+
+    (out_dir / "statistical_results.json").write_text(
+        json.dumps(results, indent=2, default=str), encoding="utf-8")
+
+    lines = _v2_report(results, df, args)
+    (out_dir / "report.md").write_text("\n".join(lines), encoding="utf-8")
+    print("\n".join(lines[:60]))
+    print(f"\nfull report -> {out_dir / 'report.md'}")
+    print(f"statistics  -> {out_dir / 'statistical_results.json'}")
+    print(f"\n{INCOMPLETE_NOTICE if args.incomplete_notice else ''}")
+
+
+def _v2_report(results, df, args) -> list:
+    import pandas as pd
+
+    adj = results["adjudication"]
+    agreement = results.get("judge_agreement") or {}
+    lines = [
+        "# Coherence v2 — autorated contextual coherence\n",
+        "**Primary endpoint:** paired R-Lens minus J-Lens difference in blinded",
+        "contextual coherence (0-4), equal-weighted across evaluation set, prompt and",
+        "preregistered relative depth. Autoraters are the primary instrument per the",
+        "2026-08-26 amendment; token-form statistics are secondary diagnostics only.\n",
+        "This report makes no claim about concept specificity, causal onset, necessity,",
+        "sufficiency, answer smuggling, or load-bearing representations (§ scope).\n",
+        f"Cells: {results['n_cells']}   prompts: {results['n_prompts']}   "
+        f"depths: 5 per model   arms: 3\n",
+        "## Judge agreement\n",
+        f"- adjudication rate: **{adj['n_disputed']}/{adj['n_cells']} "
+        f"({adj['n_disputed'] / max(1, adj['n_cells']):.0%})** "
+        f"(adjudicator: `{adj['adjudicator']}`)",
+    ]
+    if agreement:
+        lines += [
+            f"- quadratic-weighted Cohen's kappa: **{agreement['quadratic_weighted_kappa']:.3f}**"
+            f" on {agreement['n_paired_scores']} paired scores",
+            f"- exact agreement {agreement['exact_agreement']:.1%}, "
+            f"mean |difference| {agreement['mean_abs_difference']:.2f}",
+        ]
+    lines += ["", "A high adjudication rate with validated judges is evidence about the",
+              "material, not the instrument: it indicates the readouts being rated are",
+              "themselves ambiguous.\n", "## Primary result, by model\n"]
+
+    rows = []
+    for model_key, entry in results["per_model"].items():
+        for contrast, stats in entry.items():
+            if " - " not in contrast or contrast.startswith(("lexical", "prompt_echo")):
+                continue
+            rates = stats.get("win_rates") or {}
+            rows.append({
+                "model": model_key, "contrast": contrast,
+                "delta": stats.get("delta"), "ci_lo": stats.get("ci_lo"),
+                "ci_hi": stats.get("ci_hi"), "p": stats.get("p_display"),
+                "win": rates.get("win"), "tie": rates.get("tie"), "loss": rates.get("loss"),
+                "n_prompts": stats.get("n_prompts"), "n_cells": stats.get("n_cells")})
+    lines.append(pd.DataFrame(rows).to_markdown(index=False, floatfmt=".3f"))
+    lines += ["", "Positive `delta` favours the first arm. Intervals are percentile 95%",
+              "from a 10k stratified paired prompt-cluster bootstrap; p-values are",
+              "paired prompt-cluster sign-flip permutation tests.\n",
+              "## Secondary dimensions (R minus J)\n"]
+
+    rows = []
+    for model_key, entry in results["per_model"].items():
+        for dimension in ("lexical_integrity", "prompt_echo"):
+            stats = entry.get(f"{dimension}: released-R - released-J") or {}
+            rows.append({"model": model_key, "dimension": dimension,
+                         "delta": stats.get("delta"), "ci_lo": stats.get("ci_lo"),
+                         "ci_hi": stats.get("ci_hi")})
+    lines.append(pd.DataFrame(rows).to_markdown(index=False, floatfmt=".3f"))
+
+    lines += ["", "## By normalized depth (secondary, Holm-corrected)\n"]
+    rows = []
+    for model_key, by_z in results["by_depth"].items():
+        for z, stats in sorted(by_z.items()):
+            rows.append({"model": model_key, "z": z, "delta": stats.get("delta"),
+                         "ci_lo": stats.get("ci_lo"), "ci_hi": stats.get("ci_hi"),
+                         "p": stats.get("p_display"), "p_holm": stats.get("p_holm")})
+    lines.append(pd.DataFrame(rows).to_markdown(index=False, floatfmt=".3f"))
+
+    lines += ["", "## By evaluation set (DESCRIPTIVE — four prompts per set)\n",
+              "Four prompts per set is too few for confirmatory inference; these are",
+              "reported for pattern only and are Holm-corrected where tested.\n"]
+    rows = []
+    for model_key, by_set in results["by_set"].items():
+        for set_name, stats in sorted(by_set.items()):
+            rows.append({"model": model_key, "set": set_name, "delta": stats.get("delta"),
+                         "n_cells": stats.get("n_cells"), "p_holm": stats.get("p_holm")})
+    lines.append(pd.DataFrame(rows).to_markdown(index=False, floatfmt=".3f"))
+
+    lines += ["", "## Mean scores by lens\n"]
+    means = df.groupby(["model_key", "lens"])[
+        ["contextual_coherence", "lexical_integrity", "prompt_echo"]].mean()
+    lines.append(means.to_markdown(floatfmt=".3f"))
+    lines.append("")
+    return lines
+
+
+
+# ---------------------------------------------------------------------------
 # entry point
 # ---------------------------------------------------------------------------
 
@@ -1717,6 +1902,19 @@ def main() -> None:
     p.add_argument("--adjudicator", required=True, help="a THIRD family")
     p.add_argument("--max-retries", type=int, default=3)
     p.set_defaults(func=cmd_autorate)
+
+    p = sub.add_parser("analyse-v2", help="v2 Stage 6: unblind and compute the estimands")
+    p.add_argument("--ratings-dir", required=True)
+    p.add_argument("--key", required=True)
+    p.add_argument("--sample", required=True)
+    p.add_argument("--out-dir", required=True)
+    p.add_argument("--judges", nargs=2, default=None)
+    p.add_argument("--n-boot", type=int, default=10000)
+    p.add_argument("--n-perm", type=int, default=10000)
+    p.add_argument("--seed", type=int, default=20260826)
+    p.add_argument("--incomplete-notice", action="store_true",
+                   help="print the §16 incompleteness sentence (human panel not run)")
+    p.set_defaults(func=cmd_analyse_v2)
 
     args = parser.parse_args()
     args.func(args)
