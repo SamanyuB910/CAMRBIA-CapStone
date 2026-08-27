@@ -1,0 +1,571 @@
+{
+  "seed": 20260827,
+  "detail": {
+    "gpt5_only": {
+      "gemma-3-27b-it": {
+        "by_echo_delta": [
+          {
+            "echo_delta": -1.0,
+            "n_cells": 1,
+            "n_prompts": 1,
+            "mean_coherence_delta": -2.0
+          },
+          {
+            "echo_delta": 0.0,
+            "n_cells": 65,
+            "n_prompts": 19,
+            "mean_coherence_delta": 0.8461538461538461
+          },
+          {
+            "echo_delta": 1.0,
+            "n_cells": 34,
+            "n_prompts": 14,
+            "mean_coherence_delta": 1.8529411764705883
+          }
+        ],
+        "regression": {
+          "intercept": 0.7942762339278309,
+          "intercept_ci": [
+            0.5917260996675084,
+            1.0496395969320154
+          ],
+          "slope": 1.108253836582331,
+          "slope_ci": [
+            0.6111788785842779,
+            1.6910307021533355
+          ],
+          "n_cells": 100,
+          "n_prompts": 20,
+          "n_bootstrap_used": 10000,
+          "interpretation": "slope > 0 means cells where R echoes more also show a larger coherence advantage; the intercept is the fitted coherence difference at EQUAL echo, not an echo-adjusted causal effect"
+        }
+      },
+      "qwen3.5-27b": {
+        "by_echo_delta": [
+          {
+            "echo_delta": -1.0,
+            "n_cells": 1,
+            "n_prompts": 1,
+            "mean_coherence_delta": 0.0
+          },
+          {
+            "echo_delta": 0.0,
+            "n_cells": 79,
+            "n_prompts": 20,
+            "mean_coherence_delta": 0.5949367088607594
+          },
+          {
+            "echo_delta": 1.0,
+            "n_cells": 19,
+            "n_prompts": 12,
+            "mean_coherence_delta": 1.4736842105263157
+          },
+          {
+            "echo_delta": 2.0,
+            "n_cells": 1,
+            "n_prompts": 1,
+            "mean_coherence_delta": 4.0
+          }
+        ],
+        "regression": {
+          "intercept": 0.5880000000000003,
+          "intercept_ci": [
+            0.32642487046632135,
+            0.8345341078735186
+          ],
+          "slope": 1.0100000000000005,
+          "slope_ci": [
+            0.6325122657448968,
+            1.3085683578266973
+          ],
+          "n_cells": 100,
+          "n_prompts": 20,
+          "n_bootstrap_used": 10000,
+          "interpretation": "slope > 0 means cells where R echoes more also show a larger coherence advantage; the intercept is the fitted coherence difference at EQUAL echo, not an echo-adjusted causal effect"
+        }
+      },
+      "POOLED": {
+        "by_echo_delta": [
+          {
+            "echo_delta": -1.0,
+            "n_cells": 2,
+            "n_prompts": 2,
+            "mean_coherence_delta": -1.0
+          },
+          {
+            "echo_delta": 0.0,
+            "n_cells": 144,
+            "n_prompts": 20,
+            "mean_coherence_delta": 0.7083333333333334
+          },
+          {
+            "echo_delta": 1.0,
+            "n_cells": 53,
+            "n_prompts": 18,
+            "mean_coherence_delta": 1.7169811320754718
+          },
+          {
+            "echo_delta": 2.0,
+            "n_cells": 1,
+            "n_prompts": 1,
+            "mean_coherence_delta": 4.0
+          }
+        ],
+        "regression": {
+          "intercept": 0.6842397953509062,
+          "intercept_ci": [
+            0.5318070155686209,
+            0.83075926403797
+          ],
+          "slope": 1.0972083194305418,
+          "slope_ci": [
+            0.8045363709081799,
+            1.4171806962412394
+          ],
+          "n_cells": 200,
+          "n_prompts": 20,
+          "n_bootstrap_used": 10000,
+          "interpretation": "slope > 0 means cells where R echoes more also show a larger coherence advantage; the intercept is the fitted coherence difference at EQUAL echo, not an echo-adjusted causal effect"
+        }
+      }
+    },
+    "deepseek_only": {
+      "gemma-3-27b-it": {
+        "by_echo_delta": [
+          {
+            "echo_delta": -1.0,
+            "n_cells": 1,
+            "n_prompts": 1,
+            "mean_coherence_delta": -2.0
+          },
+          {
+            "echo_delta": 0.0,
+            "n_cells": 66,
+            "n_prompts": 20,
+            "mean_coherence_delta": 0.8181818181818182
+          },
+          {
+            "echo_delta": 1.0,
+            "n_cells": 32,
+            "n_prompts": 16,
+            "mean_coherence_delta": 1.0625
+          },
+          {
+            "echo_delta": 2.0,
+            "n_cells": 1,
+            "n_prompts": 1,
+            "mean_coherence_delta": 0.0
+          }
+        ],
+        "regression": {
+          "intercept": 0.7636920720030641,
+          "intercept_ci": [
+            0.4786539937005332,
+            1.0757611324512728
+          ],
+          "slope": 0.29184220605132116,
+          "slope_ci": [
+            -0.15798880326525472,
+            0.8034928240295037
+          ],
+          "n_cells": 100,
+          "n_prompts": 20,
+          "n_bootstrap_used": 10000,
+          "interpretation": "slope > 0 means cells where R echoes more also show a larger coherence advantage; the intercept is the fitted coherence difference at EQUAL echo, not an echo-adjusted causal effect"
+        }
+      },
+      "qwen3.5-27b": {
+        "by_echo_delta": [
+          {
+            "echo_delta": 0.0,
+            "n_cells": 75,
+            "n_prompts": 20,
+            "mean_coherence_delta": 0.4666666666666667
+          },
+          {
+            "echo_delta": 1.0,
+            "n_cells": 21,
+            "n_prompts": 13,
+            "mean_coherence_delta": 1.0
+          },
+          {
+            "echo_delta": 2.0,
+            "n_cells": 4,
+            "n_prompts": 3,
+            "mean_coherence_delta": 0.75
+          }
+        ],
+        "regression": {
+          "intercept": 0.48968170689052093,
+          "intercept_ci": [
+            0.3352272727272727,
+            0.6472631018197329
+          ],
+          "slope": 0.3459251486533755,
+          "slope_ci": [
+            -0.029941616766466967,
+            0.6311341864674574
+          ],
+          "n_cells": 100,
+          "n_prompts": 20,
+          "n_bootstrap_used": 10000,
+          "interpretation": "slope > 0 means cells where R echoes more also show a larger coherence advantage; the intercept is the fitted coherence difference at EQUAL echo, not an echo-adjusted causal effect"
+        }
+      },
+      "POOLED": {
+        "by_echo_delta": [
+          {
+            "echo_delta": -1.0,
+            "n_cells": 1,
+            "n_prompts": 1,
+            "mean_coherence_delta": -2.0
+          },
+          {
+            "echo_delta": 0.0,
+            "n_cells": 141,
+            "n_prompts": 20,
+            "mean_coherence_delta": 0.6312056737588653
+          },
+          {
+            "echo_delta": 1.0,
+            "n_cells": 53,
+            "n_prompts": 19,
+            "mean_coherence_delta": 1.0377358490566038
+          },
+          {
+            "echo_delta": 2.0,
+            "n_cells": 5,
+            "n_prompts": 4,
+            "mean_coherence_delta": 0.6
+          }
+        ],
+        "regression": {
+          "intercept": 0.6228550565899962,
+          "intercept_ci": [
+            0.4481169937092655,
+            0.7908119832267131
+          ],
+          "slope": 0.3294998174516246,
+          "slope_ci": [
+            0.04452204144417068,
+            0.608238483163281
+          ],
+          "n_cells": 200,
+          "n_prompts": 20,
+          "n_bootstrap_used": 10000,
+          "interpretation": "slope > 0 means cells where R echoes more also show a larger coherence advantage; the intercept is the fitted coherence difference at EQUAL echo, not an echo-adjusted causal effect"
+        }
+      }
+    },
+    "primary_mean": {
+      "gemma-3-27b-it": {
+        "by_echo_delta": [
+          {
+            "echo_delta": -1.0,
+            "n_cells": 1,
+            "n_prompts": 1,
+            "mean_coherence_delta": -2.0
+          },
+          {
+            "echo_delta": 0.0,
+            "n_cells": 53,
+            "n_prompts": 19,
+            "mean_coherence_delta": 0.8113207547169812
+          },
+          {
+            "echo_delta": 0.5,
+            "n_cells": 24,
+            "n_prompts": 15,
+            "mean_coherence_delta": 1.3125
+          },
+          {
+            "echo_delta": 1.0,
+            "n_cells": 22,
+            "n_prompts": 14,
+            "mean_coherence_delta": 1.2954545454545454
+          }
+        ],
+        "regression": {
+          "intercept": 0.7745720596355603,
+          "intercept_ci": [
+            0.5296788331164829,
+            1.0765154940478674
+          ],
+          "slope": 0.7134180011043624,
+          "slope_ci": [
+            0.14487774789478122,
+            1.3554829421775436
+          ],
+          "n_cells": 100,
+          "n_prompts": 20,
+          "n_bootstrap_used": 10000,
+          "interpretation": "slope > 0 means cells where R echoes more also show a larger coherence advantage; the intercept is the fitted coherence difference at EQUAL echo, not an echo-adjusted causal effect"
+        }
+      },
+      "qwen3.5-27b": {
+        "by_echo_delta": [
+          {
+            "echo_delta": -0.5,
+            "n_cells": 1,
+            "n_prompts": 1,
+            "mean_coherence_delta": 0.5
+          },
+          {
+            "echo_delta": 0.0,
+            "n_cells": 68,
+            "n_prompts": 20,
+            "mean_coherence_delta": 0.41911764705882354
+          },
+          {
+            "echo_delta": 0.5,
+            "n_cells": 15,
+            "n_prompts": 10,
+            "mean_coherence_delta": 1.2
+          },
+          {
+            "echo_delta": 1.0,
+            "n_cells": 14,
+            "n_prompts": 9,
+            "mean_coherence_delta": 1.3928571428571428
+          },
+          {
+            "echo_delta": 1.5,
+            "n_cells": 1,
+            "n_prompts": 1,
+            "mean_coherence_delta": -1.0
+          },
+          {
+            "echo_delta": 2.0,
+            "n_cells": 1,
+            "n_prompts": 1,
+            "mean_coherence_delta": 3.5
+          }
+        ],
+        "regression": {
+          "intercept": 0.46383066173448395,
+          "intercept_ci": [
+            0.29681274900398397,
+            0.640675797338664
+          ],
+          "slope": 0.923140156185779,
+          "slope_ci": [
+            0.4613484620760891,
+            1.2809745224665918
+          ],
+          "n_cells": 100,
+          "n_prompts": 20,
+          "n_bootstrap_used": 10000,
+          "interpretation": "slope > 0 means cells where R echoes more also show a larger coherence advantage; the intercept is the fitted coherence difference at EQUAL echo, not an echo-adjusted causal effect"
+        }
+      },
+      "POOLED": {
+        "by_echo_delta": [
+          {
+            "echo_delta": -1.0,
+            "n_cells": 1,
+            "n_prompts": 1,
+            "mean_coherence_delta": -2.0
+          },
+          {
+            "echo_delta": -0.5,
+            "n_cells": 1,
+            "n_prompts": 1,
+            "mean_coherence_delta": 0.5
+          },
+          {
+            "echo_delta": 0.0,
+            "n_cells": 121,
+            "n_prompts": 20,
+            "mean_coherence_delta": 0.5909090909090909
+          },
+          {
+            "echo_delta": 0.5,
+            "n_cells": 39,
+            "n_prompts": 17,
+            "mean_coherence_delta": 1.2692307692307692
+          },
+          {
+            "echo_delta": 1.0,
+            "n_cells": 36,
+            "n_prompts": 18,
+            "mean_coherence_delta": 1.3333333333333333
+          },
+          {
+            "echo_delta": 1.5,
+            "n_cells": 1,
+            "n_prompts": 1,
+            "mean_coherence_delta": -1.0
+          },
+          {
+            "echo_delta": 2.0,
+            "n_cells": 1,
+            "n_prompts": 1,
+            "mean_coherence_delta": 3.5
+          }
+        ],
+        "regression": {
+          "intercept": 0.6062978723404253,
+          "intercept_ci": [
+            0.47451739492433376,
+            0.7396147509544287
+          ],
+          "slope": 0.8476595744680852,
+          "slope_ci": [
+            0.5176699699949432,
+            1.1892277834457927
+          ],
+          "n_cells": 200,
+          "n_prompts": 20,
+          "n_bootstrap_used": 10000,
+          "interpretation": "slope > 0 means cells where R echoes more also show a larger coherence advantage; the intercept is the fitted coherence difference at EQUAL echo, not an echo-adjusted causal effect"
+        }
+      }
+    },
+    "adjudicated": {
+      "gemma-3-27b-it": {
+        "by_echo_delta": [
+          {
+            "echo_delta": -1.0,
+            "n_cells": 1,
+            "n_prompts": 1,
+            "mean_coherence_delta": -3.0
+          },
+          {
+            "echo_delta": 0.0,
+            "n_cells": 60,
+            "n_prompts": 19,
+            "mean_coherence_delta": 0.7083333333333334
+          },
+          {
+            "echo_delta": 0.5,
+            "n_cells": 15,
+            "n_prompts": 11,
+            "mean_coherence_delta": 1.5333333333333334
+          },
+          {
+            "echo_delta": 1.0,
+            "n_cells": 24,
+            "n_prompts": 14,
+            "mean_coherence_delta": 1.1458333333333333
+          }
+        ],
+        "regression": {
+          "intercept": 0.671808715773236,
+          "intercept_ci": [
+            0.3629311107690699,
+            1.0191632408028735
+          ],
+          "slope": 0.7481681450057849,
+          "slope_ci": [
+            0.21917482061317692,
+            1.358521124570088
+          ],
+          "n_cells": 100,
+          "n_prompts": 20,
+          "n_bootstrap_used": 10000,
+          "interpretation": "slope > 0 means cells where R echoes more also show a larger coherence advantage; the intercept is the fitted coherence difference at EQUAL echo, not an echo-adjusted causal effect"
+        }
+      },
+      "qwen3.5-27b": {
+        "by_echo_delta": [
+          {
+            "echo_delta": -1.0,
+            "n_cells": 1,
+            "n_prompts": 1,
+            "mean_coherence_delta": 1.0
+          },
+          {
+            "echo_delta": 0.0,
+            "n_cells": 74,
+            "n_prompts": 20,
+            "mean_coherence_delta": 0.41216216216216217
+          },
+          {
+            "echo_delta": 0.5,
+            "n_cells": 5,
+            "n_prompts": 4,
+            "mean_coherence_delta": 1.3
+          },
+          {
+            "echo_delta": 1.0,
+            "n_cells": 19,
+            "n_prompts": 10,
+            "mean_coherence_delta": 1.2894736842105263
+          },
+          {
+            "echo_delta": 2.0,
+            "n_cells": 1,
+            "n_prompts": 1,
+            "mean_coherence_delta": 3.0
+          }
+        ],
+        "regression": {
+          "intercept": 0.45424148606811104,
+          "intercept_ci": [
+            0.2544013296650099,
+            0.6574884737678856
+          ],
+          "slope": 0.8922600619195052,
+          "slope_ci": [
+            0.5737781398821419,
+            1.20089350044222
+          ],
+          "n_cells": 100,
+          "n_prompts": 20,
+          "n_bootstrap_used": 10000,
+          "interpretation": "slope > 0 means cells where R echoes more also show a larger coherence advantage; the intercept is the fitted coherence difference at EQUAL echo, not an echo-adjusted causal effect"
+        }
+      },
+      "POOLED": {
+        "by_echo_delta": [
+          {
+            "echo_delta": -1.0,
+            "n_cells": 2,
+            "n_prompts": 2,
+            "mean_coherence_delta": -1.0
+          },
+          {
+            "echo_delta": 0.0,
+            "n_cells": 134,
+            "n_prompts": 20,
+            "mean_coherence_delta": 0.5447761194029851
+          },
+          {
+            "echo_delta": 0.5,
+            "n_cells": 20,
+            "n_prompts": 13,
+            "mean_coherence_delta": 1.475
+          },
+          {
+            "echo_delta": 1.0,
+            "n_cells": 43,
+            "n_prompts": 18,
+            "mean_coherence_delta": 1.2093023255813953
+          },
+          {
+            "echo_delta": 2.0,
+            "n_cells": 1,
+            "n_prompts": 1,
+            "mean_coherence_delta": 3.0
+          }
+        ],
+        "regression": {
+          "intercept": 0.5550306594919283,
+          "intercept_ci": [
+            0.3799760016211207,
+            0.7388061580447766
+          ],
+          "slope": 0.8395069453134774,
+          "slope_ci": [
+            0.562499228395062,
+            1.1105400567975325
+          ],
+          "n_cells": 200,
+          "n_prompts": 20,
+          "n_bootstrap_used": 10000,
+          "interpretation": "slope > 0 means cells where R echoes more also show a larger coherence advantage; the intercept is the fitted coherence difference at EQUAL echo, not an echo-adjusted causal effect"
+        }
+      }
+    }
+  }
+}

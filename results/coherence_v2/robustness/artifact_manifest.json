@@ -1,0 +1,80 @@
+{
+  "artifacts": {
+    "adjudication": {
+      "path": "/workspace/results/coherence_v2_panel_b/ratings_a_fixed/adjudication.json",
+      "sha256": "fff77384779f41fc471a42768efa9c2eb62fb104414f38f577151eebfae3acc8",
+      "bytes": 3148
+    },
+    "combined_scores": {
+      "path": "/workspace/results/coherence_v2_panel_b/ratings_a_fixed/combined_scores.json",
+      "sha256": "c34b6174c45e3807881ed927174ebff7849ba9d793320c0c724525778e5ce56e",
+      "bytes": 87268
+    },
+    "completeness": {
+      "path": "/workspace/results/coherence_v2_panel_b/ratings_a_fixed/completeness.json",
+      "sha256": "cf501b849983b5de0d5a616163174a85ae0a7cb6d8538c6da858707a82bdec80",
+      "bytes": 354
+    },
+    "cost_report": {
+      "path": "/workspace/results/coherence_v2_panel_b/ratings_a_fixed/cost_report.json",
+      "sha256": "aca71251b537bf077a2f343382cab7eaaa8d0c1be89b1775fbeb350f238f0f33",
+      "bytes": 727
+    },
+    "panel_key": {
+      "path": "/root/panel_keys/panel_b/panel_key.jsonl",
+      "sha256": "8069446812fd52b0f38308b76b8d7338788ebaf8db36e5bd4b3834207082875b",
+      "bytes": 41189
+    },
+    "panel_manifest": {
+      "path": "/workspace/results/coherence_v2_panel_b/panel/panel_manifest.json",
+      "sha256": "1e595c6889b20652d131e80dcdf9d5b8be79f14018b3c51280b926db35100fb2",
+      "bytes": 3678
+    },
+    "panel_public": {
+      "path": "/workspace/results/coherence_v2_panel_b/panel/panel_public.jsonl",
+      "sha256": "47ee00c3abb77fed367a66b313c300f811c80a373a02195e456a8b47506a6002",
+      "bytes": 279637
+    },
+    "raw[deepseek/deepseek-chat-v3.1]": {
+      "path": "/workspace/results/coherence_v2_panel_b/ratings_a/raw_deepseek_deepseek-chat-v3.1.jsonl",
+      "sha256": "4faf52b8d6fa03ab6c8dbc9e5aef81f3698a7a03819e2a5797935818d86a9749",
+      "bytes": 277000
+    },
+    "raw[meta-llama/llama-3.1-70b-instruct]": {
+      "path": "/workspace/results/coherence_v2_panel_b/ratings_a/raw_meta-llama_llama-3.1-70b-instruct.jsonl",
+      "sha256": "0c62993cc4a00ed6510999b47bca4d40455e8e2e51540f686c8249dbb62179d9",
+      "bytes": 148314
+    },
+    "raw[openai/gpt-5]": {
+      "path": "/workspace/results/coherence_v2_panel_b/ratings_a/raw_openai_gpt-5.jsonl",
+      "sha256": "bd2eadbfda2abca644df90fd70bfc858ab6b71c2fbece94805a82ca67828a72b",
+      "bytes": 274900
+    },
+    "readouts": {
+      "path": "/workspace/results/coherence_v2_panel_b/panel/readouts.parquet",
+      "sha256": "7d38f794b5e2b4a361caa4d43ef0b4b8763145b0e500385b76f84286edebd506",
+      "bytes": 62751
+    },
+    "sample": {
+      "path": "/workspace/results/coherence_v2_panel_b/shared_panel_sample.json",
+      "sha256": "da36f04028c10cdfc87220fb8d37a79f8e45f7541f55365fca60efbe5ba730d6",
+      "bytes": 40532
+    },
+    "scores_blinded": {
+      "path": "/workspace/results/coherence_v2_panel_b/ratings_a_fixed/scores_blinded.csv",
+      "sha256": "9b087e1123e951718c5d78c2ff45c3a2de560b6277ac199374da7c9dd0f346db",
+      "bytes": 220751
+    }
+  },
+  "generated_by": "/root/CAMRBIA-CapStone/.venv/bin/rlens audit-v2 --panel-dir /workspace/results/coherence_v2_panel_b/panel --ratings-dir /workspace/results/coherence_v2_panel_b/ratings_a_fixed --raw-dir /workspace/results/coherence_v2_panel_b/ratings_a --key /root/panel_keys/panel_b/panel_key.jsonl --sample /workspace/results/coherence_v2_panel_b/shared_panel_sample.json --statistical-results /workspace/results/coherence_v2_panel_b/analysis_fixed/statistical_results.json --judges openai/gpt-5 deepseek/deepseek-chat-v3.1 --adjudicator meta-llama/llama-3.1-70b-instruct --out-dir results/coherence_v2/robustness",
+  "code": {
+    "commit": "2fd11b9186b72acbadbf8e451484ea0895b3815c",
+    "branch": "coherence-branch",
+    "dirty": true,
+    "dirty_files": [
+      "paper/final_reproducibility_manifest.json",
+      "results/coherence_v2/figures/",
+      "results/coherence_v2/robustness/"
+    ]
+  }
+}

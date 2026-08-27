@@ -1,0 +1,322 @@
+{
+  "dimension": "non_echo_coherence",
+  "rubric_hash": "55e95a7b273087ef",
+  "salt": "non-echo-2026-08-27",
+  "n_cells": 200,
+  "per_model": {
+    "gemma-3-27b-it": {
+      "released-R - released-J": {
+        "delta": 0.11000000000000001,
+        "ci_lo": -0.045000000000000005,
+        "ci_hi": 0.255,
+        "n_prompts": 20,
+        "n_cells": 100,
+        "observed": 0.11000000000000001,
+        "p_value": 0.45015498450154984,
+        "n_permutations": 10000,
+        "p_display": "0.4502",
+        "win_rates": {
+          "win": 0.46,
+          "tie": 0.27,
+          "loss": 0.27,
+          "win_adjusted": 0.595,
+          "n": 100
+        }
+      },
+      "released-R - logit": {
+        "delta": 0.985,
+        "ci_lo": 0.8049999999999999,
+        "ci_hi": 1.1800000000000002,
+        "n_prompts": 20,
+        "n_cells": 100,
+        "observed": 0.985,
+        "p_value": 9.999000099990002e-05,
+        "n_permutations": 10000,
+        "p_display": "< 1e-04",
+        "win_rates": {
+          "win": 0.75,
+          "tie": 0.11,
+          "loss": 0.14,
+          "win_adjusted": 0.805,
+          "n": 100
+        }
+      },
+      "released-J - logit": {
+        "delta": 0.875,
+        "ci_lo": 0.6849999999999999,
+        "ci_hi": 1.065,
+        "n_prompts": 20,
+        "n_cells": 100,
+        "observed": 0.875,
+        "p_value": 9.999000099990002e-05,
+        "n_permutations": 10000,
+        "p_display": "< 1e-04",
+        "win_rates": {
+          "win": 0.68,
+          "tie": 0.14,
+          "loss": 0.18,
+          "win_adjusted": 0.75,
+          "n": 100
+        }
+      }
+    },
+    "qwen3.5-27b": {
+      "released-R - released-J": {
+        "delta": 0.325,
+        "ci_lo": 0.16499999999999998,
+        "ci_hi": 0.48,
+        "n_prompts": 20,
+        "n_cells": 100,
+        "observed": 0.325,
+        "p_value": 0.004199580041995801,
+        "n_permutations": 10000,
+        "p_display": "0.0042",
+        "win_rates": {
+          "win": 0.57,
+          "tie": 0.24,
+          "loss": 0.19,
+          "win_adjusted": 0.69,
+          "n": 100
+        }
+      },
+      "released-R - logit": {
+        "delta": 0.575,
+        "ci_lo": 0.41500000000000004,
+        "ci_hi": 0.7150000000000001,
+        "n_prompts": 20,
+        "n_cells": 100,
+        "observed": 0.575,
+        "p_value": 9.999000099990002e-05,
+        "n_permutations": 10000,
+        "p_display": "< 1e-04",
+        "win_rates": {
+          "win": 0.62,
+          "tie": 0.14,
+          "loss": 0.24,
+          "win_adjusted": 0.69,
+          "n": 100
+        }
+      },
+      "released-J - logit": {
+        "delta": 0.25,
+        "ci_lo": 0.025000000000000015,
+        "ci_hi": 0.465,
+        "n_prompts": 20,
+        "n_cells": 100,
+        "observed": 0.25,
+        "p_value": 0.06979302069793021,
+        "n_permutations": 10000,
+        "p_display": "0.0698",
+        "win_rates": {
+          "win": 0.49,
+          "tie": 0.18,
+          "loss": 0.33,
+          "win_adjusted": 0.58,
+          "n": 100
+        }
+      }
+    }
+  },
+  "by_depth": {
+    "gemma-3-27b-it": {
+      "0.0": {
+        "delta": 0.1,
+        "ci_lo": -0.15,
+        "ci_hi": 0.35,
+        "n_prompts": 20,
+        "n_cells": 20,
+        "observed": 0.1,
+        "p_value": 0.672032796720328,
+        "n_permutations": 10000,
+        "p_display": "0.6720",
+        "p_holm": 1.0
+      },
+      "0.1": {
+        "delta": -0.2,
+        "ci_lo": -0.525,
+        "ci_hi": 0.125,
+        "n_prompts": 20,
+        "n_cells": 20,
+        "observed": -0.2,
+        "p_value": 0.42775722427757223,
+        "n_permutations": 10000,
+        "p_display": "0.4278",
+        "p_holm": 1.0
+      },
+      "0.2": {
+        "delta": -0.2,
+        "ci_lo": -0.525,
+        "ci_hi": 0.2,
+        "n_prompts": 20,
+        "n_cells": 20,
+        "observed": -0.2,
+        "p_value": 0.5464453554644536,
+        "n_permutations": 10000,
+        "p_display": "0.5464",
+        "p_holm": 1.0
+      },
+      "0.3": {
+        "delta": 0.175,
+        "ci_lo": -0.1,
+        "ci_hi": 0.475,
+        "n_prompts": 20,
+        "n_cells": 20,
+        "observed": 0.175,
+        "p_value": 0.4901509849015098,
+        "n_permutations": 10000,
+        "p_display": "0.4902",
+        "p_holm": 1.0
+      },
+      "0.4": {
+        "delta": 0.675,
+        "ci_lo": 0.4,
+        "ci_hi": 0.975,
+        "n_prompts": 20,
+        "n_cells": 20,
+        "observed": 0.675,
+        "p_value": 0.0034996500349965005,
+        "n_permutations": 10000,
+        "p_display": "0.0035",
+        "p_holm": 0.0314968503149685
+      }
+    },
+    "qwen3.5-27b": {
+      "0.0": {
+        "delta": 0.8,
+        "ci_lo": 0.5,
+        "ci_hi": 1.1,
+        "n_prompts": 20,
+        "n_cells": 20,
+        "observed": 0.8,
+        "p_value": 0.00039996000399960006,
+        "n_permutations": 10000,
+        "p_display": "0.0004",
+        "p_holm": 0.003999600039996
+      },
+      "0.1": {
+        "delta": 0.35,
+        "ci_lo": 0.1,
+        "ci_hi": 0.6,
+        "n_prompts": 20,
+        "n_cells": 20,
+        "observed": 0.35,
+        "p_value": 0.04509549045095491,
+        "n_permutations": 10000,
+        "p_display": "0.0451",
+        "p_holm": 0.36076392360763926
+      },
+      "0.2": {
+        "delta": 0.325,
+        "ci_lo": 0.075,
+        "ci_hi": 0.575,
+        "n_prompts": 20,
+        "n_cells": 20,
+        "observed": 0.325,
+        "p_value": 0.0832916708329167,
+        "n_permutations": 10000,
+        "p_display": "0.0833",
+        "p_holm": 0.583041695830417
+      },
+      "0.3": {
+        "delta": 0.025,
+        "ci_lo": -0.225,
+        "ci_hi": 0.275,
+        "n_prompts": 20,
+        "n_cells": 20,
+        "observed": 0.025,
+        "p_value": 1.0,
+        "n_permutations": 10000,
+        "p_display": "1.0000",
+        "p_holm": 1.0
+      },
+      "0.4": {
+        "delta": 0.125,
+        "ci_lo": -0.15,
+        "ci_hi": 0.375,
+        "n_prompts": 20,
+        "n_cells": 20,
+        "observed": 0.125,
+        "p_value": 0.48635136486351366,
+        "n_permutations": 10000,
+        "p_display": "0.4864",
+        "p_holm": 1.0
+      }
+    }
+  },
+  "mean_scores": {
+    "gemma-3-27b-it": {
+      "logit": 0.705,
+      "released-J": 1.58,
+      "released-R": 1.69
+    },
+    "qwen3.5-27b": {
+      "logit": 1.04,
+      "released-J": 1.29,
+      "released-R": 1.615
+    }
+  },
+  "secondary_means": {
+    "residual_substance": {
+      "gemma-3-27b-it": {
+        "logit": 1.805,
+        "released-J": 1.805,
+        "released-R": 1.475
+      },
+      "qwen3.5-27b": {
+        "logit": 1.57,
+        "released-J": 1.925,
+        "released-R": 1.775
+      }
+    }
+  },
+  "secondary_contrasts": {
+    "residual_substance": {
+      "gemma-3-27b-it": {
+        "released-R - released-J": {
+          "delta": -0.33,
+          "ci_lo": -0.395,
+          "ci_hi": -0.265,
+          "n_prompts": 20,
+          "n_cells": 100
+        },
+        "released-R - logit": {
+          "delta": -0.33,
+          "ci_lo": -0.41000000000000003,
+          "ci_hi": -0.24,
+          "n_prompts": 20,
+          "n_cells": 100
+        },
+        "released-J - logit": {
+          "delta": 1.3877787807814458e-18,
+          "ci_lo": -0.085,
+          "ci_hi": 0.10499999999999998,
+          "n_prompts": 20,
+          "n_cells": 100
+        }
+      },
+      "qwen3.5-27b": {
+        "released-R - released-J": {
+          "delta": -0.15,
+          "ci_lo": -0.195,
+          "ci_hi": -0.10500000000000001,
+          "n_prompts": 20,
+          "n_cells": 100
+        },
+        "released-R - logit": {
+          "delta": 0.20500000000000002,
+          "ci_lo": 0.12000000000000002,
+          "ci_hi": 0.28500000000000003,
+          "n_prompts": 20,
+          "n_cells": 100
+        },
+        "released-J - logit": {
+          "delta": 0.355,
+          "ci_lo": 0.28,
+          "ci_hi": 0.43000000000000005,
+          "n_prompts": 20,
+          "n_cells": 100
+        }
+      }
+    }
+  }
+}

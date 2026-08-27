@@ -1,0 +1,30 @@
+{
+  "figures": {
+    "fig1_primary_result": [
+      "results/coherence_v2/figures/fig1_primary_result.pdf",
+      "results/coherence_v2/figures/fig1_primary_result.svg",
+      "results/coherence_v2/figures/fig1_primary_result.png"
+    ],
+    "fig2_depth_profile": [
+      "results/coherence_v2/figures/fig2_depth_profile.pdf",
+      "results/coherence_v2/figures/fig2_depth_profile.svg",
+      "results/coherence_v2/figures/fig2_depth_profile.png"
+    ],
+    "fig3_judge_sensitivity": [
+      "results/coherence_v2/figures/fig3_judge_sensitivity.pdf",
+      "results/coherence_v2/figures/fig3_judge_sensitivity.svg",
+      "results/coherence_v2/figures/fig3_judge_sensitivity.png"
+    ],
+    "fig4_echo_sensitivity": [
+      "results/coherence_v2/figures/fig4_echo_sensitivity.pdf",
+      "results/coherence_v2/figures/fig4_echo_sensitivity.svg",
+      "results/coherence_v2/figures/fig4_echo_sensitivity.png"
+    ],
+    "fig5_judge_agreement": [
+      "results/coherence_v2/figures/fig5_judge_agreement.pdf",
+      "results/coherence_v2/figures/fig5_judge_agreement.svg",
+      "results/coherence_v2/figures/fig5_judge_agreement.png"
+    ]
+  },
+  "skipped": {}
+}

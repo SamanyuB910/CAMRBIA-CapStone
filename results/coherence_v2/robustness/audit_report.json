@@ -1,0 +1,354 @@
+{
+  "status": "PASS",
+  "n_checks": 20,
+  "n_failed": 0,
+  "counts": {
+    "n_cells": 200,
+    "n_key_rows": 200,
+    "cells_per_model": {
+      "gemma-3-27b-it": 100,
+      "qwen3.5-27b": 100
+    },
+    "prompts_per_set": {
+      "association": 4,
+      "multihop": 4,
+      "multilingual": 4,
+      "poetry": 4,
+      "typo": 4
+    },
+    "layers_per_model": {
+      "gemma-3-27b-it": [
+        0,
+        6,
+        12,
+        18,
+        24
+      ],
+      "qwen3.5-27b": [
+        0,
+        6,
+        12,
+        19,
+        25
+      ]
+    },
+    "disputed_cell_ids": [
+      "c106bcfa1632a74e",
+      "e9daf7e76858a0e3",
+      "f531c73afb95f82a",
+      "b0cf2ed25ffff59f",
+      "a57911a24630d932",
+      "4a543620e61ebb2c",
+      "04e653268beb8df0",
+      "d721affb1d522364",
+      "37db3ce459b32623",
+      "d5a3273bb1ab992c",
+      "7cf34c4265a45071",
+      "85379eb46e6a02fc",
+      "b90aba46fff948b0",
+      "6a647e80509027a8",
+      "404625677e54f731",
+      "906121b993c16f55",
+      "8f060ad15a522281",
+      "c694dc7d4435c7b0",
+      "ae4e67e5cc0795b5",
+      "5cd65bc701736ed2",
+      "76d2dd865daee97f",
+      "caafd8b481a9c048",
+      "e6bd0afb2899090f",
+      "7344e24917cea3eb",
+      "c74825eb474f9b71",
+      "ebf9e2236776091c",
+      "f487e16c84f2422a",
+      "02b63bb7dc1752e4",
+      "6d32689d597e2181",
+      "ddae7db1cad815eb",
+      "d2153c64019ebcd5",
+      "3acf7fb9b8053de5",
+      "4c7d01ca6edf08ae",
+      "5d0918ba23b2af4c",
+      "8df52e3aff3b925d",
+      "aca3aafca98f2c46",
+      "908fcba6bb9132e7",
+      "b8946f0158117ee7",
+      "ccd195853cab74b0",
+      "e7a72b8096f34cf9",
+      "0170bee2809765cd",
+      "0e9394e82562e0de",
+      "19359a4b179ec734",
+      "d18254c899ecd066",
+      "f94864caeb4a5073",
+      "9fa0a7fbde21b7a6",
+      "e6e6009493625129",
+      "7fd5c7b2e29b5b3e",
+      "5c3e87c5fafff3dc",
+      "f4357208e5ef7245",
+      "e33539952cbf4a3a",
+      "f7605d1fb3d1bcf7",
+      "c6a4d1a313da9078",
+      "b44b883868ce5cdf",
+      "7543ad012e5fef19",
+      "3c0bbe0758050805",
+      "2b2847f631355539",
+      "e554af40468b927a",
+      "b161400189247ef0",
+      "dcc10901163e19bf",
+      "99fc1081c2298666",
+      "b3e7ef253d2dbf79",
+      "6f9c3253826f1d57",
+      "266212f6a3ceb10c",
+      "7aea9a93a477576a",
+      "5d44b0d010f94486",
+      "1cba798447c0730b",
+      "52ab1e4bb74c8b27",
+      "1322cd8a426a9b1b",
+      "da75ecd7e5659b28",
+      "e57a6422a7fa8747",
+      "35a940d59a767861",
+      "4f61bb6314f5fe1d",
+      "17e9cd3b16ae160e",
+      "fefeb1ac61195c37",
+      "076ff80aa9bc6058",
+      "51c08ad2f8f11cfd",
+      "5a4448bc8e4cf335",
+      "3b1bb4da06b5f4b1",
+      "07eb5d3d72e377cb",
+      "77a67215457bfad1",
+      "63cf6e17abc3f11c",
+      "242a11a053a20ad4",
+      "5c0cd39009399716",
+      "19aa10cf9e06b712",
+      "1daaf763c87993e1",
+      "892bb3ea2fecccf8",
+      "54827a994cf8bfbc",
+      "579af3e6526d5aef",
+      "6de35ed6c087e0e3",
+      "7e00cd21b429935a",
+      "4e5aebb32d1c7709",
+      "a4a2e74ff5ba65fc",
+      "0ee8d59b12bcad40",
+      "d199c55bda825fad",
+      "d628f00afb5edb10",
+      "eb995dcbf3df28d9",
+      "98eacc77d8c62fcb",
+      "1431ccd9a9f4ea8a",
+      "75303d290cf3f889",
+      "12b3ab6eedb5a43f",
+      "e3f19853b79499ca",
+      "86804556c0964cc8",
+      "5c5736d05351d97a",
+      "8af067e5d4373e18",
+      "b5aebba2f6e8c8e8",
+      "33dfd0025cfdeaa7",
+      "93376b7012c4d6e3",
+      "b162ef4a19bf5f2b",
+      "6356c8b0a7251106",
+      "69346a5685db0b8c",
+      "bbf402421c86f303",
+      "cb39244f398dbe73",
+      "5e968225b3df9bb8",
+      "c730cc25e9359615",
+      "6e570f3c89a82e15",
+      "1d4bdf4e62c25d02",
+      "1f5e30e47d3d611c",
+      "c2e7c0ab1e624f27",
+      "40359df0a7e20496",
+      "5089264b3df9997a",
+      "5dc07dbcfd04aa47",
+      "24b61f4f3ccc33ee",
+      "a9edd50cc2b945a5",
+      "5c79abf4d4ba76a8",
+      "6bae6019d445244a"
+    ],
+    "n_disputed": 126
+  },
+  "artifacts": {
+    "adjudication": {
+      "path": "/workspace/results/coherence_v2_panel_b/ratings_a_fixed/adjudication.json",
+      "sha256": "fff77384779f41fc471a42768efa9c2eb62fb104414f38f577151eebfae3acc8",
+      "bytes": 3148
+    },
+    "combined_scores": {
+      "path": "/workspace/results/coherence_v2_panel_b/ratings_a_fixed/combined_scores.json",
+      "sha256": "c34b6174c45e3807881ed927174ebff7849ba9d793320c0c724525778e5ce56e",
+      "bytes": 87268
+    },
+    "completeness": {
+      "path": "/workspace/results/coherence_v2_panel_b/ratings_a_fixed/completeness.json",
+      "sha256": "cf501b849983b5de0d5a616163174a85ae0a7cb6d8538c6da858707a82bdec80",
+      "bytes": 354
+    },
+    "cost_report": {
+      "path": "/workspace/results/coherence_v2_panel_b/ratings_a_fixed/cost_report.json",
+      "sha256": "aca71251b537bf077a2f343382cab7eaaa8d0c1be89b1775fbeb350f238f0f33",
+      "bytes": 727
+    },
+    "panel_key": {
+      "path": "/root/panel_keys/panel_b/panel_key.jsonl",
+      "sha256": "8069446812fd52b0f38308b76b8d7338788ebaf8db36e5bd4b3834207082875b",
+      "bytes": 41189
+    },
+    "panel_manifest": {
+      "path": "/workspace/results/coherence_v2_panel_b/panel/panel_manifest.json",
+      "sha256": "1e595c6889b20652d131e80dcdf9d5b8be79f14018b3c51280b926db35100fb2",
+      "bytes": 3678
+    },
+    "panel_public": {
+      "path": "/workspace/results/coherence_v2_panel_b/panel/panel_public.jsonl",
+      "sha256": "47ee00c3abb77fed367a66b313c300f811c80a373a02195e456a8b47506a6002",
+      "bytes": 279637
+    },
+    "raw[deepseek/deepseek-chat-v3.1]": {
+      "path": "/workspace/results/coherence_v2_panel_b/ratings_a/raw_deepseek_deepseek-chat-v3.1.jsonl",
+      "sha256": "4faf52b8d6fa03ab6c8dbc9e5aef81f3698a7a03819e2a5797935818d86a9749",
+      "bytes": 277000
+    },
+    "raw[meta-llama/llama-3.1-70b-instruct]": {
+      "path": "/workspace/results/coherence_v2_panel_b/ratings_a/raw_meta-llama_llama-3.1-70b-instruct.jsonl",
+      "sha256": "0c62993cc4a00ed6510999b47bca4d40455e8e2e51540f686c8249dbb62179d9",
+      "bytes": 148314
+    },
+    "raw[openai/gpt-5]": {
+      "path": "/workspace/results/coherence_v2_panel_b/ratings_a/raw_openai_gpt-5.jsonl",
+      "sha256": "bd2eadbfda2abca644df90fd70bfc858ab6b71c2fbece94805a82ca67828a72b",
+      "bytes": 274900
+    },
+    "readouts": {
+      "path": "/workspace/results/coherence_v2_panel_b/panel/readouts.parquet",
+      "sha256": "7d38f794b5e2b4a361caa4d43ef0b4b8763145b0e500385b76f84286edebd506",
+      "bytes": 62751
+    },
+    "sample": {
+      "path": "/workspace/results/coherence_v2_panel_b/shared_panel_sample.json",
+      "sha256": "da36f04028c10cdfc87220fb8d37a79f8e45f7541f55365fca60efbe5ba730d6",
+      "bytes": 40532
+    },
+    "scores_blinded": {
+      "path": "/workspace/results/coherence_v2_panel_b/ratings_a_fixed/scores_blinded.csv",
+      "sha256": "9b087e1123e951718c5d78c2ff45c3a2de560b6277ac199374da7c9dd0f346db",
+      "bytes": 220751
+    }
+  },
+  "checks": [
+    {
+      "name": "cell_count",
+      "status": "PASS",
+      "detail": "200 cells, expected 200",
+      "fatal": true
+    },
+    {
+      "name": "three_arms_per_cell",
+      "status": "PASS",
+      "detail": "observed arm counts [3]",
+      "fatal": true
+    },
+    {
+      "name": "key_arms_one_to_one",
+      "status": "PASS",
+      "detail": "every row is a bijection onto the three lenses",
+      "fatal": true
+    },
+    {
+      "name": "key_covers_panel",
+      "status": "PASS",
+      "detail": "0 cells without a key row, 0 key rows without a cell",
+      "fatal": true
+    },
+    {
+      "name": "cells_per_model",
+      "status": "PASS",
+      "detail": "{'gemma-3-27b-it': 100, 'qwen3.5-27b': 100}",
+      "fatal": true
+    },
+    {
+      "name": "prompts_per_set",
+      "status": "PASS",
+      "detail": "{'association': 4, 'multihop': 4, 'multilingual': 4, 'poetry': 4, 'typo': 4}",
+      "fatal": true
+    },
+    {
+      "name": "prompts_shared_across_models",
+      "status": "PASS",
+      "detail": "per-model prompt-set sizes [20, 20]",
+      "fatal": true
+    },
+    {
+      "name": "five_depths_per_model",
+      "status": "PASS",
+      "detail": "{'gemma-3-27b-it': [0, 6, 12, 18, 24], 'qwen3.5-27b': [0, 6, 12, 19, 25]}",
+      "fatal": true
+    },
+    {
+      "name": "both_primary_ratings[openai/gpt-5]",
+      "status": "PASS",
+      "detail": "200/200 rated; 0 missing",
+      "fatal": true
+    },
+    {
+      "name": "no_failed_ratings[openai/gpt-5]",
+      "status": "PASS",
+      "detail": "none",
+      "fatal": true
+    },
+    {
+      "name": "both_primary_ratings[deepseek/deepseek-chat-v3.1]",
+      "status": "PASS",
+      "detail": "200/200 rated; 0 missing",
+      "fatal": true
+    },
+    {
+      "name": "no_failed_ratings[deepseek/deepseek-chat-v3.1]",
+      "status": "PASS",
+      "detail": "none",
+      "fatal": true
+    },
+    {
+      "name": "adjudicated_cells_have_third_rating",
+      "status": "PASS",
+      "detail": "126/126 disputed cells rated by meta-llama/llama-3.1-70b-instruct",
+      "fatal": true
+    },
+    {
+      "name": "no_failed_ratings[meta-llama/llama-3.1-70b-instruct]",
+      "status": "PASS",
+      "detail": "none",
+      "fatal": true
+    },
+    {
+      "name": "winner_matches_max_score",
+      "status": "PASS",
+      "detail": "consistent across 200 cells",
+      "fatal": true
+    },
+    {
+      "name": "arm_mapping_reproduces",
+      "status": "PASS",
+      "detail": "0 stored mappings differ from a deterministic rebuild",
+      "fatal": true
+    },
+    {
+      "name": "no_outgoing_payload_leakage",
+      "status": "PASS",
+      "detail": "clean across 400 payloads",
+      "fatal": true
+    },
+    {
+      "name": "effective_model_ids_match_requested",
+      "status": "PASS",
+      "detail": "{'openai/gpt-5': ['openai/gpt-5'], 'deepseek/deepseek-chat-v3.1': ['deepseek/deepseek-chat-v3.1'], 'meta-llama/llama-3.1-70b-instruct': ['meta-llama/llama-3.1-70b-instruct']}",
+      "fatal": true
+    },
+    {
+      "name": "panel_hash_reproduces",
+      "status": "PASS",
+      "detail": "recomputed a4984e34d835c60ecb661552ec0a794ef04571a2d0c8007f61c76a7dda8ab2b1, manifest a4984e34d835c60ecb661552ec0a794ef04571a2d0c8007f61c76a7dda8ab2b1",
+      "fatal": true
+    },
+    {
+      "name": "ratings_frozen_before_analysis",
+      "status": "PASS",
+      "detail": "statistics mtime 1787832493 vs ratings 1787795443",
+      "fatal": true
+    }
+  ]
+}

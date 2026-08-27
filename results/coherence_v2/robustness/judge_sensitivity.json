@@ -1,0 +1,1537 @@
+{
+  "seed": 20260827,
+  "n_boot": 10000,
+  "n_perm": 10000,
+  "variants": {
+    "gpt5_only": {
+      "is_primary": true,
+      "description": "contextual score from openai/gpt-5 alone",
+      "per_model": {
+        "gemma-3-27b-it": {
+          "released-R - released-J": {
+            "delta": 1.1599999999999997,
+            "ci_lo": 0.9200000000000002,
+            "ci_hi": 1.4,
+            "n_prompts": 20,
+            "n_cells": 100,
+            "observed": 1.1599999999999997,
+            "p_value": 9.999000099990002e-05,
+            "n_permutations": 10000,
+            "p_display": "< 1e-04",
+            "win_rates": {
+              "win": 0.7,
+              "tie": 0.2,
+              "loss": 0.1,
+              "win_adjusted": 0.8,
+              "n": 100
+            }
+          },
+          "released-R - logit": {
+            "delta": 1.5,
+            "ci_lo": 1.1099999999999999,
+            "ci_hi": 1.8399999999999999,
+            "n_prompts": 20,
+            "n_cells": 100,
+            "observed": 1.5,
+            "p_value": 9.999000099990002e-05,
+            "n_permutations": 10000,
+            "p_display": "< 1e-04",
+            "win_rates": {
+              "win": 0.77,
+              "tie": 0.04,
+              "loss": 0.19,
+              "win_adjusted": 0.79,
+              "n": 100
+            }
+          },
+          "released-J - logit": {
+            "delta": 0.33999999999999997,
+            "ci_lo": -0.15,
+            "ci_hi": 0.79,
+            "n_prompts": 20,
+            "n_cells": 100,
+            "observed": 0.33999999999999997,
+            "p_value": 0.30226977302269775,
+            "n_permutations": 10000,
+            "p_display": "0.3023",
+            "win_rates": {
+              "win": 0.5,
+              "tie": 0.11,
+              "loss": 0.39,
+              "win_adjusted": 0.555,
+              "n": 100
+            }
+          }
+        },
+        "qwen3.5-27b": {
+          "released-R - released-J": {
+            "delta": 0.79,
+            "ci_lo": 0.5199999999999999,
+            "ci_hi": 1.02,
+            "n_prompts": 20,
+            "n_cells": 100,
+            "observed": 0.79,
+            "p_value": 9.999000099990002e-05,
+            "n_permutations": 10000,
+            "p_display": "< 1e-04",
+            "win_rates": {
+              "win": 0.63,
+              "tie": 0.23,
+              "loss": 0.14,
+              "win_adjusted": 0.745,
+              "n": 100
+            }
+          },
+          "released-R - logit": {
+            "delta": 0.10999999999999996,
+            "ci_lo": -0.22000000000000003,
+            "ci_hi": 0.42000000000000004,
+            "n_prompts": 20,
+            "n_cells": 100,
+            "observed": 0.10999999999999996,
+            "p_value": 0.6903309669033096,
+            "n_permutations": 10000,
+            "p_display": "0.6903",
+            "win_rates": {
+              "win": 0.51,
+              "tie": 0.06,
+              "loss": 0.43,
+              "win_adjusted": 0.54,
+              "n": 100
+            }
+          },
+          "released-J - logit": {
+            "delta": -0.68,
+            "ci_lo": -1.06,
+            "ci_hi": -0.32999999999999996,
+            "n_prompts": 20,
+            "n_cells": 100,
+            "observed": -0.68,
+            "p_value": 0.016998300169983,
+            "n_permutations": 10000,
+            "p_display": "0.0170",
+            "win_rates": {
+              "win": 0.3,
+              "tie": 0.11,
+              "loss": 0.59,
+              "win_adjusted": 0.355,
+              "n": 100
+            }
+          }
+        }
+      },
+      "pooled": {
+        "released-R - released-J": {
+          "delta": 0.975,
+          "ci_lo": 0.8400000000000001,
+          "ci_hi": 1.0950000000000002,
+          "n_prompts": 20,
+          "n_cells": 200,
+          "observed": 0.975,
+          "p_value": 9.999000099990002e-05,
+          "n_permutations": 10000,
+          "p_display": "< 1e-04",
+          "win_rates": {
+            "win": 0.665,
+            "tie": 0.215,
+            "loss": 0.12,
+            "win_adjusted": 0.7725,
+            "n": 200
+          }
+        },
+        "released-R - logit": {
+          "delta": 0.8049999999999999,
+          "ci_lo": 0.5549999999999999,
+          "ci_hi": 1.045,
+          "n_prompts": 20,
+          "n_cells": 200,
+          "observed": 0.8049999999999999,
+          "p_value": 9.999000099990002e-05,
+          "n_permutations": 10000,
+          "p_display": "< 1e-04",
+          "win_rates": {
+            "win": 0.64,
+            "tie": 0.05,
+            "loss": 0.31,
+            "win_adjusted": 0.665,
+            "n": 200
+          }
+        },
+        "released-J - logit": {
+          "delta": -0.16999999999999998,
+          "ci_lo": -0.42000000000000004,
+          "ci_hi": 0.075,
+          "n_prompts": 20,
+          "n_cells": 200,
+          "observed": -0.16999999999999998,
+          "p_value": 0.37066293370662934,
+          "n_permutations": 10000,
+          "p_display": "0.3707",
+          "win_rates": {
+            "win": 0.4,
+            "tie": 0.11,
+            "loss": 0.49,
+            "win_adjusted": 0.455,
+            "n": 200
+          }
+        }
+      },
+      "by_depth": {
+        "gemma-3-27b-it": {
+          "0.0": {
+            "delta": 1.3,
+            "ci_lo": 0.9,
+            "ci_hi": 1.7,
+            "n_prompts": 20,
+            "n_cells": 20
+          },
+          "0.1": {
+            "delta": 1.65,
+            "ci_lo": 1.25,
+            "ci_hi": 2.1,
+            "n_prompts": 20,
+            "n_cells": 20
+          },
+          "0.2": {
+            "delta": 1.1,
+            "ci_lo": 0.7,
+            "ci_hi": 1.5,
+            "n_prompts": 20,
+            "n_cells": 20
+          },
+          "0.3": {
+            "delta": 0.95,
+            "ci_lo": 0.6,
+            "ci_hi": 1.3,
+            "n_prompts": 20,
+            "n_cells": 20
+          },
+          "0.4": {
+            "delta": 0.8,
+            "ci_lo": 0.45,
+            "ci_hi": 1.2,
+            "n_prompts": 20,
+            "n_cells": 20
+          }
+        },
+        "qwen3.5-27b": {
+          "0.0": {
+            "delta": 1.25,
+            "ci_lo": 0.75,
+            "ci_hi": 1.7,
+            "n_prompts": 20,
+            "n_cells": 20
+          },
+          "0.1": {
+            "delta": 0.5,
+            "ci_lo": 0.0,
+            "ci_hi": 1.0,
+            "n_prompts": 20,
+            "n_cells": 20
+          },
+          "0.2": {
+            "delta": 1.2,
+            "ci_lo": 0.8,
+            "ci_hi": 1.6,
+            "n_prompts": 20,
+            "n_cells": 20
+          },
+          "0.3": {
+            "delta": 0.6,
+            "ci_lo": 0.1,
+            "ci_hi": 1.05,
+            "n_prompts": 20,
+            "n_cells": 20
+          },
+          "0.4": {
+            "delta": 0.4,
+            "ci_lo": -0.15,
+            "ci_hi": 0.85,
+            "n_prompts": 20,
+            "n_cells": 20
+          }
+        }
+      },
+      "by_set": {
+        "gemma-3-27b-it": {
+          "association": {
+            "delta": 1.05,
+            "n_cells": 20,
+            "note": "DESCRIPTIVE - four prompts per set"
+          },
+          "multihop": {
+            "delta": 0.7,
+            "n_cells": 20,
+            "note": "DESCRIPTIVE - four prompts per set"
+          },
+          "multilingual": {
+            "delta": 0.55,
+            "n_cells": 20,
+            "note": "DESCRIPTIVE - four prompts per set"
+          },
+          "poetry": {
+            "delta": 2.4,
+            "n_cells": 20,
+            "note": "DESCRIPTIVE - four prompts per set"
+          },
+          "typo": {
+            "delta": 1.1,
+            "n_cells": 20,
+            "note": "DESCRIPTIVE - four prompts per set"
+          }
+        },
+        "qwen3.5-27b": {
+          "association": {
+            "delta": 0.3,
+            "n_cells": 20,
+            "note": "DESCRIPTIVE - four prompts per set"
+          },
+          "multihop": {
+            "delta": 0.65,
+            "n_cells": 20,
+            "note": "DESCRIPTIVE - four prompts per set"
+          },
+          "multilingual": {
+            "delta": 1.5,
+            "n_cells": 20,
+            "note": "DESCRIPTIVE - four prompts per set"
+          },
+          "poetry": {
+            "delta": 0.95,
+            "n_cells": 20,
+            "note": "DESCRIPTIVE - four prompts per set"
+          },
+          "typo": {
+            "delta": 0.55,
+            "n_cells": 20,
+            "note": "DESCRIPTIVE - four prompts per set"
+          }
+        }
+      }
+    },
+    "deepseek_only": {
+      "is_primary": true,
+      "description": "contextual score from deepseek/deepseek-chat-v3.1 alone",
+      "per_model": {
+        "gemma-3-27b-it": {
+          "released-R - released-J": {
+            "delta": 0.86,
+            "ci_lo": 0.59,
+            "ci_hi": 1.1300000000000001,
+            "n_prompts": 20,
+            "n_cells": 100,
+            "observed": 0.86,
+            "p_value": 0.0005999400059994001,
+            "n_permutations": 10000,
+            "p_display": "0.0006",
+            "win_rates": {
+              "win": 0.63,
+              "tie": 0.24,
+              "loss": 0.13,
+              "win_adjusted": 0.75,
+              "n": 100
+            }
+          },
+          "released-R - logit": {
+            "delta": 1.3800000000000001,
+            "ci_lo": 1.1800000000000002,
+            "ci_hi": 1.58,
+            "n_prompts": 20,
+            "n_cells": 100,
+            "observed": 1.3800000000000001,
+            "p_value": 9.999000099990002e-05,
+            "n_permutations": 10000,
+            "p_display": "< 1e-04",
+            "win_rates": {
+              "win": 0.78,
+              "tie": 0.03,
+              "loss": 0.19,
+              "win_adjusted": 0.795,
+              "n": 100
+            }
+          },
+          "released-J - logit": {
+            "delta": 0.5200000000000001,
+            "ci_lo": 0.21999999999999997,
+            "ci_hi": 0.8299999999999998,
+            "n_prompts": 20,
+            "n_cells": 100,
+            "observed": 0.5200000000000001,
+            "p_value": 0.027697230276972302,
+            "n_permutations": 10000,
+            "p_display": "0.0277",
+            "win_rates": {
+              "win": 0.57,
+              "tie": 0.09,
+              "loss": 0.34,
+              "win_adjusted": 0.615,
+              "n": 100
+            }
+          }
+        },
+        "qwen3.5-27b": {
+          "released-R - released-J": {
+            "delta": 0.5900000000000001,
+            "ci_lo": 0.43000000000000005,
+            "ci_hi": 0.75,
+            "n_prompts": 20,
+            "n_cells": 100,
+            "observed": 0.5900000000000001,
+            "p_value": 9.999000099990002e-05,
+            "n_permutations": 10000,
+            "p_display": "< 1e-04",
+            "win_rates": {
+              "win": 0.57,
+              "tie": 0.32,
+              "loss": 0.11,
+              "win_adjusted": 0.73,
+              "n": 100
+            }
+          },
+          "released-R - logit": {
+            "delta": 1.36,
+            "ci_lo": 1.1199999999999999,
+            "ci_hi": 1.61,
+            "n_prompts": 20,
+            "n_cells": 100,
+            "observed": 1.36,
+            "p_value": 9.999000099990002e-05,
+            "n_permutations": 10000,
+            "p_display": "< 1e-04",
+            "win_rates": {
+              "win": 0.84,
+              "tie": 0.08,
+              "loss": 0.08,
+              "win_adjusted": 0.88,
+              "n": 100
+            }
+          },
+          "released-J - logit": {
+            "delta": 0.7700000000000001,
+            "ci_lo": 0.5700000000000001,
+            "ci_hi": 0.97,
+            "n_prompts": 20,
+            "n_cells": 100,
+            "observed": 0.7700000000000001,
+            "p_value": 9.999000099990002e-05,
+            "n_permutations": 10000,
+            "p_display": "< 1e-04",
+            "win_rates": {
+              "win": 0.68,
+              "tie": 0.16,
+              "loss": 0.16,
+              "win_adjusted": 0.76,
+              "n": 100
+            }
+          }
+        }
+      },
+      "pooled": {
+        "released-R - released-J": {
+          "delta": 0.725,
+          "ci_lo": 0.55,
+          "ci_hi": 0.9,
+          "n_prompts": 20,
+          "n_cells": 200,
+          "observed": 0.725,
+          "p_value": 9.999000099990002e-05,
+          "n_permutations": 10000,
+          "p_display": "< 1e-04",
+          "win_rates": {
+            "win": 0.6,
+            "tie": 0.28,
+            "loss": 0.12,
+            "win_adjusted": 0.74,
+            "n": 200
+          }
+        },
+        "released-R - logit": {
+          "delta": 1.3699999999999999,
+          "ci_lo": 1.19,
+          "ci_hi": 1.5450000000000002,
+          "n_prompts": 20,
+          "n_cells": 200,
+          "observed": 1.3699999999999999,
+          "p_value": 9.999000099990002e-05,
+          "n_permutations": 10000,
+          "p_display": "< 1e-04",
+          "win_rates": {
+            "win": 0.81,
+            "tie": 0.055,
+            "loss": 0.135,
+            "win_adjusted": 0.8375,
+            "n": 200
+          }
+        },
+        "released-J - logit": {
+          "delta": 0.6449999999999999,
+          "ci_lo": 0.4699999999999999,
+          "ci_hi": 0.82,
+          "n_prompts": 20,
+          "n_cells": 200,
+          "observed": 0.6449999999999999,
+          "p_value": 9.999000099990002e-05,
+          "n_permutations": 10000,
+          "p_display": "< 1e-04",
+          "win_rates": {
+            "win": 0.625,
+            "tie": 0.125,
+            "loss": 0.25,
+            "win_adjusted": 0.6875,
+            "n": 200
+          }
+        }
+      },
+      "by_depth": {
+        "gemma-3-27b-it": {
+          "0.0": {
+            "delta": 0.35,
+            "ci_lo": 0.05,
+            "ci_hi": 0.65,
+            "n_prompts": 20,
+            "n_cells": 20
+          },
+          "0.1": {
+            "delta": 1.0,
+            "ci_lo": 0.55,
+            "ci_hi": 1.4,
+            "n_prompts": 20,
+            "n_cells": 20
+          },
+          "0.2": {
+            "delta": 1.1,
+            "ci_lo": 0.7,
+            "ci_hi": 1.55,
+            "n_prompts": 20,
+            "n_cells": 20
+          },
+          "0.3": {
+            "delta": 0.9,
+            "ci_lo": 0.5,
+            "ci_hi": 1.3,
+            "n_prompts": 20,
+            "n_cells": 20
+          },
+          "0.4": {
+            "delta": 0.95,
+            "ci_lo": 0.7,
+            "ci_hi": 1.2,
+            "n_prompts": 20,
+            "n_cells": 20
+          }
+        },
+        "qwen3.5-27b": {
+          "0.0": {
+            "delta": 0.75,
+            "ci_lo": 0.35,
+            "ci_hi": 1.15,
+            "n_prompts": 20,
+            "n_cells": 20
+          },
+          "0.1": {
+            "delta": 0.6,
+            "ci_lo": 0.15,
+            "ci_hi": 1.0,
+            "n_prompts": 20,
+            "n_cells": 20
+          },
+          "0.2": {
+            "delta": 0.8,
+            "ci_lo": 0.6,
+            "ci_hi": 1.0,
+            "n_prompts": 20,
+            "n_cells": 20
+          },
+          "0.3": {
+            "delta": 0.5,
+            "ci_lo": 0.15,
+            "ci_hi": 0.8,
+            "n_prompts": 20,
+            "n_cells": 20
+          },
+          "0.4": {
+            "delta": 0.3,
+            "ci_lo": 0.1,
+            "ci_hi": 0.5,
+            "n_prompts": 20,
+            "n_cells": 20
+          }
+        }
+      },
+      "by_set": {
+        "gemma-3-27b-it": {
+          "association": {
+            "delta": 1.05,
+            "n_cells": 20,
+            "note": "DESCRIPTIVE - four prompts per set"
+          },
+          "multihop": {
+            "delta": 0.7,
+            "n_cells": 20,
+            "note": "DESCRIPTIVE - four prompts per set"
+          },
+          "multilingual": {
+            "delta": 0.3,
+            "n_cells": 20,
+            "note": "DESCRIPTIVE - four prompts per set"
+          },
+          "poetry": {
+            "delta": 1.9,
+            "n_cells": 20,
+            "note": "DESCRIPTIVE - four prompts per set"
+          },
+          "typo": {
+            "delta": 0.35,
+            "n_cells": 20,
+            "note": "DESCRIPTIVE - four prompts per set"
+          }
+        },
+        "qwen3.5-27b": {
+          "association": {
+            "delta": 0.7000000000000001,
+            "n_cells": 20,
+            "note": "DESCRIPTIVE - four prompts per set"
+          },
+          "multihop": {
+            "delta": 0.45,
+            "n_cells": 20,
+            "note": "DESCRIPTIVE - four prompts per set"
+          },
+          "multilingual": {
+            "delta": 0.75,
+            "n_cells": 20,
+            "note": "DESCRIPTIVE - four prompts per set"
+          },
+          "poetry": {
+            "delta": 0.75,
+            "n_cells": 20,
+            "note": "DESCRIPTIVE - four prompts per set"
+          },
+          "typo": {
+            "delta": 0.30000000000000004,
+            "n_cells": 20,
+            "note": "DESCRIPTIVE - four prompts per set"
+          }
+        }
+      }
+    },
+    "primary_mean": {
+      "is_primary": true,
+      "description": "mean of the two primary judges, no adjudication",
+      "per_model": {
+        "gemma-3-27b-it": {
+          "released-R - released-J": {
+            "delta": 1.0099999999999998,
+            "ci_lo": 0.78,
+            "ci_hi": 1.2399999999999998,
+            "n_prompts": 20,
+            "n_cells": 100,
+            "observed": 1.0099999999999998,
+            "p_value": 9.999000099990002e-05,
+            "n_permutations": 10000,
+            "p_display": "< 1e-04",
+            "win_rates": {
+              "win": 0.76,
+              "tie": 0.1,
+              "loss": 0.14,
+              "win_adjusted": 0.81,
+              "n": 100
+            }
+          },
+          "released-R - logit": {
+            "delta": 1.44,
+            "ci_lo": 1.175,
+            "ci_hi": 1.6800000000000002,
+            "n_prompts": 20,
+            "n_cells": 100,
+            "observed": 1.44,
+            "p_value": 9.999000099990002e-05,
+            "n_permutations": 10000,
+            "p_display": "< 1e-04",
+            "win_rates": {
+              "win": 0.8,
+              "tie": 0.03,
+              "loss": 0.17,
+              "win_adjusted": 0.815,
+              "n": 100
+            }
+          },
+          "released-J - logit": {
+            "delta": 0.43,
+            "ci_lo": 0.049999999999999975,
+            "ci_hi": 0.7949999999999999,
+            "n_prompts": 20,
+            "n_cells": 100,
+            "observed": 0.43,
+            "p_value": 0.11488851114888511,
+            "n_permutations": 10000,
+            "p_display": "0.1149",
+            "win_rates": {
+              "win": 0.54,
+              "tie": 0.06,
+              "loss": 0.4,
+              "win_adjusted": 0.57,
+              "n": 100
+            }
+          }
+        },
+        "qwen3.5-27b": {
+          "released-R - released-J": {
+            "delta": 0.69,
+            "ci_lo": 0.5149999999999999,
+            "ci_hi": 0.8550000000000001,
+            "n_prompts": 20,
+            "n_cells": 100,
+            "observed": 0.69,
+            "p_value": 9.999000099990002e-05,
+            "n_permutations": 10000,
+            "p_display": "< 1e-04",
+            "win_rates": {
+              "win": 0.69,
+              "tie": 0.2,
+              "loss": 0.11,
+              "win_adjusted": 0.79,
+              "n": 100
+            }
+          },
+          "released-R - logit": {
+            "delta": 0.7350000000000001,
+            "ci_lo": 0.475,
+            "ci_hi": 0.9950000000000001,
+            "n_prompts": 20,
+            "n_cells": 100,
+            "observed": 0.7350000000000001,
+            "p_value": 9.999000099990002e-05,
+            "n_permutations": 10000,
+            "p_display": "< 1e-04",
+            "win_rates": {
+              "win": 0.64,
+              "tie": 0.12,
+              "loss": 0.24,
+              "win_adjusted": 0.7,
+              "n": 100
+            }
+          },
+          "released-J - logit": {
+            "delta": 0.045000000000000005,
+            "ci_lo": -0.19499999999999998,
+            "ci_hi": 0.275,
+            "n_prompts": 20,
+            "n_cells": 100,
+            "observed": 0.045000000000000005,
+            "p_value": 0.771022897710229,
+            "n_permutations": 10000,
+            "p_display": "0.7710",
+            "win_rates": {
+              "win": 0.4,
+              "tie": 0.19,
+              "loss": 0.41,
+              "win_adjusted": 0.495,
+              "n": 100
+            }
+          }
+        }
+      },
+      "pooled": {
+        "released-R - released-J": {
+          "delta": 0.85,
+          "ci_lo": 0.735,
+          "ci_hi": 0.9650000000000001,
+          "n_prompts": 20,
+          "n_cells": 200,
+          "observed": 0.85,
+          "p_value": 9.999000099990002e-05,
+          "n_permutations": 10000,
+          "p_display": "< 1e-04",
+          "win_rates": {
+            "win": 0.725,
+            "tie": 0.15,
+            "loss": 0.125,
+            "win_adjusted": 0.8,
+            "n": 200
+          }
+        },
+        "released-R - logit": {
+          "delta": 1.0875,
+          "ci_lo": 0.89,
+          "ci_hi": 1.2774999999999999,
+          "n_prompts": 20,
+          "n_cells": 200,
+          "observed": 1.0875,
+          "p_value": 9.999000099990002e-05,
+          "n_permutations": 10000,
+          "p_display": "< 1e-04",
+          "win_rates": {
+            "win": 0.72,
+            "tie": 0.075,
+            "loss": 0.205,
+            "win_adjusted": 0.7575,
+            "n": 200
+          }
+        },
+        "released-J - logit": {
+          "delta": 0.2375,
+          "ci_lo": 0.04749999999999999,
+          "ci_hi": 0.425,
+          "n_prompts": 20,
+          "n_cells": 200,
+          "observed": 0.2375,
+          "p_value": 0.11758824117588242,
+          "n_permutations": 10000,
+          "p_display": "0.1176",
+          "win_rates": {
+            "win": 0.47,
+            "tie": 0.125,
+            "loss": 0.405,
+            "win_adjusted": 0.5325,
+            "n": 200
+          }
+        }
+      },
+      "by_depth": {
+        "gemma-3-27b-it": {
+          "0.0": {
+            "delta": 0.825,
+            "ci_lo": 0.55,
+            "ci_hi": 1.1,
+            "n_prompts": 20,
+            "n_cells": 20
+          },
+          "0.1": {
+            "delta": 1.325,
+            "ci_lo": 0.975,
+            "ci_hi": 1.725,
+            "n_prompts": 20,
+            "n_cells": 20
+          },
+          "0.2": {
+            "delta": 1.1,
+            "ci_lo": 0.775,
+            "ci_hi": 1.45,
+            "n_prompts": 20,
+            "n_cells": 20
+          },
+          "0.3": {
+            "delta": 0.925,
+            "ci_lo": 0.575,
+            "ci_hi": 1.275,
+            "n_prompts": 20,
+            "n_cells": 20
+          },
+          "0.4": {
+            "delta": 0.875,
+            "ci_lo": 0.625,
+            "ci_hi": 1.15,
+            "n_prompts": 20,
+            "n_cells": 20
+          }
+        },
+        "qwen3.5-27b": {
+          "0.0": {
+            "delta": 1.0,
+            "ci_lo": 0.6,
+            "ci_hi": 1.375,
+            "n_prompts": 20,
+            "n_cells": 20
+          },
+          "0.1": {
+            "delta": 0.55,
+            "ci_lo": 0.15,
+            "ci_hi": 0.925,
+            "n_prompts": 20,
+            "n_cells": 20
+          },
+          "0.2": {
+            "delta": 1.0,
+            "ci_lo": 0.75,
+            "ci_hi": 1.225,
+            "n_prompts": 20,
+            "n_cells": 20
+          },
+          "0.3": {
+            "delta": 0.55,
+            "ci_lo": 0.175,
+            "ci_hi": 0.875,
+            "n_prompts": 20,
+            "n_cells": 20
+          },
+          "0.4": {
+            "delta": 0.35,
+            "ci_lo": 0.0,
+            "ci_hi": 0.625,
+            "n_prompts": 20,
+            "n_cells": 20
+          }
+        }
+      },
+      "by_set": {
+        "gemma-3-27b-it": {
+          "association": {
+            "delta": 1.0499999999999998,
+            "n_cells": 20,
+            "note": "DESCRIPTIVE - four prompts per set"
+          },
+          "multihop": {
+            "delta": 0.7,
+            "n_cells": 20,
+            "note": "DESCRIPTIVE - four prompts per set"
+          },
+          "multilingual": {
+            "delta": 0.425,
+            "n_cells": 20,
+            "note": "DESCRIPTIVE - four prompts per set"
+          },
+          "poetry": {
+            "delta": 2.15,
+            "n_cells": 20,
+            "note": "DESCRIPTIVE - four prompts per set"
+          },
+          "typo": {
+            "delta": 0.725,
+            "n_cells": 20,
+            "note": "DESCRIPTIVE - four prompts per set"
+          }
+        },
+        "qwen3.5-27b": {
+          "association": {
+            "delta": 0.5,
+            "n_cells": 20,
+            "note": "DESCRIPTIVE - four prompts per set"
+          },
+          "multihop": {
+            "delta": 0.55,
+            "n_cells": 20,
+            "note": "DESCRIPTIVE - four prompts per set"
+          },
+          "multilingual": {
+            "delta": 1.125,
+            "n_cells": 20,
+            "note": "DESCRIPTIVE - four prompts per set"
+          },
+          "poetry": {
+            "delta": 0.8500000000000001,
+            "n_cells": 20,
+            "note": "DESCRIPTIVE - four prompts per set"
+          },
+          "typo": {
+            "delta": 0.425,
+            "n_cells": 20,
+            "note": "DESCRIPTIVE - four prompts per set"
+          }
+        }
+      }
+    },
+    "adjudicated": {
+      "is_primary": true,
+      "description": "the frozen mean-of-two / median-of-three score",
+      "per_model": {
+        "gemma-3-27b-it": {
+          "released-R - released-J": {
+            "delta": 0.9,
+            "ci_lo": 0.63,
+            "ci_hi": 1.1800000000000002,
+            "n_prompts": 20,
+            "n_cells": 100,
+            "observed": 0.9,
+            "p_value": 0.0004999500049995,
+            "n_permutations": 10000,
+            "p_display": "0.0005",
+            "win_rates": {
+              "win": 0.63,
+              "tie": 0.24,
+              "loss": 0.13,
+              "win_adjusted": 0.75,
+              "n": 100
+            }
+          },
+          "released-R - logit": {
+            "delta": 1.2850000000000001,
+            "ci_lo": 1.035,
+            "ci_hi": 1.5399999999999998,
+            "n_prompts": 20,
+            "n_cells": 100,
+            "observed": 1.2850000000000001,
+            "p_value": 9.999000099990002e-05,
+            "n_permutations": 10000,
+            "p_display": "< 1e-04",
+            "win_rates": {
+              "win": 0.75,
+              "tie": 0.08,
+              "loss": 0.17,
+              "win_adjusted": 0.79,
+              "n": 100
+            }
+          },
+          "released-J - logit": {
+            "delta": 0.38499999999999995,
+            "ci_lo": -0.0049999999999999715,
+            "ci_hi": 0.76,
+            "n_prompts": 20,
+            "n_cells": 100,
+            "observed": 0.38499999999999995,
+            "p_value": 0.12268773122687732,
+            "n_permutations": 10000,
+            "p_display": "0.1227",
+            "win_rates": {
+              "win": 0.53,
+              "tie": 0.11,
+              "loss": 0.36,
+              "win_adjusted": 0.585,
+              "n": 100
+            }
+          }
+        },
+        "qwen3.5-27b": {
+          "released-R - released-J": {
+            "delta": 0.655,
+            "ci_lo": 0.48,
+            "ci_hi": 0.8300000000000001,
+            "n_prompts": 20,
+            "n_cells": 100,
+            "observed": 0.655,
+            "p_value": 9.999000099990002e-05,
+            "n_permutations": 10000,
+            "p_display": "< 1e-04",
+            "win_rates": {
+              "win": 0.61,
+              "tie": 0.27,
+              "loss": 0.12,
+              "win_adjusted": 0.745,
+              "n": 100
+            }
+          },
+          "released-R - logit": {
+            "delta": 1.295,
+            "ci_lo": 0.9850000000000001,
+            "ci_hi": 1.5999999999999999,
+            "n_prompts": 20,
+            "n_cells": 100,
+            "observed": 1.295,
+            "p_value": 9.999000099990002e-05,
+            "n_permutations": 10000,
+            "p_display": "< 1e-04",
+            "win_rates": {
+              "win": 0.8,
+              "tie": 0.09,
+              "loss": 0.11,
+              "win_adjusted": 0.845,
+              "n": 100
+            }
+          },
+          "released-J - logit": {
+            "delta": 0.64,
+            "ci_lo": 0.4050000000000001,
+            "ci_hi": 0.8700000000000001,
+            "n_prompts": 20,
+            "n_cells": 100,
+            "observed": 0.64,
+            "p_value": 0.00039996000399960006,
+            "n_permutations": 10000,
+            "p_display": "0.0004",
+            "win_rates": {
+              "win": 0.61,
+              "tie": 0.22,
+              "loss": 0.17,
+              "win_adjusted": 0.72,
+              "n": 100
+            }
+          }
+        }
+      },
+      "pooled": {
+        "released-R - released-J": {
+          "delta": 0.7775000000000001,
+          "ci_lo": 0.6325000000000001,
+          "ci_hi": 0.9275,
+          "n_prompts": 20,
+          "n_cells": 200,
+          "observed": 0.7775000000000001,
+          "p_value": 9.999000099990002e-05,
+          "n_permutations": 10000,
+          "p_display": "< 1e-04",
+          "win_rates": {
+            "win": 0.62,
+            "tie": 0.255,
+            "loss": 0.125,
+            "win_adjusted": 0.7475,
+            "n": 200
+          }
+        },
+        "released-R - logit": {
+          "delta": 1.29,
+          "ci_lo": 1.0899999999999999,
+          "ci_hi": 1.5025,
+          "n_prompts": 20,
+          "n_cells": 200,
+          "observed": 1.29,
+          "p_value": 9.999000099990002e-05,
+          "n_permutations": 10000,
+          "p_display": "< 1e-04",
+          "win_rates": {
+            "win": 0.775,
+            "tie": 0.085,
+            "loss": 0.14,
+            "win_adjusted": 0.8175,
+            "n": 200
+          }
+        },
+        "released-J - logit": {
+          "delta": 0.5125,
+          "ci_lo": 0.3124999999999999,
+          "ci_hi": 0.725,
+          "n_prompts": 20,
+          "n_cells": 200,
+          "observed": 0.5125,
+          "p_value": 0.0011998800119988001,
+          "n_permutations": 10000,
+          "p_display": "0.0012",
+          "win_rates": {
+            "win": 0.57,
+            "tie": 0.165,
+            "loss": 0.265,
+            "win_adjusted": 0.6525,
+            "n": 200
+          }
+        }
+      },
+      "by_depth": {
+        "gemma-3-27b-it": {
+          "0.0": {
+            "delta": 0.55,
+            "ci_lo": 0.125,
+            "ci_hi": 0.975,
+            "n_prompts": 20,
+            "n_cells": 20
+          },
+          "0.1": {
+            "delta": 1.175,
+            "ci_lo": 0.85,
+            "ci_hi": 1.525,
+            "n_prompts": 20,
+            "n_cells": 20
+          },
+          "0.2": {
+            "delta": 1.1,
+            "ci_lo": 0.7,
+            "ci_hi": 1.525,
+            "n_prompts": 20,
+            "n_cells": 20
+          },
+          "0.3": {
+            "delta": 0.775,
+            "ci_lo": 0.425,
+            "ci_hi": 1.15,
+            "n_prompts": 20,
+            "n_cells": 20
+          },
+          "0.4": {
+            "delta": 0.9,
+            "ci_lo": 0.625,
+            "ci_hi": 1.2,
+            "n_prompts": 20,
+            "n_cells": 20
+          }
+        },
+        "qwen3.5-27b": {
+          "0.0": {
+            "delta": 0.85,
+            "ci_lo": 0.4,
+            "ci_hi": 1.3,
+            "n_prompts": 20,
+            "n_cells": 20
+          },
+          "0.1": {
+            "delta": 0.525,
+            "ci_lo": 0.05,
+            "ci_hi": 0.975,
+            "n_prompts": 20,
+            "n_cells": 20
+          },
+          "0.2": {
+            "delta": 0.925,
+            "ci_lo": 0.575,
+            "ci_hi": 1.275,
+            "n_prompts": 20,
+            "n_cells": 20
+          },
+          "0.3": {
+            "delta": 0.55,
+            "ci_lo": 0.2,
+            "ci_hi": 0.9,
+            "n_prompts": 20,
+            "n_cells": 20
+          },
+          "0.4": {
+            "delta": 0.425,
+            "ci_lo": 0.075,
+            "ci_hi": 0.775,
+            "n_prompts": 20,
+            "n_cells": 20
+          }
+        }
+      },
+      "by_set": {
+        "gemma-3-27b-it": {
+          "association": {
+            "delta": 0.9,
+            "n_cells": 20,
+            "note": "DESCRIPTIVE - four prompts per set"
+          },
+          "multihop": {
+            "delta": 0.7250000000000001,
+            "n_cells": 20,
+            "note": "DESCRIPTIVE - four prompts per set"
+          },
+          "multilingual": {
+            "delta": 0.475,
+            "n_cells": 20,
+            "note": "DESCRIPTIVE - four prompts per set"
+          },
+          "poetry": {
+            "delta": 1.9,
+            "n_cells": 20,
+            "note": "DESCRIPTIVE - four prompts per set"
+          },
+          "typo": {
+            "delta": 0.5,
+            "n_cells": 20,
+            "note": "DESCRIPTIVE - four prompts per set"
+          }
+        },
+        "qwen3.5-27b": {
+          "association": {
+            "delta": 0.575,
+            "n_cells": 20,
+            "note": "DESCRIPTIVE - four prompts per set"
+          },
+          "multihop": {
+            "delta": 0.575,
+            "n_cells": 20,
+            "note": "DESCRIPTIVE - four prompts per set"
+          },
+          "multilingual": {
+            "delta": 1.05,
+            "n_cells": 20,
+            "note": "DESCRIPTIVE - four prompts per set"
+          },
+          "poetry": {
+            "delta": 0.625,
+            "n_cells": 20,
+            "note": "DESCRIPTIVE - four prompts per set"
+          },
+          "typo": {
+            "delta": 0.45000000000000007,
+            "n_cells": 20,
+            "note": "DESCRIPTIVE - four prompts per set"
+          }
+        }
+      }
+    },
+    "adjudicator_only": {
+      "is_primary": false,
+      "description": "diagnostic only",
+      "per_model": {
+        "gemma-3-27b-it": {
+          "released-R - released-J": {
+            "delta": 0.2011111111111111,
+            "ci_lo": -0.2,
+            "ci_hi": 0.5877777777777777,
+            "n_prompts": 19,
+            "n_cells": 54,
+            "observed": 0.2011111111111111,
+            "p_value": 0.46315368463153683,
+            "n_permutations": 10000,
+            "p_display": "0.4632",
+            "win_rates": {
+              "win": 0.5,
+              "tie": 0.2777777777777778,
+              "loss": 0.2222222222222222,
+              "win_adjusted": 0.6388888888888888,
+              "n": 54
+            }
+          },
+          "released-R - logit": {
+            "delta": 0.15388888888888888,
+            "ci_lo": -0.3083333333333334,
+            "ci_hi": 0.6211111111111111,
+            "n_prompts": 19,
+            "n_cells": 54,
+            "observed": 0.15388888888888888,
+            "p_value": 0.626937306269373,
+            "n_permutations": 10000,
+            "p_display": "0.6269",
+            "win_rates": {
+              "win": 0.5370370370370371,
+              "tie": 0.05555555555555555,
+              "loss": 0.4074074074074074,
+              "win_adjusted": 0.5648148148148148,
+              "n": 54
+            }
+          },
+          "released-J - logit": {
+            "delta": -0.047222222222222186,
+            "ci_lo": -0.5183333333333333,
+            "ci_hi": 0.47444444444444456,
+            "n_prompts": 19,
+            "n_cells": 54,
+            "observed": -0.047222222222222186,
+            "p_value": 0.8731126887311269,
+            "n_permutations": 10000,
+            "p_display": "0.8731",
+            "win_rates": {
+              "win": 0.4444444444444444,
+              "tie": 0.037037037037037035,
+              "loss": 0.5185185185185185,
+              "win_adjusted": 0.46296296296296297,
+              "n": 54
+            }
+          }
+        },
+        "qwen3.5-27b": {
+          "released-R - released-J": {
+            "delta": 0.011666666666666669,
+            "ci_lo": -0.21333333333333337,
+            "ci_hi": 0.21999999999999997,
+            "n_prompts": 20,
+            "n_cells": 72,
+            "observed": 0.011666666666666669,
+            "p_value": 0.9338066193380662,
+            "n_permutations": 10000,
+            "p_display": "0.9338",
+            "win_rates": {
+              "win": 0.4305555555555556,
+              "tie": 0.2222222222222222,
+              "loss": 0.3472222222222222,
+              "win_adjusted": 0.5416666666666666,
+              "n": 72
+            }
+          },
+          "released-R - logit": {
+            "delta": 1.6266666666666665,
+            "ci_lo": 1.2916666666666667,
+            "ci_hi": 1.9400000000000002,
+            "n_prompts": 20,
+            "n_cells": 72,
+            "observed": 1.6266666666666665,
+            "p_value": 9.999000099990002e-05,
+            "n_permutations": 10000,
+            "p_display": "< 1e-04",
+            "win_rates": {
+              "win": 0.875,
+              "tie": 0.027777777777777776,
+              "loss": 0.09722222222222222,
+              "win_adjusted": 0.8888888888888888,
+              "n": 72
+            }
+          },
+          "released-J - logit": {
+            "delta": 1.6149999999999998,
+            "ci_lo": 1.3041666666666667,
+            "ci_hi": 1.9166666666666667,
+            "n_prompts": 20,
+            "n_cells": 72,
+            "observed": 1.6149999999999998,
+            "p_value": 9.999000099990002e-05,
+            "n_permutations": 10000,
+            "p_display": "< 1e-04",
+            "win_rates": {
+              "win": 0.8888888888888888,
+              "tie": 0.05555555555555555,
+              "loss": 0.05555555555555555,
+              "win_adjusted": 0.9166666666666666,
+              "n": 72
+            }
+          }
+        }
+      },
+      "pooled": {
+        "released-R - released-J": {
+          "delta": 0.16863095238095235,
+          "ci_lo": -0.058392857142857156,
+          "ci_hi": 0.37809523809523815,
+          "n_prompts": 20,
+          "n_cells": 126,
+          "observed": 0.16863095238095235,
+          "p_value": 0.2862713728627137,
+          "n_permutations": 10000,
+          "p_display": "0.2863",
+          "win_rates": {
+            "win": 0.4603174603174603,
+            "tie": 0.24603174603174602,
+            "loss": 0.29365079365079366,
+            "win_adjusted": 0.5833333333333334,
+            "n": 126
+          }
+        },
+        "released-R - logit": {
+          "delta": 1.0807936507936509,
+          "ci_lo": 0.8595238095238095,
+          "ci_hi": 1.3187896825396828,
+          "n_prompts": 20,
+          "n_cells": 126,
+          "observed": 1.0807936507936509,
+          "p_value": 9.999000099990002e-05,
+          "n_permutations": 10000,
+          "p_display": "< 1e-04",
+          "win_rates": {
+            "win": 0.7301587301587301,
+            "tie": 0.03968253968253968,
+            "loss": 0.23015873015873015,
+            "win_adjusted": 0.75,
+            "n": 126
+          }
+        },
+        "released-J - logit": {
+          "delta": 0.9121626984126984,
+          "ci_lo": 0.5804166666666667,
+          "ci_hi": 1.2617460317460316,
+          "n_prompts": 20,
+          "n_cells": 126,
+          "observed": 0.9121626984126984,
+          "p_value": 0.00029997000299970003,
+          "n_permutations": 10000,
+          "p_display": "0.0003",
+          "win_rates": {
+            "win": 0.6984126984126984,
+            "tie": 0.047619047619047616,
+            "loss": 0.25396825396825395,
+            "win_adjusted": 0.7222222222222222,
+            "n": 126
+          }
+        }
+      },
+      "by_depth": {
+        "gemma-3-27b-it": {
+          "0.0": {
+            "delta": -0.16666666666666669,
+            "ci_lo": -0.7,
+            "ci_hi": 0.3666666666666667,
+            "n_prompts": 15,
+            "n_cells": 15
+          },
+          "0.1": {
+            "delta": 0.033333333333333305,
+            "ci_lo": -0.5333333333333333,
+            "ci_hi": 0.5,
+            "n_prompts": 10,
+            "n_cells": 10
+          },
+          "0.2": {
+            "delta": 1.0,
+            "ci_lo": 0.25,
+            "ci_hi": 1.75,
+            "n_prompts": 10,
+            "n_cells": 10
+          },
+          "0.3": {
+            "delta": 0.875,
+            "ci_lo": 0.5,
+            "ci_hi": 1.25,
+            "n_prompts": 6,
+            "n_cells": 6
+          },
+          "0.4": {
+            "delta": 0.6666666666666667,
+            "ci_lo": 0.16666666666666666,
+            "ci_hi": 1.0833333333333335,
+            "n_prompts": 13,
+            "n_cells": 13
+          }
+        },
+        "qwen3.5-27b": {
+          "0.0": {
+            "delta": 0.1999999999999999,
+            "ci_lo": -0.4666666666666666,
+            "ci_hi": 0.8666666666666666,
+            "n_prompts": 13,
+            "n_cells": 13
+          },
+          "0.1": {
+            "delta": -0.15,
+            "ci_lo": -0.5833333333333333,
+            "ci_hi": 0.25,
+            "n_prompts": 16,
+            "n_cells": 16
+          },
+          "0.2": {
+            "delta": 0.2,
+            "ci_lo": -0.16666666666666666,
+            "ci_hi": 0.5666666666666667,
+            "n_prompts": 14,
+            "n_cells": 14
+          },
+          "0.3": {
+            "delta": 0.1333333333333333,
+            "ci_lo": -0.3333333333333333,
+            "ci_hi": 0.6,
+            "n_prompts": 13,
+            "n_cells": 13
+          },
+          "0.4": {
+            "delta": -0.08333333333333331,
+            "ci_lo": -0.5333333333333333,
+            "ci_hi": 0.3500000000000001,
+            "n_prompts": 16,
+            "n_cells": 16
+          }
+        }
+      },
+      "by_set": {
+        "gemma-3-27b-it": {
+          "association": {
+            "delta": 0.08333333333333334,
+            "n_cells": 12,
+            "note": "DESCRIPTIVE - four prompts per set"
+          },
+          "multihop": {
+            "delta": 1.2916666666666667,
+            "n_cells": 10,
+            "note": "DESCRIPTIVE - four prompts per set"
+          },
+          "multilingual": {
+            "delta": 0.3666666666666667,
+            "n_cells": 16,
+            "note": "DESCRIPTIVE - four prompts per set"
+          },
+          "poetry": {
+            "delta": -0.7777777777777778,
+            "n_cells": 6,
+            "note": "DESCRIPTIVE - four prompts per set"
+          },
+          "typo": {
+            "delta": 0.041666666666666685,
+            "n_cells": 10,
+            "note": "DESCRIPTIVE - four prompts per set"
+          }
+        },
+        "qwen3.5-27b": {
+          "association": {
+            "delta": -0.12499999999999999,
+            "n_cells": 17,
+            "note": "DESCRIPTIVE - four prompts per set"
+          },
+          "multihop": {
+            "delta": 0.75,
+            "n_cells": 11,
+            "note": "DESCRIPTIVE - four prompts per set"
+          },
+          "multilingual": {
+            "delta": -0.20833333333333331,
+            "n_cells": 13,
+            "note": "DESCRIPTIVE - four prompts per set"
+          },
+          "poetry": {
+            "delta": 0.15833333333333333,
+            "n_cells": 17,
+            "note": "DESCRIPTIVE - four prompts per set"
+          },
+          "typo": {
+            "delta": -0.5166666666666666,
+            "n_cells": 14,
+            "note": "DESCRIPTIVE - four prompts per set"
+          }
+        }
+      }
+    }
+  }
+}
