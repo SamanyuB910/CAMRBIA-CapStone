@@ -711,7 +711,7 @@ def cmd_figures(args) -> None:
 
     # Windows consoles are cp1252; never let a stray unicode glyph kill a run
     sys.stdout.reconfigure(errors="replace")
-    figs, tables = build(args.model)
+    figs, tables = build(args.model, n_boot=args.boot)
     for name, table in tables.items():
         print(f"\n=== {name} ===")
         print(table.to_string())
@@ -811,6 +811,8 @@ def main() -> None:
     p = sub.add_parser("figures", help="interactive plots + comparison tables from the records (no GPU)")
     p.add_argument("--model", choices=["qwen3.5-4b", "qwen3.5-27b"], default="qwen3.5-27b")
     p.add_argument("--no-open", action="store_true", help="write the HTML without opening a browser")
+    p.add_argument("--boot", type=int, default=200,
+                   help="bootstrap resamples for the onset CIs on the payoff plot (0 = skip, faster)")
     p.set_defaults(func=cmd_figures)
 
     args = parser.parse_args()
