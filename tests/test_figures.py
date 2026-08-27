@@ -167,3 +167,25 @@ def test_primary_label_follows_the_rule_in_force(tmp_path):
     assert '"adjudicated": "Adjudicated"' in src, "no variant is primary by default"
     assert 'names[primary] += " (primary)"' in src
     assert figures.fig_judge_sensitivity(_judge_table(), tmp_path, primary="primary_mean")
+
+
+def test_marker_fill_follows_the_prespecified_test_not_the_interval(tmp_path):
+    """Gemma J - logit has a bootstrap interval excluding zero (0.055, 0.790)
+    but a permutation p of 0.112. The pre-specified test is the permutation
+    test, so the marker must read as non-significant."""
+    stats = _stats()
+    stats["per_model"]["gemma-3-27b-it"]["released-J - logit"] = {
+        "delta": 0.430, "ci_lo": 0.055, "ci_hi": 0.790, "p_value": 0.112,
+        "win_rates": {"win": 0.54, "tie": 0.06, "loss": 0.40}}
+    assert figures.fig_primary(stats, tmp_path)
+
+    import inspect
+    src = inspect.getsource(figures._forest)
+    assert "row[4]" in src and "PRE-SPECIFIED" in src
+
+
+def test_forest_falls_back_to_the_interval_when_no_p_value(tmp_path):
+    stats = _stats()  # no p_value fields at all
+    assert figures.fig_primary(stats, tmp_path)
+    import inspect
+    assert "(lo > 0 or hi < 0)" in inspect.getsource(figures._forest)

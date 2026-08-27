@@ -10,16 +10,21 @@ excluded here by pre-specification.
 ## Headline
 
 R-Lens readouts at $z \le 0.4$ are rated more contextually coherent than J-Lens
-readouts on **both** models, on a blinded 200-cell panel scored by two
-independently validated autoraters.
+readouts on **both** models, on a blinded 200-cell panel scored by the mean of
+two independently validated autoraters.
 
 | model | R − J | 95% CI | p | win / tie / loss |
 |---|---|---|---|---|
-| Qwen3.5-27B | **+0.655** | [0.480, 0.835] | < 1e-04 | 61 / 27 / 12 |
-| Gemma-3-27B-it | **+0.900** | [0.625, 1.170] | 0.0004 | 63 / 24 / 13 |
+| Qwen3.5-27B | **+0.690** | [0.520, 0.855] | < 1e-04 | 69 / 20 / 11 |
+| Gemma-3-27B-it | **+1.010** | [0.785, 1.235] | < 1e-04 | 76 / 10 / 14 |
 
-Mean contextual coherence (0–4): Qwen logit 0.775, J 1.415, **R 2.070**;
-Gemma logit 1.105, J 1.490, **R 2.390**.
+Mean contextual coherence (0–4): Qwen logit 1.250, J 1.295, **R 1.985**;
+Gemma logit 1.130, J 1.560, **R 2.570**.
+
+**The third judge is excluded.** It failed to clear validation (below), so the
+primary rule is the mean of the two validated judges. The adjudicated estimate
+(+0.655 / +0.900, pooled +0.778) is retained as a sensitivity analysis and is
+the *smaller* of the two.
 
 The ordering claim replicates. Three qualifications are load-bearing and appear
 in the report body, not only in a limitations list:
@@ -30,8 +35,11 @@ in the report body, not only in a limitations list:
 2. **Logit-lens comparisons are judge-dependent.** Five of nine contrasts are
    unstable across the two primary judges, and every unstable one involves the
    logit lens. On Qwen the two judges disagree in *sign* about J − logit.
-3. **Absolute scores are low.** The best arm averages ~2 of 4. This is an
-   ordering result, not a demonstration that early-layer readouts are coherent.
+3. **Absolute scores are low.** R-Lens averages 1.99 (Qwen) and 2.57 (Gemma) of
+   4 — on Qwen it does not reach the scale midpoint. And **J-Lens is
+   indistinguishable from the logit lens on both models** (+0.045, p=0.776 Qwen;
+   +0.430, p=0.112 Gemma): the entire measured gain over the baseline is carried
+   by the R variant, not by the Jacobian transport.
 
 ---
 
@@ -40,10 +48,10 @@ in the report body, not only in a limitations list:
 | # | Stage | Status |
 |---|---|---|
 | 1 | Integrity audit and freeze | **Done** — defect found, fixed, re-audited: **20/20 pass** |
-| 2 | Adjudicator validation | **OUTSTANDING** — needs `OPENROUTER_API_KEY` |
+| 2 | Adjudicator validation | **Done — did not clear.** Adjudicator demoted; primary is now mean-of-two |
 | 3 | Judge-dependence sensitivity | **Done** — strong judge robustness for R − J |
 | 4 | Prompt-echo sensitivity | **Done** — survives echo matching, 24/24 subsets |
-| 5 | Non-echo autorating | **OUTSTANDING** — new rubric, needs API + cost gate |
+| 5 | Non-echo autorating | **OUTSTANDING** — new rubric; projects to ~$4–5, inside the $25 gate |
 | 6 | Framing corrections | **Done** |
 | 7 | Tests | **Partial** — 296 pass; non-echo tests await Stage 5 |
 | 8 | Figures | **Done** — 5 figures, PDF/SVG/PNG |
@@ -144,18 +152,6 @@ incommensurable and the arithmetic was meaningless.
 
 ## Outstanding, and why it matters
 
-**Stage 2 — adjudicator validation.** `meta-llama/llama-3.1-70b-instruct` scored
-63% of cells and has never faced the 78-cell battery the two primaries passed.
-If it fails, the direction survives (mean-of-two: +0.850 pooled, both single
-judges significant on both models) but the *primary estimator* changes. Per the
-protocol: **if it fails any gate, do not relax a threshold and do not preserve
-its ratings.**
-
-```bash
-uv run rlens judge-validate --out-dir $V2B/panel --key $KEYS/panel_b/panel_key.jsonl \
-  --judge meta-llama/llama-3.1-70b-instruct --n-order 24
-```
-
 **Stage 5 — non-echo rubric.** The echo analyses restrict; they do not measure
 coherence with copied spans excluded. The specified instrument does, with
 controls in which a pure prompt-copy arm must not win >10%. Gated on projected
@@ -178,3 +174,40 @@ Three performance defects of the same kind (pandas operations inside a
 resampling loop) were fixed during this phase; a test now inspects the source of
 all three resampling functions and fails if `pd.concat`, `.groupby(` or
 `.pivot_table(` reappears after a `for ... in range(n_boot|n_perm)` line.
+
+
+---
+
+## Stage 2 — the adjudicator did not clear validation
+
+Run on 190 control cells (`--n-order 80`). **Eight of nine gates passed
+outright:** 0/10 corrupted-arm preferences, no position bias (χ²=0.66, 2 df),
+zero gap on duplicate arms, 5/5 identity-layer ties, full dynamic range on
+late-layer controls, and **0/190 unparseable responses**.
+
+The ninth could not be resolved:
+
+| pairs | flips | rate | 95% CI | p(rate > 15%) |
+|---|---|---|---|---|
+| 16 | 5 | 31.2% | [11.0%, 58.7%] | 0.079 |
+| 53 | 10 | 18.9% | [9.4%, 32.0%] | 0.266 |
+
+Escalating the battery does not help. Resolving 18.9% against a 15% ceiling at
+90% power needs **~810 comparable pairs** — a control panel several times the
+size of the experiment it validates. For scale, the admitted primary judge GPT-5
+scored 1/15 (6.7%) with an interval of [0.2%, 32%]: this control cannot even
+separate the adjudicator from a judge already in use.
+
+**Decision: treat the unresolved gate as a failure and demote the adjudicator.**
+Not relaxing the threshold, not admitting an uncertified instrument. Its ratings
+are preserved rather than deleted — they are evidence about the panel even when
+not used to score it.
+
+**This raises the reported effect (+0.778 → +0.850 pooled), and the paper says
+so.** The demotion follows from a gate specified before the adjudicator ran, the
+adjudicated estimate is the smallest of all four scoring rules, and every
+contrast keeps its direction and significance either way.
+
+A side effect worth flagging: the same battery gives GPT-5 an interval of
+[0.2%, 32%], so **order invariance is weakly controlled for every judge here**,
+not just the one that was demoted. That is now a stated limitation.

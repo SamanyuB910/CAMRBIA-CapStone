@@ -65,10 +65,16 @@ def save(fig, out_dir: Path, stem: str) -> list[str]:
 
 def _forest(ax, rows, *, xlabel, title):
     """Horizontal point-and-interval plot. ``rows`` are (label, delta, lo, hi)
-    top to bottom; an interval that excludes zero is drawn filled."""
+    with an optional fifth element: whether the PRE-SPECIFIED test called this
+    significant. When supplied it drives the marker fill, because the bootstrap
+    interval and the sign-flip permutation test can disagree -- on Gemma
+    J - logit the interval excludes zero while the permutation test does not
+    reject, and a filled marker there would contradict the text beside it.
+    Absent a verdict the interval is used, which is the honest fallback."""
     ys = list(range(len(rows)))[::-1]
-    for y, (label, delta, lo, hi) in zip(ys, rows):
-        excludes = lo > 0 or hi < 0
+    for y, row in zip(ys, rows):
+        label, delta, lo, hi = row[:4]
+        excludes = row[4] if len(row) > 4 and row[4] is not None else (lo > 0 or hi < 0)
         color = ACCENT if excludes else MUTED
         ax.plot([lo, hi], [y, y], color=color, lw=1.6, solid_capstyle="round")
         ax.plot([delta], [y], "o", ms=6, color=color,
@@ -127,12 +133,17 @@ def fig_primary(stats: dict, out_dir: Path) -> list[str]:
         for contrast in ("released-R - released-J", "released-R - logit", "released-J - logit"):
             r = stats["per_model"].get(model, {}).get(contrast)
             if r:
+                pv = r.get("p_value")
                 rows.append((f"{MODEL_LABEL.get(model, model)}   {CONTRAST_LABEL[contrast]}",
-                             r["delta"], r["ci_lo"], r["ci_hi"]))
+                             r["delta"], r["ci_lo"], r["ci_hi"],
+                             None if pv is None else pv < 0.05))
+    any_p = any(len(r) > 4 and r[4] is not None for r in rows)
     _forest(axes[1], rows, xlabel="Paired difference in coherence (points)",
             title="b  Contrasts, 95% prompt-cluster bootstrap CI")
-    axes[1].text(0.99, 0.02, "filled = interval excludes zero", transform=axes[1].transAxes,
-                 ha="right", va="bottom", fontsize=7, color=MUTED)
+    axes[1].text(0.99, 0.02,
+                 "filled = permutation p < 0.05" if any_p else "filled = interval excludes zero",
+                 transform=axes[1].transAxes, ha="right", va="bottom",
+                 fontsize=7, color=MUTED)
     fig.tight_layout()
     return save(fig, out_dir, "fig1_primary_result")
 

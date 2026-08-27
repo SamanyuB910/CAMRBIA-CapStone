@@ -5,7 +5,7 @@
 \usepackage{graphicx}
 % Figures live with the analysis outputs, not beside the source, so the
 % document cannot be compiled against a stale hand-copied set.
-\graphicspath{{../results/coherence_v2/figures/}{figures/}}
+\graphicspath{{../results/coherence_v2/figures_primary_mean/}{figures/}}
 \usepackage{amsmath}
 \usepackage{microtype}
 \usepackage[colorlinks=true,linkcolor=black,urlcolor=blue,citecolor=black]{hyperref}
@@ -52,8 +52,9 @@ prompt echo, and echo coincides with about a third of the measured gap.
 Comparisons against the logit-lens baseline are \emph{not} stable across
 judges---on Qwen the two primary judges disagree in sign about whether J-Lens
 beats the logit lens at all. And all three lenses score low in absolute terms:
-the best arm averages 2.07--2.39 out of 4. We replicate the ordering, not a
-claim that early-layer R-Lens readouts are coherent.
+the best arm averages 1.99 (Qwen) and 2.57 (Gemma) out of 4, and on Qwen J-Lens
+is indistinguishable from the logit lens. We replicate the ordering, not a claim
+that early-layer R-Lens readouts are coherent.
 \end{abstract}
 
 \section{What this document does and does not claim}
@@ -176,9 +177,11 @@ proportion. Depth and set breakdowns are Holm-corrected within model.
 \includegraphics[width=\textwidth]{fig1_primary_result.pdf}
 \caption{\textbf{Primary result.} (a) Mean contextual coherence by lens on the
 full 0--4 rubric scale. (b) Paired contrasts with 95\% prompt-cluster bootstrap
-intervals; a filled marker denotes an interval excluding zero. The axis in (a)
-is deliberately not rescaled: the ordering is clear, but every lens sits in the
-lower half of the scale.}
+intervals; a filled marker denotes significance under the \emph{pre-specified}
+sign-flip permutation test, which is not always the same as the interval
+excluding zero --- J $-$ logit on Gemma is drawn hollow for that reason. The
+axis in (a) is deliberately not rescaled: the ordering is clear, but every lens
+sits in the lower half of the scale.}
 \label{fig:primary}
 \end{figure}
 
@@ -195,13 +198,13 @@ direction, so the ordering claim replicates on both models.
 \toprule
 Model & Contrast & $\Delta$ & 95\% CI & $p$ & win & tie & loss \\
 \midrule
-Qwen3.5-27B & R $-$ J        & $0.690$ & \ci{0.515}{0.855} & $<10^{-4}$ & .69 & .20 & .11 \\
-Qwen3.5-27B & R $-$ logit    & $0.735$ & \ci{0.475}{0.995} & $<10^{-4}$ & .64 & .12 & .24 \\
-Qwen3.5-27B & J $-$ logit    & $0.045$ & \ci{-0.195}{0.275} & $0.771$   & .40 & .19 & .41 \\
+Qwen3.5-27B & R $-$ J        & $0.690$ & \ci{0.520}{0.855} & $<10^{-4}$ & .69 & .20 & .11 \\
+Qwen3.5-27B & R $-$ logit    & $0.735$ & \ci{0.480}{1.000} & $<10^{-4}$ & .64 & .12 & .24 \\
+Qwen3.5-27B & J $-$ logit    & $0.045$ & \ci{-0.195}{0.275} & $0.776$   & .40 & .19 & .41 \\
 \addlinespace
-Gemma-3-27B-it & R $-$ J     & $1.010$ & \ci{0.780}{1.240} & $<10^{-4}$ & .76 & .10 & .14 \\
-Gemma-3-27B-it & R $-$ logit & $1.440$ & \ci{1.175}{1.680} & $<10^{-4}$ & .80 & .03 & .17 \\
-Gemma-3-27B-it & J $-$ logit & $0.430$ & \ci{0.050}{0.795} & $0.115$    & .54 & .06 & .40 \\
+Gemma-3-27B-it & R $-$ J     & $1.010$ & \ci{0.785}{1.235} & $<10^{-4}$ & .76 & .10 & .14 \\
+Gemma-3-27B-it & R $-$ logit & $1.440$ & \ci{1.170}{1.675} & $<10^{-4}$ & .80 & .03 & .17 \\
+Gemma-3-27B-it & J $-$ logit & $0.430$ & \ci{0.055}{0.790} & $0.112$    & .54 & .06 & .40 \\
 \bottomrule
 \end{tabular}
 \caption{Primary endpoint and the two supporting contrasts, under the
@@ -213,19 +216,26 @@ $\Delta$ favours the first arm.}
 Two features of this table matter as much as the headline.
 
 \textbf{J-Lens is not distinguishable from the logit lens on either model}
-($+0.045$, $p = 0.771$ on Qwen; $+0.430$, $p = 0.115$ on Gemma). Under the
-primary rule the entire measured advantage over the logit-lens baseline is
-carried by the R-Lens variant, not by the Jacobian transport as such. This is a
-stronger statement than the adjudicated scoring supports, where the Qwen
-J $-$ logit contrast is positive and significant; Section~\ref{sec:judge} shows
-the contrast is judge-unstable and should not be quoted as a single number in
-either direction.
+($+0.045$, $p = 0.776$ on Qwen; $+0.430$, $p = 0.112$ on Gemma). On Qwen the two
+are almost exactly equal in mean score, 1.295 against 1.250 on a 0--4 scale.
+Under the primary rule the entire measured advantage over the logit-lens
+baseline is carried by the R-Lens variant, not by the Jacobian transport as
+such. Under the adjudicated rule the Qwen contrast is instead positive and
+significant, and Section~\ref{sec:judge} shows it is judge-unstable in sign; it
+should not be quoted as a single number in either direction.
 
-\textbf{Absolute scores are low.} Mean contextual coherence is 2.07 (Qwen) and
-2.39 (Gemma) for R-Lens against 1.42 and 1.49 for J-Lens
-(Figure~\ref{fig:primary}a). On this rubric the mid-scale band is
+On Gemma the bootstrap interval for J $-$ logit excludes zero (\ci{0.055}{0.790})
+while the permutation test does not reject ($p = 0.112$). The two procedures ask
+slightly different questions and the permutation test is the pre-specified one,
+so we read that contrast as not significant --- but the disagreement is reported
+rather than settled by taking whichever of the two is more favourable.
+
+\textbf{Absolute scores are low.} Mean contextual coherence is 1.99 (Qwen) and
+2.57 (Gemma) for R-Lens, against 1.30 and 1.56 for J-Lens and 1.25 and 1.13 for
+the logit lens (Figure~\ref{fig:primary}a). On this rubric the mid-scale band is
 ``partially relevant, not a coherent continuation''. R-Lens readouts at
-$z \le 0.4$ are better than the alternatives and still not good.
+$z \le 0.4$ are better than the alternatives and still not good; on Qwen the
+R-Lens mean does not reach the midpoint of the scale.
 
 \subsection{Depth}
 
@@ -237,15 +247,18 @@ models do not agree on where in depth the advantage is largest.}
 \label{fig:depth}
 \end{figure}
 
-\flag{The depth profiles disagree between models.} On Qwen the effect is
-largest at the embedding layer ($z = 0$, $+0.850$) and decays monotonically to
-$+0.425$ by $z = 0.4$. On Gemma the effect at $z = 0$ is the \emph{weakest} of
-the five depths ($+0.550$) and the only one that does not survive Holm
-correction ($p_{\text{Holm}} = 0.092$); it peaks at $z = 0.1$ ($+1.175$).
+\flag{The depth profiles differ between models.} On Gemma the advantage holds at
+every depth and survives Holm correction at all five: $+0.825$ at $z = 0$, a peak
+of $+1.325$ at $z = 0.1$, $+0.875$ at $z = 0.4$. On Qwen it is largest early
+($+1.000$ at both $z = 0$ and $z = 0.2$) and falls to $+0.350$ by $z = 0.4$;
+three of the five Qwen depths do not survive Holm correction ($z = 0.1$, $0.3$
+and $0.4$, all $p_{\text{Holm}}$ between $0.06$ and $0.08$).
 
-A reading on which R-Lens specifically repairs the earliest layers is supported
-by Qwen and contradicted by Gemma. What both models support is the weaker
-statement that R-Lens is ahead somewhere across $z \le 0.4$.
+The effect therefore decays with depth on Qwen and is roughly flat on Gemma, and
+on neither model is it concentrated at the single earliest layer. What both
+models support is that R-Lens is ahead across $z \le 0.4$; a sharper claim about
+\emph{where} within early depth the improvement sits is not supported by these
+two models together.
 
 \subsection{Secondary dimensions}
 
@@ -256,10 +269,10 @@ statement that R-Lens is ahead somewhere across $z \le 0.4$.
 \toprule
 Model & Dimension (R $-$ J) & $\Delta$ & 95\% CI \\
 \midrule
-Qwen3.5-27B    & Lexical integrity & $0.125$ & \ci{0.060}{0.190} \\
-Qwen3.5-27B    & Prompt echo       & $0.225$ & \ci{0.135}{0.300} \\
-Gemma-3-27B-it & Lexical integrity & $0.165$ & \ci{0.035}{0.305} \\
-Gemma-3-27B-it & Prompt echo       & $0.305$ & \ci{0.210}{0.395} \\
+Qwen3.5-27B    & Lexical integrity & $0.205$ & \ci{0.125}{0.275} \\
+Qwen3.5-27B    & Prompt echo       & $0.245$ & \ci{0.160}{0.320} \\
+Gemma-3-27B-it & Lexical integrity & $0.245$ & \ci{0.150}{0.345} \\
+Gemma-3-27B-it & Prompt echo       & $0.330$ & \ci{0.240}{0.410} \\
 \bottomrule
 \end{tabular}
 \caption{Secondary dimensions, both on 0--2 scales.}
@@ -276,11 +289,12 @@ such a comparison would be meaningless.
 
 \subsection{By evaluation set}
 
-Per-set differences are all positive on both models and range from $+0.450$
-(Qwen, typo) to $+1.900$ (Gemma, poetry). \textbf{No per-set difference
-survives Holm correction} ($p_{\text{Holm}} \ge 0.636$ throughout). With four
-prompts per set this analysis is descriptive only and is reported for pattern,
-not for inference.
+Per-set differences are all positive on both models and range from $+0.425$
+(Qwen typo; Gemma multilingual) to $+2.150$ (Gemma poetry). \textbf{No per-set
+difference survives Holm correction} ($p_{\text{Holm}} = 0.641$ throughout).
+With four prompts per set this analysis is descriptive only and is reported for
+pattern, not for inference. Poetry is the largest difference on both models,
+but on four prompts that is an observation, not a finding.
 
 \section{Robustness}
 
@@ -467,8 +481,10 @@ which.}
 \label{fig:agreement}
 \end{figure}
 
-R-Lens wins 61--63\% of R $-$ J cells and loses 12--13\%, with the remaining
-quarter tied. The effect is a broad shift, not a handful of extreme cells.
+R-Lens wins 69\% (Qwen) and 76\% (Gemma) of R $-$ J cells and loses 11\% and
+14\% respectively. The effect is a broad shift across the panel, not a handful
+of extreme cells --- so it is not the product of a few outlier readouts that a
+different rubric might score differently.
 
 \section{The earlier no-prompt panel}
 
