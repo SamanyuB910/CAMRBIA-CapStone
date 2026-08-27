@@ -1219,8 +1219,12 @@ def cmd_judge_validate(args) -> None:
     api_key = os.environ.get("OPENROUTER_API_KEY")
     if not api_key:
         raise SystemExit("set OPENROUTER_API_KEY")
-    if not args.judges or len(args.judges) < 2:
-        raise SystemExit("--judges requires two explicit model ids from different families")
+    judges = list(args.judges or [])
+    if getattr(args, "judge", None):
+        judges = [args.judge] + [j for j in judges if j != args.judge]
+    if not judges:
+        raise SystemExit("supply --judge <id> or --judges <id> <id>")
+    args.judges = judges
 
     out_dir = Path(args.out_dir).expanduser()
     panel = [json.loads(l) for l in (out_dir / "panel_public.jsonl").read_text().splitlines() if l]
@@ -1692,6 +1696,310 @@ def _v2_report(results, df, args) -> list:
 
 
 # ---------------------------------------------------------------------------
+# audit-v2  (robustness Stage 1)
+# ---------------------------------------------------------------------------
+
+
+def cmd_audit_v2(args) -> None:
+    """Fail-closed integrity audit of the frozen coherence experiment."""
+    import json
+
+    from rlens.audit_v2 import (
+        audit, audit_payload_leakage, audit_ratings, render_audit_markdown, sha256_file,
+    )
+    from rlens.autorate import render_cell
+    from rlens.panel_v2 import audit_outgoing_payload, present_for_judge
+
+    panel_dir = Path(args.panel_dir).expanduser()
+    ratings = Path(args.ratings_dir).expanduser()
+    out_dir = Path(args.out_dir).expanduser()
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    paths = {
+        "panel_public": panel_dir / "panel_public.jsonl",
+        "panel_key": Path(args.key).expanduser(),
+        "panel_manifest": panel_dir / "panel_manifest.json",
+        "readouts": panel_dir / "readouts.parquet",
+        "sample": Path(args.sample).expanduser(),
+        "combined_scores": ratings / "combined_scores.json",
+        "scores_blinded": ratings / "scores_blinded.csv",
+        "adjudication": ratings / "adjudication.json",
+        "completeness": ratings / "completeness.json",
+        "cost_report": ratings / "cost_report.json",
+    }
+    for judge in (*args.judges, args.adjudicator):
+        paths[f"raw[{judge}]"] = ratings / f"raw_{judge.replace('/', '_')}.jsonl"
+
+    report = audit(paths)
+
+    def jsonl(path):
+        return [json.loads(l) for l in Path(path).read_text(encoding="utf-8").splitlines() if l]
+
+    panel = {c["cell_id"]: c for c in jsonl(paths["panel_public"])}
+    combined = json.loads(paths["combined_scores"].read_text(encoding="utf-8"))
+    adjudication = json.loads(paths["adjudication"].read_text(encoding="utf-8"))
+    report.counts["disputed_cell_ids"] = adjudication.get("disputed_cell_ids", [])
+    report.counts["n_disputed"] = adjudication.get("n_disputed")
+
+    raw_by_judge = {j: jsonl(paths[f"raw[{j}]"]) for j in (*args.judges, args.adjudicator)}
+    audit_ratings(report, raw_by_judge, list(args.judges), args.adjudicator,
+                  combined, set(panel))
+
+    # (11) reconstruct every outgoing primary payload and audit it. The raw log
+    # stores the arm mapping but not the rendered text, so reconstructing it also
+    # proves the payload is reproducible from the frozen panel.
+    payloads, mismatches = [], 0
+    for judge in args.judges:
+        for row in raw_by_judge[judge]:
+            cell = panel.get(row["cell_id"])
+            if cell is None:
+                continue
+            shown, mapping = present_for_judge(cell, judge)
+            if row.get("arm_mapping") and row["arm_mapping"] != mapping:
+                mismatches += 1
+            payloads.append({"cell_id": row["cell_id"], "payload": render_cell(shown)})
+    report.add("arm_mapping_reproduces", mismatches == 0,
+               f"{mismatches} stored mappings differ from a deterministic rebuild")
+    audit_payload_leakage(report, payloads)
+
+    # (13) effective model ids match what was requested
+    effective = {j: sorted({r.get("judge_id") for r in raw_by_judge[j]})
+                 for j in (*args.judges, args.adjudicator)}
+    bad = {j: v for j, v in effective.items() if v != [j]}
+    report.add("effective_model_ids_match_requested", not bad, f"{effective}")
+
+    # (12) stored hashes reproduce
+    manifest = json.loads(paths["panel_manifest"].read_text(encoding="utf-8"))
+    from rlens.panel_v2 import PanelCell, panel_hash
+
+    cells = [PanelCell(cell_id=c["cell_id"], prompt_display=c["prompt"],
+                       readout_position=c["readout_position"],
+                       readout_token=c["readout_token"], arms=dict(c["candidates"]))
+             for c in jsonl(paths["panel_public"])]
+    recomputed = panel_hash(cells)
+    report.add("panel_hash_reproduces", recomputed == manifest.get("panel_sha256"),
+               f"recomputed {recomputed}, manifest {manifest.get('panel_sha256')}")
+
+    # (14) ratings frozen before any primary result
+    rating_mtime = max(paths[f"raw[{j}]"].stat().st_mtime
+                       for j in args.judges if paths[f"raw[{j}]"].exists())
+    stats = Path(args.statistical_results).expanduser() if args.statistical_results else None
+    if stats and stats.exists():
+        report.add("ratings_frozen_before_analysis", stats.stat().st_mtime >= rating_mtime,
+                   f"statistics mtime {stats.stat().st_mtime:.0f} vs ratings "
+                   f"{rating_mtime:.0f}")
+
+    (out_dir / "audit_report.json").write_text(
+        json.dumps(report.to_dict(), indent=2, default=str), encoding="utf-8")
+    (out_dir / "audit_report.md").write_text(render_audit_markdown(report), encoding="utf-8")
+    (out_dir / "artifact_manifest.json").write_text(
+        json.dumps({"artifacts": report.artifacts,
+                    "generated_by": " ".join(__import__("sys").argv),
+                    "code": _git_state_for_audit()}, indent=2), encoding="utf-8")
+
+    for c in report.checks:
+        print(f"  [{c.status:4s}] {c.name}: {c.detail}")
+    print(f"\naudit -> {out_dir / 'audit_report.md'}")
+    if report.blocking:
+        print(f"\n{len(report.blocking)} BLOCKING failure(s); robustness analysis must not proceed.")
+        raise SystemExit(2)
+    print("\nAll integrity gates passed.")
+
+
+def _git_state_for_audit() -> dict:
+    from rlens.provenance import git_state
+
+    return git_state()
+
+
+
+# ---------------------------------------------------------------------------
+# robustness  (Stages 3 and 4)
+# ---------------------------------------------------------------------------
+
+
+def cmd_robustness(args) -> None:
+    """Judge-dependence and prompt-echo sensitivity on the frozen ratings."""
+    import json
+
+    import pandas as pd
+
+    from rlens.analysis_v2 import (
+        _paired_cells, equal_weight_delta, prompt_cluster_bootstrap,
+        signflip_permutation_p, win_rates,
+    )
+    from rlens.coherence_robustness import (
+        DIAGNOSTIC_VARIANT, SCORING_VARIANTS, build_variant, by_echo_delta,
+        echo_matched, regress_coherence_on_echo,
+    )
+
+    ratings = Path(args.ratings_dir).expanduser()
+    out_dir = Path(args.out_dir).expanduser()
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    combined = json.loads((ratings / "combined_scores.json").read_text(encoding="utf-8"))
+    blinded = pd.read_csv(ratings / "scores_blinded.csv")
+    key_rows = [json.loads(l) for l in Path(args.key).read_text().splitlines() if l]
+    sample = json.loads(Path(args.sample).read_text(encoding="utf-8"))
+    judges = tuple(args.judges)
+
+    rows, detail = [], {}
+    for variant in [*SCORING_VARIANTS, DIAGNOSTIC_VARIANT]:
+        df = build_variant(blinded, combined, key_rows, sample, variant,
+                           judges=judges, adjudicator=args.adjudicator)
+        if df.empty:
+            continue
+        detail[variant] = {"is_primary": variant in SCORING_VARIANTS,
+                           "description": SCORING_VARIANTS.get(variant, "diagnostic only"),
+                           "per_model": {}, "pooled": {}, "by_depth": {}, "by_set": {}}
+
+        for model_key in [*sorted(df["model_key"].unique()), "POOLED"]:
+            sub = df if model_key == "POOLED" else df[df["model_key"] == model_key]
+            for a, b in (("released-R", "released-J"), ("released-R", "logit"),
+                         ("released-J", "logit")):
+                paired = _paired_cells(sub, a, b, "contextual_coherence")
+                stats = prompt_cluster_bootstrap(paired, n_boot=args.n_boot, seed=args.seed)
+                stats.update(signflip_permutation_p(paired, n_perm=args.n_perm,
+                                                    seed=args.seed))
+                stats["win_rates"] = win_rates(sub, a, b)
+                target = (detail[variant]["pooled"] if model_key == "POOLED"
+                          else detail[variant]["per_model"].setdefault(model_key, {}))
+                target[f"{a} - {b}"] = stats
+                rows.append({"variant": variant, "primary": variant in SCORING_VARIANTS,
+                             "model": model_key, "contrast": f"{a} - {b}",
+                             "delta": stats.get("delta"), "ci_lo": stats.get("ci_lo"),
+                             "ci_hi": stats.get("ci_hi"), "p": stats.get("p_display"),
+                             "win": (stats.get("win_rates") or {}).get("win"),
+                             "tie": (stats.get("win_rates") or {}).get("tie"),
+                             "loss": (stats.get("win_rates") or {}).get("loss"),
+                             "n_prompts": stats.get("n_prompts"),
+                             "n_cells": stats.get("n_cells")})
+
+            if model_key != "POOLED":
+                for z, group in sub.groupby("requested_depth"):
+                    paired = _paired_cells(group, "released-R", "released-J",
+                                           "contextual_coherence")
+                    detail[variant]["by_depth"].setdefault(model_key, {})[str(z)] = \
+                        prompt_cluster_bootstrap(paired, n_boot=args.n_boot, seed=args.seed)
+                for set_name, group in sub.groupby("set"):
+                    paired = _paired_cells(group, "released-R", "released-J",
+                                           "contextual_coherence")
+                    detail[variant]["by_set"].setdefault(model_key, {})[set_name] = {
+                        "delta": equal_weight_delta(paired), "n_cells": int(len(paired)),
+                        "note": "DESCRIPTIVE - four prompts per set"}
+
+    table = pd.DataFrame(rows)
+    table.to_csv(out_dir / "judge_sensitivity.csv", index=False)
+    (out_dir / "judge_sensitivity.json").write_text(
+        json.dumps({"seed": args.seed, "n_boot": args.n_boot, "n_perm": args.n_perm,
+                    "variants": detail}, indent=2, default=str), encoding="utf-8")
+
+    # ---- Stage 4: prompt-echo sensitivity on the frozen scores -------------
+    echo_rows, echo_detail = [], {}
+    for variant in [*SCORING_VARIANTS]:
+        df = build_variant(blinded, combined, key_rows, sample, variant,
+                           judges=judges, adjudicator=args.adjudicator)
+        if df.empty or "prompt_echo" not in df.columns:
+            continue
+        for model_key in [*sorted(df["model_key"].unique()), "POOLED"]:
+            sub = df if model_key == "POOLED" else df[df["model_key"] == model_key]
+            pc = _paired_cells(sub, "released-R", "released-J", "contextual_coherence")
+            pe = _paired_cells(sub, "released-R", "released-J", "prompt_echo")
+            if pc.empty or pe.empty:
+                continue
+            subsets = {"all_cells": pc,
+                       "echo_equal": echo_matched(pc, pe, rule="equal"),
+                       "echo_both_zero": echo_matched(pc, pe, rule="both_zero")}
+            for name, frame in subsets.items():
+                col = "diff_c" if "diff_c" in frame.columns else "diff"
+                if frame.empty:
+                    echo_rows.append({"variant": variant, "model": model_key,
+                                      "subset": name, "n_cells": 0, "n_prompts": 0,
+                                      "delta": None, "ci_lo": None, "ci_hi": None})
+                    continue
+                work = frame.rename(columns={col: "diff"})
+                stats = prompt_cluster_bootstrap(work, n_boot=args.n_boot, seed=args.seed)
+                echo_rows.append({"variant": variant, "model": model_key, "subset": name,
+                                  "n_cells": stats.get("n_cells"),
+                                  "n_prompts": stats.get("n_prompts"),
+                                  "delta": stats.get("delta"), "ci_lo": stats.get("ci_lo"),
+                                  "ci_hi": stats.get("ci_hi")})
+            echo_detail.setdefault(variant, {})[model_key] = {
+                "by_echo_delta": by_echo_delta(pc, pe).to_dict("records"),
+                "regression": regress_coherence_on_echo(pc, pe, n_boot=args.n_boot,
+                                                        seed=args.seed),
+            }
+
+    echo_table = pd.DataFrame(echo_rows)
+    echo_table.to_csv(out_dir / "echo_existing_scores.csv", index=False)
+    (out_dir / "echo_existing_scores.json").write_text(
+        json.dumps({"seed": args.seed, "detail": echo_detail}, indent=2, default=str),
+        encoding="utf-8")
+
+    lines = _robustness_markdown(table, echo_table, echo_detail, args)
+    (out_dir / "judge_sensitivity.md").write_text("\n".join(lines[0]), encoding="utf-8")
+    (out_dir / "echo_existing_scores.md").write_text("\n".join(lines[1]), encoding="utf-8")
+    print("\n".join(lines[0][:45]))
+    print(f"\njudge sensitivity -> {out_dir / 'judge_sensitivity.md'}")
+    print(f"echo sensitivity  -> {out_dir / 'echo_existing_scores.md'}")
+
+
+def _robustness_markdown(table, echo_table, echo_detail, args):
+    import pandas as pd
+
+    rj = table[(table["contrast"] == "released-R - released-J")
+               & (table["primary"])]
+    primary = rj[rj["model"] != "POOLED"]
+    all_positive = bool((primary["delta"] > 0).all()) if len(primary) else False
+    both_single = rj[(rj["variant"].isin(["gpt5_only", "deepseek_only"]))
+                     & (rj["model"] != "POOLED")]
+    singles_exclude_zero = bool((both_single["ci_lo"] > 0).all()) if len(both_single) else False
+
+    if all_positive and singles_exclude_zero:
+        verdict = ("**STRONG JUDGE ROBUSTNESS.** R-J is positive under every scoring "
+                   "variant, and each individual judge's confidence interval excludes "
+                   "zero on both models.")
+    elif all_positive:
+        verdict = ("**DIRECTIONAL ROBUSTNESS ONLY.** R-J is positive under every scoring "
+                   "variant, but at least one individual-judge interval includes zero, so "
+                   "the magnitude depends on the scoring rule.")
+    else:
+        verdict = ("**JUDGE DEPENDENCE.** R-J changes sign across scoring variants. The "
+                   "headline estimate is a function of the scoring rule as well as of the "
+                   "lenses, and must be reported as such.")
+
+    j = ["# Judge-dependence sensitivity (Stage 3)", "",
+         "The adjudicated primary estimate used a third judge on ~63% of cells, so the",
+         "headline number depends on the scoring rule as well as on the lenses. The same",
+         "R-J analysis is recomputed under four frozen scoring variants.", "",
+         f"Seeds: bootstrap/permutation {args.seed}; {args.n_boot} replicates, "
+         f"{args.n_perm} permutations.", "", "## Verdict", "", verdict, "",
+         "## R - J by scoring variant", "",
+         rj.to_markdown(index=False, floatfmt=".3f"), "",
+         "## All contrasts", "",
+         table.to_markdown(index=False, floatfmt=".3f"), "",
+         "`adjudicator_only` is a DIAGNOSTIC, not a primary estimator.", ""]
+
+    e = ["# Prompt-echo sensitivity on the frozen scores (Stage 4)", "",
+         "R-lens scores higher on prompt echo as well as on contextual coherence. The two",
+         "use different scales (0-4 and 0-2), so comparing their magnitudes is not",
+         "informative; what is informative is the coherence contrast restricted to cells",
+         "where the two lenses echo equally, and the paired regression of the coherence",
+         "difference on the echo difference.", "",
+         "**These are sensitivity analyses, not causal adjustment.** Restricting on echo",
+         "conditions on a variable measured from the same readouts, and the regression",
+         "intercept is the fitted difference at equal echo -- not an echo-adjusted effect.",
+         "", "## R - J contextual coherence by echo subset", "",
+         echo_table.to_markdown(index=False, floatfmt=".3f"), "",
+         "Retained cell and prompt counts are shown for every subset; a subset with few",
+         "prompts cannot support inference regardless of its point estimate.", "",
+         "## Stratified by the echo difference, and regression", "", "```json",
+         __import__("json").dumps(echo_detail, indent=2, default=str)[:6000], "```", ""]
+    return j, e
+
+
+
+# ---------------------------------------------------------------------------
 # entry point
 # ---------------------------------------------------------------------------
 
@@ -1882,8 +2190,11 @@ def main() -> None:
     p = sub.add_parser("judge-validate", help="v2 Stage 5: judge-validation panel")
     p.add_argument("--out-dir", required=True)
     p.add_argument("--key", required=True)
-    p.add_argument("--judges", nargs="+", required=True,
-                   help="two explicit OpenRouter model ids from different families")
+    p.add_argument("--judges", nargs="+", default=None,
+                   help="explicit OpenRouter model ids from different families")
+    p.add_argument("--judge", default=None,
+                   help="validate a SINGLE judge (e.g. the adjudicator) against the "
+                        "same battery as the primaries")
     p.add_argument("--control-cells", default=None,
                    help="control_cells.jsonl from panel-v2 (default: alongside the panel)")
     p.add_argument("--control-key", default=None,
@@ -1915,6 +2226,29 @@ def main() -> None:
     p.add_argument("--incomplete-notice", action="store_true",
                    help="print the §16 incompleteness sentence (human panel not run)")
     p.set_defaults(func=cmd_analyse_v2)
+
+    p = sub.add_parser("audit-v2", help="robustness Stage 1: fail-closed integrity audit")
+    p.add_argument("--panel-dir", required=True)
+    p.add_argument("--ratings-dir", required=True)
+    p.add_argument("--key", required=True)
+    p.add_argument("--sample", required=True)
+    p.add_argument("--out-dir", required=True)
+    p.add_argument("--judges", nargs=2, required=True)
+    p.add_argument("--adjudicator", required=True)
+    p.add_argument("--statistical-results", default=None)
+    p.set_defaults(func=cmd_audit_v2)
+
+    p = sub.add_parser("robustness", help="Stages 3-4: judge-dependence and echo sensitivity")
+    p.add_argument("--ratings-dir", required=True)
+    p.add_argument("--key", required=True)
+    p.add_argument("--sample", required=True)
+    p.add_argument("--out-dir", required=True)
+    p.add_argument("--judges", nargs=2, required=True)
+    p.add_argument("--adjudicator", required=True)
+    p.add_argument("--n-boot", type=int, default=10000)
+    p.add_argument("--n-perm", type=int, default=10000)
+    p.add_argument("--seed", type=int, default=20260827)
+    p.set_defaults(func=cmd_robustness)
 
     args = parser.parse_args()
     args.func(args)
