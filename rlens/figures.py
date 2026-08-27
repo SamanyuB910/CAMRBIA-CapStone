@@ -504,23 +504,32 @@ def fig_stability(loo, los, out_dir: Path) -> list[str]:
                 x = i * (len(models) + 0.7) + j
                 ticks.append(x)
                 labels.append(f"{nice.get(construct, construct)}\n{SHORT_LABEL.get(model, model)}")
-                for _, row in sub.iterrows():
+                rows_ = list(sub.iterrows())
+                # Spread the five deletions horizontally; without it, deletions
+                # at similar values overlap into what reads as a solid bar.
+                for n, (_, row) in enumerate(rows_):
+                    off = (n - (len(rows_) - 1) / 2) * 0.13
                     below = row["delta"] <= 0
-                    ax.scatter([x], [row["delta"]], s=34,
+                    ax.scatter([x + off], [row["delta"]], s=32,
                                color="#000000" if below else shades.get(model, MUTED),
                                marker="X" if below else marks.get(construct, "o"),
-                               zorder=3)
+                               zorder=4 if below else 3,
+                               edgecolor="white", linewidth=0.5)
                     if below:
-                        ax.annotate(f"−{row['dropped_set']}",
-                                    (x, row["delta"]), textcoords="offset points",
-                                    xytext=(7, -2), fontsize=6.5, color="black")
+                        # label above the marker: the area below is where the
+                        # legend sits and where the axis runs out
+                        ax.annotate(f"−{row['dropped_set']}", (x + off, row["delta"]),
+                                    textcoords="offset points", xytext=(0, -13),
+                                    ha="center", fontsize=6.5, color="black",
+                                    fontweight="bold")
         ax.axhline(0, color="black", lw=0.9, ls=(0, (4, 3)))
         ax.set_xticks(ticks)
         ax.set_xticklabels(labels, fontsize=7)
         ax.set_title("b  Leave-one-set-out (5 deletions each)", loc="left")
         ax.grid(axis="x", visible=False)
-        ax.text(0.99, 0.02, "✕ = deletion that crosses zero", transform=ax.transAxes,
-                ha="right", va="bottom", fontsize=6.5, color=MUTED)
+        ax.margins(y=0.16)
+        ax.text(0.02, 0.03, "✕ = deletion that crosses zero", transform=ax.transAxes,
+                ha="left", va="bottom", fontsize=6.5, color=MUTED)
     fig.tight_layout()
     return save(fig, out_dir, "fig7_stability")
 

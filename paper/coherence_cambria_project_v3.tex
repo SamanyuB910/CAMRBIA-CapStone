@@ -560,6 +560,17 @@ lens whose copied tokens occupy slots in a fixed-length top-10 list --- an
 effect we could separate only by refilling the list from deeper rankings, which
 we did not do (\S\ref{sec:limits}).
 
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.78\textwidth]{fig8_non_echo_contrasts.pdf}
+\caption{\textbf{Every non-echo contrast.} Both Jacobian lenses beat the logit
+lens on Gemma and R-Lens does on Qwen, while R $-$ J is inconclusive on Gemma.
+A filled marker denotes significance on the pre-specified permutation test,
+which is why the Qwen J $-$ logit row is hollow despite its interval excluding
+zero ($p=0.070$).}
+\label{fig:nonechocontrasts}
+\end{figure}
+
 \paragraph{What strengthens under non-echo scoring.} Both Jacobian lenses beat
 the logit lens on both models, and J $-$ logit is \emph{larger} here than under
 standard scoring on Gemma ($+0.875$, $p<10^{-4}$, against $+0.430$, $p=0.112$).
@@ -622,6 +633,17 @@ prompt's five depths; it is descriptive and discards magnitude, so it is less
 powerful than the primary estimator and is reported beside it, not instead.}
 \label{tab:smallsample}
 \end{table}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth]{fig7_stability.pdf}
+\caption{\textbf{Exhaustive single deletions.} (a) Every leave-one-prompt-out
+estimate; the bar is the mean of the twenty. (b) Every leave-one-set-out
+estimate. The one deletion that crosses zero --- Gemma, non-echo, poetry removed
+--- is marked. Panel (a) shows the standard estimates sitting far from zero on
+both models while the non-echo Gemma cloud sits just above it.}
+\label{fig:stability}
+\end{figure}
 
 \paragraph{The standard result is not driven by any one prompt or set.} On both
 models R $-$ J stays positive after deleting any single prompt and after
@@ -772,17 +794,19 @@ ours. Token-form statistics are not a substitute for rating the readouts.
 \section{What would change the conclusion}
 
 \begin{itemize}[leftmargin=*]
-\item The adjudicator failing its validation battery would not overturn the
-      direction, but would demote the adjudicated estimate and promote the
-      mean-of-two.
+\item A human panel of even modest size disagreeing with the autoraters on the
+      standard rubric would undercut every coherence claim here at once, since
+      nothing in this document is anchored to human judgement.
 \item A refilled non-echo analysis --- filtering prompt copies from a deeper
       ranking and topping the list back up to ten --- would separate loss of
       novel content from top-10 crowd-out. If the Gemma null persisted after
       refilling, the reading would firm up to ``R-Lens has no detectable
       advantage in novel content on Gemma''. If it became positive, the
       attenuation would be largely a presentation effect.
-\item A human panel disagreeing with the autoraters at scale would invalidate
-      the instrument, not merely widen the intervals.
+\item A mixture-invariance control --- holding the non-copied tokens fixed
+      while varying the number of copied tokens at constant list length ---
+      failing would show the non-echo rubric is presentation-sensitive, and its
+      attenuations could not be read as clean exclusions of echo.
 \item Refitting both lenses at $n = 1000$ and finding the gap disappears would
       indicate the effect is a property of the light recipe.
 \end{itemize}
@@ -809,14 +833,22 @@ Rating                       & \texttt{rlens autorate} \\
 Primary analysis             & \texttt{rlens analyse-v2} \\
 Integrity audit              & \texttt{rlens audit-v2} \\
 Judge and echo sensitivity   & \texttt{rlens robustness} \\
+Non-echo rubric validation   & \texttt{rlens non-echo-validate} \\
+Non-echo rating              & \texttt{rlens non-echo-rate} \\
+Non-echo analysis            & \texttt{rlens non-echo-analyse} \\
+Small-sample stability       & \texttt{rlens small-sample} \\
 Figures                      & \texttt{rlens figures} \\
+Reproducibility manifest     & \texttt{rlens manifest} \\
 \bottomrule
 \end{tabular}
 \end{center}
 
 \begin{sloppypar}
 \noindent
-Artifact hashes, the protocol salt, seeds and the audit verdicts are recorded in
+Two rubrics are used, each hashed and salted separately, and the software refuses
+to rate the panel under the non-echo rubric unless that rubric's own copy control
+has passed \emph{for the exact rubric text} being used. Artifact hashes, both
+protocol salts, all seeds and the audit verdicts are recorded in
 \texttt{final\_reproducibility\_\allowbreak manifest.json}. The unblinding key is
 deliberately absent from the repository and from this document's source tree.
 \end{sloppypar}
