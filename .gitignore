@@ -21,3 +21,11 @@ lenses/**/*.ckpt.pt
 
 # Local scratch
 results/plumbing/
+
+# relp large artifacts (regenerate via relp/run_27b_sweep.sh, see relp/README.md)
+relp/checkpoints/
+relp/lenses/
+relp/eval_out/
+
+# Not part of this repo; separately cloned from anthropics/jacobian-lens
+jacobian-lens/
