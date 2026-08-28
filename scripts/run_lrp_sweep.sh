@@ -22,10 +22,6 @@ SAFE=/workspace/lrp-artifacts/$MODEL
 mkdir -p "$SAFE"
 
 for cfg in "${CONFIGS[@]}"; do
-    # `rlens fit` names the endpoints j-lens/r-lens; every other arm uses the
-    # bare config name. Resolve both, or the endpoint copies silently no-op.
-    dest="lenses/ours/$MODEL/$cfg/lens.pt"
-    [ -f "$dest" ] || dest="lenses/ours/$MODEL/$cfg-lens/lens.pt"
     if [ -f "$SAFE/$cfg.pt" ]; then
         echo "=== [$(date +%H:%M)] $cfg already done, skipping ==="
         continue
@@ -33,6 +29,12 @@ for cfg in "${CONFIGS[@]}"; do
     echo "=== [$(date +%H:%M)] fitting $cfg (n=$N dim_batch=$DB) ==="
     start=$SECONDS
     if uv run rlens fit --model "$MODEL" --lens "$cfg" --n "$N" --dim-batch "$DB"; then
+        # Resolve the output path AFTER the fit: `rlens fit` writes the two
+        # endpoints to j-lens/ and r-lens/ but every other arm to the bare
+        # config name, and neither directory exists before the fit runs — so
+        # resolving up front picks the wrong one every time.
+        dest="lenses/ours/$MODEL/$cfg/lens.pt"
+        [ -f "$dest" ] || dest="lenses/ours/$MODEL/$cfg-lens/lens.pt"
         cp "$dest" "$SAFE/$cfg.pt" && echo "=== $cfg done in $((SECONDS-start))s -> $SAFE/$cfg.pt ==="
     else
         echo "!!! $cfg FAILED after $((SECONDS-start))s — continuing with the rest !!!"
