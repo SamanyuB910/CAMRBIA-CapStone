@@ -17,6 +17,8 @@ identity transport (``use_jacobian=False`` equivalent).
 from __future__ import annotations
 
 import json
+import sys
+import time
 from pathlib import Path
 
 import pandas as pd
@@ -105,6 +107,12 @@ def run_passk(
                 if target_ids and int(final_logits.argmax()) not in target_ids:
                     continue
             n_kept[set_name] += 1
+            # One flushed line per scored item, to stderr. A 27B eval over ten
+            # lenses runs for an hour with no other output, and a silent process
+            # is indistinguishable from a slow one -- two multi-hour outages in
+            # this project went unnoticed for exactly that reason.
+            print(f"[eval] {set_name} kept={n_kept[set_name]} t={time.time():.1f}",
+                  file=sys.stderr, flush=True)
 
             id_sets = [ids for w in item["intermediates"] if (ids := token_ids_of(tok, w))]
             for layer in layers:
