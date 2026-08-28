@@ -305,6 +305,52 @@ def fig_geometry_and_norms(df_cue: pd.DataFrame) -> go.Figure:
                             "construction; ratio near 1 means neither lens pushes harder")
 
 
+def fig_lrp_attribution(model: str) -> go.Figure | None:
+    """Per-rule attribution: which LRP rule carries the R-lens's improvement?
+
+    Left: pass@10 lift over the J-lens arm for each rule subset, all layers vs
+    the first half (where the post locates the advantage). Right: how far each
+    variant sits from the two endpoints in weight space — a rule can move the
+    lens a lot without that movement helping the metric.
+    """
+    from rlens import lrp
+
+    csv = REPO_ROOT / "results" / f"passk_per_layer_{model}.csv"
+    if not csv.exists():
+        return None
+    attr_all = lrp.attribution(csv)
+    if not len(attr_all):
+        return None
+    attr_half = lrp.attribution(csv, first_half_only=True)
+    geo = lrp.weight_geometry(model)
+
+    cols = 2 if len(geo) else 1
+    fig = make_subplots(rows=1, cols=cols, horizontal_spacing=0.1,
+                        subplot_titles=("pass@10 lift over the J-lens arm",
+                                        "weight-space cosine to each endpoint")[:cols])
+    order = [c for c in attr_all.index if c != "j"]
+    for label, table, colr in (("all layers", attr_all, "#2E86AB"),
+                               ("first half", attr_half, "#E4572E")):
+        if not len(table):
+            continue
+        vals = [float(table.loc[c, "lift_over_j"]) if c in table.index else float("nan") for c in order]
+        errs = [float(table.loc[c, "lift_sem"]) if c in table.index else 0.0 for c in order]
+        fig.add_trace(go.Bar(name=label, x=order, y=vals, marker_color=colr,
+                             error_y=dict(type="data", array=errs, thickness=1.4, width=4)),
+                      row=1, col=1)
+    if len(geo):
+        g = geo.groupby("config")[["cos_to_j", "cos_to_r"]].mean()
+        g = g.loc[[c for c in attr_all.index if c in g.index]]
+        for col_name, colr in (("cos_to_j", "#9AA0A6"), ("cos_to_r", "#E4572E")):
+            fig.add_trace(go.Bar(name=col_name, x=list(g.index), y=list(g[col_name]),
+                                 marker_color=colr), row=1, col=2)
+    fig.add_hline(y=0, line=dict(color="rgba(0,0,0,0.35)", width=1, dash="dot"), row=1, col=1)
+    return _layout(fig, f"LRP per-rule ablation — which rule carries the improvement? ({model})",
+                   "rule subset", "pass@10 lift", height=460, barmode="group",
+                   subtitle="error bars = ±1 SEM across layers · all arms fitted on identical prompts, "
+                            "so differences are attributable to the rules alone")
+
+
 def fig_passk(csv_path: Path, model: str) -> go.Figure | None:
     """Core experiment 1: pass@10 per category, per lens, with SEM over layers."""
     if not csv_path.exists():
@@ -365,6 +411,10 @@ def build(model: str = "qwen3.5-27b", n_boot: int = 200) -> tuple[list[tuple[str
         f = fig_passk(path, m)
         if f is not None:
             figs.append((f"passk_{m}", f))
+    for m in (model, "qwen3.5-4b"):
+        f = fig_lrp_attribution(m)
+        if f is not None:
+            figs.append((f"lrp_{m}", f))
 
     tables = {
         "onsets (cue-site interventions)": pd.DataFrame(onsets).T,
