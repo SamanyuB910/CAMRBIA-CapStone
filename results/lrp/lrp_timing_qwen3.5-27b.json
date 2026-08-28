@@ -1,0 +1,8 @@
+{
+  "measured_on": "NVIDIA H200 143GB, contended with a concurrent 4B sweep",
+  "dim_batch_8": {"sec_per_prompt": 647, "status": "ok", "gpu_mem_used_MiB": 99209},
+  "dim_batch_16": {"status": "not attempted", "reason": "db=8 already used 99GB of 143GB (54GB model + ~45GB activations); 16 would need ~90GB activations and exceed the card"},
+  "dim_batch_32": {"status": "not attempted", "reason": "would need ~4x the db=8 activation footprint"},
+  "decision": "n_prompts=4 at dim_batch=8: 8 configs x 4 prompts x 647s ~= 5.75h, inside the remaining window with buffer",
+  "caveat": "n=4 is well below the released recipe n=25; our 27B fits are therefore weaker than the released artifacts and are NOT expected to match them tightly"
+}
