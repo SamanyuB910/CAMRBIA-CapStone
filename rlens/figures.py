@@ -339,9 +339,13 @@ def fig_lrp_attribution(model: str) -> go.Figure | None:
                              error_y=dict(type="data", array=errs, thickness=1.4, width=4)),
                       row=1, col=1)
     if len(geo):
-        g = geo.groupby("config")[["cos_to_j", "cos_to_r"]].mean()
+        cos_cols = [c for c in geo.columns if c.startswith("cos_to_")]
+        g = geo.groupby("config")[cos_cols].mean()
         g = g.loc[[c for c in attr_all.index if c in g.index]]
-        for col_name, colr in (("cos_to_j", "#9AA0A6"), ("cos_to_r", "#E4572E")):
+        palette = {"cos_to_j": "#9AA0A6", "cos_to_r": "#E4572E",
+                   "cos_to_released_j": "#C9CCD1", "cos_to_released_r": "#F2A085"}
+        for col_name in cos_cols:
+            colr = palette.get(col_name, "#6A4C93")
             fig.add_trace(go.Bar(name=col_name, x=list(g.index), y=list(g[col_name]),
                                  marker_color=colr), row=1, col=2)
     fig.add_hline(y=0, line=dict(color="rgba(0,0,0,0.35)", width=1, dash="dot"), row=1, col=1)

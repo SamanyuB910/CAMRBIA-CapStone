@@ -81,19 +81,49 @@ def verify_labels(model: str) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+def released_lenses(model: str) -> dict:
+    """The published J/R lenses, as an *independent* reference target.
+
+    Our own endpoints are fitted at whatever n the budget allowed; the released
+    pair is the artifact the post actually reports on. Measuring each arm
+    against both says which rule moves our fit toward the published R-lens,
+    without depending on our own r arm existing or being well-fitted.
+    """
+    from jlens.lens import JacobianLens
+
+    out = {}
+    for key, name in (("released_j", "j-lens"), ("released_r", "r-lens")):
+        p = REPO_ROOT / "lenses" / "released" / model / name / "lens.pt"
+        if p.exists():
+            out[key] = JacobianLens.load(str(p))
+    return out
+
+
 def weight_geometry(model: str, configs: list[str] | None = None) -> pd.DataFrame:
-    """Per-layer cosine of vec(J_l) against the j and r endpoints."""
+    """Per-layer cosine of vec(J_l) against our endpoints and the released pair.
+
+    Note the saved Jacobians are fp16, so a lens compared with itself scores
+    ~1.001 rather than exactly 1. Read these to two decimals, not four.
+    """
     lenses = load_lenses(model, configs)
-    if not {"j", "r"} <= set(lenses):
+    if not lenses:
+        return pd.DataFrame()
+    refs = {k: v for k, v in lenses.items() if k in ("j", "r")}
+    refs.update(released_lenses(model))
+    if not refs:
         return pd.DataFrame()
     rows = []
     for name, lens in lenses.items():
         for layer in lens.source_layers:
             v = lens.jacobians[layer].float().flatten()
             out = {"config": name, "layer": layer}
-            for end in ("j", "r"):
-                w = lenses[end].jacobians[layer].float().flatten()
-                out[f"cos_to_{end}"] = float(
+            for ref_name, ref in refs.items():
+                if layer not in ref.jacobians:
+                    continue
+                w = ref.jacobians[layer].float().flatten()
+                if w.shape != v.shape:
+                    continue
+                out[f"cos_to_{ref_name}"] = float(
                     torch.dot(v, w) / (v.norm() * w.norm() + 1e-12))
             rows.append(out)
     return pd.DataFrame(rows)
@@ -224,7 +254,8 @@ def write_report(model: str, passk_csv: Path, out: Path, *, timing: dict | None 
         lines.append("Mean per-layer cosine of vec(J_l) to each endpoint. A variant close to `r` in")
         lines.append("weight space but without its pass@10 lift means the rule changes the lens")
         lines.append("substantially in a direction that does not help the metric.\n")
-        g = geo.groupby("config")[["cos_to_j", "cos_to_r"]].mean()
+        cos_cols = [c for c in geo.columns if c.startswith("cos_to_")]
+        g = geo.groupby("config")[cos_cols].mean()
         order = [c for c in SWEEP_ORDER if c in g.index]
         lines.append(g.loc[order].to_markdown(floatfmt=".4f"))
 
