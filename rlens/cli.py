@@ -362,21 +362,27 @@ def cmd_eval(args) -> None:
     hf, tok = _onset_model(args.model, args.dtype, args.device)
     model = jlens.from_hf(hf, tok)
 
+    # LRP sweep arms first: the attribution keys off these exact names. Track
+    # resolved paths so an endpoint is not evaluated twice under two aliases
+    # (the sweep's "j" and the legacy "ours-J" are the same file).
+    from rlens.lrp import available_configs, lens_file
+
     lenses = {"logit": None}
+    seen: set[Path] = set()
+    for cfg in available_configs(args.model):
+        p = lens_file(args.model, cfg)
+        lenses[cfg] = JacobianLens.load(str(p))
+        seen.add(p.resolve())
     for name, (kind, file) in {
         "released-J": ("released", "j-lens"),
         "released-R": ("released", "r-lens"),
         "ours-J": ("ours", "j-lens"),
         "ours-R": ("ours", "r-lens"),
     }.items():
-        if _lens_path(kind, file, args.model).exists():
-            lenses[name] = JacobianLens.load(str(_lens_path(kind, file, args.model)))
-    # LRP sweep arms (lenses/ours/<model>/<config>/lens.pt) — the attribution
-    # analysis keys off these exact names, so keep them as the config names
-    from rlens.lrp import available_configs, lens_file
-
-    for cfg in available_configs(args.model):
-        lenses[cfg] = JacobianLens.load(str(lens_file(args.model, cfg)))
+        p = _lens_path(kind, file, args.model)
+        if p.exists() and p.resolve() not in seen:
+            lenses[name] = JacobianLens.load(str(p))
+            seen.add(p.resolve())
     print(f"model: {args.model}   lenses: {list(lenses)}   sets: {args.sets}")
 
     df = run_passk(
