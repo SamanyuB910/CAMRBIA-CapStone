@@ -1,4 +1,4 @@
-# LRP per-rule ablation — qwen3.5-27b
+# LRP per-rule ablation — qwen3.5-4b
 
 Extension experiment 2: which of the three LRP rules carries the R-lens's
 improvement over the J-lens? Each arm is a lens fitted with one *subset* of the
@@ -13,25 +13,25 @@ attributable to the rules alone.
 
 ## Scope
 
-- **n = 4 fitting prompts.** The released recipe uses 25. The arms are comparable *to each other* — same prompts, same recipe — but no single qwen3.5-27b lens here should be read as reproducing the released artifact.
-- **7 of 8 rule subsets completed.** Missing: `r`.
-- **pass@10 for the sweep arms: not available.** The attribution below rests on weight-space geometry alone, which the 4B model shows is a reliable proxy for single rules and an unreliable one for combinations (see the LN paragraph).
+- **n = 25 fitting prompts.** This matches the released recipe.
+- **7 of 8 rule subsets completed.** Missing: `identity+half`.
+- **pass@10 for the sweep arms: available.**
 
 ## The effect being attributed
 
 Before asking which rule causes the R-lens's advantage, confirm the advantage
 exists on this model. From the *released* lens pair — independent of the sweep
-and unaffected by the n=4 limit — pass@10 averaged over layers:
+and unaffected by the n=25 limit — pass@10 averaged over layers:
 
 | set | logit | released J | released R | R − J |
 |---|---|---|---|---|
-| multihop | 0.057 | 0.081 | 0.099 | +0.0176 |
-| multilingual | 0.085 | 0.136 | 0.165 | +0.0284 |
-| association | 0.007 | 0.038 | 0.038 | +0.0008 |
-| typo | 0.201 | 0.206 | 0.288 | +0.0812 |
-| poetry | 0.001 | 0.003 | 0.002 | -0.0005 |
+| multihop | 0.065 | 0.072 | 0.075 | +0.0036 |
+| multilingual | 0.051 | 0.147 | 0.167 | +0.0199 |
+| association | 0.000 | 0.000 | 0.000 | +0.0000 |
+| typo | 0.197 | 0.298 | 0.360 | +0.0613 |
+| poetry | 0.002 | 0.005 | 0.005 | +0.0000 |
 
-Overall R − J = **+0.0255 ± 0.0027** SEM across 63 layers, rising to **+0.0362** over the first half of the network.
+Overall R − J = **+0.0170 ± 0.0048** SEM across 31 layers, rising to **+0.0309** over the first half of the network.
 
 Note which sets carry it. `association` and `poetry` barely move for *any* lens,
 released ones included — they are on the floor and carry no signal. Every per-rule
@@ -46,21 +46,21 @@ is checked rather than assumed.)
 
 ## Attribution
 
-| rules | cos to released R | Δ vs `j` |
-|---|---|---|
-| `j` | 0.7189 ± 0.0285 | — |
-| `ln` | 0.5405 ± 0.0413 | -0.1784 |
-| `identity` | 0.7522 ± 0.0234 | +0.0333 |
-| `half` | 0.9042 ± 0.0113 | +0.1853 |
-| `ln+identity` | 0.5745 ± 0.0391 | -0.1445 |
-| `ln+half` | 0.9027 ± 0.0117 | +0.1837 |
-| `identity+half` | 0.9180 ± 0.0098 | +0.1991 |
+| rules | cos to released R | Δ vs `j` | pass@10 | Δ pass@10 vs `j` |
+|---|---|---|---|---|
+| `j` | 0.8750 ± 0.0189 | — | 0.1023 | — |
+| `ln` | 0.8743 ± 0.0197 | -0.0007 | 0.0754 | -0.0269 |
+| `identity` | 0.8885 ± 0.0158 | +0.0135 | 0.1075 | +0.0052 |
+| `half` | 0.9811 ± 0.0030 | +0.1061 | 0.1219 | +0.0196 |
+| `ln+identity` | 0.8803 ± 0.0179 | +0.0053 | 0.1026 | +0.0003 |
+| `ln+half` | 0.9858 ± 0.0025 | +0.1108 | 0.1021 | -0.0002 |
+| `r` | 0.9971 ± 0.0010 | +0.1221 | 0.1202 | +0.0179 |
 
 ## Single rules — the headline question
 
-- `half` (split the SwiGLU product gradient 50/50): +0.1853 Δ cosine to released R — **carries the improvement**
-- `identity` (SiLU backward -> sigmoid(x)): +0.0333 Δ cosine to released R — mildly helpful
-- `ln` (detach the RMSNorm normalizer): -0.1784 Δ cosine to released R — **actively harmful**
+- `half` (split the SwiGLU product gradient 50/50): +0.0196 Δ pass@10 — **carries the improvement**
+- `identity` (SiLU backward -> sigmoid(x)): +0.0052 Δ pass@10 — mildly helpful
+- `ln` (detach the RMSNorm normalizer): -0.0269 Δ pass@10 — **actively harmful**
 
 ## Interactions
 
@@ -68,9 +68,8 @@ Does a pair beat the sum of its parts? `observed − (ruleA + ruleB)`.
 
 | pair | observed | additive prediction | interaction | reading |
 |---|---|---|---|---|
-| `ln+identity` | -0.1445 | -0.1451 | +0.0007 | additive |
-| `ln+half` | +0.1837 | +0.0069 | +0.1768 | cooperative |
-| `identity+half` | +0.1991 | +0.2185 | -0.0195 | redundant |
+| `ln+identity` | +0.0003 | -0.0216 | +0.0220 | cooperative |
+| `ln+half` | -0.0002 | -0.0073 | +0.0071 | additive |
 
 ## The LN paragraph — why a geometry-only column is provisional
 
@@ -95,26 +94,3 @@ One asymmetry runs in our favour. On 4B, geometry *understated* the LN-rule's ha
 (cos -0.0007, essentially neutral) against a clearly negative
 -0.0269 in pass@10. Where a geometry column already
 shows `ln` strongly negative, the behavioural harm is unlikely to be smaller.
-
-## Timing (measured, not estimated)
-
-```
-{
-  "measured_on": "NVIDIA H200 143GB, contended with a concurrent 4B sweep",
-  "dim_batch_8": {
-    "sec_per_prompt": 647,
-    "status": "ok",
-    "gpu_mem_used_MiB": 99209
-  },
-  "dim_batch_16": {
-    "status": "not attempted",
-    "reason": "db=8 already used 99GB of 143GB (54GB model + ~45GB activations); 16 would need ~90GB activations and exceed the card"
-  },
-  "dim_batch_32": {
-    "status": "not attempted",
-    "reason": "would need ~4x the db=8 activation footprint"
-  },
-  "decision": "n_prompts=4 at dim_batch=8: 8 configs x 4 prompts x 647s ~= 5.75h, inside the remaining window with buffer",
-  "caveat": "n=4 is well below the released recipe n=25; our 27B fits are therefore weaker than the released artifacts and are NOT expected to match them tightly"
-}
-```
