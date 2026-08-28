@@ -16,6 +16,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
@@ -152,6 +153,33 @@ def perset_figure(model: str) -> go.Figure | None:
         margin=dict(l=70, r=30, t=100, b=60))
     fig.update_yaxes(title_text="Δ pass@10 vs j")
     return fig
+
+
+def across_set_t(model: str, arms: tuple[str, ...] = ("half", "identity", "ln")) -> dict[str, float]:
+    """t of each rule's lift when the five eval sets are the sampling unit.
+
+    The bars carry across-layer SEM, which is tight because a rule that helps
+    tends to help at every depth. Treating the eval sets as the unit asks the
+    different and harder question of whether the effect generalises, and gives
+    a much weaker answer -- the 4B half-rule is t=3.2 one way and t=1.2 the
+    other. Reporting only the first would overstate the result.
+    """
+    df = per_layer_table(model)
+    if df is None:
+        return {}
+    lenses = set(df.columns.get_level_values("lens"))
+    if "j" not in lenses:
+        return {}
+    sets = list(df.columns.get_level_values("set").unique())
+    out: dict[str, float] = {}
+    for c in arms:
+        if c not in lenses:
+            continue
+        v = np.array([(df[(s, c)] - df[(s, "j")]).mean() for s in sets], dtype=float)
+        sem = v.std(ddof=1) / np.sqrt(len(v))
+        if sem > 0:
+            out[c] = float(v.mean() / sem)
+    return out
 
 
 def released_effect(model: str) -> pd.DataFrame | None:
@@ -294,6 +322,16 @@ def build() -> Path:
             fig.add_hline(y=0, line=dict(color="rgba(0,0,0,0.4)", width=1, dash="dot"), row=1, col=col)
         sub = (f"n = {n} fitting prompts · grey = baseline, orange = one rule, "
                "light orange = two rules, blue = all three · error bars = ±1 SEM across layers")
+        # Across-layer bars ask "is this consistent down the network?", which is
+        # not the question a reader assumes they answer. On 4B the half-rule is
+        # t=3.2 that way and t=1.2 across eval sets, because the effect lives in
+        # typo -- so the bar can look decisive while the generalisation is not.
+        if beh is not None:
+            spread = across_set_t(model)
+            if spread:
+                sub += ("<br>they say the effect is consistent down the network, NOT that it "
+                        "generalises across tasks — across the five eval sets instead: "
+                        + " · ".join(f"{k} t={v:+.1f}" for k, v in spread.items()))
         fig.update_layout(title=f"{model}<br><span style='font-size:12px;color:#666'>{sub}</span>",
                           template="plotly_white", height=430,
                           font=dict(family="Helvetica, Arial, sans-serif", size=13),
