@@ -214,6 +214,35 @@ def released():
     return json.loads(PROVENANCE.read_text(encoding="utf-8"))
 
 
+def test_lrp_sweep_configs_are_distinct_and_correctly_labelled():
+    """The per-rule ablation is only interpretable if each arm really carries
+    the rule subset its name claims — a mislabelled sweep is the easiest way to
+    get a confidently wrong attribution."""
+    from rlens.rules import RULE_CONFIGS, SWEEP_ORDER
+
+    assert set(SWEEP_ORDER) == set(RULE_CONFIGS) and len(SWEEP_ORDER) == 8
+    seen = {}
+    for name, cfg in RULE_CONFIGS.items():
+        triple = (cfg.ln_rule, cfg.identity_rule, cfg.half_rule)
+        assert triple not in seen, f"{name} duplicates {seen.get(triple)}"
+        seen[triple] = name
+        # the name must spell out exactly the active rules
+        expected = {"ln": cfg.ln_rule, "identity": cfg.identity_rule, "half": cfg.half_rule}
+        if name == "j":
+            assert not any(expected.values())
+        elif name == "r":
+            assert all(expected.values())
+        else:
+            assert set(name.split("+")) == {k for k, v in expected.items() if v}
+    # endpoints must match the released artifacts' configs
+    assert RULE_CONFIGS["j"].to_config_json() == RulesConfig.all_off().to_config_json()
+    assert RULE_CONFIGS["r"].to_config_json() == RulesConfig().to_config_json()
+    # single-rule arms must differ from both endpoints
+    for name in ("ln", "identity", "half"):
+        assert RULE_CONFIGS[name].to_config_json() not in (
+            RULE_CONFIGS["j"].to_config_json(), RULE_CONFIGS["r"].to_config_json())
+
+
 def test_j_lens_config_matches_released(released):
     theirs = released["j-lens"]["config_json"]
     assert RulesConfig.all_off().to_config_json() == theirs

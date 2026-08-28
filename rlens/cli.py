@@ -21,6 +21,8 @@ from pathlib import Path
 
 os.environ.setdefault("HF_HUB_DISABLE_SYMLINKS_WARNING", "1")
 
+from rlens.rules import RULE_CONFIGS  # noqa: E402  (needed at parser-build time)
+
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DRAWS = {"primary": (0, 25), "nf1": (25, 50), "nf2": (50, 75)}  # pile-10k row ranges
 JACCARD_POSITIONS = [8, 24, 48, 72, 96, 120]
@@ -208,14 +210,14 @@ def cmd_fit(args) -> None:
 
     import jlens
     from rlens.fit import FitRecipe, fit_and_save
-    from rlens.rules import RulesConfig
+
 
     if args.model != "qwen3.5-4b":
         raise SystemExit("only qwen3.5-4b is wired up so far")
     logging.basicConfig(level=logging.INFO, format="%(message)s")
     jlens.configure_logging()
 
-    rules_cfg = RulesConfig() if args.lens == "r" else RulesConfig.all_off()
+    rules_cfg = RULE_CONFIGS[args.lens]
     start, stop = DRAWS[args.draw]
     prompts, indices = _load_prompts(start, start + args.n if args.n != 25 else stop)
 
@@ -236,7 +238,8 @@ def cmd_fit(args) -> None:
         recipe = FitRecipe()
         out_dir = REPO_ROOT / "lenses" / "ours" / args.model
 
-    name = f"{args.lens}-lens" + ("" if args.draw == "primary" else f"-{args.draw}")
+    name = (f"{args.lens}-lens" if args.lens in ("j", "r") else args.lens)
+    name += "" if args.draw == "primary" else f"-{args.draw}"
     out_path = out_dir / name / "lens.pt"
     checkpoint = out_dir / name / "fit.ckpt.pt"
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -751,7 +754,8 @@ def main() -> None:
 
     p = sub.add_parser("fit", help="fit a J- or R-lens with the released recipe")
     p.add_argument("--model", default="qwen3.5-4b")
-    p.add_argument("--lens", choices=["j", "r"], required=True)
+    p.add_argument("--lens", choices=sorted(RULE_CONFIGS), required=True,
+                   help="rule subset to fit: j/r are the endpoints, the rest are the LRP ablation arms")
     p.add_argument("--draw", choices=sorted(DRAWS), default="primary")
     p.add_argument("--n", type=int, default=25)
     p.add_argument("--device", default=default_device)

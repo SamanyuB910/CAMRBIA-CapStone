@@ -134,6 +134,27 @@ class RulesConfig:
         return cls(**cfg["rules"])
 
 
+#: The eight rule subsets for the LRP per-rule ablation (extension experiment 2).
+#: ``j`` and ``r`` are the endpoints the released artifacts correspond to; the six
+#: between them isolate each rule and each pair, so a pass@10 difference can be
+#: attributed to a specific rule rather than to the bundle.
+RULE_CONFIGS: dict[str, "RulesConfig"] = {
+    "j": RulesConfig(ln_rule=False, identity_rule=False, half_rule=False),
+    "ln": RulesConfig(ln_rule=True, identity_rule=False, half_rule=False),
+    "identity": RulesConfig(ln_rule=False, identity_rule=True, half_rule=False),
+    "half": RulesConfig(ln_rule=False, identity_rule=False, half_rule=True),
+    "ln+identity": RulesConfig(ln_rule=True, identity_rule=True, half_rule=False),
+    "ln+half": RulesConfig(ln_rule=True, identity_rule=False, half_rule=True),
+    "identity+half": RulesConfig(ln_rule=False, identity_rule=True, half_rule=True),
+    "r": RulesConfig(ln_rule=True, identity_rule=True, half_rule=True),
+}
+
+#: sweep order: single rules first (they answer the headline question), pairs
+#: after (interactions), endpoints at the ends. Truncating this list still
+#: leaves a coherent experiment.
+SWEEP_ORDER = ("j", "ln", "identity", "half", "ln+identity", "ln+half", "identity+half", "r")
+
+
 # ---------------------------------------------------------------------------
 # Patched forwards. Bound per-instance by RulesPatcher; ``self`` is the
 # original transformers module, so weights/eps/act_fn are the module's own.
@@ -353,3 +374,4 @@ def apply_rules(hf_model: nn.Module, cfg: RulesConfig) -> RulesPatcher:
     """Install ``cfg``'s rules on ``hf_model``; returns the (applied) patcher.
     Use ``patcher.remove()`` or a ``with RulesPatcher(model, cfg):`` block."""
     return RulesPatcher(hf_model, cfg).apply()
+
