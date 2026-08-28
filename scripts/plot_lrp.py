@@ -206,6 +206,31 @@ def depth_figure(model: str) -> go.Figure:
     return fig
 
 
+def _27b_caveat() -> str:
+    """The 27B scope note, derived from what is on disk rather than hardcoded.
+
+    The 27B sweep's own pass@10 was lost to a disk-quota failure and the GPU
+    window closing, so the page long said "27B is weight-space only". That
+    sentence silently becomes false the moment the eval is recovered, so it is
+    computed from the data instead of asserted.
+    """
+    m = "qwen3.5-27b"
+    n_arms = len(set(pd.read_csv(RES / f"lrp_geometry_{m}.csv")["config"])) if \
+        (RES / f"lrp_geometry_{m}.csv").exists() else 0
+    common = (f"<p class='note'><b>Read the 27B panels with this caveat.</b> The 27B sweep was "
+              f"fitted at n = 4 prompts, against the released recipe's 25, and {n_arms} of the 8 rule "
+              f"subsets completed. The arms are comparable to each other — same prompts, same recipe — "
+              f"but no single 27B lens here should be read as reproducing the released artifact. ")
+    if behaviour(m) is not None:
+        return common + ("Its pass@10 eval, lost when the GPU window closed, has since been "
+                         "recovered, so both panels below are the sweep's own measurements.</p>")
+    return common + ("Its pass@10 eval was also lost — still loading weights when the window "
+                     "closed, after a disk-quota failure on the box. So the 27B left panel is not "
+                     "the sweep: it is the <i>released</i> R- and J-lenses, showing the effect the "
+                     "sweep is trying to attribute (+0.026 pass@10 overall, +0.036 over the first "
+                     "half), and the 27B attribution itself rests on weight space alone.</p>")
+
+
 def build() -> Path:
     models = [m for m in ("qwen3.5-27b", "qwen3.5-4b") if (RES / f"lrp_geometry_{m}.csv").exists()]
     parts = ["<html><head><meta charset='utf-8'><title>LRP per-rule ablation</title>",
@@ -217,13 +242,8 @@ def build() -> Path:
              "<b>Left</b>: pass@10 lift over the no-rules (<code>j</code>) baseline — the metric the "
              "R-lens post reports. <b>Right</b>: movement toward the <i>released</i> R-lens in weight "
              "space, which needs no eval at all. A rule can move the lens far in a direction that does "
-             "not help pass@10, so the two panels agreeing is what makes the attribution credible.</p>"
-             "<p class='note'><b>Read the 27B panels with this caveat.</b> The 27B sweep was fitted at "
-             "n = 4 prompts (the released recipe uses 25) and its own pass@10 eval was still loading "
-             "weights when the GPU window closed, after a disk-quota failure on the box. So for 27B the "
-             "left panel is not the sweep — it is the <i>released</i> R- and J-lenses, showing the effect "
-             "the sweep is trying to attribute (+0.026 pass@10 overall, +0.036 over the first half), and "
-             "the attribution itself rests on the weight-space panel alone.</p>"
+             "not help pass@10, so the two panels agreeing is what makes the attribution credible.</p>",
+             _27b_caveat(),
              "<p class='note'><b>Where the two panels disagree, believe pass@10.</b> On 4B the single-rule "
              "arms agree across both methods, but <code>ln+half</code> does not: it is the second-closest "
              "arm to the released R-lens in weight space (cos 0.986, above <code>half</code>'s 0.981) and "
