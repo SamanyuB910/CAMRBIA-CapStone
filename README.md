@@ -43,6 +43,16 @@ That's it: one package, one test file, one notebook, one pins file, one CLI.
 Prereqs: [uv](https://docs.astral.sh/uv/getting-started/installation/), git, ~15 GB disk,
 ~16 GB RAM for the CPU-side tests. A CUDA GPU is only needed for real fits.
 
+> **`uv: command not found`?** Its installer drops `uv` in `~/.local/bin`, which is not on
+> PATH by default. Either add it permanently — PowerShell:
+> `[Environment]::SetEnvironmentVariable("Path", "$env:USERPROFILE\.local\bin;" + [Environment]::GetEnvironmentVariable("Path","User"), "User")`
+> (reopen the terminal after) — or skip `uv` entirely by activating the venv and calling
+> the command directly:
+> ```powershell
+> .\.venv\Scripts\Activate.ps1     # then, without the `uv run` prefix:
+> rlens figures
+> ```
+
 ```bash
 git clone https://github.com/SamanyuB910/CAMRBIA-CapStone.git && cd CAMRBIA-CapStone
 uv sync                                    # exact environment from uv.lock

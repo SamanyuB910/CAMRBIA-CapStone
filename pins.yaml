@@ -33,7 +33,7 @@ model:                       # harness-VERIFICATION model (post reports the R=J 
 experiment_models:           # R>J effect phase: post reports an R-lens advantage on BOTH of these.
   qwen3.5-27b:               # same qwen3_5 architecture our patch registry already verifies (no new code)
     hf_id: Qwen/Qwen3.5-27B
-    revision: null           # resolve + pin when downloading on the GPU box (~56 GB)
+    revision: fc05daec18b0a78c049392ed2e771dde82bdf654  # main @ 2026-08-25 (~56 GB)
     n_layers: 64
     d_model: 5120
     target_layer: 62

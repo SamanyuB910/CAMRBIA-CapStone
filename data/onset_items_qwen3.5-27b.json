@@ -1,0 +1,1393 @@
+{
+ "position": -1,
+ "items": [
+  {
+   "name": "amazon-language",
+   "category": "multihop",
+   "prompt": "Fact: The language spoken in the country where the Amazon River ends is",
+   "control_prompt": "Fact: The language spoken in Mexico is",
+   "c": "Brazil",
+   "c_prime": "Mexico",
+   "c_wrong": "iron",
+   "y": "Portuguese",
+   "y_prime": "Spanish",
+   "c_id": 15477,
+   "c_prime_id": 11920,
+   "c_wrong_id": 10679,
+   "y_id": 40790,
+   "y_prime_id": 14712,
+   "t_i": 13,
+   "cue_i": 11
+  },
+  {
+   "name": "animal-cover-turtle",
+   "category": "animal-cover",
+   "prompt": "Fact: The hard covering on the back of the slow reptile that can pull its head inside its body is called a",
+   "control_prompt": "Fact: The hard covering on snake is called a",
+   "c": "turtle",
+   "c_prime": "snake",
+   "c_wrong": "Brazil",
+   "y": "shell",
+   "y_prime": "scale",
+   "c_id": 34895,
+   "c_prime_id": 24463,
+   "c_wrong_id": 15477,
+   "y_id": 12168,
+   "y_prime_id": 5281,
+   "t_i": 23,
+   "cue_i": 12
+  },
+  {
+   "name": "animal-nose-elephant",
+   "category": "animal-nose",
+   "prompt": "Fact: The long flexible body part that the largest land animal uses to pick things up is called a",
+   "control_prompt": "Fact: The long flexible body part that a snake uses to smell is called a",
+   "c": "elephant",
+   "c_prime": "snake",
+   "c_wrong": "Brazil",
+   "y": "trunk",
+   "y_prime": "tongue",
+   "c_id": 44217,
+   "c_prime_id": 24463,
+   "c_wrong_id": 15477,
+   "y_id": 36076,
+   "y_prime_id": 23684,
+   "t_i": 19,
+   "cue_i": 11
+  },
+  {
+   "name": "beverage-source-wine",
+   "category": "beverage-source",
+   "prompt": "Fact: The fruit that the alcoholic drink served at communion is made from is the",
+   "control_prompt": "Fact: The grain that beer is made from is",
+   "c": "wine",
+   "c_prime": "beer",
+   "c_wrong": "Brazil",
+   "y": "grape",
+   "y_prime": "barley",
+   "c_id": 12701,
+   "c_prime_id": 12514,
+   "c_wrong_id": 15477,
+   "y_id": 49431,
+   "y_prime_id": 77931,
+   "t_i": 15,
+   "cue_i": 10
+  },
+  {
+   "name": "bird-color-swan",
+   "category": "bird-color",
+   "prompt": "Fact: The color of the long-necked bird in the famous Tchaikovsky ballet is",
+   "control_prompt": "Fact: The typical color of an eagle's feathers is",
+   "c": "swan",
+   "c_prime": "eagle",
+   "c_wrong": "Brazil",
+   "y": "white",
+   "y_prime": "brown",
+   "c_id": 41966,
+   "c_prime_id": 57867,
+   "c_wrong_id": 15477,
+   "y_id": 4022,
+   "y_prime_id": 13477,
+   "t_i": 18,
+   "cue_i": 17
+  },
+  {
+   "name": "christmas-season",
+   "category": "multihop",
+   "prompt": "Fact: The season when the holiday with a decorated tree occurs is",
+   "control_prompt": "Fact: The season when Easter occurs is",
+   "c": "Christmas",
+   "c_prime": "Easter",
+   "c_wrong": "Mexico",
+   "y": "winter",
+   "y_prime": "spring",
+   "c_id": 9777,
+   "c_prime_id": 31330,
+   "c_wrong_id": 11920,
+   "y_id": 12050,
+   "y_prime_id": 10151,
+   "t_i": 12,
+   "cue_i": 10
+  },
+  {
+   "name": "city-state-Philadelphia",
+   "category": "city-state",
+   "prompt": "Fact: The US state where the city famous for the Liberty Bell is located is",
+   "control_prompt": "Fact: The US state where Seattle is located is",
+   "c": "Philadelphia",
+   "c_prime": "Seattle",
+   "c_wrong": "Brazil",
+   "y": "Pennsylvania",
+   "y_prime": "Washington",
+   "c_id": 18749,
+   "c_prime_id": 15875,
+   "c_wrong_id": 15477,
+   "y_id": 19168,
+   "y_prime_id": 6312,
+   "t_i": 15,
+   "cue_i": 12
+  },
+  {
+   "name": "colosseum-currency",
+   "category": "multihop",
+   "prompt": "Fact: The currency used in the country where the Colosseum stands is the",
+   "control_prompt": "Fact: The currency used in Mexico is the",
+   "c": "Italy",
+   "c_prime": "Mexico",
+   "c_wrong": "Thursday",
+   "y": "Euro",
+   "y_prime": "peso",
+   "c_id": 14898,
+   "c_prime_id": 11920,
+   "c_wrong_id": 7548,
+   "y_id": 18870,
+   "y_prime_id": 35710,
+   "t_i": 15,
+   "cue_i": 11
+  },
+  {
+   "name": "ex-city-capital-Barcelona-Toronto",
+   "category": "city-capital",
+   "prompt": "Fact: The capital of the country where Barcelona is located is",
+   "control_prompt": "Fact: The capital of Canada is",
+   "c": "Spain",
+   "c_prime": "Canada",
+   "c_wrong": "Italy",
+   "y": "Madrid",
+   "y_prime": "Ottawa",
+   "c_id": 17163,
+   "c_prime_id": 6650,
+   "c_wrong_id": 14898,
+   "y_id": 23327,
+   "y_prime_id": 31106,
+   "t_i": 11,
+   "cue_i": 8
+  },
+  {
+   "name": "ex-city-capital-Lyon-Naples",
+   "category": "city-capital",
+   "prompt": "Fact: The capital of the country where Lyon is located is",
+   "control_prompt": "Fact: The capital of Italy is",
+   "c": "France",
+   "c_prime": "Italy",
+   "c_wrong": "Spain",
+   "y": "Paris",
+   "y_prime": "Rome",
+   "c_id": 9338,
+   "c_prime_id": 14898,
+   "c_wrong_id": 17163,
+   "y_id": 11751,
+   "y_prime_id": 21047,
+   "t_i": 11,
+   "cue_i": 8
+  },
+  {
+   "name": "ex-city-capital-Naples-Barcelona",
+   "category": "city-capital",
+   "prompt": "Fact: The capital of the country where Naples is located is",
+   "control_prompt": "Fact: The capital of Spain is",
+   "c": "Italy",
+   "c_prime": "Spain",
+   "c_wrong": "France",
+   "y": "Rome",
+   "y_prime": "Madrid",
+   "c_id": 14898,
+   "c_prime_id": 17163,
+   "c_wrong_id": 9338,
+   "y_id": 21047,
+   "y_prime_id": 23327,
+   "t_i": 11,
+   "cue_i": 8
+  },
+  {
+   "name": "ex-city-capital-Toronto-Lyon",
+   "category": "city-capital",
+   "prompt": "Fact: The capital of the country where Toronto is located is",
+   "control_prompt": "Fact: The capital of France is",
+   "c": "Canada",
+   "c_prime": "France",
+   "c_wrong": "Japan",
+   "y": "Ottawa",
+   "y_prime": "Paris",
+   "c_id": 6650,
+   "c_prime_id": 9338,
+   "c_wrong_id": 6124,
+   "y_id": 31106,
+   "y_prime_id": 11751,
+   "t_i": 11,
+   "cue_i": 8
+  },
+  {
+   "name": "ex-city-continent-Toronto-Lyon",
+   "category": "city-continent",
+   "prompt": "Fact: The continent of the country where Toronto is located is",
+   "control_prompt": "Fact: The continent where France is located is",
+   "c": "Canada",
+   "c_prime": "France",
+   "c_wrong": "Egypt",
+   "y": "North",
+   "y_prime": "Europe",
+   "c_id": 6650,
+   "c_prime_id": 9338,
+   "c_wrong_id": 14437,
+   "y_id": 4634,
+   "y_prime_id": 4357,
+   "t_i": 11,
+   "cue_i": 8
+  },
+  {
+   "name": "ex-city-currency-Toronto-Beijing",
+   "category": "city-currency",
+   "prompt": "Fact: The currency used in the country where Toronto is located is the",
+   "control_prompt": "Fact: The currency used in China is the",
+   "c": "Canada",
+   "c_prime": "China",
+   "c_wrong": "India",
+   "y": "Canadian",
+   "y_prime": "yuan",
+   "c_id": 6650,
+   "c_prime_id": 5440,
+   "c_wrong_id": 6535,
+   "y_id": 11549,
+   "y_prime_id": 69827,
+   "t_i": 13,
+   "cue_i": 9
+  },
+  {
+   "name": "ex-city-language-Lyon-Naples",
+   "category": "city-language",
+   "prompt": "Fact: The language spoken in the country where Lyon is located is",
+   "control_prompt": "Fact: The language spoken in Italy is",
+   "c": "France",
+   "c_prime": "Italy",
+   "c_wrong": "Russia",
+   "y": "French",
+   "y_prime": "Italian",
+   "c_id": 9338,
+   "c_prime_id": 14898,
+   "c_wrong_id": 8100,
+   "y_id": 8323,
+   "y_prime_id": 14382,
+   "t_i": 12,
+   "cue_i": 9
+  },
+  {
+   "name": "ex-element-state-26-8",
+   "category": "element-state",
+   "prompt": "Fact: The state of matter at room temperature of the element with atomic number 26 is",
+   "control_prompt": "Fact: The state of matter at room temperature of oxygen is",
+   "c": "iron",
+   "c_prime": "oxygen",
+   "c_wrong": "mercury",
+   "y": "solid",
+   "y_prime": "gas",
+   "c_id": 10679,
+   "c_prime_id": 22817,
+   "c_wrong_id": 49044,
+   "y_id": 6235,
+   "y_prime_id": 6605,
+   "t_i": 18,
+   "cue_i": 17
+  },
+  {
+   "name": "ex-element-state-26-80",
+   "category": "element-state",
+   "prompt": "Fact: The state of matter at room temperature of the element with atomic number 26 is",
+   "control_prompt": "Fact: The state of matter at room temperature of mercury is",
+   "c": "iron",
+   "c_prime": "mercury",
+   "c_wrong": "oxygen",
+   "y": "solid",
+   "y_prime": "liquid",
+   "c_id": 10679,
+   "c_prime_id": 49044,
+   "c_wrong_id": 22817,
+   "y_id": 6235,
+   "y_prime_id": 14058,
+   "t_i": 18,
+   "cue_i": 17
+  },
+  {
+   "name": "ex-element-symbol-11-26",
+   "category": "element-symbol",
+   "prompt": "Fact: The chemical symbol for the element with atomic number 11 is",
+   "control_prompt": "Fact: The chemical symbol for iron is",
+   "c": "sodium",
+   "c_prime": "iron",
+   "c_wrong": "gold",
+   "y": "Na",
+   "y_prime": "Fe",
+   "c_id": 37315,
+   "c_prime_id": 10679,
+   "c_wrong_id": 6414,
+   "y_id": 12444,
+   "y_prime_id": 3713,
+   "t_i": 14,
+   "cue_i": 13
+  },
+  {
+   "name": "ex-element-symbol-26-79",
+   "category": "element-symbol",
+   "prompt": "Fact: The chemical symbol for the element with atomic number 26 is",
+   "control_prompt": "Fact: The chemical symbol for gold is",
+   "c": "iron",
+   "c_prime": "gold",
+   "c_wrong": "sodium",
+   "y": "Fe",
+   "y_prime": "Au",
+   "c_id": 10679,
+   "c_prime_id": 6414,
+   "c_wrong_id": 37315,
+   "y_id": 3713,
+   "y_prime_id": 30994,
+   "t_i": 14,
+   "cue_i": 13
+  },
+  {
+   "name": "ex2-city-capital-Munich",
+   "category": "city-capital",
+   "prompt": "Fact: The capital of the country where Munich is located is",
+   "control_prompt": "Fact: The capital of Japan is",
+   "c": "Germany",
+   "c_prime": "Japan",
+   "c_wrong": "Brazil",
+   "y": "Berlin",
+   "y_prime": "Tokyo",
+   "c_id": 9564,
+   "c_prime_id": 6124,
+   "c_wrong_id": 15477,
+   "y_id": 19241,
+   "y_prime_id": 25358,
+   "t_i": 11,
+   "cue_i": 8
+  },
+  {
+   "name": "ex2-city-capital-Osaka",
+   "category": "city-capital",
+   "prompt": "Fact: The capital of the country where Osaka is located is",
+   "control_prompt": "Fact: The capital of Germany is",
+   "c": "Japan",
+   "c_prime": "Germany",
+   "c_wrong": "Canada",
+   "y": "Tokyo",
+   "y_prime": "Berlin",
+   "c_id": 6124,
+   "c_prime_id": 9564,
+   "c_wrong_id": 6650,
+   "y_id": 25358,
+   "y_prime_id": 19241,
+   "t_i": 11,
+   "cue_i": 8
+  },
+  {
+   "name": "ex2-city-continent-Lima",
+   "category": "city-continent",
+   "prompt": "Fact: The continent of the country where Lima is located is",
+   "control_prompt": "Fact: The continent where Egypt is located is",
+   "c": "Peru",
+   "c_prime": "Egypt",
+   "c_wrong": "Australia",
+   "y": "South",
+   "y_prime": "Africa",
+   "c_id": 46157,
+   "c_prime_id": 14437,
+   "c_wrong_id": 8071,
+   "y_id": 4725,
+   "y_prime_id": 9871,
+   "t_i": 11,
+   "cue_i": 8
+  },
+  {
+   "name": "ex2-city-continent-Sydney",
+   "category": "city-continent",
+   "prompt": "Fact: The continent of the country where Sydney is located is",
+   "control_prompt": "Fact: The continent where Peru is located is",
+   "c": "Australia",
+   "c_prime": "Peru",
+   "c_wrong": "France",
+   "y": "Australia",
+   "y_prime": "South",
+   "c_id": 8071,
+   "c_prime_id": 46157,
+   "c_wrong_id": 9338,
+   "y_id": 8071,
+   "y_prime_id": 9514,
+   "t_i": 11,
+   "cue_i": 8
+  },
+  {
+   "name": "ex2-city-language-Cairo",
+   "category": "city-language",
+   "prompt": "Fact: The language spoken in the country where Cairo is located is",
+   "control_prompt": "Fact: The language spoken in Russia is",
+   "c": "Egypt",
+   "c_prime": "Russia",
+   "c_wrong": "Brazil",
+   "y": "Arabic",
+   "y_prime": "Russian",
+   "c_id": 14437,
+   "c_prime_id": 8100,
+   "c_wrong_id": 15477,
+   "y_id": 32988,
+   "y_prime_id": 8260,
+   "t_i": 12,
+   "cue_i": 9
+  },
+  {
+   "name": "ex2-city-language-Moscow",
+   "category": "city-language",
+   "prompt": "Fact: The language spoken in the country where Moscow is located is",
+   "control_prompt": "Fact: The language spoken in Egypt is",
+   "c": "Russia",
+   "c_prime": "Egypt",
+   "c_wrong": "Italy",
+   "y": "Russian",
+   "y_prime": "Arabic",
+   "c_id": 8100,
+   "c_prime_id": 14437,
+   "c_wrong_id": 14898,
+   "y_id": 8260,
+   "y_prime_id": 32988,
+   "t_i": 12,
+   "cue_i": 9
+  },
+  {
+   "name": "ex2-language-capital-Greek",
+   "category": "language-capital",
+   "prompt": "Fact: The capital of the country where Greek is the primary language is",
+   "control_prompt": "Fact: The capital of Sweden is",
+   "c": "Greece",
+   "c_prime": "Sweden",
+   "c_wrong": "Poland",
+   "y": "Athens",
+   "y_prime": "Stockholm",
+   "c_id": 23655,
+   "c_prime_id": 22466,
+   "c_wrong_id": 26707,
+   "y_id": 44299,
+   "y_prime_id": 50332,
+   "t_i": 13,
+   "cue_i": 8
+  },
+  {
+   "name": "ex2-language-capital-Hungarian",
+   "category": "language-capital",
+   "prompt": "Fact: The capital of the country where Hungarian is the primary language is",
+   "control_prompt": "Fact: The capital of Poland is",
+   "c": "Hungary",
+   "c_prime": "Poland",
+   "c_wrong": "Greece",
+   "y": "Budapest",
+   "y_prime": "Warsaw",
+   "c_id": 41361,
+   "c_prime_id": 26707,
+   "c_wrong_id": 23655,
+   "y_id": 67236,
+   "y_prime_id": 69724,
+   "t_i": 13,
+   "cue_i": 8
+  },
+  {
+   "name": "ex2-language-capital-Polish",
+   "category": "language-capital",
+   "prompt": "Fact: The capital of the country where Polish is the primary language is",
+   "control_prompt": "Fact: The capital of Greece is",
+   "c": "Poland",
+   "c_prime": "Greece",
+   "c_wrong": "Hungary",
+   "y": "Warsaw",
+   "y_prime": "Athens",
+   "c_id": 26707,
+   "c_prime_id": 23655,
+   "c_wrong_id": 41361,
+   "y_id": 69724,
+   "y_prime_id": 44299,
+   "t_i": 13,
+   "cue_i": 8
+  },
+  {
+   "name": "ex2-language-capital-Swedish",
+   "category": "language-capital",
+   "prompt": "Fact: The capital of the country where Swedish is the primary language is",
+   "control_prompt": "Fact: The capital of Hungary is",
+   "c": "Sweden",
+   "c_prime": "Hungary",
+   "c_wrong": "Greece",
+   "y": "Stockholm",
+   "y_prime": "Budapest",
+   "c_id": 22466,
+   "c_prime_id": 41361,
+   "c_wrong_id": 23655,
+   "y_id": 50332,
+   "y_prime_id": 67236,
+   "t_i": 13,
+   "cue_i": 8
+  },
+  {
+   "name": "ex2-river-capital-Thames",
+   "category": "river-capital",
+   "prompt": "Fact: The capital of the country where the Thames River reaches the sea is",
+   "control_prompt": "Fact: The capital of Germany is",
+   "c": "England",
+   "c_prime": "Germany",
+   "c_wrong": "Brazil",
+   "y": "London",
+   "y_prime": "Berlin",
+   "c_id": 9169,
+   "c_prime_id": 9564,
+   "c_wrong_id": 15477,
+   "y_id": 6924,
+   "y_prime_id": 19241,
+   "t_i": 14,
+   "cue_i": 9
+  },
+  {
+   "name": "food-animal-butter",
+   "category": "food-animal",
+   "prompt": "Fact: The animal that produces the yellow dairy spread used on bread is the",
+   "control_prompt": "Fact: The animal that produces honey is the",
+   "c": "butter",
+   "c_prime": "honey",
+   "c_wrong": "Brazil",
+   "y": "cow",
+   "y_prime": "bee",
+   "c_id": 13696,
+   "c_prime_id": 24924,
+   "c_wrong_id": 15477,
+   "y_id": 18775,
+   "y_prime_id": 35997,
+   "t_i": 14,
+   "cue_i": 8
+  },
+  {
+   "name": "fruit-grows-grape",
+   "category": "fruit-grows",
+   "prompt": "Fact: The kind of plant that the small round fruit used to make wine grows on is a",
+   "control_prompt": "Fact: The kind of plant that an apple grows on is a",
+   "c": "grape",
+   "c_prime": "apple",
+   "c_wrong": "Brazil",
+   "y": "vine",
+   "y_prime": "tree",
+   "c_id": 49431,
+   "c_prime_id": 22544,
+   "c_wrong_id": 15477,
+   "y_id": 28007,
+   "y_prime_id": 4757,
+   "t_i": 18,
+   "cue_i": 14
+  },
+  {
+   "name": "func-filters-count",
+   "category": "multihop",
+   "prompt": "Fact: In humans, the number of organs that filter blood to make urine is",
+   "control_prompt": "Fact: In humans, the number of livers a person has is",
+   "c": "kidney",
+   "c_prime": "liver",
+   "c_wrong": "lung",
+   "y": "2",
+   "y_prime": "1",
+   "c_id": 36690,
+   "c_prime_id": 24694,
+   "c_wrong_id": 19997,
+   "y_id": 1330,
+   "y_prime_id": 799,
+   "t_i": 15,
+   "cue_i": 14
+  },
+  {
+   "name": "gem-color-ruby",
+   "category": "gem-color",
+   "prompt": "Fact: The color of the gemstone that is the traditional birthstone for July is",
+   "control_prompt": "Fact: The color of pearl is",
+   "c": "ruby",
+   "c_prime": "pearl",
+   "c_wrong": "Brazil",
+   "y": "red",
+   "y_prime": "white",
+   "c_id": 43699,
+   "c_prime_id": 67264,
+   "c_wrong_id": 15477,
+   "y_id": 2438,
+   "y_prime_id": 4022,
+   "t_i": 16,
+   "cue_i": 15
+  },
+  {
+   "name": "greatwall-ocean",
+   "category": "multihop",
+   "prompt": "Fact: The ocean east of the country that built the Great Wall is the",
+   "control_prompt": "Fact: The ocean east of Brazil is the",
+   "c": "China",
+   "c_prime": "Brazil",
+   "c_wrong": "Earth",
+   "y": "Pacific",
+   "y_prime": "Atlantic",
+   "c_id": 5440,
+   "c_prime_id": 15477,
+   "c_wrong_id": 8964,
+   "y_id": 15979,
+   "y_prime_id": 21678,
+   "t_i": 14,
+   "cue_i": 12
+  },
+  {
+   "name": "holiday-month-christmas2",
+   "category": "holiday-month",
+   "prompt": "Fact: The month of the holiday celebrated with a decorated evergreen tree and gift-giving is",
+   "control_prompt": "Fact: The month in which Easter most often falls is",
+   "c": "Christmas",
+   "c_prime": "Easter",
+   "c_wrong": "Brazil",
+   "y": "December",
+   "y_prime": "April",
+   "c_id": 9777,
+   "c_prime_id": 31330,
+   "c_wrong_id": 15477,
+   "y_id": 6443,
+   "y_prime_id": 5632,
+   "t_i": 18,
+   "cue_i": 12
+  },
+  {
+   "name": "mars-color",
+   "category": "multihop",
+   "prompt": "Fact: The color of the planet fourth from the Sun is",
+   "control_prompt": "Fact: The color of Earth is",
+   "c": "Mars",
+   "c_prime": "Earth",
+   "c_wrong": "Venus",
+   "y": "red",
+   "y_prime": "blue",
+   "c_id": 20403,
+   "c_prime_id": 8964,
+   "c_wrong_id": 47334,
+   "y_id": 2438,
+   "y_prime_id": 6105,
+   "t_i": 11,
+   "cue_i": 7
+  },
+  {
+   "name": "month-3-godof",
+   "category": "multihop",
+   "prompt": "Fact: The third month of the year is named after the Roman god of",
+   "control_prompt": "Fact: In Roman mythology, Venus is the goddess of",
+   "c": "Mars",
+   "c_prime": "Venus",
+   "c_wrong": "Wisconsin",
+   "y": "war",
+   "y_prime": "love",
+   "c_id": 20403,
+   "c_prime_id": 47334,
+   "c_wrong_id": 19818,
+   "y_id": 3980,
+   "y_prime_id": 2854,
+   "t_i": 14,
+   "cue_i": 12
+  },
+  {
+   "name": "organ-count-kidney2",
+   "category": "organ-count",
+   "prompt": "Fact: The number of the bean-shaped organs that filter blood into urine in a human body is",
+   "control_prompt": "Fact: The number of hearts in a human body is",
+   "c": "kidney",
+   "c_prime": "heart",
+   "c_wrong": "Brazil",
+   "y": "two",
+   "y_prime": "one",
+   "c_id": 36690,
+   "c_prime_id": 4593,
+   "c_wrong_id": 15477,
+   "y_id": 1330,
+   "y_prime_id": 799,
+   "t_i": 18,
+   "cue_i": 13
+  },
+  {
+   "name": "organ-location-heart",
+   "category": "organ-location",
+   "prompt": "Fact: The part of the body that contains the organ that pumps blood is the",
+   "control_prompt": "Fact: The part of the body that contains the brain is the",
+   "c": "heart",
+   "c_prime": "brain",
+   "c_wrong": "Brazil",
+   "y": "chest",
+   "y_prime": "head",
+   "c_id": 4593,
+   "c_prime_id": 7853,
+   "c_wrong_id": 15477,
+   "y_id": 14697,
+   "y_prime_id": 1901,
+   "t_i": 15,
+   "cue_i": 13
+  },
+  {
+   "name": "paper-continent",
+   "category": "multihop",
+   "prompt": "Fact: The continent where the country that invented paper is located is",
+   "control_prompt": "Fact: The continent where France is located is",
+   "c": "China",
+   "c_prime": "France",
+   "c_wrong": "Mars",
+   "y": "Asia",
+   "y_prime": "Europe",
+   "c_id": 5440,
+   "c_prime_id": 9338,
+   "c_wrong_id": 20403,
+   "y_id": 13229,
+   "y_prime_id": 4357,
+   "t_i": 12,
+   "cue_i": 9
+  },
+  {
+   "name": "person-country-napoleon",
+   "category": "person-country",
+   "prompt": "Fact: The country whose army was led by the emperor defeated at Waterloo is",
+   "control_prompt": "Fact: Abraham Lincoln was the president of the United States of",
+   "c": "Napoleon",
+   "c_prime": "Lincoln",
+   "c_wrong": "Einstein",
+   "y": "France",
+   "y_prime": "America",
+   "c_id": 67076,
+   "c_prime_id": 23608,
+   "c_wrong_id": 52237,
+   "y_id": 9338,
+   "y_prime_id": 4994,
+   "t_i": 14,
+   "cue_i": 13
+  },
+  {
+   "name": "person-firstname-darwin",
+   "category": "person-firstname",
+   "prompt": "Fact: The first name of the naturalist who proposed evolution by natural selection was",
+   "control_prompt": "Fact: The first name of the physicist Einstein was",
+   "c": "Darwin",
+   "c_prime": "Einstein",
+   "c_wrong": "Newton",
+   "y": "Charles",
+   "y_prime": "Albert",
+   "c_id": 42905,
+   "c_prime_id": 52237,
+   "c_wrong_id": 20042,
+   "y_id": 14496,
+   "y_prime_id": 16993,
+   "t_i": 15,
+   "cue_i": 11
+  },
+  {
+   "name": "person-firstname-einstein",
+   "category": "person-firstname",
+   "prompt": "Fact: The first name of the physicist who developed the theory of general relativity was",
+   "control_prompt": "Fact: The first name of the scientist Newton was",
+   "c": "Einstein",
+   "c_prime": "Newton",
+   "c_wrong": "Darwin",
+   "y": "Albert",
+   "y_prime": "Isaac",
+   "c_id": 52237,
+   "c_prime_id": 20042,
+   "c_wrong_id": 42905,
+   "y_id": 16993,
+   "y_prime_id": 40134,
+   "t_i": 16,
+   "cue_i": 15
+  },
+  {
+   "name": "person-firstname-mozart",
+   "category": "person-firstname",
+   "prompt": "Fact: The first name of the child-prodigy composer from Salzburg who wrote The Magic Flute was",
+   "control_prompt": "Fact: The first name of the naturalist Darwin was",
+   "c": "Mozart",
+   "c_prime": "Darwin",
+   "c_wrong": "Shakespeare",
+   "y": "Wolfgang",
+   "y_prime": "Charles",
+   "c_id": 91400,
+   "c_prime_id": 42905,
+   "c_wrong_id": 40014,
+   "y_id": 83509,
+   "y_prime_id": 14496,
+   "t_i": 20,
+   "cue_i": 19
+  },
+  {
+   "name": "person-firstname-newton",
+   "category": "person-firstname",
+   "prompt": "Fact: The first name of the scientist on whose head an apple is said to have fallen was",
+   "control_prompt": "Fact: The first name of the playwright Shakespeare was",
+   "c": "Newton",
+   "c_prime": "Shakespeare",
+   "c_wrong": "Mozart",
+   "y": "Isaac",
+   "y_prime": "William",
+   "c_id": 20042,
+   "c_prime_id": 40014,
+   "c_wrong_id": 91400,
+   "y_id": 40134,
+   "y_prime_id": 12021,
+   "t_i": 18,
+   "cue_i": 12
+  },
+  {
+   "name": "person-firstname-shakespeare",
+   "category": "person-firstname",
+   "prompt": "Fact: The first name of the playwright who wrote Romeo and Juliet was",
+   "control_prompt": "Fact: The first name of the composer Mozart was",
+   "c": "Shakespeare",
+   "c_prime": "Mozart",
+   "c_wrong": "Einstein",
+   "y": "William",
+   "y_prime": "Wolfgang",
+   "c_id": 40014,
+   "c_prime_id": 91400,
+   "c_wrong_id": 52237,
+   "y_id": 12021,
+   "y_prime_id": 83509,
+   "t_i": 13,
+   "cue_i": 12
+  },
+  {
+   "name": "planet-rings-saturn2",
+   "category": "planet-feature",
+   "prompt": "Fact: The most famous feature of the sixth planet from the Sun is its",
+   "control_prompt": "Fact: The most famous feature of the planet Jupiter is its great red",
+   "c": "Saturn",
+   "c_prime": "Jupiter",
+   "c_wrong": "Brazil",
+   "y": "rings",
+   "y_prime": "spot",
+   "c_id": 47503,
+   "c_prime_id": 48017,
+   "c_wrong_id": 15477,
+   "y_id": 23769,
+   "y_prime_id": 7458,
+   "t_i": 14,
+   "cue_i": 12
+  },
+  {
+   "name": "season-next-winter",
+   "category": "season-next",
+   "prompt": "Fact: The season that comes immediately after the coldest season of the year is",
+   "control_prompt": "Fact: The season that comes immediately after summer is",
+   "c": "winter",
+   "c_prime": "summer",
+   "c_wrong": "Brazil",
+   "y": "spring",
+   "y_prime": "autumn",
+   "c_id": 12050,
+   "c_prime_id": 7094,
+   "c_wrong_id": 15477,
+   "y_id": 10151,
+   "y_prime_id": 40297,
+   "t_i": 15,
+   "cue_i": 10
+  },
+  {
+   "name": "super-populous-capital",
+   "category": "multihop",
+   "prompt": "Fact: The capital city of the most populous country in the world is",
+   "control_prompt": "Fact: The capital city of India is New",
+   "c": "China",
+   "c_prime": "India",
+   "c_wrong": "Singapore",
+   "y": "Beijing",
+   "y_prime": "Delhi",
+   "c_id": 5440,
+   "c_prime_id": 6535,
+   "c_wrong_id": 19914,
+   "y_id": 25701,
+   "y_prime_id": 21318,
+   "t_i": 13,
+   "cue_i": 8
+  },
+  {
+   "name": "super-smallest-continent",
+   "category": "multihop",
+   "prompt": "Fact: The smallest country in the world is located on the continent of",
+   "control_prompt": "Fact: The country of Singapore is located on the continent of",
+   "c": "Vatican",
+   "c_prime": "Singapore",
+   "c_wrong": "guitar",
+   "y": "Europe",
+   "y_prime": "Asia",
+   "c_id": 44993,
+   "c_prime_id": 19914,
+   "c_wrong_id": 16488,
+   "y_id": 4357,
+   "y_prime_id": 13229,
+   "t_i": 13,
+   "cue_i": 3
+  },
+  {
+   "name": "vehicle-power-bicycle",
+   "category": "vehicle-power",
+   "prompt": "Fact: The source of power for the two-wheeled vehicle ridden in the Tour de France is the rider's",
+   "control_prompt": "Fact: The source of power for a train is its",
+   "c": "bicycle",
+   "c_prime": "train",
+   "c_wrong": "Brazil",
+   "y": "legs",
+   "y_prime": "engine",
+   "c_id": 33828,
+   "c_prime_id": 5257,
+   "c_wrong_id": 15477,
+   "y_id": 13795,
+   "y_prime_id": 4560,
+   "t_i": 22,
+   "cue_i": 18
+  }
+ ],
+ "filter_log": [
+  {
+   "name": "amazon-language",
+   "kept": true,
+   "cue": " River"
+  },
+  {
+   "name": "animal-cover-turtle",
+   "kept": true,
+   "cue": "ile"
+  },
+  {
+   "name": "animal-legs-buffalo2",
+   "kept": false,
+   "reason": "clean answer wrong"
+  },
+  {
+   "name": "animal-nose-elephant",
+   "kept": true,
+   "cue": " animal"
+  },
+  {
+   "name": "atomic-80-state",
+   "kept": false,
+   "reason": "clean answer wrong"
+  },
+  {
+   "name": "basketball-players",
+   "kept": false,
+   "reason": "clean answer wrong"
+  },
+  {
+   "name": "beverage-source-wine",
+   "kept": true,
+   "cue": " communion"
+  },
+  {
+   "name": "bird-color-swan",
+   "kept": true,
+   "cue": " ballet"
+  },
+  {
+   "name": "bird-country-eagle",
+   "kept": false,
+   "reason": "clean answer wrong"
+  },
+  {
+   "name": "bird-time-owl",
+   "kept": false,
+   "reason": "clean answer wrong"
+  },
+  {
+   "name": "birthstone-emerald-month",
+   "kept": false,
+   "reason": "clean answer wrong"
+  },
+  {
+   "name": "chem-atmosphere-Z",
+   "kept": false,
+   "reason": "clean answer wrong"
+  },
+  {
+   "name": "chem-bones-Z",
+   "kept": false,
+   "reason": "multi-token: ['y', \"y'\"]"
+  },
+  {
+   "name": "chem-organic-Z",
+   "kept": false,
+   "reason": "clean answer wrong"
+  },
+  {
+   "name": "chem-photosynthesis-Z",
+   "kept": false,
+   "reason": "clean answer wrong"
+  },
+  {
+   "name": "christmas-season",
+   "kept": true,
+   "cue": " tree"
+  },
+  {
+   "name": "city-state-Philadelphia",
+   "kept": true,
+   "cue": " Bell"
+  },
+  {
+   "name": "colosseum-currency",
+   "kept": true,
+   "cue": "osse"
+  },
+  {
+   "name": "element-color-gold2",
+   "kept": false,
+   "reason": "control answer wrong"
+  },
+  {
+   "name": "etym-frigg-position",
+   "kept": false,
+   "reason": "clean answer wrong"
+  },
+  {
+   "name": "etym-saturn-position",
+   "kept": false,
+   "reason": "clean answer wrong"
+  },
+  {
+   "name": "etym-wargod-month",
+   "kept": false,
+   "reason": "clean answer wrong"
+  },
+  {
+   "name": "ex-city-capital-Barcelona-Toronto",
+   "kept": true,
+   "cue": " Barcelona"
+  },
+  {
+   "name": "ex-city-capital-Lyon-Naples",
+   "kept": true,
+   "cue": " Lyon"
+  },
+  {
+   "name": "ex-city-capital-Naples-Barcelona",
+   "kept": true,
+   "cue": " Naples"
+  },
+  {
+   "name": "ex-city-capital-Toronto-Lyon",
+   "kept": true,
+   "cue": " Toronto"
+  },
+  {
+   "name": "ex-city-continent-Toronto-Lyon",
+   "kept": true,
+   "cue": " Toronto"
+  },
+  {
+   "name": "ex-city-currency-Toronto-Beijing",
+   "kept": true,
+   "cue": " Toronto"
+  },
+  {
+   "name": "ex-city-currency-Toronto-Mumbai",
+   "kept": false,
+   "reason": "multi-token: [\"y'\"]"
+  },
+  {
+   "name": "ex-city-language-Lyon-Naples",
+   "kept": true,
+   "cue": " Lyon"
+  },
+  {
+   "name": "ex-element-state-26-8",
+   "kept": true,
+   "cue": "6"
+  },
+  {
+   "name": "ex-element-state-26-80",
+   "kept": true,
+   "cue": "6"
+  },
+  {
+   "name": "ex-element-state-8-26",
+   "kept": false,
+   "reason": "clean answer wrong"
+  },
+  {
+   "name": "ex-element-state-8-80",
+   "kept": false,
+   "reason": "clean answer wrong"
+  },
+  {
+   "name": "ex-element-state-80-8",
+   "kept": false,
+   "reason": "clean answer wrong"
+  },
+  {
+   "name": "ex-element-symbol-11-26",
+   "kept": true,
+   "cue": "1"
+  },
+  {
+   "name": "ex-element-symbol-26-79",
+   "kept": true,
+   "cue": "6"
+  },
+  {
+   "name": "ex-planet-color-third-fourth",
+   "kept": false,
+   "reason": "clean answer wrong"
+  },
+  {
+   "name": "ex2-city-capital-Munich",
+   "kept": true,
+   "cue": " Munich"
+  },
+  {
+   "name": "ex2-city-capital-Osaka",
+   "kept": true,
+   "cue": " Osaka"
+  },
+  {
+   "name": "ex2-city-continent-Lima",
+   "kept": true,
+   "cue": " Lima"
+  },
+  {
+   "name": "ex2-city-continent-Sydney",
+   "kept": true,
+   "cue": " Sydney"
+  },
+  {
+   "name": "ex2-city-language-Cairo",
+   "kept": true,
+   "cue": " Cairo"
+  },
+  {
+   "name": "ex2-city-language-Moscow",
+   "kept": true,
+   "cue": " Moscow"
+  },
+  {
+   "name": "ex2-language-capital-Greek",
+   "kept": true,
+   "cue": " Greek"
+  },
+  {
+   "name": "ex2-language-capital-Hungarian",
+   "kept": true,
+   "cue": " Hungarian"
+  },
+  {
+   "name": "ex2-language-capital-Polish",
+   "kept": true,
+   "cue": " Polish"
+  },
+  {
+   "name": "ex2-language-capital-Swedish",
+   "kept": true,
+   "cue": " Swedish"
+  },
+  {
+   "name": "ex2-river-capital-Thames",
+   "kept": true,
+   "cue": " Thames"
+  },
+  {
+   "name": "food-animal-butter",
+   "kept": true,
+   "cue": " dairy"
+  },
+  {
+   "name": "food-animal-honey",
+   "kept": false,
+   "reason": "clean answer wrong"
+  },
+  {
+   "name": "fruit-grows-grape",
+   "kept": true,
+   "cue": " wine"
+  },
+  {
+   "name": "func-filters-count",
+   "kept": true,
+   "cue": " urine"
+  },
+  {
+   "name": "func-pumps-chambers",
+   "kept": false,
+   "reason": "clean answer wrong"
+  },
+  {
+   "name": "gem-color-ruby",
+   "kept": true,
+   "cue": " July"
+  },
+  {
+   "name": "gem-source-pearl",
+   "kept": false,
+   "reason": "multi-token: ['y']"
+  },
+  {
+   "name": "greatwall-ocean",
+   "kept": true,
+   "cue": " Wall"
+  },
+  {
+   "name": "holiday-month-christmas2",
+   "kept": true,
+   "cue": "green"
+  },
+  {
+   "name": "instr-body-trumpet",
+   "kept": false,
+   "reason": "control answer wrong"
+  },
+  {
+   "name": "instr-hit-drums",
+   "kept": false,
+   "reason": "clean answer wrong"
+  },
+  {
+   "name": "mars-color",
+   "kept": true,
+   "cue": " fourth"
+  },
+  {
+   "name": "month-3-godof",
+   "kept": true,
+   "cue": " Roman"
+  },
+  {
+   "name": "organ-acid-stomach",
+   "kept": false,
+   "reason": "clean answer wrong"
+  },
+  {
+   "name": "organ-count-kidney2",
+   "kept": true,
+   "cue": " urine"
+  },
+  {
+   "name": "organ-location-brain",
+   "kept": false,
+   "reason": "multi-token: [\"y'\"]"
+  },
+  {
+   "name": "organ-location-heart",
+   "kept": true,
+   "cue": " blood"
+  },
+  {
+   "name": "osu-rival-mascot",
+   "kept": false,
+   "reason": "multi-token: [\"y'\"]"
+  },
+  {
+   "name": "paper-continent",
+   "kept": true,
+   "cue": " paper"
+  },
+  {
+   "name": "person-century-lincoln",
+   "kept": false,
+   "reason": "multi-token: [\"y'\"]"
+  },
+  {
+   "name": "person-country-napoleon",
+   "kept": true,
+   "cue": " Waterloo"
+  },
+  {
+   "name": "person-country-shakespeare",
+   "kept": false,
+   "reason": "clean answer wrong"
+  },
+  {
+   "name": "person-firstname-darwin",
+   "kept": true,
+   "cue": " evolution"
+  },
+  {
+   "name": "person-firstname-einstein",
+   "kept": true,
+   "cue": "ativity"
+  },
+  {
+   "name": "person-firstname-mozart",
+   "kept": true,
+   "cue": "ute"
+  },
+  {
+   "name": "person-firstname-newton",
+   "kept": true,
+   "cue": " apple"
+  },
+  {
+   "name": "person-firstname-shakespeare",
+   "kept": true,
+   "cue": " Juliet"
+  },
+  {
+   "name": "planet-3-moons",
+   "kept": false,
+   "reason": "clean answer wrong"
+  },
+  {
+   "name": "planet-rings-saturn2",
+   "kept": true,
+   "cue": " Sun"
+  },
+  {
+   "name": "rhyme-chair-flag",
+   "kept": false,
+   "reason": "control answer wrong"
+  },
+  {
+   "name": "rhyme-rain-neighbor",
+   "kept": false,
+   "reason": "clean answer wrong"
+  },
+  {
+   "name": "rhyme-spoon-orbit",
+   "kept": false,
+   "reason": "clean answer wrong"
+  },
+  {
+   "name": "season-next-winter",
+   "kept": true,
+   "cue": "dest"
+  },
+  {
+   "name": "spaceneedle-border",
+   "kept": false,
+   "reason": "control answer wrong"
+  },
+  {
+   "name": "spider-legs",
+   "kept": false,
+   "reason": "clean answer wrong"
+  },
+  {
+   "name": "sport-equip-tennis",
+   "kept": false,
+   "reason": "clean answer wrong"
+  },
+  {
+   "name": "super-populous-capital",
+   "kept": true,
+   "cue": " populous"
+  },
+  {
+   "name": "super-smallest-continent",
+   "kept": true,
+   "cue": " smallest"
+  },
+  {
+   "name": "tree-product-oak",
+   "kept": false,
+   "reason": "multi-token: ['y']"
+  },
+  {
+   "name": "vehicle-power-bicycle",
+   "kept": true,
+   "cue": " France"
+  },
+  {
+   "name": "violin-strings",
+   "kept": false,
+   "reason": "clean answer wrong"
+  }
+ ]
+}
