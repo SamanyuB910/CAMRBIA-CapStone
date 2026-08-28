@@ -68,10 +68,16 @@ def verify_labels(model: str) -> pd.DataFrame:
     rows = []
     for c in available_configs(model):
         raw = torch.load(lens_file(model, c), map_location="cpu", weights_only=False)
-        got = raw.get("provenance", {}).get("config_json", "")
+        prov = raw.get("provenance", {}) or {}
+        got = prov.get("config_json", "")
         rows.append({"config": c, "expected": RULE_CONFIGS[c].to_config_json(),
                      "got": got, "ok": got == RULE_CONFIGS[c].to_config_json(),
-                     "n_prompts": raw.get("n_prompts")})
+                     "n_prompts": raw.get("n_prompts"),
+                     # git commit of the run that produced this lens: arms fitted
+                     # in different runs (or on different hardware) show up here,
+                     # which matters when endpoints are reused across machines
+                     "fit_commit": prov.get("git_commit", "?"),
+                     "prompt_rows": str((prov.get("rlens_extra") or {}).get("prompt_indices", "?"))[:24]})
     return pd.DataFrame(rows)
 
 
@@ -186,7 +192,19 @@ def write_report(model: str, passk_csv: Path, out: Path, *, timing: dict | None 
     if len(bad):
         lines.append(f"\n**MISLABELLED ARMS — attribution is invalid for these:** {list(bad['config'])}")
     if len(labels):
-        lines.append("\n" + labels[["config", "n_prompts", "ok"]].to_markdown(index=False))
+        lines.append("\n" + labels[["config", "n_prompts", "fit_commit", "prompt_rows", "ok"]]
+                     .to_markdown(index=False))
+        n_commits = labels["fit_commit"].nunique()
+        n_rows = labels["prompt_rows"].nunique()
+        if n_commits > 1:
+            lines.append(f"\n**Note — arms come from {n_commits} different fitting runs** "
+                         "(see `fit_commit`). Rule effects are only cleanly attributable if every arm "
+                         "shares the recipe; check `n_prompts` and `prompt_rows` agree across arms, and "
+                         "treat cross-run comparisons as carrying an extra source of variation "
+                         "(different hardware means different kernels, hence tiny numerical differences).")
+        if n_rows > 1:
+            lines.append(f"\n**WARNING — arms were fitted on {n_rows} different prompt sets.** "
+                         "Differences between them are NOT attributable to the rules alone.")
 
     if len(attr_all):
         lines.append("\n## pass@10 lift over the J-lens arm\n")
