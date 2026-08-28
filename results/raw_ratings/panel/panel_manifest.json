@@ -1,0 +1,181 @@
+{
+  "sample_sha256": "50d8132e7e2b09608c5500992d0d3f0e8357ca72f603a2cc1107d87a4f9ed3f8",
+  "panel_sha256": "a4984e34d835c60ecb661552ec0a794ef04571a2d0c8007f61c76a7dda8ab2b1",
+  "n_cells": 200,
+  "n_prompts": 20,
+  "per_model": {
+    "gemma-3-27b-it": 100,
+    "qwen3.5-27b": 100
+  },
+  "per_set": {
+    "association": 40,
+    "multihop": 40,
+    "multilingual": 40,
+    "poetry": 40,
+    "typo": 40
+  },
+  "per_layer": {
+    "gemma-3-27b-it:L0": 20,
+    "gemma-3-27b-it:L6": 20,
+    "gemma-3-27b-it:L12": 20,
+    "gemma-3-27b-it:L18": 20,
+    "gemma-3-27b-it:L24": 20,
+    "qwen3.5-27b:L0": 20,
+    "qwen3.5-27b:L6": 20,
+    "qwen3.5-27b:L12": 20,
+    "qwen3.5-27b:L19": 20,
+    "qwen3.5-27b:L25": 20
+  },
+  "prompts": [
+    [
+      "association",
+      "interview"
+    ],
+    [
+      "association",
+      "math-h"
+    ],
+    [
+      "association",
+      "poker"
+    ],
+    [
+      "association",
+      "rivals"
+    ],
+    [
+      "multihop",
+      "atomic-79-symbol"
+    ],
+    [
+      "multihop",
+      "month-3-godof"
+    ],
+    [
+      "multihop",
+      "spaceneedle-border"
+    ],
+    [
+      "multihop",
+      "super-smallest-continent"
+    ],
+    [
+      "multilingual",
+      "es-number-after-two"
+    ],
+    [
+      "multilingual",
+      "fr-double-three"
+    ],
+    [
+      "multilingual",
+      "italian-color-sky"
+    ],
+    [
+      "multilingual",
+      "portuguese-season-spring"
+    ],
+    [
+      "poetry",
+      "couplet-crack-black"
+    ],
+    [
+      "poetry",
+      "couplet-fall-wall"
+    ],
+    [
+      "poetry",
+      "couplet-heart-apart"
+    ],
+    [
+      "poetry",
+      "couplet-white-write"
+    ],
+    [
+      "typo",
+      "typo-company"
+    ],
+    [
+      "typo",
+      "typo-message"
+    ],
+    [
+      "typo",
+      "typo-million"
+    ],
+    [
+      "typo",
+      "typo-people"
+    ]
+  ],
+  "key_path": "/root/panel_keys/panel_b/panel_key.jsonl",
+  "panel_path": "/workspace/results/coherence_v2_panel_b/panel/panel_public.jsonl",
+  "leakage_findings": 0,
+  "checks": [
+    {
+      "name": "cell_count",
+      "status": "PASS",
+      "detail": "200 cells, expected 200"
+    },
+    {
+      "name": "key_count_matches",
+      "status": "PASS",
+      "detail": "200 key rows vs 200 cells"
+    },
+    {
+      "name": "three_arms_per_cell",
+      "status": "PASS",
+      "detail": "arm counts: [3]"
+    },
+    {
+      "name": "ten_ranks_per_arm",
+      "status": "PASS",
+      "detail": "readout lengths: [10]"
+    },
+    {
+      "name": "every_cell_has_all_three_lenses",
+      "status": "PASS",
+      "detail": "observed arm sets: {('logit', 'released-J', 'released-R')}"
+    },
+    {
+      "name": "prompt_count",
+      "status": "PASS",
+      "detail": "20 distinct prompts, expected 20"
+    },
+    {
+      "name": "both_models_share_every_prompt",
+      "status": "PASS",
+      "detail": "per-model prompt sets equal: [20, 20]"
+    },
+    {
+      "name": "no_identifying_fields",
+      "status": "PASS",
+      "detail": "keys are exactly ['candidates', 'cell_id', 'note', 'prompt', 'readout_position', 'readout_token']"
+    },
+    {
+      "name": "no_identity_leakage",
+      "status": "PASS",
+      "detail": "none"
+    },
+    {
+      "name": "prompt_visible",
+      "status": "PASS",
+      "detail": "every cell carries a prompt"
+    },
+    {
+      "name": "position_highlighted",
+      "status": "PASS",
+      "detail": "every prompt marks the evaluation position"
+    },
+    {
+      "name": "panel_hash_recorded",
+      "status": "PASS",
+      "detail": "sample sha256 50d8132e7e2b0960"
+    },
+    {
+      "name": "key_outside_repository",
+      "status": "PASS",
+      "detail": "key at /root/panel_keys/panel_b/panel_key.jsonl"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "n_cells": 20,
+  "judges": [
+    "openai/gpt-5",
+    "deepseek/deepseek-chat-v3.1"
+  ],
+  "rubric_ratio": 1.0,
+  "per_judge": {
+    "openai/gpt-5": {
+      "prompt_tokens_per_call": 906,
+      "completion_tokens_per_call": 1890,
+      "usd_per_1m_prompt": 1.25,
+      "usd_per_1m_completion": 10.0,
+      "basis": "observed",
+      "projected_usd": 0.4
+    },
+    "deepseek/deepseek-chat-v3.1": {
+      "prompt_tokens_per_call": 920,
+      "completion_tokens_per_call": 193,
+      "usd_per_1m_prompt": 0.2,
+      "usd_per_1m_completion": 0.8,
+      "basis": "observed",
+      "projected_usd": 0.01
+    }
+  },
+  "projected_usd": 0.41,
+  "judges_without_measurement": [],
+  "note": "list prices; projection is per-judge calls x observed usage"
+}

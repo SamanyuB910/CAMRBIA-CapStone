@@ -1,0 +1,190 @@
+{"cell_id": "vc-corrupt-00", "kind": "coherent_vs_corrupted", "corrupted_arm": "A", "source_kind": "late_layer"}
+{"cell_id": "vc-corrupt-01", "kind": "coherent_vs_corrupted", "corrupted_arm": "B", "source_kind": "late_layer"}
+{"cell_id": "vc-corrupt-02", "kind": "coherent_vs_corrupted", "corrupted_arm": "C", "source_kind": "late_layer"}
+{"cell_id": "vc-corrupt-03", "kind": "coherent_vs_corrupted", "corrupted_arm": "A", "source_kind": "late_layer"}
+{"cell_id": "vc-corrupt-04", "kind": "coherent_vs_corrupted", "corrupted_arm": "B", "source_kind": "late_layer"}
+{"cell_id": "vc-corrupt-05", "kind": "coherent_vs_corrupted", "corrupted_arm": "C", "source_kind": "late_layer"}
+{"cell_id": "vc-corrupt-06", "kind": "coherent_vs_corrupted", "corrupted_arm": "A", "source_kind": "late_layer"}
+{"cell_id": "vc-corrupt-07", "kind": "coherent_vs_corrupted", "corrupted_arm": "B", "source_kind": "late_layer"}
+{"cell_id": "vc-corrupt-08", "kind": "coherent_vs_corrupted", "corrupted_arm": "C", "source_kind": "late_layer"}
+{"cell_id": "vc-corrupt-09", "kind": "coherent_vs_corrupted", "corrupted_arm": "A", "source_kind": "late_layer"}
+{"cell_id": "vc-dup-00", "kind": "duplicate_arms", "identical_arms": ["A", "B"]}
+{"cell_id": "vc-dup-01", "kind": "duplicate_arms", "identical_arms": ["B", "C"]}
+{"cell_id": "vc-dup-02", "kind": "duplicate_arms", "identical_arms": ["A", "C"]}
+{"cell_id": "vc-dup-03", "kind": "duplicate_arms", "identical_arms": ["A", "B"]}
+{"cell_id": "vc-dup-04", "kind": "duplicate_arms", "identical_arms": ["B", "C"]}
+{"cell_id": "vc-dup-05", "kind": "duplicate_arms", "identical_arms": ["A", "C"]}
+{"cell_id": "vc-dup-06", "kind": "duplicate_arms", "identical_arms": ["A", "B"]}
+{"cell_id": "vc-dup-07", "kind": "duplicate_arms", "identical_arms": ["B", "C"]}
+{"cell_id": "vc-dup-08", "kind": "duplicate_arms", "identical_arms": ["A", "C"]}
+{"cell_id": "vc-dup-09", "kind": "duplicate_arms", "identical_arms": ["A", "B"]}
+{"cell_id": "vc-order-a-00", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-00", "kind": "order_invariance", "twin_of": "vc-order-a-00", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-01", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-01", "kind": "order_invariance", "twin_of": "vc-order-a-01", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-02", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-02", "kind": "order_invariance", "twin_of": "vc-order-a-02", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-03", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-03", "kind": "order_invariance", "twin_of": "vc-order-a-03", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-04", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-04", "kind": "order_invariance", "twin_of": "vc-order-a-04", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-05", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-05", "kind": "order_invariance", "twin_of": "vc-order-a-05", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-06", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-06", "kind": "order_invariance", "twin_of": "vc-order-a-06", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-07", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-07", "kind": "order_invariance", "twin_of": "vc-order-a-07", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-08", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-08", "kind": "order_invariance", "twin_of": "vc-order-a-08", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-09", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-09", "kind": "order_invariance", "twin_of": "vc-order-a-09", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-10", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-10", "kind": "order_invariance", "twin_of": "vc-order-a-10", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-11", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-11", "kind": "order_invariance", "twin_of": "vc-order-a-11", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-12", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-12", "kind": "order_invariance", "twin_of": "vc-order-a-12", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-13", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-13", "kind": "order_invariance", "twin_of": "vc-order-a-13", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-14", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-14", "kind": "order_invariance", "twin_of": "vc-order-a-14", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-15", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-15", "kind": "order_invariance", "twin_of": "vc-order-a-15", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-16", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-16", "kind": "order_invariance", "twin_of": "vc-order-a-16", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-17", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-17", "kind": "order_invariance", "twin_of": "vc-order-a-17", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-18", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-18", "kind": "order_invariance", "twin_of": "vc-order-a-18", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-19", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-19", "kind": "order_invariance", "twin_of": "vc-order-a-19", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-20", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-20", "kind": "order_invariance", "twin_of": "vc-order-a-20", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-21", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-21", "kind": "order_invariance", "twin_of": "vc-order-a-21", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-22", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-22", "kind": "order_invariance", "twin_of": "vc-order-a-22", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-23", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-23", "kind": "order_invariance", "twin_of": "vc-order-a-23", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-24", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-24", "kind": "order_invariance", "twin_of": "vc-order-a-24", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-25", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-25", "kind": "order_invariance", "twin_of": "vc-order-a-25", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-26", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-26", "kind": "order_invariance", "twin_of": "vc-order-a-26", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-27", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-27", "kind": "order_invariance", "twin_of": "vc-order-a-27", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-28", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-28", "kind": "order_invariance", "twin_of": "vc-order-a-28", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-29", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-29", "kind": "order_invariance", "twin_of": "vc-order-a-29", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-30", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-30", "kind": "order_invariance", "twin_of": "vc-order-a-30", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-31", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-31", "kind": "order_invariance", "twin_of": "vc-order-a-31", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-32", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-32", "kind": "order_invariance", "twin_of": "vc-order-a-32", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-33", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-33", "kind": "order_invariance", "twin_of": "vc-order-a-33", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-34", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-34", "kind": "order_invariance", "twin_of": "vc-order-a-34", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-35", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-35", "kind": "order_invariance", "twin_of": "vc-order-a-35", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-36", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-36", "kind": "order_invariance", "twin_of": "vc-order-a-36", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-37", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-37", "kind": "order_invariance", "twin_of": "vc-order-a-37", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-38", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-38", "kind": "order_invariance", "twin_of": "vc-order-a-38", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-39", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-39", "kind": "order_invariance", "twin_of": "vc-order-a-39", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-40", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-40", "kind": "order_invariance", "twin_of": "vc-order-a-40", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-41", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-41", "kind": "order_invariance", "twin_of": "vc-order-a-41", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-42", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-42", "kind": "order_invariance", "twin_of": "vc-order-a-42", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-43", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-43", "kind": "order_invariance", "twin_of": "vc-order-a-43", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-44", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-44", "kind": "order_invariance", "twin_of": "vc-order-a-44", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-45", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-45", "kind": "order_invariance", "twin_of": "vc-order-a-45", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-46", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-46", "kind": "order_invariance", "twin_of": "vc-order-a-46", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-47", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-47", "kind": "order_invariance", "twin_of": "vc-order-a-47", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-48", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-48", "kind": "order_invariance", "twin_of": "vc-order-a-48", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-49", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-49", "kind": "order_invariance", "twin_of": "vc-order-a-49", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-50", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-50", "kind": "order_invariance", "twin_of": "vc-order-a-50", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-51", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-51", "kind": "order_invariance", "twin_of": "vc-order-a-51", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-52", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-52", "kind": "order_invariance", "twin_of": "vc-order-a-52", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-53", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-53", "kind": "order_invariance", "twin_of": "vc-order-a-53", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-54", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-54", "kind": "order_invariance", "twin_of": "vc-order-a-54", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-55", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-55", "kind": "order_invariance", "twin_of": "vc-order-a-55", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-56", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-56", "kind": "order_invariance", "twin_of": "vc-order-a-56", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-57", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-57", "kind": "order_invariance", "twin_of": "vc-order-a-57", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-58", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-58", "kind": "order_invariance", "twin_of": "vc-order-a-58", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-59", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-59", "kind": "order_invariance", "twin_of": "vc-order-a-59", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-60", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-60", "kind": "order_invariance", "twin_of": "vc-order-a-60", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-61", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-61", "kind": "order_invariance", "twin_of": "vc-order-a-61", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-62", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-62", "kind": "order_invariance", "twin_of": "vc-order-a-62", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-63", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-63", "kind": "order_invariance", "twin_of": "vc-order-a-63", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-64", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-64", "kind": "order_invariance", "twin_of": "vc-order-a-64", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-65", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-65", "kind": "order_invariance", "twin_of": "vc-order-a-65", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-66", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-66", "kind": "order_invariance", "twin_of": "vc-order-a-66", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-67", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-67", "kind": "order_invariance", "twin_of": "vc-order-a-67", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-68", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-68", "kind": "order_invariance", "twin_of": "vc-order-a-68", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-69", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-69", "kind": "order_invariance", "twin_of": "vc-order-a-69", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-70", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-70", "kind": "order_invariance", "twin_of": "vc-order-a-70", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-71", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-71", "kind": "order_invariance", "twin_of": "vc-order-a-71", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-72", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-72", "kind": "order_invariance", "twin_of": "vc-order-a-72", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-73", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-73", "kind": "order_invariance", "twin_of": "vc-order-a-73", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-74", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-74", "kind": "order_invariance", "twin_of": "vc-order-a-74", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-75", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-75", "kind": "order_invariance", "twin_of": "vc-order-a-75", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-76", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-76", "kind": "order_invariance", "twin_of": "vc-order-a-76", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-77", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-77", "kind": "order_invariance", "twin_of": "vc-order-a-77", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-78", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-78", "kind": "order_invariance", "twin_of": "vc-order-a-78", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-order-a-79", "kind": "order_invariance_original"}
+{"cell_id": "vc-order-b-79", "kind": "order_invariance", "twin_of": "vc-order-a-79", "rotation": {"A": "B", "B": "C", "C": "A"}}
+{"cell_id": "vc-late-00", "kind": "late_layer_positive"}
+{"cell_id": "vc-late-01", "kind": "late_layer_positive"}
+{"cell_id": "vc-late-02", "kind": "late_layer_positive"}
+{"cell_id": "vc-late-03", "kind": "late_layer_positive"}
+{"cell_id": "vc-late-04", "kind": "late_layer_positive"}
+{"cell_id": "vc-iden-00", "kind": "identity_layer_equal", "arms_identical": true}
+{"cell_id": "vc-iden-01", "kind": "identity_layer_equal", "arms_identical": true}
+{"cell_id": "vc-iden-02", "kind": "identity_layer_equal", "arms_identical": true}
+{"cell_id": "vc-iden-03", "kind": "identity_layer_equal", "arms_identical": true}
+{"cell_id": "vc-iden-04", "kind": "identity_layer_equal", "arms_identical": true}

@@ -1,0 +1,38 @@
+[
+  {
+    "judge_id": "openai/gpt-5",
+    "rubric_hash": "55e95a7b273087ef",
+    "salt": "non-echo-2026-08-27",
+    "n_scored": 10,
+    "n_failed": 0,
+    "checks": [
+      {
+        "name": "pure_copy_does_not_win",
+        "status": "PASS",
+        "detail": "the pure-copy arm won 0/10 (0%, max 10%); mean non-echo score of the copied arm 0.00/4",
+        "rate": 0.0,
+        "n": 10,
+        "mean_copied_score": 0.0
+      }
+    ],
+    "passed": true
+  },
+  {
+    "judge_id": "deepseek/deepseek-chat-v3.1",
+    "rubric_hash": "55e95a7b273087ef",
+    "salt": "non-echo-2026-08-27",
+    "n_scored": 10,
+    "n_failed": 0,
+    "checks": [
+      {
+        "name": "pure_copy_does_not_win",
+        "status": "PASS",
+        "detail": "the pure-copy arm won 0/10 (0%, max 10%); mean non-echo score of the copied arm 0.00/4",
+        "rate": 0.0,
+        "n": 10,
+        "mean_copied_score": 0.0
+      }
+    ],
+    "passed": true
+  }
+]

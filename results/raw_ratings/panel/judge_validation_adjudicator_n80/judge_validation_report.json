@@ -1,0 +1,80 @@
+[
+  {
+    "judge_id": "meta-llama/llama-3.1-70b-instruct",
+    "rubric_hash": "1dc1ea6e00f88593",
+    "checks": [
+      {
+        "name": "prefers_coherent_over_corrupted",
+        "status": "PASS",
+        "detail": "0/10 cells preferred the corrupted arm (0%, threshold 10%)",
+        "measured": 0.0
+      },
+      {
+        "name": "identical_candidates_score_alike",
+        "status": "PASS",
+        "detail": "max gap 0 across 10 duplicate-arm cells (threshold 1)",
+        "measured": 0
+      },
+      {
+        "name": "winner_survives_permutation",
+        "status": "UNDERPOWERED",
+        "detail": "10/53 non-tied cells flipped (19%, threshold 15%, exact binomial p=0.266) \u2014 above the threshold but not significantly (p=0.266 >= 0.05). With 53 comparable pairs the achievable rates are 0%, 2%, 4%..., so the threshold is not resolvable. Raise --n-order rather than changing judge.",
+        "measured": 0.18867924528301888
+      },
+      {
+        "name": "no_position_bias",
+        "status": "PASS",
+        "detail": "winner counts {'A': 42, 'B': 41, 'C': 48}, chi2=0.66 (2 df, reject above 5.991)",
+        "measured": 0.6564885496183206
+      },
+      {
+        "name": "identity_layer_arms_score_alike",
+        "status": "PASS",
+        "detail": "max spread 0 across 5 identity-layer cells",
+        "measured": 0
+      },
+      {
+        "name": "late_positive_has_dynamic_range",
+        "status": "PASS",
+        "detail": "late-layer mean 3.13 (min 2.0), margin over corrupted arms 3.13 (min 1.0)",
+        "measured": 3.1333333333333333
+      },
+      {
+        "name": "identity_layer_returns_tie",
+        "status": "PASS",
+        "detail": "5/5 identity-layer cells returned 'tie' (100%, min 50%)",
+        "measured": 1.0
+      },
+      {
+        "name": "no_identity_speculation",
+        "status": "PASS",
+        "detail": "none",
+        "measured": 0
+      },
+      {
+        "name": "response_completeness",
+        "status": "PASS",
+        "detail": "0/190 cells returned no parseable rating (0.0%, max 2%). Every other check here is computed only over cells that parsed.",
+        "measured": 0.0
+      }
+    ],
+    "detail": {
+      "winner_counts": {
+        "A": 42,
+        "B": 41,
+        "C": 48
+      },
+      "late_positive_mean": 3.1333333333333333,
+      "corrupted_arm_mean": 0.0,
+      "n_attempted": 190,
+      "n_failed": 0
+    },
+    "passed": false,
+    "underpowered": [
+      "winner_survives_permutation"
+    ],
+    "failed": [],
+    "n_scored": 190,
+    "n_failed": 0
+  }
+]

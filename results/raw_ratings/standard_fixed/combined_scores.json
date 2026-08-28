@@ -1,0 +1,4528 @@
+{
+  "0170bee2809765cd": {
+    "A": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "B": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "A",
+    "judge_winner_votes": [
+      "A",
+      "A",
+      "A"
+    ]
+  },
+  "02b63bb7dc1752e4": {
+    "A": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 1
+    },
+    "C": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "tie",
+      "tie",
+      "tie"
+    ]
+  },
+  "031d3e49114df5ba": {
+    "A": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 1.5,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1.5,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "A",
+    "judge_winner_votes": [
+      "A",
+      "A"
+    ]
+  },
+  "04e653268beb8df0": {
+    "A": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "C",
+    "judge_winner_votes": [
+      "C",
+      "C",
+      "A"
+    ]
+  },
+  "053340e8f8752d9c": {
+    "A": {
+      "contextual_coherence": 1.5,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 4,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "contextual_winner": "C",
+    "judge_winner_votes": [
+      "C",
+      "C"
+    ]
+  },
+  "06210a26fbfb7c13": {
+    "A": {
+      "contextual_coherence": 1.5,
+      "lexical_integrity": 1.5,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0.5
+    },
+    "C": {
+      "contextual_coherence": 1.5,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "B",
+      "B"
+    ]
+  },
+  "076ff80aa9bc6058": {
+    "A": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "B": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 4,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "C",
+    "judge_winner_votes": [
+      "C",
+      "tie",
+      "C"
+    ]
+  },
+  "07eb5d3d72e377cb": {
+    "A": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "A",
+    "judge_winner_votes": [
+      "A",
+      "tie",
+      "A"
+    ]
+  },
+  "0c92d9751502fa82": {
+    "A": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0.5
+    },
+    "B": {
+      "contextual_coherence": 1.5,
+      "lexical_integrity": 1.5,
+      "prompt_echo": 0.5
+    },
+    "C": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 1.5,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "A",
+    "judge_winner_votes": [
+      "A",
+      "A"
+    ]
+  },
+  "0e9394e82562e0de": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 1
+    },
+    "B": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "A",
+      "C",
+      "C"
+    ]
+  },
+  "0ee8d59b12bcad40": {
+    "A": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "C",
+      "B",
+      "B"
+    ]
+  },
+  "10ef8276864ef484": {
+    "A": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "B": {
+      "contextual_coherence": 0.5,
+      "lexical_integrity": 0.5,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "tie",
+      "tie"
+    ]
+  },
+  "11f07765b57afd1f": {
+    "A": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 2.5,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 1.5,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "B",
+      "B"
+    ]
+  },
+  "129ab235aff11194": {
+    "A": {
+      "contextual_coherence": 2.5,
+      "lexical_integrity": 1.5,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 0.5,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 0.5,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "A",
+    "judge_winner_votes": [
+      "A",
+      "A"
+    ]
+  },
+  "12b3ab6eedb5a43f": {
+    "A": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "C",
+    "judge_winner_votes": [
+      "B",
+      "C",
+      "A"
+    ]
+  },
+  "1322cd8a426a9b1b": {
+    "A": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "A",
+      "B",
+      "C"
+    ]
+  },
+  "1431ccd9a9f4ea8a": {
+    "A": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "A",
+    "judge_winner_votes": [
+      "B",
+      "A",
+      "A"
+    ]
+  },
+  "157a8169b3afdeee": {
+    "A": {
+      "contextual_coherence": 1.5,
+      "lexical_integrity": 1.5,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 1.5
+    },
+    "C": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 1.5,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "B",
+      "B"
+    ]
+  },
+  "159005c37d25fd2b": {
+    "A": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0.5
+    },
+    "B": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 1
+    },
+    "contextual_winner": "A",
+    "judge_winner_votes": [
+      "A",
+      "A"
+    ]
+  },
+  "16c08e2ddf2dc89e": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1.5,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "A",
+    "judge_winner_votes": [
+      "A",
+      "A"
+    ]
+  },
+  "17e9cd3b16ae160e": {
+    "A": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "B",
+      "tie",
+      "B"
+    ]
+  },
+  "19359a4b179ec734": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 1
+    },
+    "C": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "contextual_winner": "C",
+    "judge_winner_votes": [
+      "C",
+      "B",
+      "C"
+    ]
+  },
+  "19aa10cf9e06b712": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "C": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "C",
+      "B",
+      "B"
+    ]
+  },
+  "1cba798447c0730b": {
+    "A": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "A",
+    "judge_winner_votes": [
+      "B",
+      "A",
+      "A"
+    ]
+  },
+  "1d4bdf4e62c25d02": {
+    "A": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "A",
+      "tie",
+      "A"
+    ]
+  },
+  "1daaf763c87993e1": {
+    "A": {
+      "contextual_coherence": 4,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "B": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "A",
+    "judge_winner_votes": [
+      "A",
+      "A",
+      "A"
+    ]
+  },
+  "1f5e30e47d3d611c": {
+    "A": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "C",
+    "judge_winner_votes": [
+      "C",
+      "tie",
+      "B"
+    ]
+  },
+  "242a11a053a20ad4": {
+    "A": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "tie",
+      "tie",
+      "A"
+    ]
+  },
+  "24b454859c75eb9e": {
+    "A": {
+      "contextual_coherence": 1.5,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "C",
+    "judge_winner_votes": [
+      "C",
+      "C"
+    ]
+  },
+  "24b61f4f3ccc33ee": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "B",
+      "tie",
+      "A"
+    ]
+  },
+  "2647c82b2819dcc6": {
+    "A": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0.5,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 3.5,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 1.5,
+      "lexical_integrity": 1.5,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "B",
+      "B"
+    ]
+  },
+  "266212f6a3ceb10c": {
+    "A": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 0,
+      "prompt_echo": 1
+    },
+    "C": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "C",
+    "judge_winner_votes": [
+      "B",
+      "C",
+      "tie"
+    ]
+  },
+  "26b4615b841b3098": {
+    "A": {
+      "contextual_coherence": 3.5,
+      "lexical_integrity": 2,
+      "prompt_echo": 0.5
+    },
+    "B": {
+      "contextual_coherence": 0.5,
+      "lexical_integrity": 0.5,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "A",
+    "judge_winner_votes": [
+      "A",
+      "A"
+    ]
+  },
+  "2b2847f631355539": {
+    "A": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 1
+    },
+    "contextual_winner": "A",
+    "judge_winner_votes": [
+      "C",
+      "A",
+      "A"
+    ]
+  },
+  "2cacf99c44db5e5d": {
+    "A": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 2.5,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 3.5,
+      "lexical_integrity": 2,
+      "prompt_echo": 0.5
+    },
+    "contextual_winner": "C",
+    "judge_winner_votes": [
+      "C",
+      "C"
+    ]
+  },
+  "2cb6a74600c5072e": {
+    "A": {
+      "contextual_coherence": 0.5,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "C",
+    "judge_winner_votes": [
+      "C",
+      "C"
+    ]
+  },
+  "2f278a0ffa31c427": {
+    "A": {
+      "contextual_coherence": 2.5,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 3.5,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "C": {
+      "contextual_coherence": 1.5,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "B",
+      "B"
+    ]
+  },
+  "2f3d7755c58734e2": {
+    "A": {
+      "contextual_coherence": 1.5,
+      "lexical_integrity": 1.5,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 0.5,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "C",
+    "judge_winner_votes": [
+      "C",
+      "C"
+    ]
+  },
+  "300b6c0a76ee9d3a": {
+    "A": {
+      "contextual_coherence": 1.5,
+      "lexical_integrity": 1.5,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 2.5,
+      "lexical_integrity": 1.5,
+      "prompt_echo": 1
+    },
+    "C": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "B",
+      "B"
+    ]
+  },
+  "31f24413f60b3d85": {
+    "A": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 0.5,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 1.5,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "C",
+    "judge_winner_votes": [
+      "C",
+      "C"
+    ]
+  },
+  "33dfd0025cfdeaa7": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 1,
+      "prompt_echo": 1
+    },
+    "contextual_winner": "C",
+    "judge_winner_votes": [
+      "C",
+      "tie",
+      "C"
+    ]
+  },
+  "35a940d59a767861": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "A",
+    "judge_winner_votes": [
+      "tie",
+      "A",
+      "A"
+    ]
+  },
+  "36d6aa51b316cfb8": {
+    "A": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 3.5,
+      "lexical_integrity": 2,
+      "prompt_echo": 0.5
+    },
+    "C": {
+      "contextual_coherence": 2.5,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "B",
+      "B"
+    ]
+  },
+  "37db3ce459b32623": {
+    "A": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "B",
+      "tie",
+      "tie"
+    ]
+  },
+  "382bab2dd87c08cc": {
+    "A": {
+      "contextual_coherence": 0.5,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 2.5,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 3.5,
+      "lexical_integrity": 2,
+      "prompt_echo": 0.5
+    },
+    "contextual_winner": "C",
+    "judge_winner_votes": [
+      "C",
+      "C"
+    ]
+  },
+  "3acf7fb9b8053de5": {
+    "A": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "tie",
+      "B",
+      "B"
+    ]
+  },
+  "3b1bb4da06b5f4b1": {
+    "A": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "B": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "C": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "A",
+      "tie",
+      "tie"
+    ]
+  },
+  "3c0bbe0758050805": {
+    "A": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "C": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "B",
+      "C",
+      "tie"
+    ]
+  },
+  "3d8ad49992c49af8": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 1.5
+    },
+    "C": {
+      "contextual_coherence": 3.5,
+      "lexical_integrity": 2,
+      "prompt_echo": 0.5
+    },
+    "contextual_winner": "C",
+    "judge_winner_votes": [
+      "C",
+      "C"
+    ]
+  },
+  "40359df0a7e20496": {
+    "A": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "C": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "B",
+      "tie",
+      "tie"
+    ]
+  },
+  "404625677e54f731": {
+    "A": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "B",
+      "A",
+      "B"
+    ]
+  },
+  "41ecc1147c650426": {
+    "A": {
+      "contextual_coherence": 3.5,
+      "lexical_integrity": 2,
+      "prompt_echo": 0.5
+    },
+    "B": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1.5,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 1.5,
+      "prompt_echo": 1
+    },
+    "contextual_winner": "A",
+    "judge_winner_votes": [
+      "A",
+      "A"
+    ]
+  },
+  "47e4747e7aefa8be": {
+    "A": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 1.5,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "A",
+    "judge_winner_votes": [
+      "A",
+      "A"
+    ]
+  },
+  "48b6036409e43aa9": {
+    "A": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 1.5,
+      "lexical_integrity": 2,
+      "prompt_echo": 0.5
+    },
+    "C": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0.5,
+      "prompt_echo": 1
+    },
+    "contextual_winner": "A",
+    "judge_winner_votes": [
+      "A",
+      "A"
+    ]
+  },
+  "498c77da7561cc84": {
+    "A": {
+      "contextual_coherence": 0.5,
+      "lexical_integrity": 0.5,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "C": {
+      "contextual_coherence": 4,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "contextual_winner": "C",
+    "judge_winner_votes": [
+      "C",
+      "C"
+    ]
+  },
+  "4a543620e61ebb2c": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "tie",
+      "C",
+      "tie"
+    ]
+  },
+  "4c7d01ca6edf08ae": {
+    "A": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "A",
+    "judge_winner_votes": [
+      "tie",
+      "A",
+      "tie"
+    ]
+  },
+  "4de828b0d2fc5a20": {
+    "A": {
+      "contextual_coherence": 3.5,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "B": {
+      "contextual_coherence": 1.5,
+      "lexical_integrity": 1,
+      "prompt_echo": 1
+    },
+    "C": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 1.5,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "A",
+    "judge_winner_votes": [
+      "A",
+      "A"
+    ]
+  },
+  "4e5aebb32d1c7709": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "C",
+    "judge_winner_votes": [
+      "C",
+      "C",
+      "A"
+    ]
+  },
+  "4ee5bcd7e328c3d4": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1.5,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 2.5,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "contextual_winner": "C",
+    "judge_winner_votes": [
+      "C",
+      "C"
+    ]
+  },
+  "4f61bb6314f5fe1d": {
+    "A": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "A",
+      "tie",
+      "A"
+    ]
+  },
+  "5089264b3df9997a": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "A",
+      "B",
+      "B"
+    ]
+  },
+  "51c08ad2f8f11cfd": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "B",
+      "A",
+      "B"
+    ]
+  },
+  "5284e5b4044cec17": {
+    "A": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 1.5,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 3.5,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "C": {
+      "contextual_coherence": 3.5,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "tie",
+      "tie"
+    ]
+  },
+  "52ab1e4bb74c8b27": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "C",
+      "B",
+      "B"
+    ]
+  },
+  "54827a994cf8bfbc": {
+    "A": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "C": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 1
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "tie",
+      "B",
+      "A"
+    ]
+  },
+  "557a895feb21367c": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 0.5,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 2.5,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "contextual_winner": "C",
+    "judge_winner_votes": [
+      "C",
+      "C"
+    ]
+  },
+  "56e42ff57cc7576d": {
+    "A": {
+      "contextual_coherence": 1.5,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 3.5,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "C": {
+      "contextual_coherence": 2.5,
+      "lexical_integrity": 2,
+      "prompt_echo": 0.5
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "B",
+      "B"
+    ]
+  },
+  "579af3e6526d5aef": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "C",
+      "B",
+      "tie"
+    ]
+  },
+  "5a4448bc8e4cf335": {
+    "A": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "B": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "A",
+    "judge_winner_votes": [
+      "A",
+      "A",
+      "A"
+    ]
+  },
+  "5a9f7b5e97ec53f8": {
+    "A": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "C": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0.5
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "B",
+      "B"
+    ]
+  },
+  "5c0cd39009399716": {
+    "A": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "C": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "A",
+      "B",
+      "B"
+    ]
+  },
+  "5c3e87c5fafff3dc": {
+    "A": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "A",
+      "B",
+      "tie"
+    ]
+  },
+  "5c5736d05351d97a": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 4,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "A",
+      "B",
+      "B"
+    ]
+  },
+  "5c79abf4d4ba76a8": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "B",
+      "B",
+      "A"
+    ]
+  },
+  "5cd65bc701736ed2": {
+    "A": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0,
+      "prompt_echo": 1
+    },
+    "B": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 1
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "C",
+      "B",
+      "B"
+    ]
+  },
+  "5d0918ba23b2af4c": {
+    "A": {
+      "contextual_coherence": 4,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "B": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "contextual_winner": "A",
+    "judge_winner_votes": [
+      "tie",
+      "A",
+      "tie"
+    ]
+  },
+  "5d44b0d010f94486": {
+    "A": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "tie",
+      "tie",
+      "B"
+    ]
+  },
+  "5dc07dbcfd04aa47": {
+    "A": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "C",
+    "judge_winner_votes": [
+      "C",
+      "tie",
+      "tie"
+    ]
+  },
+  "5e968225b3df9bb8": {
+    "A": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "A",
+      "tie",
+      "C"
+    ]
+  },
+  "6310be9a11e5093e": {
+    "A": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 2.5,
+      "lexical_integrity": 1,
+      "prompt_echo": 0.5
+    },
+    "C": {
+      "contextual_coherence": 3.5,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "contextual_winner": "C",
+    "judge_winner_votes": [
+      "C",
+      "C"
+    ]
+  },
+  "632857ae6db0e906": {
+    "A": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0.5,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 2.5,
+      "lexical_integrity": 2,
+      "prompt_echo": 0.5
+    },
+    "C": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0.5
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "B",
+      "B"
+    ]
+  },
+  "6356c8b0a7251106": {
+    "A": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "A",
+      "tie",
+      "tie"
+    ]
+  },
+  "63cf6e17abc3f11c": {
+    "A": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 1,
+      "prompt_echo": 1
+    },
+    "B": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "A",
+    "judge_winner_votes": [
+      "A",
+      "C",
+      "A"
+    ]
+  },
+  "67e4b310a2fa55d7": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1.5,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 1.5,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "A",
+    "judge_winner_votes": [
+      "A",
+      "A"
+    ]
+  },
+  "69346a5685db0b8c": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "C",
+      "tie",
+      "B"
+    ]
+  },
+  "6a647e80509027a8": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "C",
+    "judge_winner_votes": [
+      "tie",
+      "C",
+      "C"
+    ]
+  },
+  "6b327c2a37128d53": {
+    "A": {
+      "contextual_coherence": 1.5,
+      "lexical_integrity": 1,
+      "prompt_echo": 0.5
+    },
+    "B": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 3.5,
+      "lexical_integrity": 2,
+      "prompt_echo": 0.5
+    },
+    "contextual_winner": "C",
+    "judge_winner_votes": [
+      "C",
+      "C"
+    ]
+  },
+  "6bae6019d445244a": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "B",
+      "tie",
+      "A"
+    ]
+  },
+  "6d32689d597e2181": {
+    "A": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "B": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "C",
+      "tie",
+      "B"
+    ]
+  },
+  "6de35ed6c087e0e3": {
+    "A": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 2
+    },
+    "contextual_winner": "C",
+    "judge_winner_votes": [
+      "C",
+      "C",
+      "C"
+    ]
+  },
+  "6e570f3c89a82e15": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "C",
+    "judge_winner_votes": [
+      "C",
+      "A",
+      "C"
+    ]
+  },
+  "6f9c3253826f1d57": {
+    "A": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 1,
+      "prompt_echo": 1
+    },
+    "C": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "C",
+    "judge_winner_votes": [
+      "B",
+      "C",
+      "C"
+    ]
+  },
+  "7183eca42847b9b6": {
+    "A": {
+      "contextual_coherence": 2.5,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "B": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "A",
+    "judge_winner_votes": [
+      "A",
+      "A"
+    ]
+  },
+  "7344e24917cea3eb": {
+    "A": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "B": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "C": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "A",
+    "judge_winner_votes": [
+      "tie",
+      "A",
+      "C"
+    ]
+  },
+  "75303d290cf3f889": {
+    "A": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 4,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "tie",
+      "B",
+      "B"
+    ]
+  },
+  "7543ad012e5fef19": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "C",
+    "judge_winner_votes": [
+      "B",
+      "tie",
+      "C"
+    ]
+  },
+  "76d2dd865daee97f": {
+    "A": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "B": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "C",
+      "A",
+      "A"
+    ]
+  },
+  "77a67215457bfad1": {
+    "A": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "C",
+      "B",
+      "B"
+    ]
+  },
+  "7a90ac1c26221bdf": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1.5,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1.5,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "tie",
+      "tie"
+    ]
+  },
+  "7aea9a93a477576a": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "A",
+      "B",
+      "B"
+    ]
+  },
+  "7cb173483dede936": {
+    "A": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 1.5,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0.5
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "B",
+      "B"
+    ]
+  },
+  "7cf34c4265a45071": {
+    "A": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "A",
+    "judge_winner_votes": [
+      "C",
+      "A",
+      "A"
+    ]
+  },
+  "7e00cd21b429935a": {
+    "A": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "B": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0,
+      "prompt_echo": 1
+    },
+    "C": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "A",
+    "judge_winner_votes": [
+      "B",
+      "tie",
+      "C"
+    ]
+  },
+  "7e69935d40f59346": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1.5,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "A",
+    "judge_winner_votes": [
+      "A",
+      "A"
+    ]
+  },
+  "7fd5c7b2e29b5b3e": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "B",
+      "A",
+      "B"
+    ]
+  },
+  "83638514f83b53ce": {
+    "A": {
+      "contextual_coherence": 0.5,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 0.5,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0.5
+    },
+    "contextual_winner": "C",
+    "judge_winner_votes": [
+      "C",
+      "C"
+    ]
+  },
+  "85379eb46e6a02fc": {
+    "A": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "A",
+      "B",
+      "B"
+    ]
+  },
+  "86804556c0964cc8": {
+    "A": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "tie",
+      "tie",
+      "B"
+    ]
+  },
+  "892bb3ea2fecccf8": {
+    "A": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "B": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "A",
+    "judge_winner_votes": [
+      "A",
+      "A",
+      "C"
+    ]
+  },
+  "8af067e5d4373e18": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "C",
+    "judge_winner_votes": [
+      "C",
+      "C",
+      "B"
+    ]
+  },
+  "8df52e3aff3b925d": {
+    "A": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "B",
+      "tie",
+      "C"
+    ]
+  },
+  "8f060ad15a522281": {
+    "A": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 1,
+      "prompt_echo": 1
+    },
+    "B": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "A",
+      "A",
+      "B"
+    ]
+  },
+  "8fd141dffc488d78": {
+    "A": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0.5
+    },
+    "contextual_winner": "C",
+    "judge_winner_votes": [
+      "C",
+      "C"
+    ]
+  },
+  "906121b993c16f55": {
+    "A": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 4,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "B",
+      "B",
+      "B"
+    ]
+  },
+  "908fcba6bb9132e7": {
+    "A": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "A",
+    "judge_winner_votes": [
+      "C",
+      "A",
+      "A"
+    ]
+  },
+  "92a36c4a14395a21": {
+    "A": {
+      "contextual_coherence": 4,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "B": {
+      "contextual_coherence": 0.5,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "A",
+    "judge_winner_votes": [
+      "A",
+      "A"
+    ]
+  },
+  "93376b7012c4d6e3": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "A",
+      "B",
+      "B"
+    ]
+  },
+  "97a95eaaaa5da4f3": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1.5,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 0.5,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 1.5,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "C",
+    "judge_winner_votes": [
+      "C",
+      "C"
+    ]
+  },
+  "98eacc77d8c62fcb": {
+    "A": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "A",
+      "A",
+      "tie"
+    ]
+  },
+  "99a75c512f675134": {
+    "A": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "contextual_winner": "C",
+    "judge_winner_votes": [
+      "C",
+      "C"
+    ]
+  },
+  "99fc1081c2298666": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "C",
+    "judge_winner_votes": [
+      "A",
+      "C",
+      "C"
+    ]
+  },
+  "9c0779134c2fe024": {
+    "A": {
+      "contextual_coherence": 1.5,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 2.5,
+      "lexical_integrity": 2,
+      "prompt_echo": 0.5
+    },
+    "C": {
+      "contextual_coherence": 0.5,
+      "lexical_integrity": 0.5,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "B",
+      "B"
+    ]
+  },
+  "9efd382878a41caf": {
+    "A": {
+      "contextual_coherence": 1.5,
+      "lexical_integrity": 1,
+      "prompt_echo": 0.5
+    },
+    "B": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "C": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0.5,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "B",
+      "B"
+    ]
+  },
+  "9f20b68f4c71a655": {
+    "A": {
+      "contextual_coherence": 1.5,
+      "lexical_integrity": 1.5,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 3.5,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "B",
+      "B"
+    ]
+  },
+  "9fa0a7fbde21b7a6": {
+    "A": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "A",
+    "judge_winner_votes": [
+      "A",
+      "A",
+      "B"
+    ]
+  },
+  "a0510135c9eccedd": {
+    "A": {
+      "contextual_coherence": 1.5,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 0.5,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0.5,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "A",
+    "judge_winner_votes": [
+      "A",
+      "A"
+    ]
+  },
+  "a388121833073296": {
+    "A": {
+      "contextual_coherence": 3.5,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "B": {
+      "contextual_coherence": 0.5,
+      "lexical_integrity": 0.5,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 2.5,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "contextual_winner": "A",
+    "judge_winner_votes": [
+      "A",
+      "A"
+    ]
+  },
+  "a4a2e74ff5ba65fc": {
+    "A": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0,
+      "prompt_echo": 1
+    },
+    "B": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "C": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "B",
+      "B",
+      "B"
+    ]
+  },
+  "a57911a24630d932": {
+    "A": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "C": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "tie",
+      "C",
+      "tie"
+    ]
+  },
+  "a8f3f6308523571a": {
+    "A": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "B": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1.5,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "A",
+    "judge_winner_votes": [
+      "A",
+      "A"
+    ]
+  },
+  "a9edd50cc2b945a5": {
+    "A": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "A",
+      "B",
+      "C"
+    ]
+  },
+  "aa169bbf2ea567ca": {
+    "A": {
+      "contextual_coherence": 2.5,
+      "lexical_integrity": 1.5,
+      "prompt_echo": 0.5
+    },
+    "B": {
+      "contextual_coherence": 0.5,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 0.5,
+      "lexical_integrity": 1.5,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "A",
+    "judge_winner_votes": [
+      "A",
+      "A"
+    ]
+  },
+  "aa514cfbcca47fab": {
+    "A": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 1.5,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 2.5,
+      "lexical_integrity": 1.5,
+      "prompt_echo": 1
+    },
+    "C": {
+      "contextual_coherence": 0.5,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "B",
+      "B"
+    ]
+  },
+  "ab45001284f26fb9": {
+    "A": {
+      "contextual_coherence": 1.5,
+      "lexical_integrity": 1.5,
+      "prompt_echo": 0.5
+    },
+    "B": {
+      "contextual_coherence": 2.5,
+      "lexical_integrity": 1.5,
+      "prompt_echo": 1
+    },
+    "C": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "B",
+      "B"
+    ]
+  },
+  "aca3aafca98f2c46": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "B": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "C": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "B",
+      "B",
+      "B"
+    ]
+  },
+  "ae4e67e5cc0795b5": {
+    "A": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "B": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 0,
+      "prompt_echo": 1
+    },
+    "C": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "A",
+      "C",
+      "A"
+    ]
+  },
+  "b0cf2ed25ffff59f": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 1,
+      "prompt_echo": 1
+    },
+    "C": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "B",
+      "B",
+      "A"
+    ]
+  },
+  "b0fc47aac43c714a": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 2.5,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "contextual_winner": "C",
+    "judge_winner_votes": [
+      "C",
+      "C"
+    ]
+  },
+  "b161400189247ef0": {
+    "A": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "tie",
+      "A",
+      "tie"
+    ]
+  },
+  "b162ef4a19bf5f2b": {
+    "A": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "C",
+      "C",
+      "tie"
+    ]
+  },
+  "b214ec9942ee5770": {
+    "A": {
+      "contextual_coherence": 2.5,
+      "lexical_integrity": 2,
+      "prompt_echo": 0.5
+    },
+    "B": {
+      "contextual_coherence": 0.5,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 1.5,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "A",
+    "judge_winner_votes": [
+      "A",
+      "A"
+    ]
+  },
+  "b3e7ef253d2dbf79": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "A",
+      "B",
+      "B"
+    ]
+  },
+  "b44b883868ce5cdf": {
+    "A": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "B",
+      "B",
+      "B"
+    ]
+  },
+  "b488b2cf45a88a07": {
+    "A": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1.5,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "tie",
+      "tie"
+    ]
+  },
+  "b5aebba2f6e8c8e8": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "B",
+      "tie",
+      "A"
+    ]
+  },
+  "b8946f0158117ee7": {
+    "A": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "A",
+    "judge_winner_votes": [
+      "A",
+      "A",
+      "A"
+    ]
+  },
+  "b90aba46fff948b0": {
+    "A": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "contextual_winner": "C",
+    "judge_winner_votes": [
+      "C",
+      "C",
+      "C"
+    ]
+  },
+  "bbf402421c86f303": {
+    "A": {
+      "contextual_coherence": 4,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "A",
+    "judge_winner_votes": [
+      "B",
+      "A",
+      "A"
+    ]
+  },
+  "bd84f39a3b16b31f": {
+    "A": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0.5,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "C": {
+      "contextual_coherence": 0.5,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "B",
+      "B"
+    ]
+  },
+  "c106bcfa1632a74e": {
+    "A": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "contextual_winner": "C",
+    "judge_winner_votes": [
+      "tie",
+      "C",
+      "C"
+    ]
+  },
+  "c2e7c0ab1e624f27": {
+    "A": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "A",
+      "tie",
+      "tie"
+    ]
+  },
+  "c595ca644e7b71a0": {
+    "A": {
+      "contextual_coherence": 0.5,
+      "lexical_integrity": 1.5,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 0.5,
+      "lexical_integrity": 1.5,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 2.5,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "C",
+    "judge_winner_votes": [
+      "C",
+      "C"
+    ]
+  },
+  "c694dc7d4435c7b0": {
+    "A": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "B": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "C": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "A",
+      "A",
+      "B"
+    ]
+  },
+  "c6a4d1a313da9078": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 1
+    },
+    "B": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "contextual_winner": "C",
+    "judge_winner_votes": [
+      "C",
+      "C",
+      "C"
+    ]
+  },
+  "c730cc25e9359615": {
+    "A": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "A",
+    "judge_winner_votes": [
+      "A",
+      "tie",
+      "tie"
+    ]
+  },
+  "c74825eb474f9b71": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "C",
+      "tie",
+      "A"
+    ]
+  },
+  "ca3d5e87055aa23a": {
+    "A": {
+      "contextual_coherence": 3.5,
+      "lexical_integrity": 2,
+      "prompt_echo": 1.5
+    },
+    "B": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "A",
+    "judge_winner_votes": [
+      "A",
+      "A"
+    ]
+  },
+  "caafd8b481a9c048": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 1
+    },
+    "B": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "tie",
+      "B",
+      "C"
+    ]
+  },
+  "cb39244f398dbe73": {
+    "A": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "A",
+      "B",
+      "C"
+    ]
+  },
+  "ccd195853cab74b0": {
+    "A": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 1,
+      "prompt_echo": 1
+    },
+    "B": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "A",
+    "judge_winner_votes": [
+      "A",
+      "A",
+      "B"
+    ]
+  },
+  "cd0087d26ff9a7fc": {
+    "A": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0.5,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 3.5,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 1.5,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "B",
+      "B"
+    ]
+  },
+  "cd7070966f95b4d4": {
+    "A": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0.5
+    },
+    "B": {
+      "contextual_coherence": 3.5,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 1.5,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "B",
+      "B"
+    ]
+  },
+  "d18254c899ecd066": {
+    "A": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "C",
+    "judge_winner_votes": [
+      "C",
+      "C",
+      "C"
+    ]
+  },
+  "d199c55bda825fad": {
+    "A": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "B",
+      "B",
+      "B"
+    ]
+  },
+  "d2153c64019ebcd5": {
+    "A": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "C",
+      "tie",
+      "B"
+    ]
+  },
+  "d5a3273bb1ab992c": {
+    "A": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "C": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "B",
+      "B",
+      "B"
+    ]
+  },
+  "d628f00afb5edb10": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "A",
+      "B",
+      "B"
+    ]
+  },
+  "d6435ccc86ce6628": {
+    "A": {
+      "contextual_coherence": 0.5,
+      "lexical_integrity": 0.5,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 1.5,
+      "lexical_integrity": 1.5,
+      "prompt_echo": 1
+    },
+    "C": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "B",
+      "B"
+    ]
+  },
+  "d721affb1d522364": {
+    "A": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "A",
+    "judge_winner_votes": [
+      "C",
+      "C",
+      "A"
+    ]
+  },
+  "da75ecd7e5659b28": {
+    "A": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "A",
+      "C",
+      "tie"
+    ]
+  },
+  "dcc10901163e19bf": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "C",
+    "judge_winner_votes": [
+      "B",
+      "C",
+      "C"
+    ]
+  },
+  "dd3ec80cdf80fd9c": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "A",
+    "judge_winner_votes": [
+      "A",
+      "A"
+    ]
+  },
+  "ddae7db1cad815eb": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "tie",
+      "tie",
+      "C"
+    ]
+  },
+  "e015d31b04a342b3": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 1.5,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "C": {
+      "contextual_coherence": 0.5,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "B",
+      "B"
+    ]
+  },
+  "e0bd4a362fb0f8c2": {
+    "A": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 1.5,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "C": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "A",
+    "judge_winner_votes": [
+      "A",
+      "A"
+    ]
+  },
+  "e33539952cbf4a3a": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "A",
+      "B",
+      "B"
+    ]
+  },
+  "e3f19853b79499ca": {
+    "A": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "A",
+    "judge_winner_votes": [
+      "A",
+      "A",
+      "C"
+    ]
+  },
+  "e554af40468b927a": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "C",
+      "B",
+      "B"
+    ]
+  },
+  "e57a6422a7fa8747": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "C": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "C",
+      "B",
+      "tie"
+    ]
+  },
+  "e6bd0afb2899090f": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 1,
+      "prompt_echo": 1
+    },
+    "contextual_winner": "C",
+    "judge_winner_votes": [
+      "C",
+      "tie",
+      "C"
+    ]
+  },
+  "e6e6009493625129": {
+    "A": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 2
+    },
+    "B": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "B",
+      "C",
+      "A"
+    ]
+  },
+  "e75768cf2ae7e51a": {
+    "A": {
+      "contextual_coherence": 1.5,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "C",
+    "judge_winner_votes": [
+      "C",
+      "C"
+    ]
+  },
+  "e7a72b8096f34cf9": {
+    "A": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 1,
+      "prompt_echo": 1
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "C",
+      "C",
+      "A"
+    ]
+  },
+  "e87cd3a69ed86dac": {
+    "A": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "tie",
+      "tie"
+    ]
+  },
+  "e9daf7e76858a0e3": {
+    "A": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "C": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "tie",
+      "B",
+      "B"
+    ]
+  },
+  "eaf5d2d7ba28ecca": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 1
+    },
+    "B": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0.5,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "C",
+    "judge_winner_votes": [
+      "C",
+      "C"
+    ]
+  },
+  "eb995dcbf3df28d9": {
+    "A": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "A",
+      "tie",
+      "tie"
+    ]
+  },
+  "ebf9e2236776091c": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "C",
+      "tie",
+      "C"
+    ]
+  },
+  "eed9caca0c5e4e7e": {
+    "A": {
+      "contextual_coherence": 1.5,
+      "lexical_integrity": 1.5,
+      "prompt_echo": 1
+    },
+    "B": {
+      "contextual_coherence": 2.5,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 0.5,
+      "lexical_integrity": 1.5,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "B",
+      "B"
+    ]
+  },
+  "f2a13c5672cb8131": {
+    "A": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 0.5,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 1.5,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "C",
+    "judge_winner_votes": [
+      "C",
+      "C"
+    ]
+  },
+  "f34e46fe406a6470": {
+    "A": {
+      "contextual_coherence": 4,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 1.5,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 1.5,
+      "lexical_integrity": 1.5,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "A",
+    "judge_winner_votes": [
+      "A",
+      "A"
+    ]
+  },
+  "f4357208e5ef7245": {
+    "A": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "contextual_winner": "C",
+    "judge_winner_votes": [
+      "C",
+      "C",
+      "C"
+    ]
+  },
+  "f487e16c84f2422a": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 1,
+      "prompt_echo": 1
+    },
+    "C": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 1,
+      "prompt_echo": 1
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "tie",
+      "tie",
+      "A"
+    ]
+  },
+  "f531c73afb95f82a": {
+    "A": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "A",
+      "C",
+      "tie"
+    ]
+  },
+  "f7605d1fb3d1bcf7": {
+    "A": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "B": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "contextual_winner": "tie",
+    "judge_winner_votes": [
+      "C",
+      "A",
+      "A"
+    ]
+  },
+  "f94864caeb4a5073": {
+    "A": {
+      "contextual_coherence": 1,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "C": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0,
+      "prompt_echo": 1
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "tie",
+      "tie",
+      "B"
+    ]
+  },
+  "fb8c90e5ef64cf59": {
+    "A": {
+      "contextual_coherence": 0.5,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "B": {
+      "contextual_coherence": 3.5,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "C": {
+      "contextual_coherence": 1.5,
+      "lexical_integrity": 1.5,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "B",
+      "B"
+    ]
+  },
+  "fccf38bddf589f40": {
+    "A": {
+      "contextual_coherence": 1.5,
+      "lexical_integrity": 1,
+      "prompt_echo": 0.5
+    },
+    "B": {
+      "contextual_coherence": 2.5,
+      "lexical_integrity": 2,
+      "prompt_echo": 0.5
+    },
+    "C": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 1,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "B",
+    "judge_winner_votes": [
+      "B",
+      "B"
+    ]
+  },
+  "fefeb1ac61195c37": {
+    "A": {
+      "contextual_coherence": 3,
+      "lexical_integrity": 2,
+      "prompt_echo": 1
+    },
+    "B": {
+      "contextual_coherence": 2,
+      "lexical_integrity": 2,
+      "prompt_echo": 0
+    },
+    "C": {
+      "contextual_coherence": 0,
+      "lexical_integrity": 0,
+      "prompt_echo": 0
+    },
+    "contextual_winner": "A",
+    "judge_winner_votes": [
+      "B",
+      "A",
+      "A"
+    ]
+  }
+}

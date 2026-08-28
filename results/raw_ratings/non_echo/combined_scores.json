@@ -1,0 +1,3002 @@
+{
+  "c106bcfa1632a74e": {
+    "A": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 1.5
+    },
+    "contextual_winner": "B"
+  },
+  "300b6c0a76ee9d3a": {
+    "A": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.0
+    },
+    "C": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 1.5
+    },
+    "contextual_winner": "B"
+  },
+  "e9daf7e76858a0e3": {
+    "A": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.0
+    },
+    "C": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "B"
+  },
+  "cd7070966f95b4d4": {
+    "A": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 0.5
+    },
+    "B": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 1.0
+    },
+    "C": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "tie"
+  },
+  "f531c73afb95f82a": {
+    "A": {
+      "non_echo_coherence": 3.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 3.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "C"
+  },
+  "ab45001284f26fb9": {
+    "A": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 1.5
+    },
+    "C": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "B"
+  },
+  "b0cf2ed25ffff59f": {
+    "A": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.0
+    },
+    "C": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 1.5
+    },
+    "contextual_winner": "B"
+  },
+  "9c0779134c2fe024": {
+    "A": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "tie"
+  },
+  "a57911a24630d932": {
+    "A": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "tie"
+  },
+  "4a543620e61ebb2c": {
+    "A": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 3.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 2.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "B"
+  },
+  "fccf38bddf589f40": {
+    "A": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 1.5
+    },
+    "C": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "B"
+  },
+  "b0fc47aac43c714a": {
+    "A": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.5
+    },
+    "contextual_winner": "C"
+  },
+  "04e653268beb8df0": {
+    "A": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 1.5
+    },
+    "contextual_winner": "B"
+  },
+  "d721affb1d522364": {
+    "A": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 3.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "C"
+  },
+  "37db3ce459b32623": {
+    "A": {
+      "non_echo_coherence": 3.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 4.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "B"
+  },
+  "d5a3273bb1ab992c": {
+    "A": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 1.5
+    },
+    "C": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "A"
+  },
+  "aa169bbf2ea567ca": {
+    "A": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 1.5
+    },
+    "B": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "tie"
+  },
+  "7cf34c4265a45071": {
+    "A": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "C"
+  },
+  "382bab2dd87c08cc": {
+    "A": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 1.5
+    },
+    "contextual_winner": "B"
+  },
+  "85379eb46e6a02fc": {
+    "A": {
+      "non_echo_coherence": 2.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 3.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "B"
+  },
+  "b90aba46fff948b0": {
+    "A": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 1.5
+    },
+    "contextual_winner": "tie"
+  },
+  "eed9caca0c5e4e7e": {
+    "A": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 1.5
+    },
+    "B": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "tie"
+  },
+  "6a647e80509027a8": {
+    "A": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "C"
+  },
+  "404625677e54f731": {
+    "A": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "B"
+  },
+  "906121b993c16f55": {
+    "A": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 3.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 3.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "B"
+  },
+  "ca3d5e87055aa23a": {
+    "A": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 1.0
+    },
+    "C": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "B"
+  },
+  "8f060ad15a522281": {
+    "A": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 1.5
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 1.0
+    },
+    "C": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "tie"
+  },
+  "48b6036409e43aa9": {
+    "A": {
+      "non_echo_coherence": 3.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "A"
+  },
+  "92a36c4a14395a21": {
+    "A": {
+      "non_echo_coherence": 2.5,
+      "residual_substance": 1.5
+    },
+    "B": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 3.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "C"
+  },
+  "2cacf99c44db5e5d": {
+    "A": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 3.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 3.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "C"
+  },
+  "c694dc7d4435c7b0": {
+    "A": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 1.5
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 1.5
+    },
+    "C": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "tie"
+  },
+  "ae4e67e5cc0795b5": {
+    "A": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 1.0
+    },
+    "C": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "C"
+  },
+  "5cd65bc701736ed2": {
+    "A": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 1.5
+    },
+    "B": {
+      "non_echo_coherence": 3.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 1.5
+    },
+    "contextual_winner": "B"
+  },
+  "e0bd4a362fb0f8c2": {
+    "A": {
+      "non_echo_coherence": 2.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 1.5
+    },
+    "C": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "A"
+  },
+  "36d6aa51b316cfb8": {
+    "A": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 1.5
+    },
+    "C": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "A"
+  },
+  "76d2dd865daee97f": {
+    "A": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.0
+    },
+    "contextual_winner": "C"
+  },
+  "caafd8b481a9c048": {
+    "A": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 1.5
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 1.5
+    },
+    "C": {
+      "non_echo_coherence": 2.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "C"
+  },
+  "eaf5d2d7ba28ecca": {
+    "A": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 3.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "C"
+  },
+  "3d8ad49992c49af8": {
+    "A": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 0.5
+    },
+    "C": {
+      "non_echo_coherence": 3.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "C"
+  },
+  "24b454859c75eb9e": {
+    "A": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 3.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "C"
+  },
+  "e6bd0afb2899090f": {
+    "A": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 1.0
+    },
+    "C": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "tie"
+  },
+  "7344e24917cea3eb": {
+    "A": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.0
+    },
+    "C": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "tie"
+  },
+  "c74825eb474f9b71": {
+    "A": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "tie"
+  },
+  "ebf9e2236776091c": {
+    "A": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.0
+    },
+    "C": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.0
+    },
+    "contextual_winner": "tie"
+  },
+  "f487e16c84f2422a": {
+    "A": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.0
+    },
+    "C": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.0
+    },
+    "contextual_winner": "tie"
+  },
+  "02b63bb7dc1752e4": {
+    "A": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 1.5
+    },
+    "C": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.0
+    },
+    "contextual_winner": "tie"
+  },
+  "6d32689d597e2181": {
+    "A": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.0
+    },
+    "contextual_winner": "tie"
+  },
+  "ddae7db1cad815eb": {
+    "A": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.0
+    },
+    "C": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "tie"
+  },
+  "d2153c64019ebcd5": {
+    "A": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.0
+    },
+    "contextual_winner": "tie"
+  },
+  "3acf7fb9b8053de5": {
+    "A": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.0
+    },
+    "contextual_winner": "tie"
+  },
+  "4c7d01ca6edf08ae": {
+    "A": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 1.5
+    },
+    "C": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.0
+    },
+    "contextual_winner": "tie"
+  },
+  "5284e5b4044cec17": {
+    "A": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.0
+    },
+    "C": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.0
+    },
+    "contextual_winner": "tie"
+  },
+  "5d0918ba23b2af4c": {
+    "A": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.0
+    },
+    "contextual_winner": "tie"
+  },
+  "b488b2cf45a88a07": {
+    "A": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.0
+    },
+    "C": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "tie"
+  },
+  "8df52e3aff3b925d": {
+    "A": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.0
+    },
+    "C": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 1.0
+    },
+    "contextual_winner": "B"
+  },
+  "aca3aafca98f2c46": {
+    "A": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 1.0
+    },
+    "C": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 1.0
+    },
+    "contextual_winner": "A"
+  },
+  "7183eca42847b9b6": {
+    "A": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 2.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "C"
+  },
+  "908fcba6bb9132e7": {
+    "A": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 1.5
+    },
+    "contextual_winner": "tie"
+  },
+  "2cb6a74600c5072e": {
+    "A": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "C"
+  },
+  "b8946f0158117ee7": {
+    "A": {
+      "non_echo_coherence": 3.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "A"
+  },
+  "ccd195853cab74b0": {
+    "A": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 0.5
+    },
+    "B": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 1.0
+    },
+    "contextual_winner": "C"
+  },
+  "159005c37d25fd2b": {
+    "A": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 1.5
+    },
+    "contextual_winner": "A"
+  },
+  "e7a72b8096f34cf9": {
+    "A": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 1.5
+    },
+    "contextual_winner": "C"
+  },
+  "26b4615b841b3098": {
+    "A": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 1.5
+    },
+    "C": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "A"
+  },
+  "47e4747e7aefa8be": {
+    "A": {
+      "non_echo_coherence": 3.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "A"
+  },
+  "0170bee2809765cd": {
+    "A": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 1.5
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "A"
+  },
+  "0c92d9751502fa82": {
+    "A": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 1.5
+    },
+    "C": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "tie"
+  },
+  "2f3d7755c58734e2": {
+    "A": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 1.5
+    },
+    "contextual_winner": "C"
+  },
+  "bd84f39a3b16b31f": {
+    "A": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 1.5
+    },
+    "C": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "C"
+  },
+  "cd0087d26ff9a7fc": {
+    "A": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 3.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "B"
+  },
+  "0e9394e82562e0de": {
+    "A": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 1.5
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 1.5
+    },
+    "C": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "tie"
+  },
+  "19359a4b179ec734": {
+    "A": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 1.5
+    },
+    "C": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 1.5
+    },
+    "contextual_winner": "A"
+  },
+  "9efd382878a41caf": {
+    "A": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "B"
+  },
+  "e75768cf2ae7e51a": {
+    "A": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 3.0,
+      "residual_substance": 1.5
+    },
+    "contextual_winner": "C"
+  },
+  "d18254c899ecd066": {
+    "A": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 3.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "C"
+  },
+  "157a8169b3afdeee": {
+    "A": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 1.0
+    },
+    "C": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "C"
+  },
+  "6b327c2a37128d53": {
+    "A": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 1.0
+    },
+    "contextual_winner": "C"
+  },
+  "4de828b0d2fc5a20": {
+    "A": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 0.5
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "A"
+  },
+  "2647c82b2819dcc6": {
+    "A": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 3.5,
+      "residual_substance": 1.5
+    },
+    "C": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 1.5
+    },
+    "contextual_winner": "B"
+  },
+  "f34e46fe406a6470": {
+    "A": {
+      "non_echo_coherence": 3.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "A"
+  },
+  "f94864caeb4a5073": {
+    "A": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 1.5
+    },
+    "C": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 1.5
+    },
+    "contextual_winner": "B"
+  },
+  "9fa0a7fbde21b7a6": {
+    "A": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "A"
+  },
+  "5a9f7b5e97ec53f8": {
+    "A": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.5
+    },
+    "C": {
+      "non_echo_coherence": 3.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "C"
+  },
+  "99a75c512f675134": {
+    "A": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 1.5
+    },
+    "contextual_winner": "tie"
+  },
+  "06210a26fbfb7c13": {
+    "A": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 1.0
+    },
+    "C": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "tie"
+  },
+  "e6e6009493625129": {
+    "A": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "C"
+  },
+  "7fd5c7b2e29b5b3e": {
+    "A": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "A"
+  },
+  "2f278a0ffa31c427": {
+    "A": {
+      "non_echo_coherence": 2.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.5
+    },
+    "C": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "A"
+  },
+  "053340e8f8752d9c": {
+    "A": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 3.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 2.5,
+      "residual_substance": 1.5
+    },
+    "contextual_winner": "B"
+  },
+  "5c3e87c5fafff3dc": {
+    "A": {
+      "non_echo_coherence": 3.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 3.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "tie"
+  },
+  "f4357208e5ef7245": {
+    "A": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.5
+    },
+    "contextual_winner": "C"
+  },
+  "e33539952cbf4a3a": {
+    "A": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "B"
+  },
+  "10ef8276864ef484": {
+    "A": {
+      "non_echo_coherence": 2.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 3.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "C"
+  },
+  "498c77da7561cc84": {
+    "A": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 3.0,
+      "residual_substance": 1.5
+    },
+    "C": {
+      "non_echo_coherence": 3.5,
+      "residual_substance": 1.5
+    },
+    "contextual_winner": "C"
+  },
+  "f7605d1fb3d1bcf7": {
+    "A": {
+      "non_echo_coherence": 2.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.5
+    },
+    "contextual_winner": "A"
+  },
+  "e015d31b04a342b3": {
+    "A": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 1.5
+    },
+    "C": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "C"
+  },
+  "aa514cfbcca47fab": {
+    "A": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 1.5
+    },
+    "C": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "C"
+  },
+  "83638514f83b53ce": {
+    "A": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 1.5
+    },
+    "contextual_winner": "A"
+  },
+  "c6a4d1a313da9078": {
+    "A": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 1.5
+    },
+    "contextual_winner": "C"
+  },
+  "b44b883868ce5cdf": {
+    "A": {
+      "non_echo_coherence": 3.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 3.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "tie"
+  },
+  "7543ad012e5fef19": {
+    "A": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.0
+    },
+    "C": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "tie"
+  },
+  "3c0bbe0758050805": {
+    "A": {
+      "non_echo_coherence": 2.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 3.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "C"
+  },
+  "2b2847f631355539": {
+    "A": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 1.5
+    },
+    "C": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.0
+    },
+    "contextual_winner": "C"
+  },
+  "e554af40468b927a": {
+    "A": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 1.5
+    },
+    "B": {
+      "non_echo_coherence": 3.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 3.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "tie"
+  },
+  "b161400189247ef0": {
+    "A": {
+      "non_echo_coherence": 2.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 3.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "C"
+  },
+  "9f20b68f4c71a655": {
+    "A": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "B"
+  },
+  "dcc10901163e19bf": {
+    "A": {
+      "non_echo_coherence": 3.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 1.0
+    },
+    "C": {
+      "non_echo_coherence": 2.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "A"
+  },
+  "99fc1081c2298666": {
+    "A": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 3.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "C"
+  },
+  "56e42ff57cc7576d": {
+    "A": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 1.0
+    },
+    "C": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.0
+    },
+    "contextual_winner": "tie"
+  },
+  "a388121833073296": {
+    "A": {
+      "non_echo_coherence": 2.5,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 3.5,
+      "residual_substance": 1.5
+    },
+    "contextual_winner": "C"
+  },
+  "b3e7ef253d2dbf79": {
+    "A": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.5
+    },
+    "C": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "tie"
+  },
+  "6f9c3253826f1d57": {
+    "A": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.0
+    },
+    "C": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "B"
+  },
+  "266212f6a3ceb10c": {
+    "A": {
+      "non_echo_coherence": 2.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.0
+    },
+    "C": {
+      "non_echo_coherence": 3.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "C"
+  },
+  "7aea9a93a477576a": {
+    "A": {
+      "non_echo_coherence": 3.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "A"
+  },
+  "5d44b0d010f94486": {
+    "A": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 1.5
+    },
+    "B": {
+      "non_echo_coherence": 3.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 3.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "tie"
+  },
+  "1cba798447c0730b": {
+    "A": {
+      "non_echo_coherence": 3.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 1.0
+    },
+    "C": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "A"
+  },
+  "52ab1e4bb74c8b27": {
+    "A": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "tie"
+  },
+  "1322cd8a426a9b1b": {
+    "A": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 1.5
+    },
+    "C": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "A"
+  },
+  "da75ecd7e5659b28": {
+    "A": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 2.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "C"
+  },
+  "e57a6422a7fa8747": {
+    "A": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 3.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "B"
+  },
+  "d6435ccc86ce6628": {
+    "A": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "C"
+  },
+  "35a940d59a767861": {
+    "A": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 1.5
+    },
+    "C": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "A"
+  },
+  "11f07765b57afd1f": {
+    "A": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "C"
+  },
+  "b214ec9942ee5770": {
+    "A": {
+      "non_echo_coherence": 2.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "A"
+  },
+  "4f61bb6314f5fe1d": {
+    "A": {
+      "non_echo_coherence": 3.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 1.5
+    },
+    "C": {
+      "non_echo_coherence": 3.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "A"
+  },
+  "17e9cd3b16ae160e": {
+    "A": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "B"
+  },
+  "67e4b310a2fa55d7": {
+    "A": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 1.0
+    },
+    "contextual_winner": "B"
+  },
+  "fefeb1ac61195c37": {
+    "A": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "B"
+  },
+  "a8f3f6308523571a": {
+    "A": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 2.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "B"
+  },
+  "076ff80aa9bc6058": {
+    "A": {
+      "non_echo_coherence": 3.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 1.5
+    },
+    "C": {
+      "non_echo_coherence": 3.0,
+      "residual_substance": 1.5
+    },
+    "contextual_winner": "tie"
+  },
+  "a0510135c9eccedd": {
+    "A": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "tie"
+  },
+  "51c08ad2f8f11cfd": {
+    "A": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "B"
+  },
+  "129ab235aff11194": {
+    "A": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 1.0
+    },
+    "C": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "A"
+  },
+  "5a4448bc8e4cf335": {
+    "A": {
+      "non_echo_coherence": 3.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "A"
+  },
+  "3b1bb4da06b5f4b1": {
+    "A": {
+      "non_echo_coherence": 3.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 3.0,
+      "residual_substance": 1.5
+    },
+    "C": {
+      "non_echo_coherence": 3.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "tie"
+  },
+  "7e69935d40f59346": {
+    "A": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 1.5
+    },
+    "contextual_winner": "A"
+  },
+  "07eb5d3d72e377cb": {
+    "A": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "A"
+  },
+  "dd3ec80cdf80fd9c": {
+    "A": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "A"
+  },
+  "77a67215457bfad1": {
+    "A": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "C"
+  },
+  "63cf6e17abc3f11c": {
+    "A": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 1.0
+    },
+    "C": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 1.5
+    },
+    "contextual_winner": "C"
+  },
+  "242a11a053a20ad4": {
+    "A": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "C"
+  },
+  "c595ca644e7b71a0": {
+    "A": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.5
+    },
+    "C": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 1.5
+    },
+    "contextual_winner": "B"
+  },
+  "5c0cd39009399716": {
+    "A": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "A"
+  },
+  "19aa10cf9e06b712": {
+    "A": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 1.5
+    },
+    "C": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "tie"
+  },
+  "557a895feb21367c": {
+    "A": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 1.5
+    },
+    "contextual_winner": "C"
+  },
+  "1daaf763c87993e1": {
+    "A": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.0
+    },
+    "contextual_winner": "C"
+  },
+  "892bb3ea2fecccf8": {
+    "A": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 1.0
+    },
+    "C": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 1.0
+    },
+    "contextual_winner": "tie"
+  },
+  "7cb173483dede936": {
+    "A": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 1.5
+    },
+    "C": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 1.5
+    },
+    "contextual_winner": "B"
+  },
+  "54827a994cf8bfbc": {
+    "A": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 1.5
+    },
+    "contextual_winner": "A"
+  },
+  "579af3e6526d5aef": {
+    "A": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 2.5,
+      "residual_substance": 1.5
+    },
+    "contextual_winner": "C"
+  },
+  "6de35ed6c087e0e3": {
+    "A": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.0
+    },
+    "contextual_winner": "C"
+  },
+  "7e00cd21b429935a": {
+    "A": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 1.5
+    },
+    "B": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 1.0
+    },
+    "C": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "tie"
+  },
+  "4e5aebb32d1c7709": {
+    "A": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 1.0
+    },
+    "C": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 1.5
+    },
+    "contextual_winner": "B"
+  },
+  "a4a2e74ff5ba65fc": {
+    "A": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "tie"
+  },
+  "6310be9a11e5093e": {
+    "A": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 2.5,
+      "residual_substance": 1.5
+    },
+    "contextual_winner": "C"
+  },
+  "7a90ac1c26221bdf": {
+    "A": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "tie"
+  },
+  "0ee8d59b12bcad40": {
+    "A": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 1.5
+    },
+    "contextual_winner": "A"
+  },
+  "31f24413f60b3d85": {
+    "A": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "C"
+  },
+  "f2a13c5672cb8131": {
+    "A": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "C"
+  },
+  "d199c55bda825fad": {
+    "A": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 2.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 1.0
+    },
+    "contextual_winner": "B"
+  },
+  "d628f00afb5edb10": {
+    "A": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "tie"
+  },
+  "eb995dcbf3df28d9": {
+    "A": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "A"
+  },
+  "98eacc77d8c62fcb": {
+    "A": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.5
+    },
+    "B": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 1.5
+    },
+    "contextual_winner": "A"
+  },
+  "1431ccd9a9f4ea8a": {
+    "A": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 1.5
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 1.5
+    },
+    "C": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "tie"
+  },
+  "75303d290cf3f889": {
+    "A": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 3.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 3.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "B"
+  },
+  "41ecc1147c650426": {
+    "A": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 1.5
+    },
+    "contextual_winner": "A"
+  },
+  "12b3ab6eedb5a43f": {
+    "A": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "B"
+  },
+  "e3f19853b79499ca": {
+    "A": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.5
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 1.0
+    },
+    "C": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "A"
+  },
+  "86804556c0964cc8": {
+    "A": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 1.0
+    },
+    "C": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 1.0
+    },
+    "contextual_winner": "A"
+  },
+  "5c5736d05351d97a": {
+    "A": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 3.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 3.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "B"
+  },
+  "8af067e5d4373e18": {
+    "A": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 1.5
+    },
+    "B": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.0
+    },
+    "contextual_winner": "C"
+  },
+  "b5aebba2f6e8c8e8": {
+    "A": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "B"
+  },
+  "33dfd0025cfdeaa7": {
+    "A": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 1.5
+    },
+    "C": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 1.5
+    },
+    "contextual_winner": "tie"
+  },
+  "93376b7012c4d6e3": {
+    "A": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "B"
+  },
+  "b162ef4a19bf5f2b": {
+    "A": {
+      "non_echo_coherence": 3.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 1.5
+    },
+    "C": {
+      "non_echo_coherence": 4.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "C"
+  },
+  "6356c8b0a7251106": {
+    "A": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 1.5
+    },
+    "C": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "A"
+  },
+  "69346a5685db0b8c": {
+    "A": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "C"
+  },
+  "632857ae6db0e906": {
+    "A": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 2.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "B"
+  },
+  "8fd141dffc488d78": {
+    "A": {
+      "non_echo_coherence": 3.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 3.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "C"
+  },
+  "bbf402421c86f303": {
+    "A": {
+      "non_echo_coherence": 3.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 2.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 3.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "tie"
+  },
+  "cb39244f398dbe73": {
+    "A": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "C"
+  },
+  "5e968225b3df9bb8": {
+    "A": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "tie"
+  },
+  "c730cc25e9359615": {
+    "A": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "tie"
+  },
+  "6e570f3c89a82e15": {
+    "A": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "A"
+  },
+  "1d4bdf4e62c25d02": {
+    "A": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "tie"
+  },
+  "1f5e30e47d3d611c": {
+    "A": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "C"
+  },
+  "fb8c90e5ef64cf59": {
+    "A": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "A"
+  },
+  "c2e7c0ab1e624f27": {
+    "A": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "tie"
+  },
+  "e87cd3a69ed86dac": {
+    "A": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 1.5
+    },
+    "C": {
+      "non_echo_coherence": 2.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "C"
+  },
+  "40359df0a7e20496": {
+    "A": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 1.5
+    },
+    "C": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "tie"
+  },
+  "16c08e2ddf2dc89e": {
+    "A": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "C"
+  },
+  "5089264b3df9997a": {
+    "A": {
+      "non_echo_coherence": 2.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "A"
+  },
+  "5dc07dbcfd04aa47": {
+    "A": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "C"
+  },
+  "031d3e49114df5ba": {
+    "A": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "tie"
+  },
+  "24b61f4f3ccc33ee": {
+    "A": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 1.5
+    },
+    "B": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 1.5
+    },
+    "C": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 1.5
+    },
+    "contextual_winner": "B"
+  },
+  "a9edd50cc2b945a5": {
+    "A": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 1.0
+    },
+    "B": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "tie"
+  },
+  "4ee5bcd7e328c3d4": {
+    "A": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 1.5
+    },
+    "contextual_winner": "tie"
+  },
+  "5c79abf4d4ba76a8": {
+    "A": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 1.5
+    },
+    "B": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 0.0,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "B"
+  },
+  "6bae6019d445244a": {
+    "A": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 1.5
+    },
+    "B": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 1.5
+    },
+    "C": {
+      "non_echo_coherence": 0.5,
+      "residual_substance": 1.5
+    },
+    "contextual_winner": "B"
+  },
+  "97a95eaaaa5da4f3": {
+    "A": {
+      "non_echo_coherence": 1.0,
+      "residual_substance": 2.0
+    },
+    "B": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 2.0
+    },
+    "C": {
+      "non_echo_coherence": 1.5,
+      "residual_substance": 2.0
+    },
+    "contextual_winner": "tie"
+  }
+}
