@@ -42,7 +42,14 @@ explicit = true
 
 [tool.uv.sources]
 jlens = { git = "https://github.com/anthropics/jacobian-lens", rev = "581d398613e5602a5af361e1c34d3a92ea82ba8e" }
-torch = { index = "pytorch-cu128" }
+# Same torch version everywhere; only the build differs. The cu128 index has no
+# macOS wheels, so an unconditional source made `uv sync` fail outright on a Mac
+# and took the CPU-only analysis layer (`rlens stats`, `rlens figures`) down with
+# it. Non-darwin resolves the CUDA build from the pytorch index; darwin falls
+# back to the default index, which ships torch 2.11.0 for arm64.
+torch = [
+    { index = "pytorch-cu128", marker = "sys_platform != 'darwin'" },
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

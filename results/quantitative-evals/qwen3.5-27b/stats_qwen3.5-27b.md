@@ -81,4 +81,4 @@ correctness filter could not run (deviation 7). `intermediate_drop_rate`:
 fraction of intermediates with no single-token surface form (deviation 1).
 
 
-Per-layer Wilson CIs -> results/stats_wilson_qwen3.5-27b.csv
+Per-layer Wilson CIs -> qwen3.5-27b/stats_wilson_qwen3.5-27b.csv

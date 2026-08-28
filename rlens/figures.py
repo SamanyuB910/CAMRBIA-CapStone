@@ -89,7 +89,7 @@ def _mpl():
     plt.rcParams.update({
         "figure.facecolor": SURFACE, "axes.facecolor": SURFACE, "savefig.facecolor": SURFACE,
         "font.size": 9, "axes.titlesize": 10, "axes.labelsize": 9,
-        "axes.titleweight": "semibold", "axes.titlelocation": "left",
+        "axes.titleweight": "bold", "axes.titlelocation": "left",
         "axes.edgecolor": AXIS, "axes.labelcolor": INK_2,
         "xtick.color": MUTED, "ytick.color": MUTED,
         "xtick.labelcolor": INK_2, "ytick.labelcolor": INK_2,
@@ -229,7 +229,7 @@ def fig_per_layer(models: list[dict], *, band_draws: int = 500, seed: int = 0):
     # upper-right: the first-half annotation owns the top-left of panel 1
     axes[0].legend(loc="upper right", ncols=1)
     fig.suptitle(f"pass@{models[0]['k']} by depth: the R-lens separates from the J-lens early",
-                 x=0.006, ha="left", color=INK, fontsize=12, fontweight="semibold")
+                 x=0.006, ha="left", color=INK, fontsize=12, fontweight="bold")
     band_note = f"Bands: 95% item-level bootstrap ({band_draws} draws). " if band_draws else ""
     fig.supxlabel(band_note + "Post's per-layer definition, sets weighted equally. "
                   "All four lenses coincide at the final layer by construction.",
@@ -302,7 +302,7 @@ def fig_headline(models: list[dict], *, draws: int = 2000, seed: int = 0,
     ax.legend(ncols=len(lens_order), loc="upper left", bbox_to_anchor=(0, 1.06))
     ax.set_ylim(0, d[["mean", "hi"]].max().max() * 1.16)
     fig.suptitle("First-half-of-layers mean, with item-bootstrap 95% CIs",
-                 x=0.006, ha="left", color=INK, fontsize=12, fontweight="semibold")
+                 x=0.006, ha="left", color=INK, fontsize=12, fontweight="bold")
     note = f"Error bars: item-level bootstrap, {draws} draws, sets weighted equally."
     if notes:
         note += "  Hatched, no error bar — " + " ".join(notes)
@@ -353,7 +353,7 @@ def fig_per_set(models: list[dict]):
 
     axes[0, 0].legend(loc="upper left", fontsize=7.5)
     fig.suptitle("Per-set curves: the pooled mean hides typo (input echo) and poetry (a flat null)",
-                 x=0.006, ha="left", color=INK, fontsize=12, fontweight="semibold")
+                 x=0.006, ha="left", color=INK, fontsize=12, fontweight="bold")
     return fig
 
 
@@ -408,7 +408,7 @@ def fig_k_sweep(models: list[dict], *, ks=(1, 5, 10, 50), auc_kmax: int = 100):
     ax.legend(loc="upper left", ncols=2, fontsize=8)
 
     fig.suptitle("Two definitions of pass@k, side by side — never mix them",
-                 x=0.006, ha="left", color=INK, fontsize=12, fontweight="semibold")
+                 x=0.006, ha="left", color=INK, fontsize=12, fontweight="bold")
     fig.supxlabel("Left/centre: the POST's per-layer pass@k, first half of layers. "
                   "Right: the PAPER's any-layer pass@k integrated over log k and normalized "
                   "(always-rank-1 = 1), averaged over sets.",
@@ -475,7 +475,7 @@ def fig_diff_forest(models: list[dict], *, draws: int = 2000, seed: int = 0,
                           markerfacecolor=SURFACE, label="hollow / faded: p ≥ 0.05")]
     axes[0].legend(handles=handles, loc="upper right", fontsize=8)
     fig.suptitle("Where the advantage actually lives: paired differences by set",
-                 x=0.006, ha="left", color=INK, fontsize=12, fontweight="semibold")
+                 x=0.006, ha="left", color=INK, fontsize=12, fontweight="bold")
     fig.supxlabel(f"Item-level bootstrap, {draws} draws, 95% CI; p = one-sided share of draws "
                   f"with difference ≤ 0. Shaded rows are the two aggregates; the rest are single "
                   f"sets. R > J holds everywhere it is significant; R > logit does not.",
@@ -567,7 +567,7 @@ def fig_post_models(models: list[dict], *, draws: int = 2000, seed: int = 0,
     ax.legend(ncols=2, loc="upper left", bbox_to_anchor=(0, 1.12), fontsize=8,
               columnspacing=1.6)
     fig.suptitle(f"Mean per-layer pass@{models[0]['k']} by model",
-                 x=0.006, ha="left", color=INK, fontsize=12, fontweight="semibold")
+                 x=0.006, ha="left", color=INK, fontsize=12, fontweight="bold")
     return fig
 
 
@@ -595,13 +595,18 @@ def fig_post_sets(model: dict, *, draws: int = 2000, seed: int = 0,
     ax.legend(ncols=2, loc="upper left", bbox_to_anchor=(0, 1.12), fontsize=8,
               columnspacing=1.6)
     fig.suptitle(f"{model['label']}",
-                 x=0.006, ha="left", color=INK, fontsize=12, fontweight="semibold")
+                 x=0.006, ha="left", color=INK, fontsize=12, fontweight="bold")
     return fig
 
 
 # ---------------------------------------------------------------------------
 # driver
 # ---------------------------------------------------------------------------
+
+# output stem per figure; anything absent falls back to "fig_{name}". The two
+# post-replication charts use short stems (models.png, sets_<model>.png) because
+# they are dropped straight into the writeup, where the caption carries the title.
+FILE_STEM = {"post_models": "models", "post_sets": "sets_{model}"}
 
 FIGURES = {
     "per_layer": "pass@k by depth, four lenses, one panel per model",
@@ -639,7 +644,8 @@ def make_figures(model_names: list[str], out_dir: Path | str, *, which=None, k: 
         if name == "post_sets":                      # one figure per model
             for m in models:
                 fig = fig_post_sets(m, draws=draws, seed=seed, with_control=with_control)
-                path = out_dir / f"sets_{m['model']}.{fmt}"
+                stem = FILE_STEM["post_sets"].format(model=m["model"])
+                path = out_dir / f"{stem}.{fmt}"
                 fig.savefig(path, dpi=dpi, bbox_inches="tight")
                 fig.clf()
                 written.append(path)
@@ -648,7 +654,7 @@ def make_figures(model_names: list[str], out_dir: Path | str, *, which=None, k: 
         if name not in builders:
             raise SystemExit(f"unknown figure {name!r} - choose from {sorted(builders)}")
         fig = builders[name]()
-        path = out_dir / f"fig_{name}.{fmt}"
+        path = out_dir / f"{FILE_STEM.get(name, f'fig_{name}')}.{fmt}"
         fig.savefig(path, dpi=dpi, bbox_inches="tight")
         fig.clf()
         written.append(path)
