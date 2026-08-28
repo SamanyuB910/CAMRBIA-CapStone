@@ -28,8 +28,10 @@ own experiments. The full research plan is in [`plan.md`](plan.md).
 | `rlens/fit.py` | Patch model → official `jlens.fit` → save in the released `lens.pt` format with provenance. |
 | `rlens/analysis.py` | Readout tables / rank trajectories (notebook) and lens-vs-lens agreement metrics (verification). |
 | `rlens/evals.py` | The pass@10 battery (five official eval sets, post protocol): R vs J vs logit lens per layer. |
-| `rlens/cli.py` | The **`rlens` command** — every runnable task: `download`, `smoke`, `fit`, `compare`, `eval`. |
-| `tests/` | The correctness gates, all in `test_rlens.py` (see [Tests](#tests)). |
+| `rlens/stats.py` | **C5** — Wilson CIs, item-level bootstraps, the paired R>J test, both pass@k definitions. CPU; reads the rank parquet, never the model. |
+| `rlens/figures.py` | **C6** — the five figures, drawn from the same `stats` aggregations the tables use. CPU, matplotlib only. |
+| `rlens/cli.py` | The **`rlens` command** — every runnable task: `download`, `smoke`, `fit`, `compare`, `eval`, `stats`, `figures`. |
+| `tests/` | The correctness gates: `test_rlens.py` (rules/fits, needs torch), `test_evals.py`, `test_stats.py` + `test_figures.py` (CPU-only analysis, no torch). |
 | `01_readouts.ipynb` | Released J vs R side by side on the post's example prompts. |
 | `pins.yaml` | **Every pinned version in one file**: packages, git commits, HF revisions, recipe constants. |
 | `pyproject.toml` / `uv.lock` | The Python environment; `uv sync` reproduces it exactly. |
@@ -169,6 +171,21 @@ uv run rlens compare --functional
 # re-run the notebook; it picks up lenses/ours/** automatically as extra columns
 uv run jupyter nbconvert --to notebook --execute --inplace 01_readouts.ipynb
 ```
+
+**The analysis layer needs no GPU and no torch.** `rlens stats` and `rlens figures`
+read only the committed rank parquets, so they run on a laptop with pandas +
+matplotlib (`rlens/__init__.py` and the argument parser both import torch lazily
+for exactly this reason):
+
+```bash
+uv run rlens stats   --model gemma-3-27b-it        # C5 -> stats_*.md + stats_wilson_*.csv
+uv run rlens figures --models qwen3.5-27b gemma-3-27b-it   # C6 -> results/quantitative-evals/figures/
+```
+
+`torch` is still a hard dependency of the project (the fitting/eval layer needs
+it), but it resolves per platform: the CUDA `+cu128` build on Linux/Windows, the
+plain PyPI build on macOS — same version, one `uv sync` everywhere. Before that
+split, `uv sync` failed outright on a Mac and took the analysis layer with it.
 
 **Reading the verdict:** ours-vs-released must land within 1.5× the nf1-vs-nf2 noise
 floor for both lenses (with the exact released draw recovered, expect far below it).
