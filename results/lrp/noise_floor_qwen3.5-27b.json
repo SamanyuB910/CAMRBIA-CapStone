@@ -1,0 +1,12 @@
+{
+  "what": "two 27B J-lenses, n=4 each, disjoint pile-10k draws [0:4) vs [25:29)",
+  "rel_frob_mean": 0.7860963577705045,
+  "rel_frob_max": 1.7990373373031616,
+  "corr_mean": 0.6756377340324463,
+  "corr_min": 0.15193374454975128,
+  "n_layers_compared": 62,
+  "cos_to_released_R_primary_j": 0.7143869433672198,
+  "cos_to_released_R_nf1_j": 0.7717658165962465,
+  "NOISE_FLOOR_on_the_cos_scale": 0.057378873229026794,
+  "half_rule_effect_for_comparison": 0.1853
+}

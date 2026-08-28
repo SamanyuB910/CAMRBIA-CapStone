@@ -1,0 +1,572 @@
+% ---------------------------------------------------------------------------
+% Causal concept onset -- CAMBRIA Capstone, extension experiment 1
+% Build:  pdflatex causal_onset.tex   (twice, for refs)
+% ---------------------------------------------------------------------------
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage[colorlinks=true,linkcolor=blue!50!black,urlcolor=blue!50!black,
+            citecolor=blue!50!black]{hyperref}
+\usepackage{listings}
+\usepackage{enumitem}
+
+\lstset{basicstyle=\ttfamily\footnotesize, breaklines=true,
+        frame=single, framesep=4pt, rulecolor=\color{black!25},
+        backgroundcolor=\color{black!3}, columns=fullflexible}
+
+\newcommand{\jlens}{J\nobreakdash-lens}
+\newcommand{\rlens}{R\nobreakdash-lens}
+\newcommand{\Lread}{L_{\text{read}}}
+\newcommand{\Lcaus}{L_{\text{causal}}}
+
+\title{\textbf{Causal Concept Onset}\\[0.3em]
+       \large Does the \rlens{} surface a concept earlier,\\
+       or merely predict what later layers will compute?}
+\author{CAMBRIA Capstone --- Extension Experiment 1\\ \small Owner: Samanyu}
+\date{August 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent
+The \rlens{} names intermediate concepts at earlier layers than the \jlens. The
+published work treats this as evidence that the concept is \emph{present} earlier.
+But the \jlens{} is by construction a \emph{forward-looking} linear model --- it maps a
+residual state to the model's \emph{final} state --- so an earlier readout is equally
+consistent with the lens having become a better \emph{predictor} of what later layers
+will compute. Readout alone cannot distinguish the two.
+
+We separate them by measuring a second onset: the earliest layer at which
+\emph{intervening} on the lens direction changes the model's answer. We find the
+\rlens{} reads a concept at layer~5 at the cue token where the \jlens{} reads at
+layer~20, but both become causally effective only around layers~20--23. The
+readout-to-causal gap is $15$ layers for R and $3$ for J
+($\text{R}-\text{J} = 12$--$14$ layers, $P(\text{R}{>}\text{J}) \geq 97\%$ across three
+control regimes).
+
+A lens-free control settles the interpretation: cross-prompt activation patching shows
+the cue residual is not causally sufficient until layer~$\ell^\star = 49$. \textbf{Both
+lenses read the concept long before the model can demonstrably use it. The \rlens{}
+is more anticipatory, not earlier-grounded.}
+
+We also quantify self-repair: single-layer ablation understates causal importance by
+roughly $5\times$ at the final token, because later layers recompute the deleted
+direction.
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+% ===========================================================================
+\section{The problem}
+
+\subsection{Why an earlier readout proves nothing on its own}
+
+Both lenses have the form
+\begin{equation}
+  \operatorname{lens}(h_\ell) \;=\; \operatorname{unembed}(J_\ell\, h_\ell),
+  \qquad
+  J_\ell \;=\; \mathbb{E}\!\left[\frac{\partial h_{\text{final}}}{\partial h_\ell}\right].
+\end{equation}
+$J_\ell$ is fitted to map layer~$\ell$ onto the \emph{final} residual state. It is a
+predictor of the model's endpoint, not a description of layer~$\ell$'s contents.
+
+So when the \rlens{} names ``Brazil'' at layer~5 and the \jlens{} does not until
+layer~20, there are two incompatible readings:
+
+\begin{center}
+\begin{tabular}{@{}p{0.45\textwidth}p{0.45\textwidth}@{}}
+\toprule
+\textbf{(A) Earlier presence} & \textbf{(B) Better prediction} \\
+\midrule
+The concept genuinely enters the residual stream at layer~5, and the \jlens{} is too
+blunt to detect it. The \rlens{} is a better \emph{instrument}. &
+The concept is not there at layer~5. The \rlens{} has become better at extrapolating
+what layers~6--20 are \emph{going to} compute. The \rlens{} is a better
+\emph{forecaster}. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+Both predict exactly the same readout curves. No amount of additional readout
+measurement separates them. The distinction matters because interpretability claims
+built on lens readouts --- ``the model has decided X by layer~5'' --- are only valid
+under~(A).
+
+\subsection{The discriminating measurement}
+
+Interventions break the tie. If the concept is causally present at layer~5, then
+perturbing its direction there should change the model's answer. If the lens is merely
+forecasting, the direction at layer~5 carries no causal weight and perturbing it
+changes nothing.
+
+We therefore define two onsets per (item, lens):
+
+\begin{description}[leftmargin=1.4em,style=nextline]
+\item[Readout onset $\Lread$] the earliest layer at which the concept enters the lens
+  top-$k$ at the readout position.
+\item[Causal onset $\Lcaus$] the earliest layer at which intervening on the lens
+  direction changes the model's downstream answer --- requiring \emph{both} necessity
+  and sufficiency (Section~\ref{sec:measurements}).
+\end{description}
+
+\noindent
+and study the gap $\text{gap} = \Lcaus - \Lread$.
+
+\medskip
+\noindent\fbox{\begin{minipage}{0.97\textwidth}
+\textbf{Pre-registered logic.} If the \rlens's readout onset is earlier than the
+\jlens's \emph{and its causal onset moves earlier with it}, the \rlens{} genuinely
+surfaces concepts earlier (reading A). If readout moves earlier but causal onset does
+not, the early readout is predictive, not causal (reading B), and the improvement is a
+better decoder rather than earlier presence.
+\end{minipage}}
+
+% ===========================================================================
+\section{Design}
+
+\subsection{Model and data}
+
+Qwen3.5-27B, 63 layers analysed, released \jlens{}/\rlens{} pair. 52 items with clean
+intermediate$\to$target structure (multihop plus 24 relational categories:
+city-capital, element-symbol, river-capital, and so on). Threshold $\rho = 0.2$,
+persistence window $w = 2$ (an onset must hold for $w$ consecutive layers, so a
+single noisy layer cannot declare an onset).
+
+\subsection{Two intervention sites}
+
+Every measurement is taken at both:
+
+\begin{itemize}[leftmargin=1.4em]
+  \item \textbf{the cue token} --- where the intermediate concept is introduced (e.g.\
+        ``the Amazon River''). This is where the concept should first exist.
+  \item \textbf{the final token} --- where the answer is produced.
+\end{itemize}
+
+\noindent
+The distinction is essential: reading a concept at the final token conflates
+``the concept is here'' with ``the model has already retrieved it to answer''.
+
+\subsection{Three measurements}
+\label{sec:measurements}
+
+\begin{description}[leftmargin=1.4em,style=nextline]
+\item[Measurement A --- readout.] Where does the lens \emph{name} the intermediate?
+  Per-layer rank of the concept's surface forms in the lens top-$k$.
+
+\item[Measurement B --- necessity.] Does \emph{removing} the direction hurt the answer?
+  Project the lens direction out of the residual; measure the log-prob drop of the
+  correct answer, as \emph{excess over a norm-matched random ablation}.
+
+\item[Measurement C --- sufficiency.] Does \emph{swapping} the direction redirect the
+  answer? Replace the concept's direction with a different concept's (Brazil$\to$France)
+  and test whether the answer follows (Portuguese$\to$French).
+\end{description}
+
+\noindent
+Causal onset requires \textbf{both} B and C. Necessity alone is satisfied by any
+direction the model happens to depend on; sufficiency alone can be produced by a
+large enough push in any direction. Their conjunction is what identifies a concept
+that is genuinely in use.
+
+\subsection{Controls}
+
+\begin{longtable}{@{}p{0.28\textwidth}p{0.66\textwidth}@{}}
+\toprule
+\textbf{Control} & \textbf{What it rules out} \\
+\midrule \endhead
+Norm-matched random ablation & Generic damage from perturbing the residual at all.
+  Every curve is reported as excess over this. \\
+\addlinespace
+Wrong-concept ablation & Concept-specificity. Ablating an unrelated concept's
+  direction should do nothing. \\
+\addlinespace
+Answer-direction ablation & An upper reference: ablating the \emph{answer} direction
+  should be devastating, confirming the intervention machinery works. \\
+\addlinespace
+\texttt{eqnorm} regime & Cross-lens differences caused by push \emph{size} rather than
+  push \emph{direction}. R and J lens vectors have different norms
+  (Section~\ref{sec:pushsize}). \\
+\addlinespace
+\texttt{band} regime & Self-repair. Intervene at every layer $0..\ell$ rather than at
+  $\ell$ alone. \\
+\addlinespace
+Self-patch drift & Numerical noise in the patching pipeline: patching a prompt with
+  \emph{itself} must be a no-op. \\
+\addlinespace
+Swap-pair conditioning & Ill-conditioned swaps. We log the cosine and condition number
+  $\kappa$ of every swap pair. \\
+\bottomrule
+\end{longtable}
+
+\subsection{Three regimes, all of which must agree}
+
+Results are reported under \texttt{raw} (pre-registered primary), \texttt{eqnorm}
+(equalised push size), and \texttt{band} (repair-robust). A finding that appears in
+only one regime is not reported as a finding.
+
+% ===========================================================================
+\section{Interventions: the mathematics, and one serious bug}
+
+\subsection{Ablation}
+
+Project the unit lens direction $\hat{v}_c$ out of the residual:
+$h' = h - (h \cdot \hat{v}_c)\,\hat{v}_c$. Applied in three modes:
+single-layer ($\ell$ only), persistent ($\ell \to \text{end}$), and band
+($0 \to \ell$).
+
+\subsection{The swap, and why the natural formulation is unusable}
+
+The reference formulation uses pinv coordinates: $z = V^{+}h$, then
+$h' = h + \alpha V(\Pi z - z)$ where $\Pi$ exchanges two coordinates.
+
+\medskip
+\noindent\fbox{\begin{minipage}{0.97\textwidth}
+\textbf{This is an exact involution:} $\operatorname{swap}(\operatorname{swap}(h)) = h$.
+Applying it across a band of layers therefore \emph{undoes itself} on every second
+layer. The symptom was diagnostic and initially baffling: band-swap produced a
+\emph{weaker} effect ($1.9\%$) than single-layer swap ($11.5\%$), which is backwards ---
+intervening at more layers cannot do less.
+\end{minipage}}
+
+\medskip
+\noindent
+The fix is to make the operation idempotent by \emph{clamping} rather than adding.
+\texttt{make\_clamp\_swap} sets the two lens coordinates to their swapped \emph{clean}
+values, so re-application is a no-op:
+
+\begin{lstlisting}[language=Python]
+def make_clamp_swap(v_c, v_cp, h_clean, alpha=1.0, ridge=0.0):
+    """Clamp the two lens coordinates to their swapped CLEAN values.
+
+    Idempotent by construction, so it is safe to apply across a band. The
+    plain pinv swap must NOT be used that way -- it is an exact involution
+    (swap(swap(h)) == h), so a band undoes itself every second layer.
+    """
+\end{lstlisting}
+
+\noindent
+With the clamp swap, band-swap gives $34.6\%$ (R) / $25.0\%$ (J) --- now correctly
+\emph{stronger} than single-layer.
+
+We additionally implemented the bisector reflection $h - 2(h\cdot\hat{u})\hat{u}$ with
+$\hat{u} \propto \hat{v}_s - \hat{v}_t$, recommended by the community repository
+because same-category lens vectors have cosine $0.5$--$0.75$ and the pinv form is
+ill-conditioned. $\alpha = 1$ is the exact swap; $\alpha = 2$ is \emph{not} ``double
+strength'' and must not be used.
+
+\subsection{Lens-free activation patching}
+
+The strongest control uses no lens at all. Replace the receiver's cue activation
+\emph{wholesale} with a donor prompt's, and find $\ell^\star$, the earliest layer at
+which this redirects the answer. Because it involves no direction and no lens,
+$\ell^\star$ is a \emph{ceiling}: no direction-based causal onset may legitimately
+precede it.
+
+% ===========================================================================
+\section{Results}
+
+\subsection{Self-repair: single-layer ablation is misleading}
+
+\begin{center}
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+\textbf{27B, cue token, R-lens} & \textbf{L0--21} & \textbf{L22--42} & \textbf{L43--63} \\
+\midrule
+single-layer (\texttt{N})         & 0.003 & 0.029 & 0.004 \\
+persistent $\ell\to$end (\texttt{N\_persist}) & \textbf{0.124} & 0.069 & 0.005 \\
+band $0\to\ell$ (\texttt{N\_band})            & 0.005 & 0.068 & \textbf{0.118} \\
+\midrule
+\emph{wrong-concept control}      & 0.005 & 0.005 & 0.001 \\
+\emph{answer-direction reference} & 0.053 & 0.038 & 0.010 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+At L0--21 single-layer ablation gives $0.003$ --- essentially nothing --- while
+persistent ablation over the same layers gives $0.124$, roughly $40\times$ larger. At
+the final token the effect is starker still: single-layer $\approx 0.01$ against
+persistent $0.68$--$0.73$, a masking factor of about $5\times$ in the bands that
+matter.
+
+\medskip
+\noindent\fbox{\begin{minipage}{0.97\textwidth}
+\textbf{Finding.} Deleting a concept direction at one layer does almost nothing,
+because later layers recompute it. Any necessity measurement performed one layer at a
+time will conclude the concept is not used --- and be wrong. This is a methodological
+hazard for lens-intervention work generally.
+\end{minipage}}
+
+\noindent
+The wrong-concept control stays flat at $0.005/0.005/0.001$, confirming the effect is
+concept-specific rather than generic damage. The answer-direction reference at the
+final token reaches $\approx 10.2$, confirming the machinery can detect a large effect
+when one exists.
+
+\subsection{The payoff: readout-to-causal gap at the cue}
+
+\begin{center}
+\begin{tabular}{@{}lrrrlll@{}}
+\toprule
+\textbf{Regime} & \textbf{R} & \textbf{J} & \textbf{R $-$ J} & \textbf{95\% CI} & \textbf{$P(R{>}J)$} & \textbf{defined} \\
+\midrule
+\texttt{raw}    & 15 & 3 & \textbf{12} & $(0, 14)$ & 97.3\% & 100\% \\
+\texttt{eqnorm} & 17 & 3 & \textbf{14} & $(2, 16)$ & 99.5\% & 100\% \\
+\texttt{band}   & 18 & 5 & \textbf{13} & $(1, 15)$ & 98.8\% & 100\% \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+All three regimes agree. The \rlens's readout runs $12$--$14$ layers ahead of its own
+causal onset; the \jlens's runs only $3$--$5$ ahead.
+
+Underlying onsets at $\rho = 0.2$: R reads at layer~$5$ and becomes causal at
+layer~$20$; J reads at layer~$20$ and becomes causal at layer~$23$.
+
+\medskip
+\noindent
+\textbf{This is reading (B).} The \rlens's readout advantage of $15$ layers at the cue
+buys only $3$ layers of earlier causal onset. The rest is anticipation.
+
+\subsection{The lens-free ceiling}
+
+\begin{center}
+\begin{tabular}{@{}ll@{}}
+\toprule
+$\ell^\star$ (earliest causally sufficient cue layer) & \textbf{49.0}, 95\% CI $(49.0, 49.0)$, 54 pairs \\
+top-1 flip rate to donor's answer & 22.7\% \\
+self-patch drift (must be $\approx 0$) & mean 0.009, worst layer 0.021 \\
+offset (last layer still flipping) & 63.0 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+Then:
+\begin{itemize}[leftmargin=1.4em]
+  \item R: $\Lread = 5$ vs $\ell^\star = 49$ $\Rightarrow$ reads \textbf{44 layers}
+        before the information is demonstrably usable.
+  \item J: $\Lread = 20$ vs $\ell^\star = 49$ $\Rightarrow$ reads \textbf{29 layers}
+        before.
+\end{itemize}
+
+\medskip
+\noindent\fbox{\begin{minipage}{0.97\textwidth}
+\textbf{Both lenses are anticipatory.} This is the strongest result in the experiment
+because it uses no lens: the cue's residual simply is not causally sufficient until
+layer~49, so \emph{no} direction-based readout at layer~5 can reflect a concept the
+model is already using. The \rlens{} is more anticipatory than the \jlens, not more
+grounded.
+\end{minipage}}
+
+\subsection{Read/write asymmetry}
+
+Comparing intervention strengths at the final token ($\ell^\star = 49$, cue offset 47):
+
+\begin{center}
+\begin{tabular}{@{}lr@{}}
+\toprule
+\textbf{Intervention} & \textbf{Answers flipped} \\
+\midrule
+whole-vector patch (lens-free) & \textbf{100\%} \\
+clamped band swap (lens direction, $0\to\ell$) & 35\% \\
+single-layer swap (lens direction) & $\sim$11\% \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+The lens direction is a genuine but \emph{partial} handle on the computation:
+replacing the whole activation always works, replacing only the lens-identified
+direction works about a third of the time. Concepts are readable along the lens
+direction more easily than they are writable along it.
+
+\subsection{Sensitivity to the threshold}
+
+\begin{center}
+\begin{tabular}{@{}lrrrrrr@{}}
+\toprule
+ & \textbf{R.$\Lread$} & \textbf{R.$\Lcaus$} & \textbf{R.gap} & \textbf{J.$\Lread$} & \textbf{J.$\Lcaus$} & \textbf{J.gap} \\
+\midrule
+$\rho = 0.1$ & 5 & 19 & 14 & 10 & 22 & 12 \\
+$\rho = 0.2$ & 5 & 20 & 15 & 20 & 23 & \phantom{0}3 \\
+$\rho = 0.3$ & 8 & 22 & 14 & 20 & 23 & \phantom{0}3 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+The R gap is stable ($14$--$15$) across thresholds. The J gap is \emph{not}
+($12 \to 3$): at $\rho = 0.1$ the \jlens{} reads at layer~10, at $\rho = 0.2$ at
+layer~20. The headline $\text{R}-\text{J}$ difference therefore depends partly on
+where the \jlens's readout threshold falls, and the $\rho = 0.1$ row is the
+conservative one to quote.
+
+\subsection{Per-category variation}
+
+\begin{center}
+\begin{tabular}{@{}lrrrrrr@{}}
+\toprule
+\textbf{Category} & \textbf{R.$\Lread$} & \textbf{R.$\Lcaus$} & \textbf{R.gap} & \textbf{J.$\Lread$} & \textbf{J.$\Lcaus$} & \textbf{J.gap} \\
+\midrule
+multihop         &  9 & 22 & 13 & 22 & 22 & \phantom{0}0 \\
+city-capital     &  8 & 22 & 14 & 22 & 23 & \phantom{0}1 \\
+person-firstname & 22 & 24 & \phantom{0}2 & 23 & 26 & \phantom{0}3 \\
+language-capital &  5 & 41 & 36 &  9 & 41 & 32 \\
+city-continent   &  3 & 27 & 24 &  7 & 29 & 22 \\
+city-language    &  5 & 21 & 16 &  6 & 35 & 29 \\
+element-state    & 22 & 25 & \phantom{0}3 & 23 & 29 & \phantom{0}6 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+The gap is highly category-dependent. \texttt{language-capital} shows a $36$-layer R
+gap; \texttt{person-firstname} shows $2$. The aggregate is not a uniform property of
+the lens.
+
+% ===========================================================================
+\section{Caveats}
+
+\subsection{Push sizes are not matched in the primary regime}
+\label{sec:pushsize}
+
+R and J lens vectors have systematically different norms:
+
+\begin{center}
+\begin{tabular}{@{}lrrrrrr@{}}
+\toprule
+$\|\delta h\|$ & \multicolumn{3}{c}{\textbf{ablate}} & \multicolumn{3}{c}{\textbf{swap}} \\
+\cmidrule(lr){2-4}\cmidrule(lr){5-7}
+ & J & R & logit & J & R & logit \\
+\midrule
+L0--21  & 1.69 & 2.25 & 0.63 & 2.30 & 3.00 & 1.35 \\
+L22--42 & 9.25 & 8.96 & 2.55 & 11.90 & 11.67 & 4.45 \\
+L43--63 & 16.61 & 16.02 & 10.69 & 21.88 & 21.24 & 15.16 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+In early layers the R push is $\sim33\%$ larger, which could by itself produce an
+earlier causal onset. This is why the \texttt{eqnorm} regime exists --- and the result
+is \emph{stronger} there ($\text{R}-\text{J} = 14$), so push size is not driving it.
+
+\subsection{Swap conditioning}
+
+Swap-pair cosines average $0.26$ (J) / $0.24$ (R) with $\kappa \approx 1.35$, across
+3276 pairs. Well-conditioned on average, but the distribution reaches cosine $0.69$,
+where a swap is close to a no-op.
+
+\subsection{Integer onsets and bootstrap CIs}
+
+Onsets are integers, so percentile CIs sit on mass points and are lumpy. The raw
+bootstrap histogram of $\text{R}-\text{J}$ is bimodal, with mass at $0$--$3$ and a
+larger cluster at $8$--$14$. The point estimate of $12$ sits in the upper mode; the CI
+lower bound of $0$ reflects the smaller mode. Quoting $P(\text{R}{>}\text{J}) = 97.3\%$
+alongside the CI is more informative than the CI alone.
+
+\subsection{Sample size and scope}
+
+52 items, one model, one prompt style. \texttt{multihop} is the only set with a
+naturally clean intermediate$\to$target structure; the other categories were
+constructed. No 4B replication of the causal-onset result exists --- 4B swap success is
+known to be weak ($\sim13/81$ in the reference implementation), which is why the effect
+model was used.
+
+\subsection{What is \emph{not} claimed}
+
+\begin{itemize}[leftmargin=1.4em]
+  \item That the \rlens{} is worse. It reads earlier and reads more; the finding is
+        about what that readout \emph{means}.
+  \item That concepts are absent at layer~5. Absence of demonstrated causal effect is
+        not proof of absence --- an effect below our detection threshold remains
+        possible.
+  \item That $\ell^\star = 49$ is the layer where the concept ``appears''. It is the
+        earliest layer where a \emph{whole-activation} replacement redirects the
+        answer, a strictly stronger intervention.
+\end{itemize}
+
+% ===========================================================================
+\section{Things we got wrong}
+
+\begin{description}[leftmargin=1.4em,style=nextline]
+\item[The pinv swap is an involution.] Described in Section~3.2. Caught only because
+  band-swap was \emph{weaker} than single-layer swap, which is impossible. Had the
+  numbers merely looked plausible, this would have silently invalidated every band
+  result.
+
+\item[\texttt{-{}-at-cue} was not actually applied.] \texttt{runner.run()} received
+  \texttt{item.t\_i} instead of \texttt{pos\_i}, so the cue-site experiment was a
+  byte-identical rerun of the final-token one. Detected by noticing that iteration~4
+  reproduced iteration~3 exactly. We then confirmed the fix by verifying the test
+  \emph{fails} without it --- checking that a regression test can actually fail is the
+  step most often skipped.
+
+\item[NaN poisoning in onset detection.] \texttt{\_onset} used \texttt{.max()} on arrays
+  containing NaN, silently propagating. Replaced with \texttt{np.nanmax} plus a
+  finite-window check, and verified red-without-fix.
+
+\item[bf16 non-determinism from batch shape.] Identical inputs gave margin drifts of
+  $6.25\times10^{-2}$ depending on batch shape. Fixed by padding chunks to a constant
+  batch shape and referencing every effect to an in-batch identity condition. Residual
+  drift is now exactly $0.00$.
+
+\item[\texttt{git checkout -{}- .} destroyed 2.3\,h of results.] Replaced with a sync
+  script that resets code paths only.
+\end{description}
+
+\subsection{What we would do differently}
+
+\begin{enumerate}[leftmargin=1.4em]
+  \item Run the lens-free patching control \emph{first}. $\ell^\star = 49$ reframes
+        every lens-based number, and it is cheaper than the full sweep.
+  \item Pre-register the threshold. The J gap moves from $12$ to $3$ between
+        $\rho = 0.1$ and $\rho = 0.2$; choosing $\rho$ after seeing results would be
+        a researcher degree of freedom.
+  \item Match push norms in the primary regime rather than as a secondary control.
+  \item Expand beyond 52 items, and report per-category results as primary given how
+        much variation they show.
+\end{enumerate}
+
+% ===========================================================================
+\section{Reproduction}
+
+\begin{lstlisting}[language=bash]
+git checkout causal-onset
+uv sync && uv run rlens download --experiment-models
+uv run pytest                       # intervention math has its own tests
+
+# final-token site
+uv run rlens onset --model qwen3.5-27b
+
+# cue site (the primary analysis)
+uv run rlens onset --model qwen3.5-27b --at-cue
+
+# figures
+uv run rlens figures --model qwen3.5-27b
+\end{lstlisting}
+
+\paragraph{Artifacts.}
+\texttt{results/onset\_qwen3.5-27b.md} (final token),
+\texttt{results/onset\_qwen3.5-27b\_cue.md} (cue site, primary),
+\texttt{results/onset\_records\_*.parquet} (per-item records),
+\texttt{results/patch\_records\_*.parquet} (patching),
+\texttt{results/figures\_qwen3.5-27b.html} (all measurements with SEM ribbons).
+
+\paragraph{Key code.}
+\texttt{rlens/onset.py}: \texttt{make\_ablation}, \texttt{make\_pinv\_swap},
+\texttt{make\_clamp\_swap}, \texttt{make\_reflection\_swap}, \texttt{make\_patch},
+\texttt{EditRunner}, \texttt{build\_dataset}, \texttt{run\_measurements},
+\texttt{analyze}, \texttt{build\_patch\_pairs}, \texttt{run\_patching}.
+
+\end{document}

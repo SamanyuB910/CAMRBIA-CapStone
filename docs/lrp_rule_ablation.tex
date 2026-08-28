@@ -1,0 +1,745 @@
+% ---------------------------------------------------------------------------
+% LRP per-rule ablation -- CAMBRIA Capstone, extension experiment 2
+% Build:  pdflatex lrp_rule_ablation.tex   (twice, for refs)
+% ---------------------------------------------------------------------------
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage[colorlinks=true,linkcolor=blue!50!black,urlcolor=blue!50!black,
+            citecolor=blue!50!black]{hyperref}
+\usepackage{listings}
+\usepackage{enumitem}
+
+\lstset{basicstyle=\ttfamily\footnotesize, breaklines=true,
+        frame=single, framesep=4pt, rulecolor=\color{black!25},
+        backgroundcolor=\color{black!3}, columns=fullflexible}
+
+\newcommand{\jlens}{J\nobreakdash-lens}
+\newcommand{\rlens}{R\nobreakdash-lens}
+\newcommand{\cfg}[1]{\texttt{#1}}
+
+\title{\textbf{Which LRP Rule Carries the \rlens?}\\[0.3em]
+       \large A per-rule ablation of the three stop-gradient rules\\
+       that separate the \rlens{} from the \jlens}
+\author{CAMBRIA Capstone --- Extension Experiment 2}
+\date{August 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent
+The \rlens{} improves on the \jlens{} by installing three layer-wise relevance
+propagation (LRP) stop-gradient rules before fitting. The original work reports the
+combined effect and never separates the rules, and its fitting code was never
+released. We rebuilt the fitting harness, verified it reproduces the released
+artifacts, and fitted a lens for each of the eight subsets of the three rules on two
+models under an otherwise identical recipe.
+
+\textbf{Result.} Only the \emph{half-rule} contributes. It recovers $53\%$ of the
+full \rlens{} advantage on Qwen3.5\nobreakdash-27B and $112\%$ on
+Qwen3.5\nobreakdash-4B. The \emph{LN-rule} alone scores \emph{below} the \jlens{}
+baseline on both models. The \emph{identity-rule} has no reliable effect --- it
+changes sign between models.
+
+\textbf{Secondary result.} Weight-space similarity to the released \rlens{} fails to
+predict lens quality. Two arms are mispredicted in \emph{sign}. We report this
+separately because, unlike the attribution itself, it does not depend on corpus size.
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+% ===========================================================================
+\section{The problem}
+
+\subsection{What the \rlens{} is}
+
+The \jlens{} approximates the map from an intermediate residual stream state to the
+model's final state by its average input--output Jacobian,
+\begin{equation}
+  J_\ell \;=\; \mathbb{E}_{x,t}\!\left[\frac{\partial h_{\text{final}}}{\partial h_\ell}\right],
+  \qquad
+  \operatorname{lens}(h) \;=\; \operatorname{unembed}(J_\ell\, h),
+\end{equation}
+with the expectation taken over prompts $x$ and token positions $t$ from a
+pretraining-like corpus.
+
+The \rlens{} changes nothing about this definition. It changes the \emph{gradients}
+the expectation is taken over, by installing three LRP stop-gradient rules into the
+backward pass before fitting. The forward pass is bit-identical; only $\partial
+h_{\text{final}}/\partial h_\ell$ differs.
+
+\subsection{The three rules}
+
+\begin{longtable}{@{}p{0.16\textwidth}p{0.34\textwidth}p{0.42\textwidth}@{}}
+\toprule
+\textbf{Rule} & \textbf{What it changes} & \textbf{Motivation} \\
+\midrule
+\endhead
+\cfg{ln\_rule} & Detach the RMSNorm normalizer, so gradient does not flow through the
+  normalization scale factor. & Treats normalization as a fixed rescaling rather than
+  a function of the input. \\
+\addlinespace
+\cfg{identity\_rule} & Replace the SiLU backward with $\sigma(x)$, i.e.\ treat
+  $\mathrm{SiLU}(x)$ as locally $x \cdot \sigma(x)$ with $\sigma$ constant. & Removes
+  the derivative-of-gate term, an LRP-style ``identity'' relevance assignment. \\
+\addlinespace
+\cfg{half\_rule} & Split the SwiGLU product gradient $50/50$ between its two factors
+  ($\beta = 0.5$). & Distributes relevance evenly across a multiplicative
+  interaction, rather than by local partial derivative. \\
+\bottomrule
+\end{longtable}
+
+\subsection{The question, and why nobody could answer it}
+
+The published work reports the \rlens{} as a package. Three rules go in, one improved
+lens comes out, and the contribution of each is unknown. Answering this requires
+fitting lenses with each rule subset --- which requires fitting code that was never
+released. Only the final \emph{weights} were published.
+
+This is the gap the experiment fills: eight lenses per model, one per subset of
+$\{\text{ln}, \text{identity}, \text{half}\}$, fitted on identical prompts with an
+identical recipe, so that any difference is attributable to the rules alone.
+
+% ===========================================================================
+\section{Prerequisite: rebuilding and verifying the fitting harness}
+
+Every result below is downstream of one question: \emph{does our reimplementation of
+the fitting procedure actually reproduce theirs?} If not, the sweep measures
+properties of our bug rather than properties of the rules.
+
+\subsection{Recovering the recipe}
+
+The released artifacts carry provenance metadata, which we extracted rather than
+guessed. All four released lenses (4B and 27B, \jlens{} and \rlens) record:
+
+\begin{center}
+\begin{tabular}{@{}ll@{}}
+\toprule
+\texttt{dataset\_id}   & \texttt{NeelNanda/pile-10k} \\
+\texttt{n\_prompts}    & \textbf{25} \\
+\texttt{docs\_consumed}& 25 \\
+\texttt{t\_max}        & 128 tokens \\
+\texttt{skip\_first}   & 4 positions \\
+\texttt{target\_layer} & 30 (4B) / 62 (27B), i.e.\ penultimate \\
+\texttt{weighting}     & uniform \\
+\texttt{corpus\_mode}  & pretrain \\
+\texttt{git\_commit}   & \texttt{"modal"} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+We further inferred the prompt rows: \texttt{docs\_consumed == n\_prompts} implies no
+documents were skipped, so the draw is pile-10k rows $[0,25)$.
+
+We also verified that the released files append $J_{\text{target}} = I$ exactly
+($\|J_{30} - I\|_F = 0$ in both released 4B lenses) and mirrored that.
+
+\subsection{Bit-exactness of the patched forward}
+
+Because the rules only alter the backward pass, the patched forward must be
+unchanged. We verified max logit difference $= 0.0$ across all eight rule
+combinations on the real model.
+
+One implementation subtlety: the naive identity-rule form
+\texttt{x * torch.sigmoid(x).detach()} differs from the fused \texttt{F.silu} by
+roughly one ulp, which we measured at $2.3\times10^{-5}$ on final fp32 logits of the
+4B model. We therefore implemented it as a custom autograd function whose forward
+calls \texttt{F.silu} and whose backward returns $\sigma(x)$, giving an exactly
+unchanged forward:
+
+\begin{lstlisting}[language=Python]
+class SiluWithSigmoidGrad(torch.autograd.Function):
+    @staticmethod
+    def forward(ctx, x):
+        ctx.save_for_backward(x)
+        return torch.nn.functional.silu(x)      # fused: forward is exact
+    @staticmethod
+    def backward(ctx, grad_output):
+        (x,) = ctx.saved_tensors
+        return grad_output * torch.sigmoid(x)   # the LRP identity rule
+\end{lstlisting}
+
+\subsection{The verification, and why it needs a noise floor}
+
+Comparing our fitted lens to the released one requires knowing what agreement to
+expect. An absolute tolerance is meaningless here, because two lenses fitted with
+\emph{identical code} on \emph{different prompt draws} already disagree
+substantially. So we measured that disagreement and used it as the bar.
+
+\begin{center}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+\textbf{Comparison (4B, per-layer mean)} & \textbf{rel\_frob} & \textbf{corr} \\
+\midrule
+ours-R vs released-R                     & \textbf{0.0742} & 0.9961 \\
+ours-J vs released-J                     & \textbf{0.1754} & 0.9737 \\
+\emph{noise floor}: J-nf1 vs J-nf2       & \emph{0.3067}   & \emph{0.9405} \\
+\emph{context}: released J vs released R & \emph{0.4470}   & \emph{0.8855} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+where $\mathrm{rel\_frob} = \|A - B\|_F / \|B\|_F$, and the appended identity layer is
+excluded.
+
+Both of our lenses land \emph{under} the noise floor: our reimplementation differs
+from theirs by less than two runs of the same code differ from each other. The last
+row is the control in the other direction --- released J vs released R sit at 0.4470,
+confirming the metric has the resolution to see a real difference when one exists.
+Without it, small numbers everywhere could simply mean the metric is blind.
+
+Behaviourally, on the full 496-item battery: ours-J $0.080$ vs released-J $0.082$;
+ours-R $0.096$ vs released-R $0.098$ --- agreement to $0.002$.
+
+\medskip
+\noindent\fbox{\begin{minipage}{0.97\textwidth}
+\textbf{Verdict: PASS.} The rebuilt fitting harness reproduces the released
+artifacts. Everything downstream is licensed by this.
+\end{minipage}}
+
+% ===========================================================================
+\section{Experimental design}
+
+\subsection{The factorial}
+
+Eight arms, one per subset of the three rules:
+
+\begin{center}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+\textbf{Arm} & \cfg{ln} & \cfg{identity} & \cfg{half} \\
+\midrule
+\cfg{j} (baseline) & --- & --- & --- \\
+\cfg{ln} & \checkmark & --- & --- \\
+\cfg{identity} & --- & \checkmark & --- \\
+\cfg{half} & --- & --- & \checkmark \\
+\cfg{ln+identity} & \checkmark & \checkmark & --- \\
+\cfg{ln+half} & \checkmark & --- & \checkmark \\
+\cfg{identity+half} & --- & \checkmark & \checkmark \\
+\cfg{r} (full \rlens) & \checkmark & \checkmark & \checkmark \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The endpoints \cfg{j} and \cfg{r} are the \jlens{} and \rlens{} respectively, which
+gives the design two built-in sanity checks: \cfg{j} must reproduce our verified
+\jlens, and \cfg{r} must land closest to the released \rlens.
+
+\subsection{Controls}
+
+\begin{itemize}[leftmargin=1.4em]
+  \item \textbf{Identical prompts.} Every arm uses the same pile-10k rows, the same
+        \texttt{t\_max}, the same \texttt{skip\_first}. The rules change the backward
+        pass, not the data.
+  \item \textbf{Identical recipe.} Same target layer, same estimator, same dtype.
+  \item \textbf{Provenance verification.} Each fitted lens must carry the
+        \texttt{config\_json} of the arm it is named for. A mislabelled sweep is the
+        cheapest way to obtain a confidently wrong answer, so this is checked rather
+        than assumed. All arms verified: correct \texttt{config\_json}, one shared
+        fit commit, one shared prompt set.
+  \item \textbf{Ordering for graceful degradation.} Single rules first
+        ($\text{j} \to \text{ln} \to \text{identity} \to \text{half}$), then pairs,
+        then the full lens. The single rules answer the headline question, so a
+        truncated sweep still yields a coherent result.
+\end{itemize}
+
+\subsection{Two independent readouts}
+
+\begin{enumerate}[leftmargin=1.4em]
+  \item \textbf{Behavioural} --- pass@10 on the five official eval sets (multihop,
+        multilingual, association, typo, poetry), per layer, with the correctness
+        filter. This is the metric the original work reports.
+  \item \textbf{Weight-space} --- per-layer cosine of each arm's $J_\ell$ against the
+        released \rlens. Requires no eval at all.
+\end{enumerate}
+
+\noindent
+We originally treated agreement between these as what makes an attribution credible.
+Section~\ref{sec:discordance} reports that this expectation was wrong, which is
+itself one of the findings.
+
+% ===========================================================================
+\section{Execution: what the runs actually cost}
+
+\subsection{Calibration (measured, not estimated)}
+
+Fitting cost scales with $d_{\text{model}} \times \text{params}$. We measured rather
+than extrapolated:
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Setting} & \textbf{Result} & \textbf{Note} \\
+\midrule
+\cfg{dim\_batch=8}  & 647 s/prompt, 99{,}209 MiB & measured on H200 143\,GB \\
+\cfg{dim\_batch=16} & not attempted & would need $\sim$90\,GB activations; exceeds card \\
+\cfg{dim\_batch=32} & not attempted & $\sim4\times$ the \cfg{dim\_batch=8} footprint \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+The $99$\,GB at \cfg{dim\_batch=8} is $54$\,GB of model plus $\sim45$\,GB of
+activations, leaving no room to double the batch. This forced the 27B prompt count
+down to $n=4$: $8\ \text{configs} \times 4\ \text{prompts} \times 647\,\text{s}
+\approx 5.75$\,h.
+
+\subsection{What completed}
+
+\begin{center}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+\textbf{Model} & \textbf{Arms fitted} & \textbf{$n$} & \textbf{pass@10} \\
+\midrule
+Qwen3.5-4B  & 7 of 8 (missing \cfg{identity+half}) & 25 (= released recipe) & all arms \\
+Qwen3.5-27B & 7 of 8 (missing \cfg{r})             & 4                      & all arms, 388 items \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+Neither model is individually complete, though between them all eight configurations
+were fitted at least once. The 4B arm is the scientifically stronger one: $n=25$ is
+\emph{exactly} the released recipe, against a baseline that provably reproduces the
+published artifact.
+
+% ===========================================================================
+\section{Results}
+
+\subsection{The effect being attributed}
+
+Before asking which rule causes the \rlens{} advantage, we confirm the advantage
+exists. Using only the \emph{released} lens pair --- independent of our fitting:
+
+\begin{center}
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+\textbf{27B, by eval set} & \textbf{logit} & \textbf{released J} & \textbf{released R} & \textbf{R $-$ J} \\
+\midrule
+typo         & 0.201 & 0.206 & 0.288 & $\mathbf{+0.0812}$ \\
+multilingual & 0.085 & 0.136 & 0.165 & $\mathbf{+0.0284}$ \\
+multihop     & 0.057 & 0.081 & 0.099 & $+0.0176$ \\
+association  & 0.007 & 0.038 & 0.038 & $+0.0008$ \\
+poetry       & 0.001 & 0.003 & 0.002 & $-0.0005$ \\
+\midrule
+\textbf{overall} & 0.0699 & 0.0929 & 0.1183 & $\mathbf{+0.0255 \pm 0.0027}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+$+0.0255 \pm 0.0027$ SEM across 63 layers ($\approx 9\sigma$), rising to $+0.0362$
+over the first half of the network. The effect is real and sizeable.
+
+\textbf{Note which sets carry it.} \texttt{association} and \texttt{poetry} barely
+move for \emph{any} lens, released ones included. See
+Section~\ref{sec:floor}.
+
+\subsection{Behavioural attribution}
+
+\begin{center}
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+\textbf{27B ($n=4$)} & \textbf{pass@10} & \textbf{$\Delta$ vs \cfg{j}} & \textbf{$t$(layers)} & \textbf{$t$(sets)} \\
+\midrule
+\cfg{j} (baseline) & 0.0943 & --- & --- & --- \\
+\cfg{half}          & \textbf{0.1078} & $\mathbf{+0.0135}$ & $+4.5$ & $+1.8$ \\
+\cfg{identity+half} & 0.1047 & $+0.0104$ & $+3.6$ & $+2.0$ \\
+\cfg{ln+half}       & 0.1040 & $+0.0098$ & $+4.3$ & $+1.7$ \\
+\cfg{ln+identity}   & 0.1017 & $+0.0074$ & $+2.7$ & $+2.1$ \\
+\cfg{ln}            & 0.0879 & $-0.0064$ & $-3.0$ & $-1.8$ \\
+\cfg{identity}      & 0.0878 & $-0.0065$ & $-5.2$ & $-1.6$ \\
+\midrule
+released-J & 0.0929 & & & \\
+released-R & 0.1183 & & & \\
+logit lens & 0.0699 & & & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+\textbf{4B ($n=25$)} & \textbf{pass@10} & \textbf{$\Delta$ vs \cfg{j}} & \textbf{$t$(layers)} & \textbf{$t$(sets)} \\
+\midrule
+\cfg{j} (baseline) & 0.1023 & --- & --- & --- \\
+\cfg{half}        & \textbf{0.1219} & $\mathbf{+0.0196}$ & $+3.2$ & $+1.2$ \\
+\cfg{r}           & 0.1202 & $+0.0179$ & $+4.0$ & $+1.5$ \\
+\cfg{identity}    & 0.1075 & $+0.0052$ & $+2.3$ & $+1.4$ \\
+\cfg{ln+identity} & 0.1026 & $+0.0003$ & --- & --- \\
+\cfg{ln+half}     & 0.1021 & $-0.0002$ & --- & --- \\
+\cfg{ln}          & 0.0754 & $-0.0269$ & $-3.7$ & $-1.4$ \\
+\midrule
+released-J & 0.1046 & & & \\
+released-R & 0.1220 & & & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Normalised: fraction of the \rlens{} advantage recovered}
+
+Dividing each rule's lift by the full released $\text{R}-\text{J}$ gap makes the two
+models comparable despite different scales:
+
+\begin{center}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+\textbf{Rule} & \textbf{27B} & \textbf{4B} \\
+\midrule
+\cfg{half}     & $\mathbf{53.0\%}$ & $\mathbf{111.9\%}$ \\
+\cfg{ln}       & $-25.0\%$ & $-153.7\%$ \\
+\cfg{identity} & $-25.6\%$ & $+29.9\%$ \\
+\midrule
+\emph{full advantage} & $+0.0254$ & $+0.0175$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Headline}
+
+\noindent\fbox{\begin{minipage}{0.97\textwidth}
+\textbf{Of the three LRP rules, only the half-rule contributes to the \rlens's
+advantage.} It recovers roughly half to all of the effect depending on model. The
+LN-rule actively hurts on both. The identity-rule has no reliable effect --- it
+changes sign between models ($+29.9\%$ at 4B, $-25.6\%$ at 27B).
+\end{minipage}}
+
+% ===========================================================================
+\section{The weight-space discordance}
+\label{sec:discordance}
+
+We expected cosine-to-released-R to corroborate pass@10. It does not.
+
+\begin{center}
+\begin{tabular}{@{}lrrl@{}}
+\toprule
+\textbf{27B arm} & \textbf{$\Delta$cos to R} & \textbf{$\Delta$pass@10} & \textbf{agreement} \\
+\midrule
+\cfg{half}          & $+0.1853$ & $+0.0135$ & consistent \\
+\cfg{identity+half} & $+0.1991$ & $+0.0104$ & consistent \\
+\cfg{ln+half}       & $+0.1837$ & $+0.0098$ & consistent \\
+\cfg{ln}            & $-0.1784$ & $-0.0064$ & consistent \\
+\cfg{ln+identity}   & $-0.1445$ & $+0.0074$ & \textbf{sign wrong} \\
+\cfg{identity}      & $+0.0333$ & $-0.0065$ & \textbf{sign wrong} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+On 4B the failure appears elsewhere: \cfg{ln+half} is the \emph{second closest} arm
+to the released \rlens{} in weight space ($\cos = 0.9858$, above \cfg{half}'s
+$0.9811$) and yet scores $0.1021$ --- indistinguishable from the $0.1023$ baseline.
+
+\subsection{Why this happens}
+
+The mechanism is measurable. Two \jlens{}es fitted on \emph{disjoint} 25-prompt draws
+differ by $\mathrm{rel\_frob} = 0.3067$, while an $n=4$ \jlens{} lands within
+$0.0014$ pass@10 of an $n=25$ one. In other words:
+
+\begin{center}
+\emph{At these corpus sizes the lens is behaviourally saturated long before it is
+geometrically converged.}
+\end{center}
+
+\noindent
+Cosine-to-R measures a quantity still carrying heavy prompt-sampling noise; pass@10
+measures one that stopped moving well before $n=25$. This also explains why the
+verification in Section 2 had to be judged against a noise floor: an absolute
+weight-match criterion would have been unmeetable at $n=25$ no matter how correct the
+implementation.
+
+\medskip
+\noindent\fbox{\begin{minipage}{0.97\textwidth}
+\textbf{Secondary finding.} Weight-space similarity to the released \rlens{} does not
+predict lens quality, and gets the sign wrong for two arms. This is a contribution
+beyond the original work, and unlike the attribution it is \emph{immune to the
+corpus-size critique} --- both readings are taken on the same lenses, so lens quality
+does not enter.
+\end{minipage}}
+
+\subsection{The $n=4$ noise floor, and which geometry readings survive it}
+\label{sec:noisefloor}
+
+The obvious objection to every weight-space number above is that each arm is a single
+$n=4$ draw. We measured the alternative directly: a second \cfg{j} lens, identical
+config and identical $n$, fitted on a \emph{disjoint} draw (pile-10k rows $[25,29)$
+against the sweep's $[0,4)$). Its disagreement with the sweep's \cfg{j} is variation
+attributable to prompt sampling alone, with no rule difference involved.
+
+\begin{center}
+\begin{tabular}{@{}lr@{}}
+\toprule
+\textbf{Two 27B \jlens{}es, $n=4$, disjoint draws} & \\
+\midrule
+$\mathrm{rel\_frob}$ mean (max)              & 0.786 (1.799) \\
+$\mathrm{corr}$ mean (min)                   & 0.676 (0.152) \\
+\textbf{noise floor on the cosine scale}     & $\mathbf{0.0574}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+For context, the 4B floor at $n=25$ is $\mathrm{rel\_frob} = 0.307$. At $n=4$ it is
+$0.786$, roughly $2.6\times$ worse --- while behaviour moved by only $0.0014$ pass@10
+over the same reduction. That is the saturation asymmetry of
+Section~\ref{sec:discordance} quantified at both ends.
+
+Measuring each arm against the floor:
+
+\begin{center}
+\begin{tabular}{@{}lrrl@{}}
+\toprule
+\textbf{Arm} & \textbf{$\Delta$cos} & \textbf{$\times$ floor} & \textbf{verdict} \\
+\midrule
+\cfg{identity+half} & $+0.1991$ & $3.5$ & clears \\
+\cfg{half}          & $+0.1853$ & $3.2$ & clears \\
+\cfg{ln+half}       & $+0.1837$ & $3.2$ & clears \\
+\cfg{ln}            & $-0.1784$ & $3.1$ & clears \\
+\cfg{ln+identity}   & $-0.1445$ & $2.5$ & clears \\
+\cfg{identity}      & $+0.0333$ & $0.6$ & \textbf{within noise} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+Two things fall out, and both confirm conclusions we had previously reached on
+judgement alone.
+
+\begin{enumerate}[leftmargin=1.4em]
+  \item \textbf{\cfg{identity} is the only arm that fails to clear the floor} --- and it
+        is precisely the arm whose geometry mispredicted its behaviour in sign
+        ($+0.0333$ cosine against $-0.0065$ pass@10). Its weight-space reading was
+        never signal.
+  \item \textbf{The three half-containing arms are mutually indistinguishable.}
+        Pairwise gaps are $0.0016$--$0.0154$, i.e.\ $0.03$--$0.27\times$ the floor.
+        They cannot be ranked in weight space, which is exactly the restriction we
+        placed on them behaviourally.
+\end{enumerate}
+
+\noindent
+So the geometry column is not worthless --- \cfg{half} and \cfg{ln} clear the floor by
+more than $3\times$, and their signs match pass@10. It is unreliable specifically where
+effects are small, which is where its two sign errors occurred. The
+\cfg{ln+identity} case remains the genuine anomaly: it clears the floor at $2.5\times$
+and is \emph{still} wrong in sign, which no amount of sampling noise explains and which
+we cannot account for.
+
+% ===========================================================================
+\section{Caveats}
+
+\subsection{Corpus size}
+\label{sec:corpus}
+
+The \jlens{} documentation states: \emph{``The paper's lenses use 1000 sequences of
+128 tokens from a pretraining-like corpus. Quality saturates quickly (\S9.3);
+$\sim$100 prompts is usable.''}
+
+The released \rlens{} artifacts used \textbf{25}. This is below the paper's own
+guidance, and is a property of the artifacts we are replicating rather than a defect
+in the replication --- our 4B arm matches their $n$ exactly.
+
+Our 27B arms used $n=4$, which is $6\times$ under the released recipe. We bounded its
+cost directly rather than assuming:
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Comparison} & \textbf{Isolates} & \textbf{Gap} \\
+\midrule
+our \cfg{j} ($n{=}4$) vs released-J ($n{=}25$), 27B & implementation $+$ $n$ drop & $+0.0014$ \\
+our \cfg{j} ($n{=}25$) vs released-J ($n{=}25$), 4B & implementation alone & $-0.0023$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+Dropping from 25 prompts to 4 moved pass@10 by \emph{less} than our implementation's
+own reproduction error at matched $n$. Both are $\approx 0.002$, roughly $10\times$
+smaller than the half-rule's effect. \textbf{Corpus size is not what threatens the
+headline} --- but it does undercut every weight-space number, consistent with
+Section~\ref{sec:discordance}.
+
+\subsection{Floor effects in the eval battery}
+\label{sec:floor}
+
+On both models, \texttt{association} and \texttt{poetry} sit near zero for
+\emph{every} lens including the released ones. At 27B their released
+$\text{R}-\text{J}$ gaps are $+0.0008$ and $-0.0005$. They carry no signal.
+
+Consequently every per-rule lift reported here is an attribution of the
+\emph{typo/multilingual} effect, and should be quoted that way rather than as a claim
+about the five-set battery. This applies equally to the original work's claims.
+
+\subsection{Which uncertainty is being reported}
+
+The same numbers give very different confidence depending on the sampling unit:
+
+\begin{center}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+\textbf{4B rule} & \textbf{$t$ across layers} & \textbf{$t$ across eval sets} \\
+\midrule
+\cfg{half}     & $+3.2$ & $+1.2$ \\
+\cfg{identity} & $+2.3$ & $+1.4$ \\
+\cfg{ln}       & $-3.7$ & $-1.4$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+Across-layer SEM asks \emph{``is the effect consistent down the network?''} (yes,
+strongly). Across-set SEM asks \emph{``does it generalise across tasks?''} (not
+established). Both are honest; reporting only the first overstates the result. Note
+also that layers are \emph{not} independent draws --- a bad prompt sample shifts every
+layer together --- so the across-layer $t$ provides no protection against sampling
+error in the fitting corpus.
+
+\subsection{Item-level uncertainty is unavailable}
+
+The plan called for bootstrap CIs over items. The per-layer CSV stores aggregated
+fractions, discarding per-item outcomes, so item-level CIs cannot be computed from
+the saved artifacts. Retaining per-item outcomes would be a cheap change and is the
+single highest-value fix for a rerun.
+
+\subsection{Incomplete arms}
+
+4B is missing \cfg{identity+half}; 27B is missing \cfg{r}. The 27B omission
+specifically disables the design's sanity check that \cfg{r} lands closest to the
+released \rlens.
+
+\subsection{What cannot be claimed}
+
+\begin{itemize}[leftmargin=1.4em]
+  \item Any ranking among \cfg{half} / \cfg{identity+half} / \cfg{ln+half} at 27B ---
+        gaps of $\sim0.003$, only $\sim2\times$ the measured reproduction error.
+  \item That any 27B lens of ours approximates a properly fitted lens.
+  \item Generalisation across the full eval battery (across-set $t$ is $1.2$--$2.1$).
+  \item Anything about specific weight values.
+\end{itemize}
+
+% ===========================================================================
+\section{Things we got wrong}
+
+Recorded because several were near-misses that would have produced confident wrong
+answers rather than loud failures.
+
+\subsection{Silent wrong answers}
+
+\begin{description}[leftmargin=1.4em,style=nextline]
+\item[Directory naming would have emptied the attribution table.]
+  \texttt{rlens fit} writes the two endpoints to \texttt{j-lens/} and \texttt{r-lens/}
+  but every other arm to its bare config name. Code that assumed one convention
+  silently resolved nothing for half the arms.
+
+\item[The fix for it was worse than the bug.] Our first correction resolved the output
+  path \emph{before} the fit ran --- when neither directory exists yet, so the fallback
+  fired for every arm. Path resolution has to happen after the fit.
+
+\item[Pandas drops MultiIndex names on CSV round-trip.] \texttt{to\_csv} does not
+  preserve MultiIndex \emph{names}, so every later
+  \texttt{groupby(level="lens")} failed silently. Caught by validating the analysis
+  against \emph{synthetic} lenses with a planted signal, before any real results
+  existed --- a practice worth keeping.
+
+\item[The noise-floor script would have reported ``zero noise''.] Our first version
+  copied the fitted lens from \texttt{j-lens/}, not knowing that
+  \texttt{-{}-draw nf1} writes to \texttt{j-lens-nf1/}. It would have banked a duplicate
+  of the \emph{primary} lens under the noise-floor name and reported a floor of
+  $\approx 1.000$ --- ``no sampling noise at all,'' entirely wrong and entirely
+  plausible-looking.
+
+\item[A verdict threshold that flattered small effects.] Our report generator scored
+  each rule against a fraction of the maximum, which labels a $+0.03$ rule a
+  ``carrier'' whenever the true carrier happens to be large. Replaced with a dominance
+  test: top rule, positive, at least twice the runner-up.
+
+\item[Hardcoded caveats going stale.] The figure page asserted ``27B is weight-space
+  only'' as fixed prose. That sentence became false the moment the eval was recovered,
+  while the panels silently changed underneath it. Caveats are now derived from what
+  is on disk.
+\end{description}
+
+\subsection{Infrastructure}
+
+\begin{description}[leftmargin=1.4em,style=nextline]
+\item[\texttt{OSError: [Errno 122] Disk quota exceeded} --- the root cause of everything.]
+  \texttt{df} reported 299\,TB free while writes failed. A per-volume quota was
+  exhausted by 53\,GB of \texttt{fit.ckpt.pt} checkpoint files (one per arm, $\sim$7\,GB
+  each at 27B). This single fault explained a set of unrelated-looking symptoms: fits
+  dying silently, \texttt{scp} reporting \texttt{close remote: Failure}, and the eval
+  computing for an hour then producing no file. Deleting the checkpoints restored
+  writes.
+
+\item[Two monitoring failures, both costing hours.] The first watched a \emph{log file},
+  where ``stalled'' is indistinguishable from ``slow.'' The second matched the
+  \emph{wrapper} shell rather than the actual worker process, so a dead job looked
+  alive. Monitors must watch the worker process and must emit on every terminal
+  state, not only the success signature.
+
+\item[\texttt{run\_passk} printed nothing at all.] A 27B eval over ten lenses runs for
+  an hour with no output, which is what made the above failures invisible. Now emits
+  one flushed line per scored item.
+
+\item[\texttt{pkill -f chain\_r\_arm} killed its own SSH shell,] because the pattern
+  matched the command line containing it. Everything after the \texttt{pkill} silently
+  did not run, leaving no job armed to bank results.
+
+\item[\texttt{git checkout -- .} destroyed 2.3\,h of results.] Replaced with a sync
+  script that resets code paths only.
+
+\item[A hardcoded model guard.] \texttt{cmd\_fit} contained
+  \texttt{if args.model != "qwen3.5-4b": raise SystemExit}, which killed the first 27B
+  calibration. The wrapper script misreported this as an OOM.
+\end{description}
+
+\subsection{What we would do differently}
+
+\begin{enumerate}[leftmargin=1.4em]
+  \item Retain per-item eval outcomes, enabling item-level bootstrap CIs.
+  \item Report across-set uncertainty alongside across-layer from the start.
+  \item Fit the noise-floor arm \emph{first}, not last --- it calibrates every other
+        number and costs one arm's compute.
+  \item Delete checkpoints on arm completion; they are resume state, not artifacts.
+  \item Drop \texttt{association} and \texttt{poetry}, or replace them with sets that
+        are not at floor, and spend the compute on more prompts instead.
+\end{enumerate}
+
+% ===========================================================================
+\section{Reproduction}
+
+\begin{lstlisting}[language=bash]
+# fit one arm (any subset of the three rules)
+uv run rlens fit --model qwen3.5-27b --lens half --n 4 --dim-batch 8
+
+# the full ordered sweep, with per-arm copy-off
+./scripts/run_lrp_sweep.sh qwen3.5-27b 4 8
+
+# pass@10 over every fitted arm + released + logit lens
+uv run rlens eval --model qwen3.5-27b
+
+# analysis (CPU only, from the committed CSVs -- no GPU, no lens weights)
+uv run python scripts/report_lrp.py
+uv run python scripts/plot_lrp.py
+
+# the noise floor: same config, same n, disjoint prompt draw
+uv run rlens fit --model qwen3.5-27b --lens j --draw nf1 --n 4 --dim-batch 8
+\end{lstlisting}
+
+\paragraph{Artifacts.}
+\texttt{results/lrp/}: \texttt{lrp\_qwen3.5-\{4b,27b\}.md} (reports),
+\texttt{figures\_lrp.html} (7 panels),
+\texttt{passk\_per\_layer\_*.csv} (per-layer pass@10),
+\texttt{lrp\_geometry\_*.csv} (per-layer cosines),
+\texttt{lrp\_labels\_*.csv} (provenance verification),
+\texttt{lrp\_timing\_qwen3.5-27b.json} (measured calibration).
+
+\end{document}
