@@ -19,7 +19,6 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 
 ROOT = Path(__file__).resolve().parents[1]
 RES = ROOT / "results" / "lrp"
@@ -182,56 +181,6 @@ def across_set_t(model: str, arms: tuple[str, ...] = ("half", "identity", "ln"))
     return out
 
 
-def released_effect(model: str) -> pd.DataFrame | None:
-    """Per-layer pass@10 gap between the RELEASED R- and J-lenses.
-
-    This is the effect the sweep attributes. It comes from the released
-    artifacts, not from any sweep arm, so it is available for 27B even though
-    the sweep's own pass@10 was lost when the GPU window closed.
-    """
-    p = ROOT / "results" / f"passk_per_layer_{model}.csv"
-    if not p.exists():
-        return None
-    df = pd.read_csv(p, header=[0, 1], index_col=0)
-    df.columns = pd.MultiIndex.from_tuples(list(df.columns), names=["set", "lens"])
-    per = df.T.groupby(level="lens").mean().T
-    if not {"released-R", "released-J"} <= set(per.columns):
-        return None
-    d = per["released-R"] - per["released-J"]
-    # SEM across the five eval sets, per layer
-    setwise = pd.DataFrame({s: df[(s, "released-R")] - df[(s, "released-J")]
-                            for s in df.columns.get_level_values("set").unique()})
-    return pd.DataFrame({"gap": d, "sem": setwise.sem(axis=1)})
-
-
-def depth_figure(model: str) -> go.Figure:
-    """Per-layer cosine to the released R-lens, one trace per rule subset.
-
-    The bar panels average over depth, which hides the thing the averages are
-    made of: whether a rule helps everywhere or only in one band.
-    """
-    g = pd.read_csv(RES / f"lrp_geometry_{model}.csv")
-    ref = "cos_to_released_r" if "cos_to_released_r" in g.columns else "cos_to_r"
-    fig = go.Figure()
-    for cfg in [c for c in ORDER if c in set(g["config"])]:
-        d = g[g["config"] == cfg].sort_values("layer")
-        n = n_rules(cfg)
-        fig.add_trace(go.Scatter(
-            x=d["layer"], y=d[ref], name=cfg, mode="lines",
-            line=dict(color=SHADE[n], width=3 if cfg in ("j", "half", "r") else 1.6,
-                      dash="solid" if n != 2 else "dot"),
-            hovertemplate=f"{cfg}<br>layer %{{x}}<br>cos %{{y:.3f}}<extra></extra>"))
-    fig.update_layout(
-        title=f"{model} — cosine to the released R-lens, layer by layer"
-              "<br><span style='font-size:12px;color:#666'>the bar panel above is the mean of "
-              "these curves; a rule that only helps in one depth band shows up here and not there"
-              "</span>",
-        template="plotly_white", height=400, legend=dict(title="rules"),
-        font=dict(family="Helvetica, Arial, sans-serif", size=13),
-        margin=dict(l=70, r=30, t=95, b=60))
-    fig.update_xaxes(title_text="layer")
-    fig.update_yaxes(title_text="cosine to released R")
-    return fig
 
 
 def _27b_caveat() -> str:
@@ -259,6 +208,78 @@ def _27b_caveat() -> str:
                      "half), and the 27B attribution itself rests on weight space alone.</p>")
 
 
+def attribution_figure(model: str, beh: pd.DataFrame) -> go.Figure:
+    """pass@10 lift over the j baseline, one bar per rule subset. The headline."""
+    cfgs = [c for c in ORDER if c in beh.index and c != "j"]
+    n = "4" if "27b" in model else "25"
+    fig = go.Figure(go.Bar(
+        x=cfgs, y=[beh.loc[c, "lift"] for c in cfgs], showlegend=False,
+        marker_color=[SHADE[n_rules(c)] for c in cfgs],
+        marker_line=dict(width=1, color="rgba(0,0,0,0.25)"),
+        error_y=dict(type="data", array=[beh.loc[c, "sem"] for c in cfgs], thickness=1.4, width=4),
+        hovertemplate="%{x}<br>lift %{y:+.4f}<extra></extra>"))
+    fig.add_hline(y=0, line=dict(color="rgba(0,0,0,0.45)", width=1, dash="dot"))
+    sub = (f"n = {n} fitting prompts · orange = one rule, light orange = two rules, "
+           "blue = all three · error bars = ±1 SEM across layers")
+    # Across-layer bars ask "is this consistent down the network?", which is not
+    # the question a reader assumes they answer. On 4B the half-rule is t=3.2
+    # that way and t=1.2 across eval sets, because the effect lives in typo --
+    # so the bar can look decisive while the generalisation is not.
+    spread = across_set_t(model)
+    if spread:
+        sub += ("<br>they say the effect is consistent down the network, NOT that it generalises "
+                "across tasks — across the five eval sets instead: "
+                + " · ".join(f"{k} t={v:+.1f}" for k, v in spread.items()))
+    fig.update_layout(title=f"{model} — pass@10 lift over <code>j</code>, by rule subset"
+                            f"<br><span style='font-size:12px;color:#666'>{sub}</span>",
+                      template="plotly_white", height=420,
+                      font=dict(family="Helvetica, Arial, sans-serif", size=13),
+                      margin=dict(l=70, r=30, t=105, b=60))
+    fig.update_yaxes(title_text="Δ pass@10 vs j")
+    return fig
+
+
+def discordance_figure(models: list[str]) -> go.Figure | None:
+    """Weight-space movement against pass@10 lift, one point per (model, arm).
+
+    If cosine-to-R predicted lens quality the points would trend upward. The
+    arms that break it -- `identity` and `ln+identity`, positive or strongly
+    negative in cosine and the opposite in pass@10 -- are labelled.
+    """
+    xs, ys, texts, colors, symbols = [], [], [], [], []
+    for i, model in enumerate(models):
+        geo, beh = geometry(model), behaviour(model)
+        if geo is None or beh is None:
+            continue
+        for c in [c for c in ORDER if c in geo.index and c in beh.index and c != "j"]:
+            xs.append(geo.loc[c, "move_toward_R"])
+            ys.append(beh.loc[c, "lift"])
+            texts.append(f"{c} ({model.replace('qwen3.5-', '')})")
+            colors.append(SHADE[n_rules(c)])
+            symbols.append("circle" if i == 0 else "square")
+    if not xs:
+        return None
+    fig = go.Figure(go.Scatter(
+        x=xs, y=ys, mode="markers+text", text=texts, textposition="top center",
+        textfont=dict(size=10, color="#555"), showlegend=False,
+        marker=dict(size=12, color=colors, symbol=symbols,
+                    line=dict(width=1, color="rgba(0,0,0,0.35)")),
+        hovertemplate="%{text}<br>Δcos %{x:+.3f}<br>Δpass@10 %{y:+.4f}<extra></extra>"))
+    fig.add_hline(y=0, line=dict(color="rgba(0,0,0,0.45)", width=1, dash="dot"))
+    fig.add_vline(x=0, line=dict(color="rgba(0,0,0,0.45)", width=1, dash="dot"))
+    fig.update_layout(
+        title="weight-space movement does not predict pass@10"
+              "<br><span style='font-size:12px;color:#666'>circles = 27B, squares = 4B · "
+              "a working proxy would put every point in the lower-left or upper-right quadrant; "
+              "the off-diagonal points are where cosine-to-R gets the sign wrong</span>",
+        template="plotly_white", height=460,
+        font=dict(family="Helvetica, Arial, sans-serif", size=13),
+        margin=dict(l=70, r=30, t=100, b=60))
+    fig.update_xaxes(title_text="Δ cosine to released R  (vs j)")
+    fig.update_yaxes(title_text="Δ pass@10  (vs j)")
+    return fig
+
+
 def build() -> Path:
     models = [m for m in ("qwen3.5-27b", "qwen3.5-4b") if (RES / f"lrp_geometry_{m}.csv").exists()]
     parts = ["<html><head><meta charset='utf-8'><title>LRP per-rule ablation</title>",
@@ -267,81 +288,44 @@ def build() -> Path:
              "</style></head><body><h1>LRP per-rule ablation — which rule carries the R-lens?</h1>",
              "<p class='note'>Each bar is a lens fitted with one <b>subset</b> of the three LRP rules, "
              "on identical prompts and recipe, so a difference is attributable to the rules alone. "
-             "<b>Left</b>: pass@10 lift over the no-rules (<code>j</code>) baseline — the metric the "
-             "R-lens post reports. <b>Right</b>: movement toward the <i>released</i> R-lens in weight "
-             "space, which needs no eval at all. A rule can move the lens far in a direction that does "
-             "not help pass@10, so the two panels agreeing is what makes the attribution credible.</p>",
+             "Everything below is <b>pass@10</b> — the metric the R-lens post reports. Panels based on "
+             "weight-space cosine have been removed from the attribution: they were the only reading "
+             "available for 27B before its eval was recovered, and they turned out to mispredict it. "
+             "What survives of them is one figure at the end, kept as a result in its own right.</p>",
              _27b_caveat(),
-             "<p class='note'><b>Where the two panels disagree, believe pass@10.</b> On 4B the single-rule "
-             "arms agree across both methods, but <code>ln+half</code> does not: it is the second-closest "
-             "arm to the released R-lens in weight space (cos 0.986, above <code>half</code>'s 0.981) and "
-             "yet scores exactly the <code>j</code> baseline on every eval set. Adding the LN-rule to the "
-             "half-rule cancels the half-rule's behavioural benefit while moving the weights closer to R; "
-             "the identity-rule, inert on its own, is what restores it in <code>r</code>. So cosine-to-R is "
-             "a good proxy for the single rules and an unreliable one for combinations — which is the main "
-             "caveat on the 27B panel.</p>"
-             "<p class='note'><b>Floor effects.</b> On both models <code>association</code> and "
-             "<code>poetry</code> sit near zero for every lens, released ones included, so they carry no "
-             "signal. The R-lens advantage lives in <code>typo</code> (27B: +0.081), then "
-             "<code>multilingual</code> (+0.028), then <code>multihop</code> (+0.018). Read every lift "
-             "below as an attribution of that effect, not of the battery as a whole.</p>"]
+             "<p class='note'><b>The two caveats that apply to every panel.</b> "
+             "<i>Floor effects</i>: on both models <code>association</code> and <code>poetry</code> sit "
+             "near zero for every lens, released ones included, so they carry no signal — the R-lens "
+             "advantage lives in <code>typo</code> (27B: +0.081), then <code>multilingual</code> "
+             "(+0.028), then <code>multihop</code> (+0.018). "
+             "<i>Corpus size</i>: the released artifacts themselves used only 25 prompts, against the "
+             "J-lens paper's 1000 and its \"~100 is usable\" guidance. That bounds what these numbers "
+             "can support — though measured directly, its cost is small: an n=4 J-lens lands within "
+             "0.0014 pass@10 of the released n=25 one, roughly a tenth of the half-rule's effect.</p>"]
 
+    first = True
     for model in models:
-        geo, beh = geometry(model), behaviour(model)
-        rel = released_effect(model) if beh is None else None
-        n = "4" if "27b" in model else "25"
-        left = ("pass@10 lift over j" if beh is not None else
-                "the effect being attributed:<br>released R − released J pass@10, per layer"
-                if rel is not None else "pass@10 lift over j (not evaluated)")
-        fig = make_subplots(rows=1, cols=2, horizontal_spacing=0.12,
-                            subplot_titles=(left, "movement toward the released R-lens (weight space)"))
-        if rel is not None:
-            fig.add_trace(go.Scatter(
-                x=list(rel.index) + list(rel.index[::-1]),
-                y=list(rel["gap"] + rel["sem"]) + list((rel["gap"] - rel["sem"])[::-1]),
-                fill="toself", fillcolor="rgba(46,134,171,0.18)", line=dict(width=0),
-                hoverinfo="skip", showlegend=False), row=1, col=1)
-            fig.add_trace(go.Scatter(x=rel.index, y=rel["gap"], mode="lines", showlegend=False,
-                                     line=dict(color=SHADE[3], width=2.5),
-                                     hovertemplate="layer %{x}<br>gap %{y:.4f}<extra></extra>"),
-                          row=1, col=1)
-            fig.update_xaxes(title_text="layer", row=1, col=1)
-        if beh is not None:
-            cfgs = [c for c in ORDER if c in beh.index and c != "j"]
-            fig.add_trace(go.Bar(x=cfgs, y=[beh.loc[c, "lift"] for c in cfgs], showlegend=False,
-                                 marker_color=[SHADE[n_rules(c)] for c in cfgs],
-                                 error_y=dict(type="data", array=[beh.loc[c, "sem"] for c in cfgs],
-                                              thickness=1.4, width=4)), row=1, col=1)
-        if geo is not None:
-            cfgs = [c for c in ORDER if c in geo.index and c != "j"]
-            fig.add_trace(go.Bar(x=cfgs, y=[geo.loc[c, "move_toward_R"] for c in cfgs], showlegend=False,
-                                 marker_color=[SHADE[n_rules(c)] for c in cfgs],
-                                 error_y=dict(type="data", array=[geo.loc[c, "sem"] for c in cfgs],
-                                              thickness=1.4, width=4)), row=1, col=2)
-        for col in (1, 2):
-            fig.add_hline(y=0, line=dict(color="rgba(0,0,0,0.4)", width=1, dash="dot"), row=1, col=col)
-        sub = (f"n = {n} fitting prompts · grey = baseline, orange = one rule, "
-               "light orange = two rules, blue = all three · error bars = ±1 SEM across layers")
-        # Across-layer bars ask "is this consistent down the network?", which is
-        # not the question a reader assumes they answer. On 4B the half-rule is
-        # t=3.2 that way and t=1.2 across eval sets, because the effect lives in
-        # typo -- so the bar can look decisive while the generalisation is not.
-        if beh is not None:
-            spread = across_set_t(model)
-            if spread:
-                sub += ("<br>they say the effect is consistent down the network, NOT that it "
-                        "generalises across tasks — across the five eval sets instead: "
-                        + " · ".join(f"{k} t={v:+.1f}" for k, v in spread.items()))
-        fig.update_layout(title=f"{model}<br><span style='font-size:12px;color:#666'>{sub}</span>",
-                          template="plotly_white", height=430,
-                          font=dict(family="Helvetica, Arial, sans-serif", size=13),
-                          margin=dict(l=70, r=30, t=95, b=60))
-        fig.update_yaxes(title_text="pass@10 lift" if beh is not None else "Δ pass@10", row=1, col=1)
-        fig.update_yaxes(title_text="Δ cosine to released R", row=1, col=2)
-        parts.append(fig.to_html(full_html=False, include_plotlyjs=("inline" if model == models[0] else False)))
-        for extra in (perlayer_lift_figure(model), perset_figure(model), depth_figure(model)):
-            if extra is not None:
-                parts.append(extra.to_html(full_html=False, include_plotlyjs=False))
+        beh = behaviour(model)
+        if beh is None:          # no pass@10 for this model -> nothing defensible to draw
+            continue
+        parts.append(f"<h2>{model}</h2>")
+        for fig in (attribution_figure(model, beh), perlayer_lift_figure(model), perset_figure(model)):
+            if fig is not None:
+                parts.append(fig.to_html(full_html=False,
+                                         include_plotlyjs=("inline" if first else False)))
+                first = False
+
+    disc = discordance_figure(models)
+    if disc is not None:
+        parts += ["<h2>Why the weight-space panels were dropped</h2>",
+                  "<p class='note'>Cosine-to-released-R was the only reading available for 27B "
+                  "before its pass@10 was recovered, and it was wrong about two arms. It is kept "
+                  "here as a <i>result</i> — weight-space similarity to the released R-lens does "
+                  "not predict lens quality — and nowhere as evidence about which rule is better. "
+                  "The underlying reason is measurable: two J-lenses fitted on disjoint 25-prompt "
+                  "draws differ by rel_frob 0.307, so at these corpus sizes lens weights are still "
+                  "far from converged while pass@10 has long since saturated.</p>",
+                  disc.to_html(full_html=False, include_plotlyjs=False)]
 
     parts.append("</body></html>")
     out = RES / "figures_lrp.html"
