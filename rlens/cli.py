@@ -366,6 +366,12 @@ def cmd_eval(args) -> None:
     }.items():
         if _lens_path(kind, file, args.model).exists():
             lenses[name] = JacobianLens.load(str(_lens_path(kind, file, args.model)))
+    # LRP sweep arms (lenses/ours/<model>/<config>/lens.pt) — the attribution
+    # analysis keys off these exact names, so keep them as the config names
+    from rlens.lrp import available_configs, lens_dir
+
+    for cfg in available_configs(args.model):
+        lenses[cfg] = JacobianLens.load(str(lens_dir(args.model) / cfg / "lens.pt"))
     print(f"model: {args.model}   lenses: {list(lenses)}   sets: {args.sets}")
 
     df = run_passk(
@@ -703,6 +709,40 @@ def cmd_ablate(args) -> None:
 
 
 # ---------------------------------------------------------------------------
+# lrp (per-rule attribution from the sweep; no GPU)
+# ---------------------------------------------------------------------------
+
+
+def cmd_lrp(args) -> None:
+    import json
+
+    from rlens import lrp
+
+    configs = lrp.available_configs(args.model)
+    print(f"arms fitted: {configs or '(none)'}")
+    if not configs:
+        raise SystemExit(f"no lenses under {lrp.lens_dir(args.model)} — run scripts/run_lrp_sweep.sh first")
+    labels = lrp.verify_labels(args.model)
+    bad = labels[~labels["ok"]]
+    if len(bad):
+        print(f"WARNING: mislabelled arms: {list(bad['config'])}")
+    timing_path = REPO_ROOT / "results" / f"lrp_timing_{args.model}.json"
+    timing = json.loads(timing_path.read_text()) if timing_path.exists() else None
+    csv = REPO_ROOT / "results" / f"passk_per_layer_{args.model}.csv"
+    if not csv.exists():
+        raise SystemExit(f"missing {csv} — run `rlens eval --model {args.model}` first")
+    out = lrp.write_report(args.model, csv, REPO_ROOT / "results" / f"lrp_sweep_{args.model}.md",
+                           timing=timing)
+    attr = lrp.attribution(csv)
+    if len(attr):
+        print(attr.to_string(float_format="%.4f"))
+        inter = lrp.interactions(attr)
+        if len(inter):
+            print("\n" + inter.to_string(index=False, float_format="%.4f"))
+    print(f"report -> {out}")
+
+
+# ---------------------------------------------------------------------------
 # figures (no GPU: reads the committed records)
 # ---------------------------------------------------------------------------
 
@@ -811,6 +851,10 @@ def main() -> None:
     p.add_argument("--device", default=default_device)
     p.add_argument("--dtype", choices=["bf16", "fp32"], default="bf16")
     p.set_defaults(func=cmd_ablate)
+
+    p = sub.add_parser("lrp", help="per-rule attribution from the LRP sweep (no GPU)")
+    p.add_argument("--model", default="qwen3.5-27b")
+    p.set_defaults(func=cmd_lrp)
 
     p = sub.add_parser("figures", help="interactive plots + comparison tables from the records (no GPU)")
     p.add_argument("--model", choices=["qwen3.5-4b", "qwen3.5-27b"], default="qwen3.5-27b")
