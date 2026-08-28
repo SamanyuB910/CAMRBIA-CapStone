@@ -373,10 +373,10 @@ def cmd_eval(args) -> None:
             lenses[name] = JacobianLens.load(str(_lens_path(kind, file, args.model)))
     # LRP sweep arms (lenses/ours/<model>/<config>/lens.pt) — the attribution
     # analysis keys off these exact names, so keep them as the config names
-    from rlens.lrp import available_configs, lens_dir
+    from rlens.lrp import available_configs, lens_file
 
     for cfg in available_configs(args.model):
-        lenses[cfg] = JacobianLens.load(str(lens_dir(args.model) / cfg / "lens.pt"))
+        lenses[cfg] = JacobianLens.load(str(lens_file(args.model, cfg)))
     print(f"model: {args.model}   lenses: {list(lenses)}   sets: {args.sets}")
 
     df = run_passk(

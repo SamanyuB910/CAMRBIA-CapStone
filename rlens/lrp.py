@@ -33,16 +33,30 @@ def lens_dir(model: str) -> Path:
     return REPO_ROOT / "lenses" / "ours" / model
 
 
+def lens_file(model: str, config: str) -> Path | None:
+    """Path to a sweep arm's lens, accepting either directory convention.
+
+    ``rlens fit`` names the two endpoints ``j-lens``/``r-lens`` (the historical
+    layout the verification workflow uses) but the sweep refers to every arm by
+    its config name. Resolve both rather than silently missing the endpoints.
+    """
+    for d in (config, f"{config}-lens"):
+        p = lens_dir(model) / d / "lens.pt"
+        if p.exists():
+            return p
+    return None
+
+
 def available_configs(model: str) -> list[str]:
     """Sweep arms that actually have a fitted lens on disk, in sweep order."""
-    return [c for c in SWEEP_ORDER if (lens_dir(model) / c / "lens.pt").exists()]
+    return [c for c in SWEEP_ORDER if lens_file(model, c) is not None]
 
 
 def load_lenses(model: str, configs: list[str] | None = None) -> dict:
     from jlens.lens import JacobianLens
 
     configs = configs or available_configs(model)
-    return {c: JacobianLens.load(str(lens_dir(model) / c / "lens.pt")) for c in configs}
+    return {c: JacobianLens.load(str(lens_file(model, c))) for c in configs}
 
 
 def verify_labels(model: str) -> pd.DataFrame:
@@ -53,7 +67,7 @@ def verify_labels(model: str) -> pd.DataFrame:
     """
     rows = []
     for c in available_configs(model):
-        raw = torch.load(lens_dir(model) / c / "lens.pt", map_location="cpu", weights_only=False)
+        raw = torch.load(lens_file(model, c), map_location="cpu", weights_only=False)
         got = raw.get("provenance", {}).get("config_json", "")
         rows.append({"config": c, "expected": RULE_CONFIGS[c].to_config_json(),
                      "got": got, "ok": got == RULE_CONFIGS[c].to_config_json(),

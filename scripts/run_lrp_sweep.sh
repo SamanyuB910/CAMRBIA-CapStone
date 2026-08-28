@@ -22,7 +22,10 @@ SAFE=/workspace/lrp-artifacts/$MODEL
 mkdir -p "$SAFE"
 
 for cfg in "${CONFIGS[@]}"; do
+    # `rlens fit` names the endpoints j-lens/r-lens; every other arm uses the
+    # bare config name. Resolve both, or the endpoint copies silently no-op.
     dest="lenses/ours/$MODEL/$cfg/lens.pt"
+    [ -f "$dest" ] || dest="lenses/ours/$MODEL/$cfg-lens/lens.pt"
     if [ -f "$SAFE/$cfg.pt" ]; then
         echo "=== [$(date +%H:%M)] $cfg already done, skipping ==="
         continue
