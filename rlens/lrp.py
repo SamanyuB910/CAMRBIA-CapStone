@@ -79,13 +79,25 @@ def weight_geometry(model: str, configs: list[str] | None = None) -> pd.DataFram
     return pd.DataFrame(rows)
 
 
+def read_passk(passk_csv: Path) -> pd.DataFrame:
+    """Per-layer pass@10 CSV -> DataFrame with a named (set, lens) column index.
+
+    ``to_csv`` does not round-trip MultiIndex *names*, so they are restored
+    here; without this a ``groupby(level="lens")`` downstream raises.
+    """
+    df = pd.read_csv(passk_csv, header=[0, 1], index_col=0)
+    df.columns = pd.MultiIndex.from_tuples(list(df.columns), names=["set", "lens"])
+    df.index.name = "layer"
+    return df
+
+
 def attribution(passk_csv: Path, *, first_half_only: bool = False) -> pd.DataFrame:
     """pass@10 lift over the J-lens arm, per rule subset.
 
     ``passk_csv`` is the per-layer CSV written by ``rlens eval`` with one
     column group per lens.
     """
-    df = pd.read_csv(passk_csv, header=[0, 1], index_col=0)
+    df = read_passk(passk_csv)
     if first_half_only:
         df = df[df.index < (df.index.max() + 1) // 2]
     per_lens = df.T.groupby(level="lens").mean().T  # layer x lens
