@@ -77,16 +77,74 @@ essentially all of the movement toward the released R-lens. Every arm containing
 lands at cos ≈ 0.90; every arm without it stays at or below the `j` baseline.
 
 The **LN-rule** alone moves the lens *away* from the R-lens, and it is the only
-rule that does. Its harm is absorbed when paired with the half-rule (`ln+half`
-reaches 0.9027 vs `half` 0.9042), which is why the full R-lens still works — but the
-LN-rule is not what makes it work.
+rule that does.
+
+It is tempting to add that the LN-rule's harm is "absorbed" when paired with the
+half-rule, since `ln+half` (0.9027) sits essentially on top of `half` (0.9042).
+**The 4B behavioural data says that inference is wrong.** On 4B, `ln+half` is
+geometrically the *second closest* arm to the released R-lens (cos 0.9858, above
+`half`'s 0.9811) and yet scores pass@10 = 0.102 — identical to the `j` baseline on
+every eval set, against `half`'s 0.122. Adding the LN-rule to the half-rule cancels
+the half-rule's entire behavioural benefit while moving the weights *closer* to R.
+The full `r` lens then recovers it (0.120), so the identity-rule — inert on its own
+at +0.005 — is what rescues the half-rule in LN's presence. That is a three-way
+interaction, and no single-rule arm reveals it.
+
+**This is the main caveat on everything above.** The 27B column is weight-space
+only, and 4B demonstrates that weight-space geometry mispredicts behaviour for
+precisely the arms containing `ln`. On 27B, `half` (0.9042), `ln+half` (0.9027) and
+`identity+half` (0.9180) lie within 0.015 of one another — well inside the range
+where 4B shows geometry and pass@10 can disagree. The 27B ordering among those
+three should not be trusted until the pass@10 eval lands.
 
 The **identity-rule** is close to inert (+0.03), consistent with the 4B behavioural
 result (+5.1% pass@10, inside noise).
 
-This is the same ordering the 4B model gives by an independent method
-(pass@10 lift: half +19.1%, identity +5.1%, ln −26.3%). Two models, two metrics,
-one conclusion: **the half-rule is the R-lens.**
+For the **single rules**, this is the same ordering the 4B model gives by an
+independent method (pass@10, relative to the `j` baseline: half +19.1%, identity
++5.1%, ln −26.3%). Two models, two metrics, one conclusion for the single-rule
+question: **among the three rules taken individually, the half-rule is what makes
+the R-lens work, and the LN-rule on its own is harmful.**
+
+That claim is solid. The claim about *combinations* is not yet, for the reason in
+the LN paragraph above, and the 27B combination arms should be read as provisional
+until their pass@10 lands.
+
+## Floor effects in the 4B behavioural numbers
+
+Worth knowing before quoting the 4B percentages. Broken out by eval set, the mean
+pass@10 lift over `j` is:
+
+| rules | multihop | multilingual | association | typo | poetry |
+|---|---|---|---|---|---|
+| `ln` | +0.000 | −0.034 | +0.000 | **−0.100** | +0.000 |
+| `identity` | +0.004 | +0.019 | +0.000 | +0.003 | +0.000 |
+| `half` | +0.000 | +0.016 | +0.000 | **+0.082** | +0.000 |
+| `ln+identity` | +0.011 | +0.004 | +0.000 | −0.013 | +0.000 |
+| `ln+half` | +0.000 | −0.001 | +0.000 | −0.000 | +0.000 |
+| `r` | +0.004 | +0.022 | +0.000 | +0.065 | +0.000 |
+
+`association` is exactly 0.000 for every lens including the released R-lens, and
+`poetry` is ~0.005 for every lens: at 4B those two sets are on the floor and carry
+no signal at all. `multihop` barely moves. So the 4B headline is carried by **typo**,
+with **multilingual** a distant second — "the half-rule helps" means "the half-rule
+helps on typo, mildly on multilingual, and the remaining three sets cannot tell."
+The same structure holds at 27B, so this is not a small-model artifact. Using the
+released lens pair, the R−J gap by set is:
+
+| set | released-J | released-R | R − J |
+|---|---|---|---|
+| typo | 0.206 | 0.288 | **+0.0812** |
+| multilingual | 0.136 | 0.165 | **+0.0284** |
+| multihop | 0.081 | 0.099 | +0.0176 |
+| association | 0.038 | 0.038 | +0.0008 |
+| poetry | 0.003 | 0.002 | −0.0005 |
+
+So on both models the R-lens advantage lives almost entirely in **typo**, then
+multilingual, then multihop; `association` and `poetry` contribute nothing at either
+scale. Any per-rule attribution is therefore an attribution of the typo/multilingual
+effect, and should be quoted that way rather than as a claim about the eval battery
+as a whole.
 
 ## Timing (measured, not estimated)
 

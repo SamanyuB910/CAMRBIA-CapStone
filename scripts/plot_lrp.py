@@ -25,6 +25,8 @@ RES = ROOT / "results" / "lrp"
 ORDER = ["j", "ln", "identity", "half", "ln+identity", "ln+half", "identity+half", "r"]
 # one colour per number of active rules: baseline / single / pair / all three
 SHADE = {0: "#9AA0A6", 1: "#E4572E", 2: "#F2A085", 3: "#2E86AB"}
+RIBBON = {0: "rgba(154,160,166,0.15)", 1: "rgba(228,87,46,0.15)",
+          2: "rgba(242,160,133,0.15)", 3: "rgba(46,134,171,0.15)"}
 
 
 def n_rules(cfg: str) -> int:
@@ -62,6 +64,94 @@ def behaviour(model: str) -> pd.DataFrame | None:
         rows[c] = {"lift": float(d.mean()), "sem": float(d.sem()) if len(d) > 1 else 0.0,
                    "passk": float(per[c].mean())}
     return pd.DataFrame(rows).T
+
+
+def per_layer_table(model: str) -> pd.DataFrame | None:
+    """Sweep pass@10 indexed by layer, columns (set, lens). None if not evaluated."""
+    p = RES / f"passk_per_layer_{model}.csv"
+    if not p.exists():
+        return None
+    df = pd.read_csv(p, header=[0, 1], index_col=0)
+    df.columns = pd.MultiIndex.from_tuples(list(df.columns), names=["set", "lens"])
+    return df
+
+
+def perlayer_lift_figure(model: str) -> go.Figure | None:
+    """pass@10 lift over the j baseline, layer by layer, one line per rule subset.
+
+    The headline bar chart is a single number per arm; this is what that number
+    averages over. It answers a question the bars cannot: does the half-rule help
+    uniformly, or only in the early layers where the R-lens is supposed to win?
+    """
+    df = per_layer_table(model)
+    if df is None:
+        return None
+    sets = list(df.columns.get_level_values("set").unique())
+    per = df.T.groupby(level="lens").mean().T
+    arms = [c for c in ORDER if c in per.columns and c != "j"]
+    fig = go.Figure()
+    for cfg in arms:
+        setwise = pd.DataFrame({s: df[(s, cfg)] - df[(s, "j")] for s in sets})
+        mean, sem = setwise.mean(axis=1), setwise.sem(axis=1)
+        n = n_rules(cfg)
+        wide = cfg in ("half", "ln", "r")
+        if wide:  # ribbon only on the traces the reader is meant to compare
+            fig.add_trace(go.Scatter(
+                x=list(mean.index) + list(mean.index[::-1]),
+                y=list(mean + sem) + list((mean - sem)[::-1]), fill="toself",
+                fillcolor=RIBBON[n],
+                line=dict(width=0), hoverinfo="skip", showlegend=False))
+        fig.add_trace(go.Scatter(
+            x=mean.index, y=mean, name=cfg, mode="lines",
+            line=dict(color=SHADE[n], width=3 if wide else 1.6,
+                      dash="solid" if n != 2 else "dot"),
+            hovertemplate=f"{cfg}<br>layer %{{x}}<br>lift %{{y:+.3f}}<extra></extra>"))
+    fig.add_hline(y=0, line=dict(color="rgba(0,0,0,0.45)", width=1, dash="dot"))
+    half = len(df) // 2
+    fig.add_vrect(x0=df.index[0], x1=df.index[half], fillcolor="rgba(0,0,0,0.035)",
+                  line_width=0, annotation_text="first half", annotation_position="top left")
+    fig.update_layout(
+        title=f"{model} — pass@10 lift over <code>j</code>, layer by layer"
+              "<br><span style='font-size:12px;color:#666'>ribbons = ±1 SEM across the five "
+              "eval sets · the shaded band is the first half of the network, where the R-lens "
+              "is supposed to help most</span>",
+        template="plotly_white", height=430, legend=dict(title="rules"),
+        font=dict(family="Helvetica, Arial, sans-serif", size=13),
+        margin=dict(l=70, r=30, t=100, b=60))
+    fig.update_xaxes(title_text="layer")
+    fig.update_yaxes(title_text="Δ pass@10 vs j")
+    return fig
+
+
+def perset_figure(model: str) -> go.Figure | None:
+    """Lift over j broken out by eval set — does a rule help everywhere, or in one place?"""
+    df = per_layer_table(model)
+    if df is None:
+        return None
+    sets = list(df.columns.get_level_values("set").unique())
+    lenses = set(df.columns.get_level_values("lens"))
+    arms = [c for c in ORDER if c in lenses and c != "j"]
+    fig = go.Figure()
+    for cfg in arms:
+        vals, errs = [], []
+        for s in sets:
+            d = (df[(s, cfg)] - df[(s, "j")]).dropna()
+            vals.append(d.mean())
+            errs.append(d.sem() if len(d) > 1 else 0.0)
+        fig.add_trace(go.Bar(x=sets, y=vals, name=cfg, marker_color=SHADE[n_rules(cfg)],
+                             marker_line=dict(width=1, color="rgba(0,0,0,0.25)"),
+                             error_y=dict(type="data", array=errs, thickness=1.2, width=3)))
+    fig.add_hline(y=0, line=dict(color="rgba(0,0,0,0.45)", width=1, dash="dot"))
+    fig.update_layout(
+        title=f"{model} — pass@10 lift over <code>j</code>, by eval set"
+              "<br><span style='font-size:12px;color:#666'>error bars = ±1 SEM across layers · "
+              "a rule that only worked on one set would be a much weaker claim than one that "
+              "works on all five</span>",
+        template="plotly_white", height=420, barmode="group", legend=dict(title="rules"),
+        font=dict(family="Helvetica, Arial, sans-serif", size=13),
+        margin=dict(l=70, r=30, t=100, b=60))
+    fig.update_yaxes(title_text="Δ pass@10 vs j")
+    return fig
 
 
 def released_effect(model: str) -> pd.DataFrame | None:
@@ -133,8 +223,20 @@ def build() -> Path:
              "weights when the GPU window closed, after a disk-quota failure on the box. So for 27B the "
              "left panel is not the sweep — it is the <i>released</i> R- and J-lenses, showing the effect "
              "the sweep is trying to attribute (+0.026 pass@10 overall, +0.036 over the first half), and "
-             "the attribution itself rests on the weight-space panel alone. The 4B model has both panels, "
-             "and they agree.</p>"]
+             "the attribution itself rests on the weight-space panel alone.</p>"
+             "<p class='note'><b>Where the two panels disagree, believe pass@10.</b> On 4B the single-rule "
+             "arms agree across both methods, but <code>ln+half</code> does not: it is the second-closest "
+             "arm to the released R-lens in weight space (cos 0.986, above <code>half</code>'s 0.981) and "
+             "yet scores exactly the <code>j</code> baseline on every eval set. Adding the LN-rule to the "
+             "half-rule cancels the half-rule's behavioural benefit while moving the weights closer to R; "
+             "the identity-rule, inert on its own, is what restores it in <code>r</code>. So cosine-to-R is "
+             "a good proxy for the single rules and an unreliable one for combinations — which is the main "
+             "caveat on the 27B panel.</p>"
+             "<p class='note'><b>Floor effects.</b> On both models <code>association</code> and "
+             "<code>poetry</code> sit near zero for every lens, released ones included, so they carry no "
+             "signal. The R-lens advantage lives in <code>typo</code> (27B: +0.081), then "
+             "<code>multilingual</code> (+0.028), then <code>multihop</code> (+0.018). Read every lift "
+             "below as an attribution of that effect, not of the battery as a whole.</p>"]
 
     for model in models:
         geo, beh = geometry(model), behaviour(model)
@@ -179,7 +281,9 @@ def build() -> Path:
         fig.update_yaxes(title_text="pass@10 lift" if beh is not None else "Δ pass@10", row=1, col=1)
         fig.update_yaxes(title_text="Δ cosine to released R", row=1, col=2)
         parts.append(fig.to_html(full_html=False, include_plotlyjs=("inline" if model == models[0] else False)))
-        parts.append(depth_figure(model).to_html(full_html=False, include_plotlyjs=False))
+        for extra in (perlayer_lift_figure(model), perset_figure(model), depth_figure(model)):
+            if extra is not None:
+                parts.append(extra.to_html(full_html=False, include_plotlyjs=False))
 
     parts.append("</body></html>")
     out = RES / "figures_lrp.html"
