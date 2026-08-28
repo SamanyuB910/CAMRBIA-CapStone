@@ -15,7 +15,7 @@ attributable to the rules alone.
 
 - **n = 4 fitting prompts.** The released recipe uses 25. The arms are comparable *to each other* — same prompts, same recipe — but no single qwen3.5-27b lens here should be read as reproducing the released artifact.
 - **7 of 8 rule subsets completed.** Missing: `r`.
-- **pass@10 for the sweep arms: not available.** The attribution below rests on weight-space geometry alone, which the 4B model shows is a reliable proxy for single rules and an unreliable one for combinations (see the LN paragraph).
+- **pass@10 for the sweep arms: available.**
 
 ## The effect being attributed
 
@@ -46,21 +46,21 @@ is checked rather than assumed.)
 
 ## Attribution
 
-| rules | cos to released R | Δ vs `j` |
-|---|---|---|
-| `j` | 0.7189 ± 0.0285 | — |
-| `ln` | 0.5405 ± 0.0413 | -0.1784 |
-| `identity` | 0.7522 ± 0.0234 | +0.0333 |
-| `half` | 0.9042 ± 0.0113 | +0.1853 |
-| `ln+identity` | 0.5745 ± 0.0391 | -0.1445 |
-| `ln+half` | 0.9027 ± 0.0117 | +0.1837 |
-| `identity+half` | 0.9180 ± 0.0098 | +0.1991 |
+| rules | cos to released R | Δ vs `j` | pass@10 | Δ pass@10 vs `j` |
+|---|---|---|---|---|
+| `j` | 0.7189 ± 0.0285 | — | 0.0943 | — |
+| `ln` | 0.5405 ± 0.0413 | -0.1784 | 0.0879 | -0.0064 |
+| `identity` | 0.7522 ± 0.0234 | +0.0333 | 0.0878 | -0.0065 |
+| `half` | 0.9042 ± 0.0113 | +0.1853 | 0.1078 | +0.0135 |
+| `ln+identity` | 0.5745 ± 0.0391 | -0.1445 | 0.1017 | +0.0074 |
+| `ln+half` | 0.9027 ± 0.0117 | +0.1837 | 0.1040 | +0.0098 |
+| `identity+half` | 0.9180 ± 0.0098 | +0.1991 | 0.1047 | +0.0104 |
 
 ## Single rules — the headline question
 
-- `half` (split the SwiGLU product gradient 50/50): +0.1853 Δ cosine to released R — **carries the improvement**
-- `identity` (SiLU backward -> sigmoid(x)): +0.0333 Δ cosine to released R — mildly helpful
-- `ln` (detach the RMSNorm normalizer): -0.1784 Δ cosine to released R — **actively harmful**
+- `half` (split the SwiGLU product gradient 50/50): +0.0135 Δ pass@10 — **carries the improvement**
+- `ln` (detach the RMSNorm normalizer): -0.0064 Δ pass@10 — **actively harmful**
+- `identity` (SiLU backward -> sigmoid(x)): -0.0065 Δ pass@10 — **actively harmful**
 
 ## Interactions
 
@@ -68,9 +68,9 @@ Does a pair beat the sum of its parts? `observed − (ruleA + ruleB)`.
 
 | pair | observed | additive prediction | interaction | reading |
 |---|---|---|---|---|
-| `ln+identity` | -0.1445 | -0.1451 | +0.0007 | additive |
-| `ln+half` | +0.1837 | +0.0069 | +0.1768 | cooperative |
-| `identity+half` | +0.1991 | +0.2185 | -0.0195 | redundant |
+| `ln+identity` | +0.0074 | -0.0129 | +0.0203 | cooperative |
+| `ln+half` | +0.0098 | +0.0071 | +0.0026 | additive |
+| `identity+half` | +0.0104 | +0.0070 | +0.0035 | additive |
 
 ## The LN paragraph — why a geometry-only column is provisional
 
