@@ -212,8 +212,6 @@ def cmd_fit(args) -> None:
     from rlens.fit import FitRecipe, fit_and_save
 
 
-    if args.model != "qwen3.5-4b":
-        raise SystemExit("only qwen3.5-4b is wired up so far")
     logging.basicConfig(level=logging.INFO, format="%(message)s")
     jlens.configure_logging()
 
@@ -221,7 +219,10 @@ def cmd_fit(args) -> None:
     start, stop = DRAWS[args.draw]
     prompts, indices = _load_prompts(start, start + args.n if args.n != 25 else stop)
 
-    model = _pins()["model"]
+    pins = _pins()
+    # the 4B entry lives at pins["model"]; the larger effect models under
+    # pins["experiment_models"], each carrying its own target_layer
+    model = pins["model"] if args.model == "qwen3.5-4b" else pins["experiment_models"][args.model]
     tok = transformers.AutoTokenizer.from_pretrained(model["hf_id"], revision=model["revision"])
     if args.tiny:
         hf = _tiny_model(tok)
@@ -235,8 +236,12 @@ def cmd_fit(args) -> None:
         hf = transformers.AutoModelForCausalLM.from_pretrained(
             model["hf_id"], revision=model["revision"], dtype=dtype, device_map=args.device
         )
-        recipe = FitRecipe()
+        n_layers = hf.config.get_text_config().num_hidden_layers
+        recipe = FitRecipe(model_id=model["hf_id"],
+                           target_layer=model.get("target_layer", n_layers - 2))
         out_dir = REPO_ROOT / "lenses" / "ours" / args.model
+        print(f"recipe: {model['hf_id']} target_layer={recipe.target_layer} "
+              f"(n_layers={n_layers}) skip_first={recipe.skip_first} t_max={recipe.max_seq_len}")
 
     name = (f"{args.lens}-lens" if args.lens in ("j", "r") else args.lens)
     name += "" if args.draw == "primary" else f"-{args.draw}"
